@@ -22,7 +22,7 @@ public class MainController {
 
     @PostMapping("/")
     public @ResponseBody
-    String psotForm(@RequestBody PostFormDto postFormDto) {
+    String postForm(@RequestBody PostFormDto postFormDto) {
 
 
         return "success";
