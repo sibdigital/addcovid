@@ -19,8 +19,8 @@ function addPerson(){
         lastname: values.lastname,
         firstname: values.firstname,
         patronymic: values.patronymic,
-        isAgree: values.agree
-    }, 0)
+        isagree: values.isagree
+    }, $$('person_table').count() + 1)
 
     $$('form_person').clear()
 }
@@ -115,7 +115,7 @@ webix.ready(function() {
                                     {
                                         view: 'combo',
                                         name: 'department',
-                                        label: 'Министрество',
+                                        label: 'Министерство',
                                         labelPosition: 'top',
                                         options: [
                                             { id: 1, value: 'Министерство финансов Республики Бурятия'},
@@ -149,7 +149,7 @@ webix.ready(function() {
                                     {
                                         view: 'textarea',
                                         name: 'okved_add',
-                                        label: 'ОКВЭД',
+                                        label: 'ОКВЭД (доп.)',
                                         labelPosition: 'top'
                                     },
                                     {
@@ -175,13 +175,24 @@ webix.ready(function() {
                                 id: 'person_table',
                                 view: 'datatable',
                                 height: 400,
-                                select: true,
+                                name: 'persons',
+                                select: 'row',
+                                resizeColumn:true,
+                                readonly: true,
                                 columns: [
+                                    { id: 'id', header: '', css: 'rank', width: 50 },
                                     { id: 'lastname', header: 'Фамилия', adjust: true },
                                     { id: 'firstname', header: 'Имя', adjust: true },
                                     { id: 'patronymic', header: 'Отчество', adjust: true },
-                                    { id: 'is_agree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
+                                    { id: 'isagree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
                                 ],
+                                on:{
+                                    'data->onStoreUpdated': function(){
+                                        this.data.each(function(obj, i){
+                                            obj.id = i + 1;
+                                        });
+                                    }
+                                },
                                 data: []
                             },
                             {
@@ -195,7 +206,7 @@ webix.ready(function() {
                                             {view: 'text', name: 'lastname', inputWidth: '200', label: 'Фамилия', labelPosition: 'top' },
                                             {view: 'text', name: 'firstname', inputWidth: '200', label: 'Имя', labelPosition: 'top'},
                                             {view: 'text', name: 'patronymic', inputWidth: '200', label: 'Отчество', labelPosition: 'top'},
-                                            {view: 'checkbox', label: 'Согласие'},
+                                            {view: 'checkbox', label: 'Согласие', name: 'isagree', id: 'agree_checkbox'},
                                             {},
                                         ]
                                     },
