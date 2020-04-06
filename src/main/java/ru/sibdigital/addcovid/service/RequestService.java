@@ -12,8 +12,11 @@ import ru.sibdigital.addcovid.model.DocRequest;
 import ru.sibdigital.addcovid.repository.*;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -49,9 +52,24 @@ public class RequestService {
             if(!uploadFolder.exists()){
                 uploadFolder.mkdirs();
             }
+/*
             File file = new File(String.format("%s\\%s_%s",uploadingDir, UUID.randomUUID(),postForm.getAttachment().getOriginalFilename()));
             postForm.getAttachment().transferTo(file);
             filename = file.getName();
+*/
+
+            byte[] valueDecoded = Base64.getDecoder().decode(postForm.getAttachment());
+
+            String inputFilename = String.format("%s\\%s_%s",uploadingDir, UUID.randomUUID(),postForm.getAttachmentFilename());
+            FileOutputStream fos;
+
+            fos = new FileOutputStream(inputFilename);
+            fos.write(valueDecoded);
+            fos.close();
+            filename = inputFilename;
+
+        } catch (IOException ex) {
+            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         } catch (Exception ex) {
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         }
@@ -63,8 +81,8 @@ public class RequestService {
         if(postForm.getOrganizationId() != null){
             organization = clsOrganizationRepo.getOne(postForm.getOrganizationId());
         } else {
-            organization = clsOrganizationRepo.getFirstByHashCode(postForm.sha256()).get();
-            if(organization == null){
+//            organization = clsOrganizationRepo.getFirstByHashCode(postForm.sha256()).get();
+//            if(organization == null){
                 organization = ClsOrganization.builder()
                         .name(postForm.getOrganizationName())
                         .shortName(postForm.getOrganizationShortName())
@@ -80,12 +98,8 @@ public class RequestService {
                         .timeImport(Timestamp.valueOf(LocalDateTime.now()))
                         .build();
                 organization = clsOrganizationRepo.save(organization);
-            }
+//            }
         }
-
-
-
-
 
         Set<DocPerson> personSet = postForm.getPersons()
                 .stream()
@@ -101,7 +115,7 @@ public class RequestService {
                 .organization(organization)
                 .department(departmentRepo.getOne(postForm.getDepartmentId()))
                 .personOfficeCnt(postForm.getPersonOfficeCnt())
-                .personOfficeFactCnt(postForm.getPersonOfficeFactCnt())
+                //.personOfficeFactCnt(postForm.getPersonOfficeFactCnt())
                 .personRemoteCnt(postForm.getPersonRemoteCnt())
                 .personSlrySaveCnt(postForm.getPersonSlrySaveCnt())
                 .attachmentPath(filename)
@@ -114,12 +128,7 @@ public class RequestService {
                 .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
 
-
-
         docRequest = docRequestRepo.save(docRequest);
-
-
-
 
         DocRequest finalDocRequest = docRequest;
         docRequest.getDocAddressFact().forEach(docAddressFact -> {
@@ -133,18 +142,6 @@ public class RequestService {
         docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
         docPersonRepo.saveAll(docRequest.getDocPersonSet());
 
-
-
-
-
         return organization.getHashCode();
-
-
-
-
-
-
-
-
     }
 }

@@ -87,6 +87,9 @@ function removeAddr(){
 }
 
 
+let uploadFile = '';
+let uploadFilename = '';
+
 webix.ready(function() {
     webix.ui({
         container: 'app',
@@ -152,7 +155,7 @@ webix.ready(function() {
                                     },
                                     {
                                         view: 'combo',
-                                        name: 'department',
+                                        name: 'departmentId',
                                         label: 'Министерство, курирующее вашу деятельность',
                                         labelPosition: 'top',
                                         options: [
@@ -224,6 +227,23 @@ webix.ready(function() {
                                         value: 'Выбрать файл для загрузки',
                                         autosend: false,
                                         multiple: false,
+                                        on:{
+                                            onBeforeFileAdd: function(upload){
+                                                if(upload.type.toUpperCase() !== 'PDF') return false;
+                                                let reader = new FileReader();
+                                                // reader.onload = function (e) {
+                                                //     $$("dataTable").clearAll();
+                                                //     $$("dataTable").parse( e.target.result, "json" );
+                                                // };
+                                                reader.readAsBinaryString(upload.file);
+                                                //console.log(reader);
+                                                //debugger
+                                                uploadFile = window.btoa(reader.result)
+                                                uploadFilename = upload.name
+                                                //console.log(uploadFile);
+                                                return false;
+                                            }
+                                        }
                                         //formData: {}
                                     },
                                 ]
@@ -377,7 +397,6 @@ webix.ready(function() {
                                 click: function () {
                                     let params = $$('form').getValues()
 
-
                                     let persons = []
                                     $$('person_table').data.each(function(obj){
                                         let person = {
@@ -398,6 +417,9 @@ webix.ready(function() {
                                         addrs.push(addr)
                                     })
                                     params.addressFact = addrs
+
+                                    params.attachment = uploadFile
+                                    params.attachmentFilename = uploadFilename
 
                                     console.log(params);
 

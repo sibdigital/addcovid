@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.dto.ListItemDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.repository.ClsDepartmentRepo;
+import ru.sibdigital.addcovid.service.RequestService;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,9 @@ public class MainController {
 
     @Autowired
     private ClsDepartmentRepo clsDepartmentRepo;
+
+    @Autowired
+    private RequestService requestService;
 
     @GetMapping
     public String greeting(Map<String, Object> model) throws JsonProcessingException {
@@ -36,7 +40,7 @@ public class MainController {
     public @ResponseBody
     String postForm(@RequestBody PostFormDto postFormDto) {
 
-
+        requestService.addNewRequst(postFormDto);
 
         return postFormDto.sha256();
     }

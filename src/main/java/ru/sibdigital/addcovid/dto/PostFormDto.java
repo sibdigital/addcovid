@@ -36,7 +36,9 @@ public class PostFormDto {
     private Long personSlrySaveCnt;
     private Long personOfficeFactCnt;
 
-    private MultipartFile attachment;
+    //private MultipartFile attachment;
+    private String attachment;
+    private String attachmentFilename;
 
     public String sha256() {
         try{
