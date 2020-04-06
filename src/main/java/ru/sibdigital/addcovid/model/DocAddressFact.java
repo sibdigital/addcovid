@@ -1,9 +1,10 @@
-package ru.sibdigital.model;
+package ru.sibdigital.addcovid.model;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -12,7 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DocAddressFact implements Serializable {
-
+  @Id
   private long id;
   private String addressFact;
   private long personOfficeFactCnt;
