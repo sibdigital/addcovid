@@ -43,8 +43,13 @@ public class MainController {
     public @ResponseBody
     String postForm(@RequestBody PostFormDto postFormDto) {
 
-        String hash = requestService.addNewRequest(postFormDto);
+        try {
+            String hash = requestService.addNewRequest(postFormDto);
 
-        return hash;
+//            return hash;
+            return "Заявка принята. Ожидайте ответ на электронную почту.";
+        } catch(Exception e){
+            return "Невозможно сохранить заявку";
+        }
     }
 }

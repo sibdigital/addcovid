@@ -41,7 +41,4 @@ public class PostFormDto {
     private Boolean isAgree;
     private Boolean isProtect;
     private String reqBasis;
-
-
-
 }

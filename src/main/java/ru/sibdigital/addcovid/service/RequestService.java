@@ -77,8 +77,13 @@ public class RequestService {
 
         String sha256 = SHA256Generator.generate(postForm.getOrganizationInn(), postForm.getOrganizationOgrn(), postForm.getOrganizationName());
 
-        DocRequest docRequest = docRequestRepo.getTopByOrgHashCode(sha256).orElseGet(() -> null);
+        DocRequest docRequest = null;
+        try {
+            docRequest = docRequestRepo.getTopByOrgHashCode(sha256).orElseGet(() -> null);
 
+        } catch (Exception e) {
+            docRequest = null;
+        }
         ClsOrganization organization;
 
 
