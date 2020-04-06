@@ -14,12 +14,12 @@ public class PersonDto {
     private String lastname;
     private String firstname;
     private String patronymic;
-    private Boolean isAgree;
+    //private Boolean isAgree;
 
    public DocPerson convertToPersonEntity(){
        return DocPerson.builder().firstname(this.firstname)
                .lastname(this.lastname)
-               .isAgree(this.isAgree)
+               //.isAgree(this.isAgree)
                .patronymic(this.patronymic)
                .build();
    }
