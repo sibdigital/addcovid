@@ -13,18 +13,18 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DocAddressFact implements Serializable {
-  @Id
-  private long id;
+    @Id
+  private Long id;
   private String addressFact;
-  private long personOfficeFactCnt;
-  private long idRequest;
+  private Long personOfficeFactCnt;
+  private Long idRequest;
 
 
-  public long getId() {
+  public Long getId() {
     return id;
   }
 
-  public void setId(long id) {
+  public void setId(Long id) {
     this.id = id;
   }
 
@@ -38,20 +38,20 @@ public class DocAddressFact implements Serializable {
   }
 
 
-  public long getPersonOfficeFactCnt() {
+  public Long getPersonOfficeFactCnt() {
     return personOfficeFactCnt;
   }
 
-  public void setPersonOfficeFactCnt(long personOfficeFactCnt) {
+  public void setPersonOfficeFactCnt(Long personOfficeFactCnt) {
     this.personOfficeFactCnt = personOfficeFactCnt;
   }
 
 
-  public long getIdRequest() {
+  public Long getIdRequest() {
     return idRequest;
   }
 
-  public void setIdRequest(long idRequest) {
+  public void setIdRequest(Long idRequest) {
     this.idRequest = idRequest;
   }
 

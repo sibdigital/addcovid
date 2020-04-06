@@ -6,142 +6,145 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.sql.Timestamp;
+
 
 @Entity
 @Table(name = "doc_request")
 @AllArgsConstructor
 @NoArgsConstructor
 public class DocRequest {
-  @Id
-  private long id;
-  private long personOfficeCnt;
-  private long personRemoteCnt;
-  private long personSlrySaveCnt;
-  private long personOfficeFactCnt;
-  private long idOrganization;
-  private long idDepartment;
-  private String attachmentPath;
-  private long statusReview;
-  private java.sql.Timestamp timeCreate;
-  private long statusImport;
-  private java.sql.Timestamp timeImport;
-  private java.sql.Timestamp timeReview;
+
+    @Id
+    private Long id;
+    private Long personOfficeCnt;
+    private Long personRemoteCnt;
+    private Long personSlrySaveCnt;
+    private Long personOfficeFactCnt;
+    private Long idOrganization;
+    private Long idDepartment;
+    private String attachmentPath;
+    private Long statusReview;
+    private Timestamp timeCreate;
+    private Long statusImport;
+    private Timestamp timeImport;
+    private Timestamp timeReview;
 
 
-  public long getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(long id) {
-    this.id = id;
-  }
-
-
-  public long getPersonOfficeCnt() {
-    return personOfficeCnt;
-  }
-
-  public void setPersonOfficeCnt(long personOfficeCnt) {
-    this.personOfficeCnt = personOfficeCnt;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
 
-  public long getPersonRemoteCnt() {
-    return personRemoteCnt;
-  }
+    public Long getPersonOfficeCnt() {
+        return personOfficeCnt;
+    }
 
-  public void setPersonRemoteCnt(long personRemoteCnt) {
-    this.personRemoteCnt = personRemoteCnt;
-  }
-
-
-  public long getPersonSlrySaveCnt() {
-    return personSlrySaveCnt;
-  }
-
-  public void setPersonSlrySaveCnt(long personSlrySaveCnt) {
-    this.personSlrySaveCnt = personSlrySaveCnt;
-  }
+    public void setPersonOfficeCnt(Long personOfficeCnt) {
+        this.personOfficeCnt = personOfficeCnt;
+    }
 
 
-  public long getPersonOfficeFactCnt() {
-    return personOfficeFactCnt;
-  }
+    public Long getPersonRemoteCnt() {
+        return personRemoteCnt;
+    }
 
-  public void setPersonOfficeFactCnt(long personOfficeFactCnt) {
-    this.personOfficeFactCnt = personOfficeFactCnt;
-  }
-
-
-  public long getIdOrganization() {
-    return idOrganization;
-  }
-
-  public void setIdOrganization(long idOrganization) {
-    this.idOrganization = idOrganization;
-  }
+    public void setPersonRemoteCnt(Long personRemoteCnt) {
+        this.personRemoteCnt = personRemoteCnt;
+    }
 
 
-  public long getIdDepartment() {
-    return idDepartment;
-  }
+    public Long getPersonSlrySaveCnt() {
+        return personSlrySaveCnt;
+    }
 
-  public void setIdDepartment(long idDepartment) {
-    this.idDepartment = idDepartment;
-  }
-
-
-  public String getAttachmentPath() {
-    return attachmentPath;
-  }
-
-  public void setAttachmentPath(String attachmentPath) {
-    this.attachmentPath = attachmentPath;
-  }
+    public void setPersonSlrySaveCnt(Long personSlrySaveCnt) {
+        this.personSlrySaveCnt = personSlrySaveCnt;
+    }
 
 
-  public long getStatusReview() {
-    return statusReview;
-  }
+    public Long getPersonOfficeFactCnt() {
+        return personOfficeFactCnt;
+    }
 
-  public void setStatusReview(long statusReview) {
-    this.statusReview = statusReview;
-  }
-
-
-  public java.sql.Timestamp getTimeCreate() {
-    return timeCreate;
-  }
-
-  public void setTimeCreate(java.sql.Timestamp timeCreate) {
-    this.timeCreate = timeCreate;
-  }
+    public void setPersonOfficeFactCnt(Long personOfficeFactCnt) {
+        this.personOfficeFactCnt = personOfficeFactCnt;
+    }
 
 
-  public long getStatusImport() {
-    return statusImport;
-  }
+    public Long getIdOrganization() {
+        return idOrganization;
+    }
 
-  public void setStatusImport(long statusImport) {
-    this.statusImport = statusImport;
-  }
-
-
-  public java.sql.Timestamp getTimeImport() {
-    return timeImport;
-  }
-
-  public void setTimeImport(java.sql.Timestamp timeImport) {
-    this.timeImport = timeImport;
-  }
+    public void setIdOrganization(Long idOrganization) {
+        this.idOrganization = idOrganization;
+    }
 
 
-  public java.sql.Timestamp getTimeReview() {
-    return timeReview;
-  }
+    public Long getIdDepartment() {
+        return idDepartment;
+    }
 
-  public void setTimeReview(java.sql.Timestamp timeReview) {
-    this.timeReview = timeReview;
-  }
+    public void setIdDepartment(Long idDepartment) {
+        this.idDepartment = idDepartment;
+    }
+
+
+    public String getAttachmentPath() {
+        return attachmentPath;
+    }
+
+    public void setAttachmentPath(String attachmentPath) {
+        this.attachmentPath = attachmentPath;
+    }
+
+
+    public Long getStatusReview() {
+        return statusReview;
+    }
+
+    public void setStatusReview(Long statusReview) {
+        this.statusReview = statusReview;
+    }
+
+
+    public Timestamp getTimeCreate() {
+        return timeCreate;
+    }
+
+    public void setTimeCreate(Timestamp timeCreate) {
+        this.timeCreate = timeCreate;
+    }
+
+
+    public Long getStatusImport() {
+        return statusImport;
+    }
+
+    public void setStatusImport(Long statusImport) {
+        this.statusImport = statusImport;
+    }
+
+
+    public Timestamp getTimeImport() {
+        return timeImport;
+    }
+
+    public void setTimeImport(Timestamp timeImport) {
+        this.timeImport = timeImport;
+    }
+
+
+    public Timestamp getTimeReview() {
+        return timeReview;
+    }
+
+    public void setTimeReview(Timestamp timeReview) {
+        this.timeReview = timeReview;
+    }
 
 }
