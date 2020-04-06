@@ -18,7 +18,7 @@ public class ClsDepartment {
 
     @Id
     @Column(name = "id", nullable = false)
-    private Integer id;
+    private Long id;
     private String name;
     private String description;
     private Integer statusImport;
@@ -28,11 +28,11 @@ public class ClsDepartment {
 
 
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
