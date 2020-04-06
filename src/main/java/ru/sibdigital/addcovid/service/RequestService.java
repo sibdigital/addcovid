@@ -1,6 +1,8 @@
 package ru.sibdigital.addcovid.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.ClsOrganization;
@@ -9,12 +11,15 @@ import ru.sibdigital.addcovid.model.DocPerson;
 import ru.sibdigital.addcovid.model.DocRequest;
 import ru.sibdigital.addcovid.repository.*;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class RequestService {
 
     @Autowired
@@ -32,30 +37,50 @@ public class RequestService {
     @Autowired
     ClsDepartmentRepo departmentRepo;
 
+    @Value("upload.path")
+    String uploadingDir;
 
 
     public String addNewRequst(PostFormDto postForm){
+
+        String filename = "error while upload";
+        try{
+            File uploadFolder = new File(uploadingDir);
+            if(!uploadFolder.exists()){
+                uploadFolder.mkdirs();
+            }
+            File file = new File(String.format("%s\\%s_%s",uploadingDir, UUID.randomUUID(),postForm.getAttachment().getOriginalFilename()));
+            postForm.getAttachment().transferTo(file);
+            filename = file.getName();
+        } catch (Exception ex) {
+            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
+        }
+
+
 
         ClsOrganization organization;
 
         if(postForm.getOrganizationId() != null){
             organization = clsOrganizationRepo.getOne(postForm.getOrganizationId());
         } else {
-            organization = ClsOrganization.builder()
-                    .name(postForm.getOrganizationName())
-                    .shortName(postForm.getOrganizationShortName())
-                    .inn(postForm.getOrganizationInn())
-                    .ogrn(postForm.getOrganizationOgrn())
-                    .addressJur(postForm.getOrganizationAddressJur())
-                    .okvedAdd(postForm.getOrganizationOkvedAdd())
-                    .okved(postForm.getOrganizationOkved())
-                    .email(postForm.getOrganizationEmail())
-                    .phone(postForm.getOrganizationPhone())
-                    .hashCode(postForm.sha256())
-                    .statusImport(0)
-                    .timeImport(Timestamp.valueOf(LocalDateTime.now()))
-                    .build();
-            organization = clsOrganizationRepo.save(organization);
+            organization = clsOrganizationRepo.getFirstByHashCode(postForm.sha256()).get();
+            if(organization == null){
+                organization = ClsOrganization.builder()
+                        .name(postForm.getOrganizationName())
+                        .shortName(postForm.getOrganizationShortName())
+                        .inn(postForm.getOrganizationInn())
+                        .ogrn(postForm.getOrganizationOgrn())
+                        .addressJur(postForm.getOrganizationAddressJur())
+                        .okvedAdd(postForm.getOrganizationOkvedAdd())
+                        .okved(postForm.getOrganizationOkved())
+                        .email(postForm.getOrganizationEmail())
+                        .phone(postForm.getOrganizationPhone())
+                        .hashCode(postForm.sha256())
+                        .statusImport(0)
+                        .timeImport(Timestamp.valueOf(LocalDateTime.now()))
+                        .build();
+                organization = clsOrganizationRepo.save(organization);
+            }
         }
 
 
@@ -79,7 +104,7 @@ public class RequestService {
                 .personOfficeFactCnt(postForm.getPersonOfficeFactCnt())
                 .personRemoteCnt(postForm.getPersonRemoteCnt())
                 .personSlrySaveCnt(postForm.getPersonSlrySaveCnt())
-                .attachmentPath("")
+                .attachmentPath(filename)
                 .docPersonSet(personSet)
                 .docAddressFact(docAddressFactSet)
                 .statusReview(0)
@@ -89,7 +114,12 @@ public class RequestService {
                 .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
 
+
+
         docRequest = docRequestRepo.save(docRequest);
+
+
+
 
         DocRequest finalDocRequest = docRequest;
         docRequest.getDocAddressFact().forEach(docAddressFact -> {
