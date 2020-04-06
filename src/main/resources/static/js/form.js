@@ -112,6 +112,15 @@ webix.ready(function() {
                                         labelPosition: 'top',
                                         required: true
                                     },
+                                    {
+                                        view: 'combo',
+                                        name: 'department',
+                                        label: 'Министрество',
+                                        labelPosition: 'top',
+                                        data: [
+                                            { 'id': 1, 'value': 'org name'}
+                                        ]
+                                    }
                                 ]
                             },
                             {
