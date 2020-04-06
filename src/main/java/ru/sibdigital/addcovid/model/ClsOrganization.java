@@ -1,33 +1,36 @@
 package ru.sibdigital.addcovid.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 @Entity
-@Table(name = "cls_organization")
+@Table(name = "cls_organization", schema = "public", catalog = "addcovid")
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClsOrganization implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+@Builder(toBuilder = true)
+public class ClsOrganization {
     private Long id;
     private String name;
     private String shortName;
     private String inn;
     private String ogrn;
+    private String hashCode;
     private String addressJur;
     private String okvedAdd;
     private String okved;
     private String email;
     private String phone;
-    private Long statusImport;
+    private Integer statusImport;
     private Timestamp timeImport;
 
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
 
     public Long getId() {
         return id;
@@ -37,7 +40,8 @@ public class ClsOrganization implements Serializable {
         this.id = id;
     }
 
-
+    @Basic
+    @Column(name = "name", nullable = false, length = -1)
     public String getName() {
         return name;
     }
@@ -46,7 +50,8 @@ public class ClsOrganization implements Serializable {
         this.name = name;
     }
 
-
+    @Basic
+    @Column(name = "short_name", nullable = false, length = 255)
     public String getShortName() {
         return shortName;
     }
@@ -55,7 +60,8 @@ public class ClsOrganization implements Serializable {
         this.shortName = shortName;
     }
 
-
+    @Basic
+    @Column(name = "inn", nullable = false, length = 12)
     public String getInn() {
         return inn;
     }
@@ -64,7 +70,8 @@ public class ClsOrganization implements Serializable {
         this.inn = inn;
     }
 
-
+    @Basic
+    @Column(name = "ogrn", nullable = false, length = 13)
     public String getOgrn() {
         return ogrn;
     }
@@ -73,7 +80,18 @@ public class ClsOrganization implements Serializable {
         this.ogrn = ogrn;
     }
 
+    @Basic
+    @Column(name = "hash_code", nullable = false, length = -1)
+    public String getHashCode() {
+        return hashCode;
+    }
 
+    public void setHashCode(String hashCode) {
+        this.hashCode = hashCode;
+    }
+
+    @Basic
+    @Column(name = "address_jur", nullable = false, length = 255)
     public String getAddressJur() {
         return addressJur;
     }
@@ -82,7 +100,8 @@ public class ClsOrganization implements Serializable {
         this.addressJur = addressJur;
     }
 
-
+    @Basic
+    @Column(name = "okved_add", nullable = true)
     public String getOkvedAdd() {
         return okvedAdd;
     }
@@ -91,7 +110,8 @@ public class ClsOrganization implements Serializable {
         this.okvedAdd = okvedAdd;
     }
 
-
+    @Basic
+    @Column(name = "okved", nullable = false, length = -1)
     public String getOkved() {
         return okved;
     }
@@ -100,7 +120,8 @@ public class ClsOrganization implements Serializable {
         this.okved = okved;
     }
 
-
+    @Basic
+    @Column(name = "email", nullable = false, length = 100)
     public String getEmail() {
         return email;
     }
@@ -109,7 +130,8 @@ public class ClsOrganization implements Serializable {
         this.email = email;
     }
 
-
+    @Basic
+    @Column(name = "phone", nullable = false, length = 100)
     public String getPhone() {
         return phone;
     }
@@ -118,16 +140,18 @@ public class ClsOrganization implements Serializable {
         this.phone = phone;
     }
 
-
-    public Long getStatusImport() {
+    @Basic
+    @Column(name = "status_import", nullable = false)
+    public Integer getStatusImport() {
         return statusImport;
     }
 
-    public void setStatusImport(Long statusImport) {
+    public void setStatusImport(Integer statusImport) {
         this.statusImport = statusImport;
     }
 
-
+    @Basic
+    @Column(name = "time_import", nullable = true)
     public Timestamp getTimeImport() {
         return timeImport;
     }
@@ -136,4 +160,28 @@ public class ClsOrganization implements Serializable {
         this.timeImport = timeImport;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClsOrganization that = (ClsOrganization) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(shortName, that.shortName) &&
+                Objects.equals(inn, that.inn) &&
+                Objects.equals(ogrn, that.ogrn) &&
+                Objects.equals(hashCode, that.hashCode) &&
+                Objects.equals(addressJur, that.addressJur) &&
+                Objects.equals(okvedAdd, that.okvedAdd) &&
+                Objects.equals(okved, that.okved) &&
+                Objects.equals(email, that.email) &&
+                Objects.equals(phone, that.phone) &&
+                Objects.equals(statusImport, that.statusImport) &&
+                Objects.equals(timeImport, that.timeImport);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, shortName, inn, ogrn, hashCode, addressJur, okvedAdd, okved, email, phone, statusImport, timeImport);
+    }
 }

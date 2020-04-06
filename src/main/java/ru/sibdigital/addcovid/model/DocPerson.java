@@ -1,29 +1,32 @@
 package ru.sibdigital.addcovid.model;
 
-
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.io.Serializable;
+import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
-@Table(name = "doc_person")
+@Table(name = "doc_person", schema = "public", catalog = "addcovid")
 @AllArgsConstructor
 @NoArgsConstructor
-public class DocPerson implements Serializable {
-
-    @Id
+@Builder(toBuilder = true)
+public class DocPerson {
     private Long id;
-    private Long idRequest;
     private String lastname;
     private String firstname;
     private String patronymic;
-    private String isAgree;
+    private Boolean isAgree;
 
+    @ManyToOne
+    @JoinColumn(name="id_request", nullable=false)
+    private DocRequest docRequest;
 
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+/*    @SequenceGenerator(name = "PERSON_SEQ", sequenceName = "doc_person_id_seq")*/
     public Long getId() {
         return id;
     }
@@ -32,16 +35,8 @@ public class DocPerson implements Serializable {
         this.id = id;
     }
 
-
-    public Long getIdRequest() {
-        return idRequest;
-    }
-
-    public void setIdRequest(Long idRequest) {
-        this.idRequest = idRequest;
-    }
-
-
+    @Basic
+    @Column(name = "lastname", nullable = false, length = 100)
     public String getLastname() {
         return lastname;
     }
@@ -50,7 +45,8 @@ public class DocPerson implements Serializable {
         this.lastname = lastname;
     }
 
-
+    @Basic
+    @Column(name = "firstname", nullable = false, length = 100)
     public String getFirstname() {
         return firstname;
     }
@@ -59,7 +55,8 @@ public class DocPerson implements Serializable {
         this.firstname = firstname;
     }
 
-
+    @Basic
+    @Column(name = "patronymic", nullable = true, length = 100)
     public String getPatronymic() {
         return patronymic;
     }
@@ -68,13 +65,30 @@ public class DocPerson implements Serializable {
         this.patronymic = patronymic;
     }
 
-
-    public String getIsAgree() {
+    @Basic
+    @Column(name = "is_agree", nullable = false)
+    public Boolean getAgree() {
         return isAgree;
     }
 
-    public void setIsAgree(String isAgree) {
-        this.isAgree = isAgree;
+    public void setAgree(Boolean agree) {
+        isAgree = agree;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DocPerson docPerson = (DocPerson) o;
+        return Objects.equals(id, docPerson.id) &&
+                Objects.equals(lastname, docPerson.lastname) &&
+                Objects.equals(firstname, docPerson.firstname) &&
+                Objects.equals(patronymic, docPerson.patronymic) &&
+                Objects.equals(isAgree, docPerson.isAgree);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, lastname, firstname, patronymic, isAgree);
+    }
 }

@@ -1,36 +1,42 @@
 package ru.sibdigital.addcovid.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.sql.Timestamp;
-
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
-@Table(name = "doc_request")
+@Table(name = "doc_request", schema = "public", catalog = "addcovid")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
 public class DocRequest {
-
-    @Id
     private Long id;
     private Long personOfficeCnt;
     private Long personRemoteCnt;
     private Long personSlrySaveCnt;
     private Long personOfficeFactCnt;
-    private Long idOrganization;
-    private Long idDepartment;
     private String attachmentPath;
-    private Long statusReview;
+    private Integer statusReview;
     private Timestamp timeCreate;
-    private Long statusImport;
+    private Integer statusImport;
     private Timestamp timeImport;
     private Timestamp timeReview;
 
+    @OneToMany(mappedBy="docRequest")
+    private Set<DocPerson> docPersonSet;
 
+
+
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+/*    @SequenceGenerator(name = "REQUEST_SEQ", sequenceName = "doc_request_id_seq")*/
     public Long getId() {
         return id;
     }
@@ -39,7 +45,8 @@ public class DocRequest {
         this.id = id;
     }
 
-
+    @Basic
+    @Column(name = "person_office_cnt", nullable = false)
     public Long getPersonOfficeCnt() {
         return personOfficeCnt;
     }
@@ -48,7 +55,8 @@ public class DocRequest {
         this.personOfficeCnt = personOfficeCnt;
     }
 
-
+    @Basic
+    @Column(name = "person_remote_cnt", nullable = false)
     public Long getPersonRemoteCnt() {
         return personRemoteCnt;
     }
@@ -57,7 +65,8 @@ public class DocRequest {
         this.personRemoteCnt = personRemoteCnt;
     }
 
-
+    @Basic
+    @Column(name = "person_slry_save_cnt", nullable = false)
     public Long getPersonSlrySaveCnt() {
         return personSlrySaveCnt;
     }
@@ -66,7 +75,8 @@ public class DocRequest {
         this.personSlrySaveCnt = personSlrySaveCnt;
     }
 
-
+    @Basic
+    @Column(name = "person_office_fact_cnt", nullable = false)
     public Long getPersonOfficeFactCnt() {
         return personOfficeFactCnt;
     }
@@ -75,25 +85,8 @@ public class DocRequest {
         this.personOfficeFactCnt = personOfficeFactCnt;
     }
 
-
-    public Long getIdOrganization() {
-        return idOrganization;
-    }
-
-    public void setIdOrganization(Long idOrganization) {
-        this.idOrganization = idOrganization;
-    }
-
-
-    public Long getIdDepartment() {
-        return idDepartment;
-    }
-
-    public void setIdDepartment(Long idDepartment) {
-        this.idDepartment = idDepartment;
-    }
-
-
+    @Basic
+    @Column(name = "attachment_path", nullable = false, length = 255)
     public String getAttachmentPath() {
         return attachmentPath;
     }
@@ -102,16 +95,18 @@ public class DocRequest {
         this.attachmentPath = attachmentPath;
     }
 
-
-    public Long getStatusReview() {
+    @Basic
+    @Column(name = "status_review", nullable = false)
+    public Integer getStatusReview() {
         return statusReview;
     }
 
-    public void setStatusReview(Long statusReview) {
+    public void setStatusReview(Integer statusReview) {
         this.statusReview = statusReview;
     }
 
-
+    @Basic
+    @Column(name = "time_create", nullable = false)
     public Timestamp getTimeCreate() {
         return timeCreate;
     }
@@ -120,16 +115,18 @@ public class DocRequest {
         this.timeCreate = timeCreate;
     }
 
-
-    public Long getStatusImport() {
+    @Basic
+    @Column(name = "status_import", nullable = false)
+    public Integer getStatusImport() {
         return statusImport;
     }
 
-    public void setStatusImport(Long statusImport) {
+    public void setStatusImport(Integer statusImport) {
         this.statusImport = statusImport;
     }
 
-
+    @Basic
+    @Column(name = "time_import", nullable = true)
     public Timestamp getTimeImport() {
         return timeImport;
     }
@@ -138,7 +135,8 @@ public class DocRequest {
         this.timeImport = timeImport;
     }
 
-
+    @Basic
+    @Column(name = "time_review", nullable = true)
     public Timestamp getTimeReview() {
         return timeReview;
     }
@@ -147,4 +145,26 @@ public class DocRequest {
         this.timeReview = timeReview;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DocRequest that = (DocRequest) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(personOfficeCnt, that.personOfficeCnt) &&
+                Objects.equals(personRemoteCnt, that.personRemoteCnt) &&
+                Objects.equals(personSlrySaveCnt, that.personSlrySaveCnt) &&
+                Objects.equals(personOfficeFactCnt, that.personOfficeFactCnt) &&
+                Objects.equals(attachmentPath, that.attachmentPath) &&
+                Objects.equals(statusReview, that.statusReview) &&
+                Objects.equals(timeCreate, that.timeCreate) &&
+                Objects.equals(statusImport, that.statusImport) &&
+                Objects.equals(timeImport, that.timeImport) &&
+                Objects.equals(timeReview, that.timeReview);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, personOfficeFactCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview);
+    }
 }

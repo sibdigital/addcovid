@@ -22,6 +22,7 @@ create table cls_organization
 	short_name varchar(255) not null,
 	inn varchar(12) not null,
 	ogrn varchar(13) not null,
+    hash_code text not null,
 	address_jur varchar(255) not null,
 	okved_add jsonb,
 	okved text not null,

@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostFormDto {
-
+    private Long organizationId;
     private long departmentId;
 
     private String organizationName;
@@ -21,7 +21,7 @@ public class PostFormDto {
     private String  organizationInn;
     private String  organizationOgrn;
     private String  organizationAddressJur;
-    private List<String> organizationOkvedAdd;
+    private String organizationOkvedAdd;
     private String  organizationOkved;
     private String  organizationEmail;
     private String  organizationPhone;
@@ -36,7 +36,6 @@ public class PostFormDto {
     private Long personOfficeFactCnt;
 
     private MultipartFile attachment;
-
 
 
 }
