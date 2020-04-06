@@ -50,14 +50,14 @@ function removePerson(){
 
 function addAddr(){
     let values = $$('form_addr').getValues()
-    if(values.address_fact == '' || values.person_office_fact_cnt == ''){
+    if(values.addressFact == '' || values.personOfficeFactCnt == ''){
         webix.message('обязательные поля')
         return;
     }
 
     $$('addr_table').add({
-        person_office_fact_cnt: values.person_office_fact_cnt,
-        address_fact: values.address_fact,
+        personOfficeFactCnt: values.personOfficeFactCnt,
+        addressFact: values.addressFact,
     }, $$('addr_table').count() + 1)
 
     $$('form_addr').clear()
@@ -65,7 +65,7 @@ function addAddr(){
 
 function editAddr(){
     let values = $$('form_addr').getValues()
-    if(values.address_fact == '' || values.person_office_fact_cnt == ''){
+    if(values.addressFact == '' || values.personOfficeFactCnt == ''){
         webix.message('обязательные поля')
         return;
     }
@@ -108,21 +108,21 @@ webix.ready(function() {
                                 rows: [
                                     {
                                         view: 'text',
-                                        name: 'name',
+                                        name: 'organizationName',
                                         label: 'Полное наименование организации/фамилия, имя, отчество индивидуального предпринимателя',
                                         labelPosition: 'top',
                                         required: true
                                     },
                                     {
                                         view: 'text',
-                                        name: 'short_name',
+                                        name: 'organizationShortName',
                                         label: 'Краткое наименование организации',
                                         labelPosition: 'top',
                                         required: true
                                     },
                                     {
                                         view: 'text',
-                                        name: 'inn',
+                                        name: 'organizationInn',
                                         label: 'ИНН',
                                         labelPosition: 'top',
                                         //pattern: {mask: '############', allow: /[0-9]/g},
@@ -131,21 +131,21 @@ webix.ready(function() {
                                     },
                                     {
                                         view: 'text',
-                                        name: 'ogrn',
+                                        name: 'organizationOgrn',
                                         label: 'ОГРН',
                                         labelPosition: 'top',
                                         required: true
                                     },
                                     {
                                         view: 'text',
-                                        name: 'email',
+                                        name: 'organizationEmail',
                                         label: 'e-mail',
                                         labelPosition: 'top',
                                         required: true
                                     },
                                     {
                                         view: 'text',
-                                        name: 'phone',
+                                        name: 'organizationPhone',
                                         label: 'Телефон',
                                         labelPosition: 'top',
                                         required: true
@@ -199,20 +199,20 @@ webix.ready(function() {
                                 rows: [
                                     {
                                         view: 'text',
-                                        name: 'okved',
+                                        name: 'organizationOkved',
                                         label: 'Основной вид осуществляемой деятельности (отрасль)',
                                         labelPosition: 'top',
                                         required: true
                                     },
                                     {
                                         view: 'textarea',
-                                        name: 'okved_add',
+                                        name: 'organizationOkvedAdd',
                                         label: 'Дополнительные виды осуществляемой деятельности',
                                         labelPosition: 'top'
                                     },
                                     {
                                         view: 'textarea',
-                                        name: 'address_jur',
+                                        name: 'organizationAddressJur',
                                         label: 'Юридический адрес',
                                         labelPosition: 'top',
                                         required: true
@@ -233,34 +233,34 @@ webix.ready(function() {
                         type: 'space',
                         rows: [
                             {
-                                view: 'text', name: 'person_office_cnt',
+                                view: 'text', name: 'personOfficeCnt',
                                 label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы',
                                 labelPosition: 'top' },
                             {
-                                view: 'text', name: 'person_remote_cnt',
+                                view: 'text', name: 'personRemoteCnt',
                                 label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
                                 labelPosition: 'top' },
                             {
-                                view: 'text', name: 'person_slry_save_cnt',
+                                view: 'text', name: 'personSlrySaveCnt',
                                 label: 'Суммарная численность работников, в отношении которых соответствующим решением Президента Российской Федерации установлен режим работы нерабочего дня с сохранением заработной платы',
                                 labelPosition: 'top'
                             },
                             {
                                 rows: [
                                     {
-                                        view: 'datatable', name: 'address_fact', label: '', labelPosition: 'top',
+                                        view: 'datatable', name: 'addressFact', label: '', labelPosition: 'top',
                                         height: 200,
                                         editable: true,
                                         id: 'addr_table',
                                         columns: [
                                             { id: 'id', header: '', css: 'rank'},
                                             {
-                                                id: 'address_fact',
+                                                id: 'addressFact',
                                                 header: 'Фактический адрес осуществления деятельности',
                                                 editor: 'text',
                                                 fillspace: true },
                                             {
-                                                id: 'person_office_fact_cnt',
+                                                id: 'personOfficeFactCnt',
                                                 header: 'Численность работников, не подлежащих переводу на дистанционный режим работы, осуществляющих деятельность по указанному в  пункте 11 настоящей формы фактическому адресу',
                                                 editor: 'text',
                                                 width: 200}
@@ -282,8 +282,8 @@ webix.ready(function() {
                                             {
                                                 type: 'space',
                                                 cols: [
-                                                    {view: 'text', name: 'address_fact', label: 'Фактический адрес', labelPosition: 'top' },
-                                                    {view: 'text', name: 'person_office_fact_cnt', inputWidth: '250', label: 'Численность работников', labelPosition: 'top'},
+                                                    {view: 'text', name: 'addressFact', label: 'Фактический адрес', labelPosition: 'top' },
+                                                    {view: 'text', name: 'personOfficeFactCnt', inputWidth: '250', label: 'Численность работников', labelPosition: 'top'},
                                                     {},
                                                 ]
                                             },
@@ -320,9 +320,9 @@ webix.ready(function() {
                                 readonly: true,
                                 columns: [
                                     { id: 'id', header: '', css: 'rank', width: 50 },
-                                    { id: 'lastname', header: 'Фамилия', adjust: true },
-                                    { id: 'firstname', header: 'Имя', adjust: true },
-                                    { id: 'patronymic', header: 'Отчество', adjust: true },
+                                    { id: 'lastname', header: 'Фамилия', adjust: true, sort: 'string', fillspace: true },
+                                    { id: 'firstname', header: 'Имя', adjust: true, sort: 'string', fillspace: true },
+                                    { id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string' },
                                     //{ id: 'isagree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
                                 ],
                                 on:{
@@ -375,9 +375,40 @@ webix.ready(function() {
                                 align: 'center',
                                 click: function () {
                                     let params = $$('form').getValues()
+
+
+                                    let persons = []
+                                    $$('person_table').data.each(function(obj){
+                                        let person = {
+                                            lastname: obj.lastname,
+                                            firstname: obj.firstname,
+                                            patronymic: obj.patronymic
+                                        }
+                                        persons.push(person)
+                                    })
+                                    params.persons = persons
+
+                                    let addrs = []
+                                    $$('addr_table').data.each(function(obj){
+                                        let addr = {
+                                            addressFact: obj.addressFact,
+                                            personOfficeFactCnt: obj.personOfficeFactCnt
+                                        }
+                                        addrs.push(addr)
+                                    })
+                                    params.addressFact = addrs
+
                                     console.log(params);
 
-                                    //webix.ajax().post()
+
+                                    webix.ajax()
+                                        .headers({'Content-type': 'application/json'})
+                                        .post('/',
+                                        JSON.stringify(params),
+                                        function(text, data, xhr){
+                                            console.log(text);
+                                            webix.message();
+                                        })
                                 }
 
                             }
