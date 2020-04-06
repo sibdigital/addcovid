@@ -415,7 +415,9 @@ webix.ready(function() {
                                 view: 'text', name: 'personSlrySaveCnt',
                                 label: 'Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы',
                                 labelPosition: 'top',
-                                validate:webix.rules.isNumber(),
+                                validate: function(val){
+                                    return !isNaN(val*1);
+                                },
                                 invalidMessage: 'Поле не может быть пустым',
                                 required: true
                             },
@@ -423,7 +425,9 @@ webix.ready(function() {
                                 view: 'text', name: 'personRemoteCnt',
                                 label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
                                 invalidMessage: 'Поле не может быть пустым',
-                                validate:webix.rules.isNumber(),
+                                validate: function(val){
+                                    return !isNaN(val*1);
+                                },
                                 required: true,
                                 labelPosition: 'top'
                             },
@@ -431,7 +435,9 @@ webix.ready(function() {
                                 view: 'text', name: 'personOfficeCnt',
                                 label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
                                 labelPosition: 'top',
-                                validate:webix.rules.isNumber(),
+                                validate: function(val){
+                                    return !isNaN(val*1);
+                                },
                                 invalidMessage: 'Поле не может быть пустым',
                                 required: true
                             },
