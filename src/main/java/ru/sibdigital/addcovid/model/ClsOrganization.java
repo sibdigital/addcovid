@@ -18,8 +18,8 @@ public class ClsOrganization {
 
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @SequenceGenerator(name = "CLS_ORG_GEN", sequenceName = "cls_organization_id_seq")
+    @SequenceGenerator(name = "CLS_ORG_GEN", sequenceName = "cls_organization_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CLS_ORG_GEN")
     private Long id;
     private String name;
     private String shortName;
