@@ -14,21 +14,20 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class ClsDepartment {
+
+
+    @Id
+    @Column(name = "id", nullable = false)
     private Integer id;
     private String name;
     private String description;
     private Integer statusImport;
     private Timestamp timeImport;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_department", referencedColumnName = "id")
-    private ClsDepartment department;
 
 
 
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+
     public Integer getId() {
         return id;
     }

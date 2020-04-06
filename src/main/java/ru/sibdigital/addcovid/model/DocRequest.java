@@ -15,6 +15,11 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class DocRequest {
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @SequenceGenerator(name = "DOC_SEQ_GEN", sequenceName = "doc_request_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DOC_SEQ_GEN")
     private Long id;
     private Long personOfficeCnt;
     private Long personRemoteCnt;
@@ -27,15 +32,20 @@ public class DocRequest {
     private Timestamp timeImport;
     private Timestamp timeReview;
 
-    @OneToMany(mappedBy="docRequest")
+    @OneToMany(targetEntity = DocPerson.class,mappedBy="docRequest", fetch = FetchType.LAZY)
     private Set<DocPerson> docPersonSet;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_department", referencedColumnName = "id")
+    private ClsDepartment department;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_organization", referencedColumnName = "id")
+    private ClsOrganization organization;
 
+    @OneToMany(targetEntity = DocAddressFact.class, mappedBy="docRequestAddressFact", fetch = FetchType.LAZY)
+    private Set<DocAddressFact> docAddressFact;
 
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
 /*    @SequenceGenerator(name = "REQUEST_SEQ", sequenceName = "doc_request_id_seq")*/
     public Long getId() {
         return id;
@@ -143,6 +153,46 @@ public class DocRequest {
 
     public void setTimeReview(Timestamp timeReview) {
         this.timeReview = timeReview;
+    }
+
+    public Set<DocPerson> getDocPersonSet() {
+        return docPersonSet;
+    }
+
+    public void setDocPersonSet(Set<DocPerson> docPersonSet) {
+        this.docPersonSet = docPersonSet;
+    }
+
+    public ClsDepartment getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(ClsDepartment department) {
+        this.department = department;
+    }
+
+    public ClsOrganization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(ClsOrganization organization) {
+        this.organization = organization;
+    }
+
+    public Set<DocAddressFact> getDocAddressFactSet() {
+        return docAddressFact;
+    }
+
+    public void setDocAddressFactSet(Set<DocAddressFact> docAddressFactSet) {
+        this.docAddressFact = docAddressFactSet;
+    }
+
+    public Set<DocAddressFact> getDocAddressFact() {
+        return docAddressFact;
+    }
+
+    public void setDocAddressFact(Set<DocAddressFact> docAddressFact) {
+        this.docAddressFact = docAddressFact;
     }
 
     @Override

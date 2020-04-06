@@ -13,19 +13,35 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class DocPerson {
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+
+    @Basic
+    @Column(name = "lastname", nullable = false, length = 100)
     private String lastname;
+
+    @Basic
+    @Column(name = "firstname", nullable = false, length = 100)
     private String firstname;
+
+    @Basic
+    @Column(name = "patronymic", nullable = true, length = 100)
     private String patronymic;
+
+
+
+    @Basic
+    @Column(name = "is_agree", nullable = false)
     private Boolean isAgree;
 
     @ManyToOne
     @JoinColumn(name="id_request", nullable=false)
     private DocRequest docRequest;
 
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+
 /*    @SequenceGenerator(name = "PERSON_SEQ", sequenceName = "doc_person_id_seq")*/
     public Long getId() {
         return id;
@@ -35,8 +51,6 @@ public class DocPerson {
         this.id = id;
     }
 
-    @Basic
-    @Column(name = "lastname", nullable = false, length = 100)
     public String getLastname() {
         return lastname;
     }
@@ -45,8 +59,6 @@ public class DocPerson {
         this.lastname = lastname;
     }
 
-    @Basic
-    @Column(name = "firstname", nullable = false, length = 100)
     public String getFirstname() {
         return firstname;
     }
@@ -55,8 +67,6 @@ public class DocPerson {
         this.firstname = firstname;
     }
 
-    @Basic
-    @Column(name = "patronymic", nullable = true, length = 100)
     public String getPatronymic() {
         return patronymic;
     }
@@ -65,14 +75,20 @@ public class DocPerson {
         this.patronymic = patronymic;
     }
 
-    @Basic
-    @Column(name = "is_agree", nullable = false)
     public Boolean getAgree() {
         return isAgree;
     }
 
     public void setAgree(Boolean agree) {
         isAgree = agree;
+    }
+
+    public DocRequest getDocRequest() {
+        return docRequest;
+    }
+
+    public void setDocRequest(DocRequest docRequest) {
+        this.docRequest = docRequest;
     }
 
     @Override

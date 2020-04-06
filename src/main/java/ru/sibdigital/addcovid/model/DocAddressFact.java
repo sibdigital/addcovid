@@ -13,16 +13,19 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class DocAddressFact {
-    private Long id;
-    private String addressFact;
-    private Integer personOfficeFactCnt;
 
-
-    private DocRequest requst;
 
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String addressFact;
+    private Long personOfficeFactCnt;
+
+    @ManyToOne
+    @JoinColumn(name="id_request", nullable=false)
+    private DocRequest docRequestAddressFact;
+
 //    @SequenceGenerator(name = "ADDRESS_SEQ", sequenceName = "doc_address_fact_id_seq")
     public Long getId() {
         return id;
@@ -44,12 +47,21 @@ public class DocAddressFact {
 
     @Basic
     @Column(name = "person_office_fact_cnt", nullable = false)
-    public Integer getPersonOfficeFactCnt() {
+    public Long getPersonOfficeFactCnt() {
         return personOfficeFactCnt;
     }
 
-    public void setPersonOfficeFactCnt(Integer personOfficeFactCnt) {
+    public void setPersonOfficeFactCnt(Long personOfficeFactCnt) {
         this.personOfficeFactCnt = personOfficeFactCnt;
+    }
+
+
+    public DocRequest getDocRequest() {
+        return docRequestAddressFact;
+    }
+
+    public void setDocRequest(DocRequest docRequest) {
+        this.docRequestAddressFact = docRequest;
     }
 
     @Override
