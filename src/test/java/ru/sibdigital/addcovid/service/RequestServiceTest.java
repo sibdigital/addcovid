@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 @SpringBootTest
 @Slf4j
@@ -135,5 +136,14 @@ class RequestServiceTest {
         Assertions.assertNotNull(docRequest);
 
 
+    }
+
+    @Test
+    void getRequestToBeWatchedByDepartment() {
+
+
+        List<DocRequest> docRequests = requestService.getRequestToBeWatchedByDepartment(1L);
+
+        Assertions.assertNotNull(docRequests);
     }
 }

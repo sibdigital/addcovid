@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -167,6 +168,12 @@ public class RequestService {
 
 
         return docRequest;
+    }
+
+
+    public List<DocRequest> getRequestToBeWatchedByDepartment(Long id){
+
+        return this.docRequestRepo.getAllByDepartmentId(id).orElseGet(()->null);
     }
 
 
