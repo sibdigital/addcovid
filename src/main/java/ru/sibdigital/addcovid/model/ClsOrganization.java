@@ -1,4 +1,4 @@
-package ru.sibdigital.model;
+package ru.sibdigital.addcovid.model;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

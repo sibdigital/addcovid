@@ -1,9 +1,10 @@
-package ru.sibdigital.model;
+package ru.sibdigital.addcovid.model;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
@@ -14,6 +15,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class DocRequest {
 
+    @Id
     private Long id;
     private Long personOfficeCnt;
     private Long personRemoteCnt;

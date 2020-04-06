@@ -1,8 +1,7 @@
-package ru.sibdigital.model;
+package ru.sibdigital.addcovid.model;
 
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;

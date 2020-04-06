@@ -1,10 +1,11 @@
-package ru.sibdigital.model;
+package ru.sibdigital.addcovid.model;
 
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -14,6 +15,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class DocPerson implements Serializable {
 
+    @Id
     private Long id;
     private Long idRequest;
     private String lastname;
