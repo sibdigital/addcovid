@@ -5,9 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "cls_department")
@@ -15,55 +15,57 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ClsDepartment implements Serializable {
 
-  private long id;
-  private String name;
-  private String description;
-  private long statusImport;
-  private java.sql.Timestamp timeImport;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String name;
+    private String description;
+    private Long statusImport;
+    private Timestamp timeImport;
 
 
-  public long getId() {
-    return id;
-  }
+    public Long getId() {
+        return id;
+    }
 
-  public void setId(long id) {
-    this.id = id;
-  }
-
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
 
-  public String getDescription() {
-    return description;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-
-  public long getStatusImport() {
-    return statusImport;
-  }
-
-  public void setStatusImport(long statusImport) {
-    this.statusImport = statusImport;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
 
-  public java.sql.Timestamp getTimeImport() {
-    return timeImport;
-  }
+    public String getDescription() {
+        return description;
+    }
 
-  public void setTimeImport(java.sql.Timestamp timeImport) {
-    this.timeImport = timeImport;
-  }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
+    public Long getStatusImport() {
+        return statusImport;
+    }
+
+    public void setStatusImport(Long statusImport) {
+        this.statusImport = statusImport;
+    }
+
+
+    public Timestamp getTimeImport() {
+        return timeImport;
+    }
+
+    public void setTimeImport(Timestamp timeImport) {
+        this.timeImport = timeImport;
+    }
 
 }
