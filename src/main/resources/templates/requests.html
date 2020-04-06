@@ -1,14 +1,20 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8">
     <title>Addcovid</title>
     <link type="text/css" rel="stylesheet" href="/libs/webix.css">
     <script src="/libs/webix.min.js"></script>
+    <script src="/libs/routie.min.js"></script>
+    <script data-main="js/index" src="/libs/require.min.js"></script>
     <style>body {margin: 0}</style>
 </head>
 <body>
 <div id="app"></div>
-<script src="/js/requests.js"></script>
+<script th:inline="javascript">
+    let ID_DEPARTMENT = [[${id_department}]]
+    console.log(ID_DEPARTMENT)
+</script>
+<!--<script src="/js/requests.js"></script>-->
 </body>
 </html>

@@ -387,7 +387,7 @@ webix.ready(function() {
                                 view: 'textarea',
                                 height: 150,
                                 label: 'Обоснование заявки',
-                                name: 'req_basis',
+                                name: 'reqBasis',
                                 invalidMessage: 'Поле не может быть пустым',
                                 required: true,
                                 labelPosition: 'top'
