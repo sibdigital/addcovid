@@ -17,7 +17,7 @@ public class DocAddressFact {
 
     @Id
     @Column(name = "id", nullable = false)
-    @SequenceGenerator(name = "DOC_ADDR_SEQ_GEN", sequenceName = "doc_address_id_seq", allocationSize = 1, schema = "public")
+    @SequenceGenerator(name = "DOC_ADDR_SEQ_GEN", sequenceName = "doc_address_fact_id_seq", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DOC_ADDR_SEQ_GEN")
     private Long id;
     private String addressFact;

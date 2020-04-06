@@ -77,7 +77,7 @@ create table doc_person
 			references doc_request
 				on delete cascade
 		constraint fk_request
-			references cls_department,
+			references doc_request,
 	lastname varchar(100) not null,
 	firstname varchar(100) not null,
 	patronymic varchar(100),

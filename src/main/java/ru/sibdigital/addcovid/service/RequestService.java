@@ -80,15 +80,32 @@ public class RequestService {
                 .personRemoteCnt(postForm.getPersonRemoteCnt())
                 .personSlrySaveCnt(postForm.getPersonSlrySaveCnt())
                 .attachmentPath("")
-                .statusReview(0)
                 .docPersonSet(personSet)
                 .docAddressFact(docAddressFactSet)
+                .statusReview(0)
                 .timeReview(Timestamp.valueOf(LocalDateTime.now()))
                 .statusImport(0)
                 .timeImport(Timestamp.valueOf(LocalDateTime.now()))
+                .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
 
         docRequest = docRequestRepo.save(docRequest);
+
+        DocRequest finalDocRequest = docRequest;
+        docRequest.getDocAddressFact().forEach(docAddressFact -> {
+            docAddressFact.setDocRequest(finalDocRequest);
+        });
+
+        docRequest.getDocPersonSet().forEach(docPerson -> {
+            docPerson.setDocRequest(finalDocRequest);
+        });
+
+        docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
+        docPersonRepo.saveAll(docRequest.getDocPersonSet());
+
+
+
+
 
         return organization.getHashCode();
 

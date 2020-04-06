@@ -179,14 +179,6 @@ public class DocRequest {
         this.organization = organization;
     }
 
-    public Set<DocAddressFact> getDocAddressFactSet() {
-        return docAddressFact;
-    }
-
-    public void setDocAddressFactSet(Set<DocAddressFact> docAddressFactSet) {
-        this.docAddressFact = docAddressFactSet;
-    }
-
     public Set<DocAddressFact> getDocAddressFact() {
         return docAddressFact;
     }
