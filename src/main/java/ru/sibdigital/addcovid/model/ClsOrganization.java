@@ -14,6 +14,12 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class ClsOrganization {
+
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "CLS_ORG_GEN", sequenceName = "cls_organization_id_seq")
     private Long id;
     private String name;
     private String shortName;
@@ -28,9 +34,6 @@ public class ClsOrganization {
     private Integer statusImport;
     private Timestamp timeImport;
 
-    @Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
 
     public Long getId() {
         return id;

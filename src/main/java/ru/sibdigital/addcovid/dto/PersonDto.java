@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.sibdigital.addcovid.model.DocPerson;
 
 @Data
 @AllArgsConstructor
@@ -13,5 +14,14 @@ public class PersonDto {
     private String lastname;
     private String firstname;
     private String patronymic;
-    private String isAgree;
+    private Boolean isAgree;
+
+   public DocPerson convertToPersonEntity(){
+       return DocPerson.builder().firstname(this.firstname)
+               .lastname(this.lastname)
+               .isAgree(this.isAgree)
+               .patronymic(this.patronymic)
+               .build();
+   }
+
 }
