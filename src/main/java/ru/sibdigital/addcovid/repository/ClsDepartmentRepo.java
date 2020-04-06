@@ -6,4 +6,5 @@ import ru.sibdigital.addcovid.model.ClsDepartment;
 
 @Repository
 public interface ClsDepartmentRepo extends JpaRepository<ClsDepartment, Long> {
+
 }

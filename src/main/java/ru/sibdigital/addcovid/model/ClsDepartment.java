@@ -1,37 +1,44 @@
 package ru.sibdigital.addcovid.model;
 
-
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 @Entity
-@Table(name = "cls_department")
+@Table(name = "cls_department", schema = "public", catalog = "addcovid")
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClsDepartment implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+@Builder(toBuilder = true)
+public class ClsDepartment {
+    private Integer id;
     private String name;
     private String description;
-    private Long statusImport;
+    private Integer statusImport;
     private Timestamp timeImport;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_department", referencedColumnName = "id")
+    private ClsDepartment department;
 
-    public Long getId() {
+
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-
+    @Basic
+    @Column(name = "name", nullable = false, length = 255)
     public String getName() {
         return name;
     }
@@ -40,7 +47,8 @@ public class ClsDepartment implements Serializable {
         this.name = name;
     }
 
-
+    @Basic
+    @Column(name = "description", nullable = true, length = -1)
     public String getDescription() {
         return description;
     }
@@ -49,16 +57,18 @@ public class ClsDepartment implements Serializable {
         this.description = description;
     }
 
-
-    public Long getStatusImport() {
+    @Basic
+    @Column(name = "status_import", nullable = false)
+    public Integer getStatusImport() {
         return statusImport;
     }
 
-    public void setStatusImport(Long statusImport) {
+    public void setStatusImport(Integer statusImport) {
         this.statusImport = statusImport;
     }
 
-
+    @Basic
+    @Column(name = "time_import", nullable = true)
     public Timestamp getTimeImport() {
         return timeImport;
     }
@@ -67,4 +77,20 @@ public class ClsDepartment implements Serializable {
         this.timeImport = timeImport;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClsDepartment that = (ClsDepartment) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(description, that.description) &&
+                Objects.equals(statusImport, that.statusImport) &&
+                Objects.equals(timeImport, that.timeImport);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, statusImport, timeImport);
+    }
 }
