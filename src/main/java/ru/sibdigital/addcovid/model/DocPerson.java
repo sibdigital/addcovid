@@ -108,4 +108,6 @@ public class DocPerson {
     public int hashCode() {
         return Objects.hash(id, lastname, firstname, patronymic, isAgree);
     }
+
+
 }

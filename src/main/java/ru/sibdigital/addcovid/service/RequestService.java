@@ -10,6 +10,7 @@ import ru.sibdigital.addcovid.model.DocAddressFact;
 import ru.sibdigital.addcovid.model.DocPerson;
 import ru.sibdigital.addcovid.model.DocRequest;
 import ru.sibdigital.addcovid.repository.*;
+import ru.sibdigital.addcovid.utils.SHA256Generator;
 
 import java.io.File;
 import java.sql.Timestamp;
@@ -41,7 +42,7 @@ public class RequestService {
     String uploadingDir;
 
 
-    public String addNewRequst(PostFormDto postForm){
+    public String addNewRequest(PostFormDto postForm){
 
         String filename = "error while upload";
         try{
@@ -63,7 +64,8 @@ public class RequestService {
         if(postForm.getOrganizationId() != null){
             organization = clsOrganizationRepo.getOne(postForm.getOrganizationId());
         } else {
-            organization = clsOrganizationRepo.getFirstByHashCode(postForm.sha256()).get();
+            String sha256 = SHA256Generator.generate(postForm.getOrganizationInn(), postForm.getOrganizationOgrn(), postForm.getOrganizationName());
+            organization = clsOrganizationRepo.getFirstByHashCode(sha256).orElseGet(() -> null);
             if(organization == null){
                 organization = ClsOrganization.builder()
                         .name(postForm.getOrganizationName())
@@ -75,17 +77,13 @@ public class RequestService {
                         .okved(postForm.getOrganizationOkved())
                         .email(postForm.getOrganizationEmail())
                         .phone(postForm.getOrganizationPhone())
-                        .hashCode(postForm.sha256())
+                        .hashCode(sha256)
                         .statusImport(0)
                         .timeImport(Timestamp.valueOf(LocalDateTime.now()))
                         .build();
                 organization = clsOrganizationRepo.save(organization);
             }
         }
-
-
-
-
 
         Set<DocPerson> personSet = postForm.getPersons()
                 .stream()
@@ -118,9 +116,6 @@ public class RequestService {
 
         docRequest = docRequestRepo.save(docRequest);
 
-
-
-
         DocRequest finalDocRequest = docRequest;
         docRequest.getDocAddressFact().forEach(docAddressFact -> {
             docAddressFact.setDocRequest(finalDocRequest);
@@ -133,18 +128,30 @@ public class RequestService {
         docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
         docPersonRepo.saveAll(docRequest.getDocPersonSet());
 
-
-
-
-
         return organization.getHashCode();
-
-
-
-
-
-
-
-
     }
+
+    public DocRequest getLastRequestInfoByInnAndOgrnAndOrganizationName(String inn, String ogrn, String organizationName){
+
+        String sha256 = SHA256Generator.generate(inn, ogrn, organizationName);
+        ClsOrganization organization = clsOrganizationRepo.getFirstByHashCode(sha256).orElseGet(() -> null);
+        if(organization == null) {
+            return null;
+        }
+
+        DocRequest docRequest = docRequestRepo.getTopByOrganization(organization).orElseGet(() -> null);
+
+
+        return docRequest;
+    }
+
+
+
+
+
+
+
+
+
+
 }

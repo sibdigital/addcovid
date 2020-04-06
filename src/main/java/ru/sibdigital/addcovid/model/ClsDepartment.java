@@ -92,4 +92,6 @@ public class ClsDepartment {
     public int hashCode() {
         return Objects.hash(id, name, description, statusImport, timeImport);
     }
+
+
 }

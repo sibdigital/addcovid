@@ -187,4 +187,6 @@ public class ClsOrganization {
     public int hashCode() {
         return Objects.hash(id, name, shortName, inn, ogrn, hashCode, addressJur, okvedAdd, okved, email, phone, statusImport, timeImport);
     }
+
+
 }

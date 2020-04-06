@@ -32,7 +32,7 @@ public class DocRequest {
     private Timestamp timeImport;
     private Timestamp timeReview;
 
-    @OneToMany(targetEntity = DocPerson.class,mappedBy="docRequest", fetch = FetchType.LAZY)
+    @OneToMany(targetEntity = DocPerson.class,mappedBy="docRequest", fetch = FetchType.EAGER)
     private Set<DocPerson> docPersonSet;
 
     @OneToOne(cascade = CascadeType.MERGE)
@@ -43,7 +43,7 @@ public class DocRequest {
     @JoinColumn(name = "id_organization", referencedColumnName = "id")
     private ClsOrganization organization;
 
-    @OneToMany(targetEntity = DocAddressFact.class, mappedBy="docRequestAddressFact", fetch = FetchType.LAZY)
+    @OneToMany(targetEntity = DocAddressFact.class, mappedBy="docRequestAddressFact", fetch = FetchType.EAGER)
     private Set<DocAddressFact> docAddressFact;
 
 /*    @SequenceGenerator(name = "REQUEST_SEQ", sequenceName = "doc_request_id_seq")*/
@@ -209,4 +209,5 @@ public class DocRequest {
     public int hashCode() {
         return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, personOfficeFactCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview);
     }
+
 }
