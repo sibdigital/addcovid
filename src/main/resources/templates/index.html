@@ -10,16 +10,7 @@
 <body>
 <div id="app"></div>
 
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    var listDepartmentJava = /*[[${listDepartment}]]*/ [];
-    let listDepartment = new Array();
-    for (var i = 0; i < listDepartmentJava.length; i++) {
-        console.log(listDepartmentJava[i].value); // Obviously here I would like to access the User properties
-        listDepartment.push(listDepartmentJava[i]);
-    }
-    /*]]>*/
-</script>
+
 <script src="/js/form.js"></script>
 </body>
 </html>
