@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="//cdn.webix.com/edge/webix.css" type="text/css">
+    <script src="//cdn.webix.com/edge/webix.js" type="text/javascript"></script>
+    <title>Title</title>
+</head>
+<body>
+<script type="text/javascript" charset="utf-8">
+    webix.ui({
+        view:"form",
+        id:"log_form",
+        width:300,
+        elements:[
+            { view:"text", label:"login", name:"login"},
+            { view:"text", type:"password", label:"Password", name:"password"},
+            { margin:5, cols:[
+                    { view:"button", value:"Войти" , css:"webix_primary", click: submit},
+                    //{ view:"button", value:"Cancel"}
+                ]}
+        ]
+    });
+    function submit(){
+        //webix.message(JSON.stringify($$("log_form").getValues(), null, 2));
+        webix.send("authenticate", $$("log_form").getValues());
+    }
+</script>
+</body>
+</html>
