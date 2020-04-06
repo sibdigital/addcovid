@@ -24,6 +24,12 @@ function addPerson(){
         //isagree: values.isagree
     }, $$('person_table').count() + 1)
 
+    if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 ){
+        $$('send_btn').enable();
+    }else{
+        $$('send_btn').disable();
+    }
+
     $$('form_person').clear()
 }
 
@@ -46,6 +52,12 @@ function removePerson(){
         .then(
             function () {
                 $$("person_table").remove($$("person_table").getSelectedId());
+                let cnt = $$('person_table').data.count();
+                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0){
+                    $$('send_btn').enable();
+                }else{
+                    $$('send_btn').disable();
+                }
             }
         )
 }
@@ -114,11 +126,11 @@ webix.ready(function() {
                 //align: 'center',
                 cols: [
                     {
-/*
-                        view: 'template',
-                        width: 20,
-                        borderless: true
-*/
+                        /*
+                                                view: 'template',
+                                                width: 20,
+                                                borderless: true
+                        */
                     },
                     {
                         view: 'label',
@@ -247,7 +259,7 @@ webix.ready(function() {
                                         labelPosition: 'top',
                                         height: 150,
                                         readonly: true,
-                                        value: '№\tНаимнование органа власти\tОписание\n' +
+                                        value: '№\tНаименование органа власти\tОписание\n' +
                                             '1\tМинистерство финансов Республики Бурятия\tНет курируемых предприятий/организаций\n' +
                                             '2\tМинистерство экономики Республики Бурятия\tВ сфере финансовой, страховой деятельности\n' +
                                             '3\tМинистерство имущественных и земельных отношений  Республики Бурятия\t"оценочная деятельность,\n' +
@@ -457,7 +469,7 @@ webix.ready(function() {
                             },
                         ]
                     },
-                    view_section('Данные о ваших работниках, чья деятельность предусматривает выход на работу'),
+                    view_section('Данные о ваших работниках, чья деятельность предусматривает выход на работу (Обязательный для заполнения раздел)'),
                     {
                         view: 'scrollview',
                         type: 'space',
@@ -465,57 +477,57 @@ webix.ready(function() {
                         scroll: 'y',
                         body: {
                             rows: [
-                            {
-                                id: 'person_table',
-                                view: 'datatable',
-                                height: 400,
-                                name: 'persons',
-                                select: 'row',
-                                resizeColumn:true,
-                                readonly: true,
-                                columns: [
-                                    { id: 'id', header: '', css: 'rank', width: 50 },
-                                    { id: 'lastname', header: 'Фамилия', adjust: true, sort: 'string', fillspace: true },
-                                    { id: 'firstname', header: 'Имя', adjust: true, sort: 'string', fillspace: true },
-                                    { id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string' },
-                                    //{ id: 'isagree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
-                                ],
-                                on:{
-                                    'data->onStoreUpdated': function(){
-                                        this.data.each(function(obj, i){
-                                            obj.id = i + 1;
-                                        });
-                                    }
-                                },
-                                data: []
-                            },
-                            {
-                                view: 'form',
-                                id: 'form_person',
-                                elements: [
-                                    {
-                                        type: 'space',
-                                        margin: 0,
-                                        cols: [
-                                            {view: 'text', name: 'lastname', inputWidth: '250', label: 'Фамилия', labelPosition: 'top' },
-                                            {view: 'text', name: 'firstname', inputWidth: '250', label: 'Имя', labelPosition: 'top'},
-                                            {view: 'text', name: 'patronymic', inputWidth: '250', label: 'Отчество', labelPosition: 'top'},
-                                            //{view: 'checkbox', label: 'Согласие', name: 'isagree', id: 'agree_checkbox'},
-                                            {},
-                                        ]
+                                {
+                                    id: 'person_table',
+                                    view: 'datatable',
+                                    height: 400,
+                                    name: 'persons',
+                                    select: 'row',
+                                    resizeColumn:true,
+                                    readonly: true,
+                                    columns: [
+                                        { id: 'id', header: '', css: 'rank', width: 50 },
+                                        { id: 'lastname', header: 'Фамилия', adjust: true, sort: 'string', fillspace: true },
+                                        { id: 'firstname', header: 'Имя', adjust: true, sort: 'string', fillspace: true },
+                                        { id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string' },
+                                        //{ id: 'isagree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
+                                    ],
+                                    on:{
+                                        'data->onStoreUpdated': function(){
+                                            this.data.each(function(obj, i){
+                                                obj.id = i + 1;
+                                            });
+                                        }
                                     },
-                                    {
-                                        //type: 'space',
-                                        margin: 5,
-                                        cols: [
-                                            {view: 'button', value: 'Добавить', width: 150, click: addPerson },
-                                            {view: 'button', value: 'Изменить', width: 150, click: editPerson },
-                                            {view: 'button', value: 'Удалить', width: 150, click: removePerson}
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
+                                    data: []
+                                },
+                                {
+                                    view: 'form',
+                                    id: 'form_person',
+                                    elements: [
+                                        {
+                                            type: 'space',
+                                            margin: 0,
+                                            cols: [
+                                                {view: 'text', name: 'lastname', inputWidth: '250', label: 'Фамилия', labelPosition: 'top' },
+                                                {view: 'text', name: 'firstname', inputWidth: '250', label: 'Имя', labelPosition: 'top'},
+                                                {view: 'text', name: 'patronymic', inputWidth: '250', label: 'Отчество', labelPosition: 'top'},
+                                                //{view: 'checkbox', label: 'Согласие', name: 'isagree', id: 'agree_checkbox'},
+                                                {},
+                                            ]
+                                        },
+                                        {
+                                            //type: 'space',
+                                            margin: 5,
+                                            cols: [
+                                                {view: 'button', value: 'Добавить', width: 150, click: addPerson },
+                                                {view: 'button', value: 'Изменить', width: 150, click: editPerson },
+                                                {view: 'button', value: 'Удалить', width: 150, click: removePerson}
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
                         }
                     },
                     view_section('Подача заявки'),
@@ -531,14 +543,20 @@ webix.ready(function() {
                     {
                         view: 'checkbox',
                         name: 'isAgree',
+                        id: 'isAgree',
                         labelPosition: 'top',
                         invalidMessage: 'Поле не может быть пустым',
                         required: true,
                         label: 'Подтверждаю согласие работников на обработку персональных данных',
                         on: {
-                            'change': function (newv, oldv) {
-                                flag = flag + newv
-                                //if(flag == 2) $$('send_btn').disabled = false
+                            onChange (newv, oldv) {
+                                let cnt = $$('person_table').data.count();
+                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0){
+                                    $$('send_btn').enable();
+                                }else{
+                                    $$('send_btn').disable();
+                                }
+                                //$$('send_btn').disabled = !($$('isAgree').getValue() && $$('isProtect').getValue() )
                             }
                         }
                     },
@@ -583,14 +601,19 @@ webix.ready(function() {
                     {
                         view: 'checkbox',
                         name: 'isProtect',
+                        id: 'isProtect',
                         labelPosition: 'top',
                         invalidMessage: 'Поле не может быть пустым',
                         required: true,
                         label: 'Подтверждаю обязательное выполнение требований по защите от COVID-19',
                         on: {
-                            'change': function (newv, oldv) {
-                                flag = flag + newv
-                                //if(flag == 2) $$('send_btn').disabled = false
+                            onChange(newv, oldv) {
+                                let cnt = $$('person_table').data.count();
+                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0){
+                                    $$('send_btn').enable();
+                                }else{
+                                    $$('send_btn').disable();
+                                }
                             }
                         }
                     },
@@ -606,7 +629,7 @@ webix.ready(function() {
                                 view: 'button',
                                 css: 'webix_primary',
                                 value: 'Подать заявку',
-                                //disabled: true,
+                                disabled: true,
                                 align: 'center',
                                 click: function () {
                                     if($$('form').validate()) {
@@ -656,16 +679,16 @@ webix.ready(function() {
                         ]
                     }
                 ],
-/*
-                rules: [
-                    {
-                        email: webix.rules.isEmail(),
-                        organizationInn: webix.rules.isNumber(),
-                        organizationOgrn: webix.rules.isNumber(),
+                /*
+                                rules: [
+                                    {
+                                        email: webix.rules.isEmail(),
+                                        organizationInn: webix.rules.isNumber(),
+                                        organizationOgrn: webix.rules.isNumber(),
 
-                    }
-                ]
-*/
+                                    }
+                                ]
+                */
             }
         ]
     })
