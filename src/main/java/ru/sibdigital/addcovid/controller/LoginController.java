@@ -52,9 +52,10 @@ public class LoginController {
             //не прошли аутентификацию
             log.debug("LoginController. Аутентификация не пройдена.");
 
+            model.put("message", "Аутентификация не пройдена.");
             return "login";
         }
-        log.debug("LoginController. Аутентификация  пройдена.");
+        log.debug("LoginController. Аутентификация пройдена.");
 
 //        if (error != null)
 //            model.addAttribute("error", "Your username and password is invalid.");

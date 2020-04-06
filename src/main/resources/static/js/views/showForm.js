@@ -13,6 +13,7 @@ define(function() {
     return {
         view: 'scrollview',
         scroll: 'y',
+        id: 'show_layout',
         autowidth: true,
         autoheight: true,
         body: {
@@ -253,7 +254,6 @@ define(function() {
                                     editable: true,
                                     id: 'addr_table',
                                     columns: [
-                                        {id: 'id', header: '', css: 'rank'},
                                         {
                                             id: 'addressFact',
                                             header: 'Фактический адрес осуществления деятельности',
@@ -270,13 +270,6 @@ define(function() {
                                         }
                                     ],
                                     data: [],
-                                    on: {
-                                        'data->onStoreUpdated': function () {
-                                            this.data.each(function (obj, i) {
-                                                obj.id = i + 1;
-                                            });
-                                        }
-                                    },
                                 },
                             ]
                         },
@@ -355,7 +348,9 @@ define(function() {
                                         resizeColumn: true,
                                         readonly: true,
                                         columns: [
+/*
                                             {id: 'id', header: '', css: 'rank', width: 50},
+*/
                                             {
                                                 id: 'lastname',
                                                 header: 'Фамилия',
@@ -373,13 +368,6 @@ define(function() {
                                             {id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string'},
                                             //{ id: 'isagree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
                                         ],
-                                        on: {
-                                            'data->onStoreUpdated': function () {
-                                                this.data.each(function (obj, i) {
-                                                    obj.id = i + 1;
-                                                });
-                                            }
-                                        },
                                         data: []
                                     },
                                 ]
@@ -467,58 +455,67 @@ define(function() {
                             align: 'center'
                         },
                         {
+                            view: 'text',
+                            name: 'description',
+                            label: 'Примечание',
+                            id: 'comment',
+                            labelPosition: 'top'
+                        },
+                        {
                             cols: [
                                 {
-                                    id: 'send_btn',
+                                    id: 'accept_btn',
                                     view: 'button',
                                     css: 'webix_primary',
-                                    value: 'Подать заявку',
-                                    //disabled: true,
+                                    value: 'Принять заявку',
                                     align: 'center',
                                     click: function () {
-                                        if ($$('form').validate()) {
-                                            let params = $$('form').getValues()
+                                        let params = this.getTopParentView().config.item
+                                        params.statusReview = 1
 
-                                            let persons = []
-                                            $$('person_table').data.each(function (obj) {
-                                                let person = {
-                                                    lastname: obj.lastname,
-                                                    firstname: obj.firstname,
-                                                    patronymic: obj.patronymic
-                                                }
-                                                persons.push(person)
-                                            })
-                                            params.persons = persons
+                                        webix.ajax()
+                                            .headers({'Content-type': 'application/json'})
+                                            .put('/doc_requests/' + params.id,
+                                                JSON.stringify(params),
+                                                function (text, data, xhr) {
+                                                    console.log(text);
+                                                    webix.message(text);
 
-                                            let addrs = []
-                                            $$('addr_table').data.each(function (obj) {
-                                                let addr = {
-                                                    addressFact: obj.addressFact,
-                                                    personOfficeFactCnt: obj.personOfficeFactCnt
-                                                }
-                                                addrs.push(addr)
-                                            })
-                                            params.addressFact = addrs
+                                                    let modal = $$('show_layout').getTopParentView();
 
-                                            params.attachment = uploadFile
-                                            params.attachmentFilename = uploadFilename
+                                                    setTimeout(function() {
+                                                        modal.close();
+                                                    }, 0)
+                                                })
 
-                                            console.log(params);
-
-                                            webix.ajax()
-                                                .headers({'Content-type': 'application/json'})
-                                                .post('/',
-                                                    JSON.stringify(params),
-                                                    function (text, data, xhr) {
-                                                        console.log(text);
-                                                        webix.message(text);
-                                                    })
-                                        }
-                                        else {
-                                            webix.message('Не заполнены обязательные поля. Для просмотра прокрутите страницу вверх', 'error')
-                                        }
                                     }
+                                },
+                                {
+                                    id: 'reject_btn',
+                                    view: 'button',
+                                    css: 'webix_secondary',
+                                    value: 'Отклонить заявку',
+                                    align: 'center',
+                                    click: function () {
+                                        let params = this.getTopParentView().config.item
+                                        params.statusReview = 2
+                                        //params.description = $$('comment').getValue()
 
+                                        webix.ajax()
+                                            .headers({'Content-type': 'application/json'})
+                                            .put('/doc_requests/' + params.id,
+                                                JSON.stringify(params),
+                                                function (text, data, xhr) {
+                                                    console.log(text);
+                                                    webix.message(text);
+
+                                                    let modal = $$('show_layout').getTopParentView();
+
+                                                    setTimeout(function() {
+                                                        modal.close();
+                                                    }, 0)
+                                                })
+                                    }
                                 }
                             ]
                         }

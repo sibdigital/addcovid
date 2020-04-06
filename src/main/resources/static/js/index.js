@@ -45,12 +45,14 @@ require(
                 rows: [
                     {
                         view: 'toolbar',
+                        height: 40,
                         cols: [
+                            {},
                             {
                                 view: 'label',
-                                label: 'ЕИС Работающая Бурятия. Проверки.',
-                                id: 'head_label'
-                            }
+                                label: '<span style="font-size: 1.5rem">ЕИС "Работающая Бурятия". Список заявок.</span>',
+                            },
+                            {}
                         ]
                     },
                     {

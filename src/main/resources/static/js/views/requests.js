@@ -5,40 +5,30 @@ define(['views/showform'], function(showform) {
         width: document.body.clientWidth - 8,
         rows: [
             {
-                view: 'toolbar',
-                height: 40,
-                cols: [
-                    {},
-                    {
-                        view: 'label',
-                        label: '<span style="font-size: 1.5rem">ЕИС "Работающая Бурятия". Список заявок.</span>',
-                    },
-                    {}
-                ]
-            },
-            {
                 view: "datatable",
                 height: document.body.clientHeight,
                 id: 'requests_table',
                 select: 'row',
                 //autoConfig: true,
+                pager: 'Pager',
+                resizeColumn:true,
+                pager: 'Pager',
+                datafetch: 15,
                 columns: [
-                    {id: "orgName", header: "Название организации", template: "#organization.name#"},
-                    {id: "inn", header: "ИНН", template: "#organization.inn#"},
-                    {id: "ogrn", header: "ОГРН", template: "#organization.ogrn#"},
-                    {id: "orgPhone", header: "Телефон", template: "#organization.phone#"},
+                    {id: "orgName", header: "Название организации", template: "#organization.name#", adjust: true},
+                    {id: "inn", header: "ИНН", template: "#organization.inn#", adjust: true},
+                    {id: "ogrn", header: "ОГРН", template: "#organization.ogrn#", adjust: true},
+                    {id: "orgPhone", header: "Телефон", template: "#organization.phone#", adjust: true},
                     //{id: "orgPhone", header: "Обоснование заявки", template: "#organization.description#"},
-                    {id: "personOfficeCnt", header: "personOfficeCnt"},
-                    {id: "personRemoteCnt", header: "personRemoteCnt"},
-                    {id: "personSlrySaveCnt", header: "personSlrySaveCnt"},
-                    {id: "timeCreate", header: "Дата заявки"}
+                    {id: "personSlrySaveCnt", header: "Численность с сохранением зп", adjust: true},
+                    {id: "personOfficeCnt", header: "Численность работающих", adjust: true},
+                    {id: "personRemoteCnt", header: "Численность на удаленный режим", adjust: true},
+                    {id: "timeCreate", header: "Дата заявки", adjust: true}
                 ],
                 on: {
                     onItemDblClick: function (id) {
                         let data = $$('requests_table').getItem(id);
                         console.log(data);
-                        $$('head_label').config.item_data = data
-                        //routie('showform')
 
                         queryWin = webix.ui({
                             view: 'window',
@@ -58,8 +48,16 @@ define(['views/showform'], function(showform) {
                             width: 1200,
                             height: 800,
                             position: 'center',
+                            item: data,
                             modal: true,
                             body: showform,
+                            on: {
+                                'onHide': function () {
+                                    $$('requests_table').clearAll();
+                                    $$('requests_table').load($$('requests_table').config.url)
+                                }
+                            }
+
                         });
 
                         $$('form').parse(data)
@@ -71,6 +69,14 @@ define(['views/showform'], function(showform) {
                     }
                 },
                 url: "list_request/" + ID_DEPARTMENT
+            },
+            {
+                view: 'pager',
+                id: 'Pager',
+                height: 38,
+                size: 15,
+                group: 5,
+                template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
             }
         ]
     }
