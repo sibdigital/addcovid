@@ -222,7 +222,9 @@ webix.ready(function() {
                                         view: 'uploader',
                                         css: 'webix_secondary',
                                         value: 'Выбрать файл для загрузки',
-                                        formData: {}
+                                        autosend: false,
+                                        multiple: false,
+                                        //formData: {}
                                     },
                                 ]
                             }
@@ -273,7 +275,6 @@ webix.ready(function() {
                                                 });
                                             }
                                         },
-
                                     },
                                     {
                                         view: 'form',
@@ -399,7 +400,6 @@ webix.ready(function() {
                                     params.addressFact = addrs
 
                                     console.log(params);
-
 
                                     webix.ajax()
                                         .headers({'Content-type': 'application/json'})

@@ -34,9 +34,8 @@ public class MainController {
     public @ResponseBody
     String postForm(@RequestBody PostFormDto postFormDto) {
 
-//    public @ResponseBody
-//    String postForm(@ModelAttribute("form") PostFormDto postFormDto) {
-        System.out.println(postFormDto);
-        return "success: " + postFormDto.sha256();
+
+
+        return postFormDto.sha256();
     }
 }
