@@ -3,10 +3,14 @@ package ru.sibdigital.addcovid.controller;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 import ru.sibdigital.addcovid.dto.ListItemDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.repository.ClsDepartmentRepo;
+import ru.sibdigital.addcovid.utils.SHA256Generator;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +40,6 @@ public class MainController {
 
 
 
-        return postFormDto.sha256();
+        return SHA256Generator.generate(postFormDto.getOrganizationInn(), postFormDto.getOrganizationOgrn(), postFormDto.getOrganizationName());
     }
 }
