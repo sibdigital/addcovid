@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
     Optional<DocRequest> getTopByOrganization(ClsOrganization clsOrganization);
+    Optional<DocRequest> getTopByOrgHashCode(String sha256code);
 }

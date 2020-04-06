@@ -25,7 +25,6 @@ public class ClsOrganization {
     private String shortName;
     private String inn;
     private String ogrn;
-    private String hashCode;
     private String addressJur;
     private String okvedAdd;
     private String okved;
@@ -81,16 +80,6 @@ public class ClsOrganization {
 
     public void setOgrn(String ogrn) {
         this.ogrn = ogrn;
-    }
-
-    @Basic
-    @Column(name = "hash_code", nullable = false, length = -1)
-    public String getHashCode() {
-        return hashCode;
-    }
-
-    public void setHashCode(String hashCode) {
-        this.hashCode = hashCode;
     }
 
     @Basic
@@ -173,7 +162,6 @@ public class ClsOrganization {
                 Objects.equals(shortName, that.shortName) &&
                 Objects.equals(inn, that.inn) &&
                 Objects.equals(ogrn, that.ogrn) &&
-                Objects.equals(hashCode, that.hashCode) &&
                 Objects.equals(addressJur, that.addressJur) &&
                 Objects.equals(okvedAdd, that.okvedAdd) &&
                 Objects.equals(okved, that.okved) &&
@@ -185,7 +173,7 @@ public class ClsOrganization {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, shortName, inn, ogrn, hashCode, addressJur, okvedAdd, okved, email, phone, statusImport, timeImport);
+        return Objects.hash(id, name, shortName, inn, ogrn, addressJur, okvedAdd, okved, email, phone, statusImport, timeImport);
     }
 
 

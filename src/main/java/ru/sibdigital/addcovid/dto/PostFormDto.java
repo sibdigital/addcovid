@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -35,8 +34,13 @@ public class PostFormDto {
     private Long personSlrySaveCnt;
     private Long personOfficeFactCnt;
 
-    private MultipartFile attachment;
+    //private MultipartFile attachment;
+    private String attachment;
+    private String attachmentFilename;
 
+    private Boolean isAgree;
+    private Boolean isProtect;
+    private String reqBasis;
 
 
 

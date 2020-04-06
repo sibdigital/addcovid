@@ -34,9 +34,11 @@ public class DocPerson {
 
 
 
+/*
     @Basic
     @Column(name = "is_agree", nullable = false)
     private Boolean isAgree;
+*/
 
     @ManyToOne
     @JoinColumn(name="id_request", nullable=false)
@@ -76,6 +78,7 @@ public class DocPerson {
         this.patronymic = patronymic;
     }
 
+/*
     public Boolean getAgree() {
         return isAgree;
     }
@@ -83,6 +86,7 @@ public class DocPerson {
     public void setAgree(Boolean agree) {
         isAgree = agree;
     }
+*/
 
     public DocRequest getDocRequest() {
         return docRequest;
@@ -100,13 +104,13 @@ public class DocPerson {
         return Objects.equals(id, docPerson.id) &&
                 Objects.equals(lastname, docPerson.lastname) &&
                 Objects.equals(firstname, docPerson.firstname) &&
-                Objects.equals(patronymic, docPerson.patronymic) &&
-                Objects.equals(isAgree, docPerson.isAgree);
+                Objects.equals(patronymic, docPerson.patronymic);
+                //Objects.equals(isAgree, docPerson.isAgree);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, lastname, firstname, patronymic, isAgree);
+        return Objects.hash(id, lastname, firstname, patronymic/*, isAgree*/);
     }
 
 

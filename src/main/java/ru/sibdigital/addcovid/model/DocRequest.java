@@ -24,13 +24,17 @@ public class DocRequest {
     private Long personOfficeCnt;
     private Long personRemoteCnt;
     private Long personSlrySaveCnt;
-    private Long personOfficeFactCnt;
+    //private Long personOfficeFactCnt;
     private String attachmentPath;
     private Integer statusReview;
     private Timestamp timeCreate;
     private Integer statusImport;
     private Timestamp timeImport;
     private Timestamp timeReview;
+    private Boolean isAgree;
+    private Boolean isProtect;
+    private String reqBasis;
+    private String orgHashCode;
 
     @OneToMany(targetEntity = DocPerson.class,mappedBy="docRequest", fetch = FetchType.EAGER)
     private Set<DocPerson> docPersonSet;
@@ -85,6 +89,7 @@ public class DocRequest {
         this.personSlrySaveCnt = personSlrySaveCnt;
     }
 
+/*
     @Basic
     @Column(name = "person_office_fact_cnt", nullable = false)
     public Long getPersonOfficeFactCnt() {
@@ -94,6 +99,7 @@ public class DocRequest {
     public void setPersonOfficeFactCnt(Long personOfficeFactCnt) {
         this.personOfficeFactCnt = personOfficeFactCnt;
     }
+*/
 
     @Basic
     @Column(name = "attachment_path", nullable = false, length = 255)
@@ -151,6 +157,46 @@ public class DocRequest {
         return timeReview;
     }
 
+    @Basic
+    @Column(name = "is_agree", nullable = false)
+    public Boolean getAgree() {
+        return isAgree;
+    }
+
+    public void setAgree(Boolean agree) {
+        isAgree = agree;
+    }
+
+    @Basic
+    @Column(name = "is_protect", nullable = false)
+    public Boolean getProtect() {
+        return isProtect;
+    }
+
+    public void setProtect(Boolean protect) {
+        isProtect = protect;
+    }
+
+    @Basic
+    @Column(name = "req_basis", nullable = false)
+    public String getReqBasis() {
+        return reqBasis;
+    }
+
+    public void setReqBasis(String reqBasis) {
+        this.reqBasis = reqBasis;
+    }
+
+    @Basic
+    @Column(name = "org_hash_code", nullable = false)
+    public String getOrgHashCode() {
+        return orgHashCode;
+    }
+
+    public void setOrgHashCode(String orgHashCode) {
+        this.orgHashCode = orgHashCode;
+    }
+
     public void setTimeReview(Timestamp timeReview) {
         this.timeReview = timeReview;
     }
@@ -196,18 +242,24 @@ public class DocRequest {
                 Objects.equals(personOfficeCnt, that.personOfficeCnt) &&
                 Objects.equals(personRemoteCnt, that.personRemoteCnt) &&
                 Objects.equals(personSlrySaveCnt, that.personSlrySaveCnt) &&
-                Objects.equals(personOfficeFactCnt, that.personOfficeFactCnt) &&
                 Objects.equals(attachmentPath, that.attachmentPath) &&
                 Objects.equals(statusReview, that.statusReview) &&
                 Objects.equals(timeCreate, that.timeCreate) &&
                 Objects.equals(statusImport, that.statusImport) &&
                 Objects.equals(timeImport, that.timeImport) &&
-                Objects.equals(timeReview, that.timeReview);
+                Objects.equals(timeReview, that.timeReview) &&
+                Objects.equals(isAgree, that.isAgree) &&
+                Objects.equals(isProtect, that.isProtect) &&
+                Objects.equals(reqBasis, that.reqBasis) &&
+                Objects.equals(orgHashCode, that.orgHashCode) &&
+                Objects.equals(docPersonSet, that.docPersonSet) &&
+                Objects.equals(department, that.department) &&
+                Objects.equals(organization, that.organization) &&
+                Objects.equals(docAddressFact, that.docAddressFact);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, personOfficeFactCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview);
+        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview, isAgree, isProtect, reqBasis, orgHashCode, docPersonSet, department, organization, docAddressFact);
     }
-
 }

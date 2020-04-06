@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Base64;
 
 @SpringBootTest
 @Slf4j
@@ -44,7 +45,7 @@ class RequestServiceTest {
                .firstname("Татьяна")
                .lastname("Михайлова")
                . patronymic("Анатольевна")
-               .isAgree(true)
+               /*.isAgree(true)*/
                .build();
 
 
@@ -67,6 +68,9 @@ class RequestServiceTest {
                .personSlrySaveCnt(6L)
                .personOfficeFactCnt(1L)
                .attachment(null)
+               .isAgree(true)
+               .isProtect(true)
+               .reqBasis("Потому что")
                .build();
    }
 
@@ -98,9 +102,17 @@ class RequestServiceTest {
 
 
 
+        Base64.Encoder enc = Base64.getEncoder();
+        StringBuilder stringBuilder = new StringBuilder();
+        byte[] encbytes = enc.encode(file.getBytes());
+        for (int i = 0; i < encbytes.length; i++)
+        {
+            stringBuilder.append((char)encbytes[i]);
+        }
 
 
-        this.postForm.setAttachment(file);
+
+        this.postForm.setAttachment(stringBuilder.toString());
 
 
         requestService.addNewRequest(postForm);
