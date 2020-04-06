@@ -24,7 +24,7 @@ public class DocRequest {
     private Long personOfficeCnt;
     private Long personRemoteCnt;
     private Long personSlrySaveCnt;
-    private Long personOfficeFactCnt;
+    //private Long personOfficeFactCnt;
     private String attachmentPath;
     private Integer statusReview;
     private Timestamp timeCreate;
@@ -85,6 +85,7 @@ public class DocRequest {
         this.personSlrySaveCnt = personSlrySaveCnt;
     }
 
+/*
     @Basic
     @Column(name = "person_office_fact_cnt", nullable = false)
     public Long getPersonOfficeFactCnt() {
@@ -94,6 +95,7 @@ public class DocRequest {
     public void setPersonOfficeFactCnt(Long personOfficeFactCnt) {
         this.personOfficeFactCnt = personOfficeFactCnt;
     }
+*/
 
     @Basic
     @Column(name = "attachment_path", nullable = false, length = 255)
@@ -196,7 +198,7 @@ public class DocRequest {
                 Objects.equals(personOfficeCnt, that.personOfficeCnt) &&
                 Objects.equals(personRemoteCnt, that.personRemoteCnt) &&
                 Objects.equals(personSlrySaveCnt, that.personSlrySaveCnt) &&
-                Objects.equals(personOfficeFactCnt, that.personOfficeFactCnt) &&
+//                Objects.equals(personOfficeFactCnt, that.personOfficeFactCnt) &&
                 Objects.equals(attachmentPath, that.attachmentPath) &&
                 Objects.equals(statusReview, that.statusReview) &&
                 Objects.equals(timeCreate, that.timeCreate) &&
@@ -207,6 +209,6 @@ public class DocRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, personOfficeFactCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview);
+        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, /*personOfficeFactCnt,*/ attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview);
     }
 }
