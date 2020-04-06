@@ -1,0 +1,227 @@
+webix.i18n.setLocale("ru-RU");
+
+function view_section(title){
+    return {
+        view: 'template',
+        type: 'section',
+        template: title
+    }
+}
+
+function addPerson(){
+    let values = $$('form_person').getValues()
+    if(values.lastname == '' || values.firstname == ''){
+        webix.message('Фамилия, Имя - обязательные поля')
+        return;
+    }
+
+    $$('person_table').add({
+        lastname: values.lastname,
+        firstname: values.firstname,
+        patronymic: values.patronymic,
+        isAgree: values.agree
+    }, 0)
+
+    $$('form_person').clear()
+}
+
+function editPerson(){
+    let values = $$('form_person').getValues()
+    if(values.lastname == '' || values.firstname == '') {
+        webix.message('Фамилия, Имя - обязательные поля')
+        return;
+    }
+
+    $$('form_person').save()
+}
+
+function removePerson(){
+    if(!$$("person_table").getSelectedId()){
+        webix.message("Ничего не выбрано!");
+        return;
+    }
+    webix.confirm('Вы действительно хотите удалить выбранную запись?')
+        .then(
+            function () {
+                $$("person_table").remove($$("person_table").getSelectedId());
+            }
+        )
+}
+
+
+webix.ready(function() {
+    webix.ui({
+        container: 'app',
+        autowidth: true,
+        height: document.body.clientHeight,
+        width: document.body.clientWidth - 8,
+        rows: [
+            {
+                id: 'form',
+                view: 'form',
+                complexData: true,
+                elements: [
+                    view_section('Данные о вашей организации'),
+                    {
+                        type: 'space',
+                        margin: 5,
+                        cols: [
+                            {
+                                rows: [
+                                    {
+                                        view: 'text',
+                                        name: 'name',
+                                        label: 'Наименование',
+                                        labelPosition: 'top',
+                                        required: true
+                                    },
+                                    {
+                                        view: 'text',
+                                        name: 'short_name',
+                                        label: 'Краткое наименование',
+                                        labelPosition: 'top',
+                                        required: true
+                                    },
+                                    {
+                                        view: 'text',
+                                        name: 'inn',
+                                        label: 'ИНН',
+                                        labelPosition: 'top',
+                                        //pattern: {mask: '############', allow: /[0-9]/g},
+                                        invalidMessage: 'Поле не может быть пустым',
+                                        required: true
+                                    },
+                                    {
+                                        view: 'text',
+                                        name: 'ogrn',
+                                        label: 'ОГРН',
+                                        labelPosition: 'top',
+                                        required: true
+                                    },
+                                    {
+                                        view: 'text',
+                                        name: 'email',
+                                        label: 'e-mail',
+                                        labelPosition: 'top',
+                                        required: true
+                                    },
+                                    {
+                                        view: 'text',
+                                        name: 'phone',
+                                        label: 'Телефон',
+                                        labelPosition: 'top',
+                                        required: true
+                                    },
+                                    {
+                                        view: 'combo',
+                                        name: 'department',
+                                        label: 'Министрество',
+                                        labelPosition: 'top',
+                                        options: [
+                                            { id: 1, value: 'Министерство финансов Республики Бурятия'},
+                                            { id: 2, value: 'Министерство экономики Республики Бурятия'},
+                                            { id: 3, value: 'Министерство имущественных и земельных отношений  Республики Бурятия'},
+                                            { id: 4, value: 'Министерство промышленности и торговли Республики Бурятия'},
+                                            { id: 5, value: 'Министерство природных ресурсов Республики Бурятия'},
+                                            { id: 6, value: 'Министерство сельского хозяйства и продовольствия Республики Бурятия'},
+                                            { id: 7, value: 'Министерство строительства и модернизации жилищно-коммунального комплекса Республики Бурятия'},
+                                            { id: 8, value: 'Министерство по развитию транспорта, энергетики и дорожного хозяйства Республики Бурятия'},
+                                            { id: 9, value: 'Министерство социальной защиты населения Республики Бурятия'},
+                                            { id: 10, value: 'Министерство здравоохранения Республики Бурятия'},
+                                            { id: 11, value: 'Министерство культуры Республики Бурятия'},
+                                            { id: 12, value: 'Министерство образования и науки Республики Бурятия'},
+                                            { id: 13, value: 'Министерство спорта и молодежной политики Республики Бурятия'},
+                                            { id: 14, value: 'Министерство туризма Республики Бурятия'},
+                                            { id: 15, value: 'Республиканское агентство лесного хозяйства'},
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                rows: [
+                                    {
+                                        view: 'text',
+                                        name: 'okved',
+                                        label: 'ОКВЭД',
+                                        labelPosition: 'top',
+                                        required: true
+                                    },
+                                    {
+                                        view: 'textarea',
+                                        name: 'okved_add',
+                                        label: 'ОКВЭД',
+                                        labelPosition: 'top'
+                                    },
+                                    {
+                                        view: 'textarea',
+                                        name: 'address_jur',
+                                        label: 'Юридический адрес',
+                                        labelPosition: 'top',
+                                        required: true
+                                    },
+                                ]
+                            }
+                        ]
+                    },
+                    view_section('Данные о ваших сотрудниках'),
+                    {
+                        view: 'scrollview',
+                        type: 'space',
+                        height: 600,
+                        scroll: 'y',
+                        body: {
+                            rows: [
+                            {
+                                id: 'person_table',
+                                view: 'datatable',
+                                height: 400,
+                                select: true,
+                                columns: [
+                                    { id: 'lastname', header: 'Фамилия', adjust: true },
+                                    { id: 'firstname', header: 'Имя', adjust: true },
+                                    { id: 'patronymic', header: 'Отчество', adjust: true },
+                                    { id: 'is_agree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
+                                ],
+                                data: []
+                            },
+                            {
+                                view: 'form',
+                                id: 'form_person',
+                                elements: [
+                                    {
+                                        type: 'space',
+                                        margin: 5,
+                                        cols: [
+                                            {view: 'text', name: 'lastname', inputWidth: '200', label: 'Фамилия', labelPosition: 'top' },
+                                            {view: 'text', name: 'firstname', inputWidth: '200', label: 'Имя', labelPosition: 'top'},
+                                            {view: 'text', name: 'patronymic', inputWidth: '200', label: 'Отчество', labelPosition: 'top'},
+                                            {view: 'checkbox', label: 'Согласие'},
+                                            {},
+                                        ]
+                                    },
+                                    {
+                                        type: 'space',
+                                        margin: 5,
+                                        cols: [
+                                            {view: 'button', value: 'Добавить', width: 150, click: addPerson },
+                                            {view: 'button', value: 'Изменить', width: 150, click: editPerson },
+                                            {view: 'button', value: 'Удалить', width: 150, click: removePerson}
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                        }
+                    }
+                ],
+                rules: [
+                    {
+                        'email': webix.rules.isEmail()
+                    }
+                ]
+            }
+        ]
+    })
+
+    $$('form_person').bind('person_table')
+})
