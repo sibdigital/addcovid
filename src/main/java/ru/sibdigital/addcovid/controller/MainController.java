@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import ru.sibdigital.addcovid.dto.ListItemDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.repository.ClsDepartmentRepo;
-import ru.sibdigital.addcovid.utils.SHA256Generator;
+import ru.sibdigital.addcovid.service.RequestService;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +22,9 @@ public class MainController {
 
     @Autowired
     private ClsDepartmentRepo clsDepartmentRepo;
+
+    @Autowired
+    private RequestService requestService;
 
     @GetMapping
     public String greeting(Map<String, Object> model) {
@@ -38,8 +41,8 @@ public class MainController {
     public @ResponseBody
     String postForm(@RequestBody PostFormDto postFormDto) {
 
+        String hash = requestService.addNewRequest(postFormDto);
 
-
-        return SHA256Generator.generate(postFormDto.getOrganizationInn(), postFormDto.getOrganizationOgrn(), postFormDto.getOrganizationName());
+        return hash;
     }
 }
