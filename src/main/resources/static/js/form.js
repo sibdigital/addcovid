@@ -10,8 +10,10 @@ function view_section(title){
 
 function addPerson(){
     let values = $$('form_person').getValues()
-debugger
-    if(values.lastname == '' || values.firstname == '') return;
+    if(values.lastname == '' || values.firstname == ''){
+        webix.message('Фамилия, Имя - обязательные поля')
+        return;
+    }
 
     $$('person_table').add({
         lastname: values.lastname,
@@ -23,12 +25,27 @@ debugger
     $$('form_person').clear()
 }
 
+function editPerson(){
+    let values = $$('form_person').getValues()
+    if(values.lastname == '' || values.firstname == '') {
+        webix.message('Фамилия, Имя - обязательные поля')
+        return;
+    }
+
+    $$('form_person').save()
+}
+
 function removePerson(){
     if(!$$("person_table").getSelectedId()){
         webix.message("Ничего не выбрано!");
         return;
     }
-    $$("person_table").remove($$("person_table").getSelectedId());
+    webix.confirm('Вы действительно хотите удалить выбранную запись?')
+        .then(
+            function () {
+                $$("person_table").remove($$("person_table").getSelectedId());
+            }
+        )
 }
 
 
@@ -36,7 +53,8 @@ webix.ready(function() {
     webix.ui({
         container: 'app',
         autowidth: true,
-        height: document.body.clientHeight - 85,
+        height: document.body.clientHeight,
+        width: document.body.clientWidth - 8,
         rows: [
             {
                 id: 'form',
@@ -134,11 +152,12 @@ webix.ready(function() {
                                 id: 'person_table',
                                 view: 'datatable',
                                 height: 400,
+                                select: true,
                                 columns: [
-                                    { id: 'lastname', header: 'Фамилия'},
-                                    { id: 'firstname', header: 'Имя'},
-                                    { id: 'patronymic', header: 'Отчество'},
-                                    { id: 'is_agree', header: 'Согласие'}
+                                    { id: 'lastname', header: 'Фамилия', adjust: true },
+                                    { id: 'firstname', header: 'Имя', adjust: true },
+                                    { id: 'patronymic', header: 'Отчество', adjust: true },
+                                    { id: 'is_agree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
                                 ],
                                 data: []
                             },
@@ -155,14 +174,14 @@ webix.ready(function() {
                                             {view: 'text', name: 'patronymic', inputWidth: '200', label: 'Отчество', labelPosition: 'top'},
                                             {view: 'checkbox', label: 'Согласие'},
                                             {},
-                                            {view: 'button', value: 'Добавить', width: 150, click: addPerson },
                                         ]
                                     },
                                     {
                                         type: 'space',
                                         margin: 5,
                                         cols: [
-                                            {},
+                                            {view: 'button', value: 'Добавить', width: 150, click: addPerson },
+                                            {view: 'button', value: 'Изменить', width: 150, click: editPerson },
                                             {view: 'button', value: 'Удалить', width: 150, click: removePerson}
                                         ]
                                     }
