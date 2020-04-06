@@ -15,7 +15,8 @@ import java.util.Objects;
 public class DocPerson {
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "DOC_PERSON_SEQ_GEN", sequenceName = "doc_person_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DOC_PERSON_SEQ_GEN")
     private Long id;
 
 
