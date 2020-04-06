@@ -399,7 +399,8 @@ webix.ready(function() {
                                 view: 'textarea',
                                 height: 150,
                                 label: 'Обоснование заявки',
-                                name: 'req_basis',
+                                name: 'reqBasis',
+                                id: 'reqBasis',
                                 invalidMessage: 'Поле не может быть пустым',
                                 required: true,
                                 labelPosition: 'top'
@@ -408,16 +409,21 @@ webix.ready(function() {
                                 id: 'upload',
                                 view: 'uploader',
                                 css: 'webix_secondary',
-                                value: 'Загрузить файл с пояснением обоснования',
+                                value: 'Загрузить PDF-файл с пояснением обоснования',
                                 autosend: false,
                                 required: true,
                                 multiple: false,
                                 on: {
                                     onBeforeFileAdd: function (upload) {
-                                        if (upload.type.toUpperCase() !== 'PDF') return false;
+                                        if (upload.type.toUpperCase() !== 'PDF') {
+                                            $$('no_pdf').setValue('Загружать можно только PDF-файлы!');
+                                            $$('file').setValue('');
+                                            return false;
+                                        }
                                         let reader = new FileReader();
                                         reader.addEventListener("load", function () { // Setting up base64 URL on image
-                                            uploadFile = window.btoa(reader.result)
+                                            uploadFile = window.btoa(reader.result);
+                                            $$('no_pdf').setValue('');
                                             $$('file').setValue(uploadFilename);
                                         }, false);
                                         reader.readAsBinaryString(upload.file);
@@ -431,6 +437,13 @@ webix.ready(function() {
                                 view: 'label',
                                 label: '',
                                 id: 'file'
+                            },
+                            {
+                                paddingLeft: 10,
+                                view: 'label',
+                                visible: false,
+                                label: '',
+                                id: 'no_pdf'
                             }
                         ]
                     },

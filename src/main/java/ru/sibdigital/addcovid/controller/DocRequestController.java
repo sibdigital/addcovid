@@ -26,9 +26,9 @@ public class DocRequestController {
     @GetMapping("/doc_requests")
     public Optional<List<DocRequest>> requests(Map<String, Object> model) {
 
-        Optional<List<DocRequest>> docRequests =  docRequestRepo.getAllByDepartmentId(3l);
+        //Optional<List<DocRequest>> docRequests =  docRequestRepo.getAllByDepartmentId(3);
 
-        return docRequests;
+        return null;//docRequests;
     }
 
 }
