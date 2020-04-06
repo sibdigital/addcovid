@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
-@Table(name = "cls_department", schema = "public", catalog = "addcovid")
+@Table(name = "cls_department", schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)

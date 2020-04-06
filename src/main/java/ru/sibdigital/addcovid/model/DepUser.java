@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "dep_user", schema = "public", catalog = "addcovid")
+@Table(name = "dep_user", schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
 public class DepUser implements Serializable {

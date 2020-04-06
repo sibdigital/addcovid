@@ -53,11 +53,13 @@ function removePerson(){
 function addAddr(){
     let values = $$('form_addr').getValues()
     if(values.addressFact == '' || values.personOfficeFactCnt == ''){
-        webix.message('обязательные поля')
+        webix.message('не заполнены обязательные поля')
         return;
     }
-    //debugger
-    //if(typeof values.personOfficeFactCnt)
+    if(isNaN(values.personOfficeFactCnt * 1)) {
+        webix.message('требуется числовое значение')
+        return;
+    }
 
     $$('addr_table').add({
         personOfficeFactCnt: values.personOfficeFactCnt,
@@ -71,6 +73,10 @@ function editAddr(){
     let values = $$('form_addr').getValues()
     if(values.addressFact == '' || values.personOfficeFactCnt == ''){
         webix.message('обязательные поля')
+        return;
+    }
+    if(isNaN(values.personOfficeFactCnt * 1)) {
+        webix.message('требуется числовое значение')
         return;
     }
 
@@ -102,11 +108,25 @@ webix.ready(function() {
         width: document.body.clientWidth - 8,
         rows: [
             {
-                view: 'template',
-                template: 'ЕИС "Работающая Бурятия". Подача заявки.',
-                borderless: true,
+                view: 'toolbar',
+                //borderless: true,
                 height: 40,
-                align: 'center'
+                //align: 'center',
+                cols: [
+                    {
+/*
+                        view: 'template',
+                        width: 20,
+                        borderless: true
+*/
+                    },
+                    {
+                        view: 'label',
+                        label: '<span style="font-size: 1.5rem">ЕИС "Работающая Бурятия". Подача заявки.</span>',
+                        //css: 'main_label'
+                    },
+                    {}
+                ]
             },
             {
                 id: 'form',
@@ -141,8 +161,10 @@ webix.ready(function() {
                                         name: 'organizationInn',
                                         label: 'ИНН',
                                         labelPosition: 'top',
-                                        //pattern: {mask: '############', allow: /[0-9]/g},
-                                        validate:webix.rules.isNumber(),
+                                        validate: function(val){
+                                            return !isNaN(val*1);
+                                        },
+                                        //attributes:{ type:"number" },
                                         invalidMessage: 'Поле не может быть пустым',
                                         required: true
                                     },
@@ -150,9 +172,12 @@ webix.ready(function() {
                                         view: 'text',
                                         name: 'organizationOgrn',
                                         label: 'ОГРН',
-                                        //pattern:{ mask:'#############', allow:/[0-9]/g},
+                                        validate: function(val){
+                                            return !isNaN(val*1);
+                                        },
+                                        //attributes:{ type:"number" },
                                         labelPosition: 'top',
-                                        validate:webix.rules.isNumber(),
+                                        //validate:webix.rules.isNumber(),
                                         invalidMessage: 'Поле не может быть пустым',
                                         required: true
                                     },
@@ -298,6 +323,7 @@ webix.ready(function() {
                             {
                                 view: 'datatable', name: 'addressFact', label: '', labelPosition: 'top',
                                 height: 200,
+                                select: 'row',
                                 editable: true,
                                 id: 'addr_table',
                                 columns: [
@@ -333,8 +359,11 @@ webix.ready(function() {
                                     {
                                         type: 'space',
                                         cols: [
-                                            {view: 'text', name: 'addressFact', label: 'Фактический адрес', labelPosition: 'top' },
-                                            {view: 'text', name: 'personOfficeFactCnt', inputWidth: '250', label: 'Численность работников', labelPosition: 'top'},
+                                            {view: 'text', name: 'addressFact', label: 'Фактический адрес', labelPosition: 'top', required: true },
+                                            {view: 'text', name: 'personOfficeFactCnt', inputWidth: '250', label: 'Численность работников', labelPosition: 'top',
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true,
+                                            },
                                             {},
                                         ]
                                     },
@@ -400,7 +429,9 @@ webix.ready(function() {
                                 view: 'text', name: 'personSlrySaveCnt',
                                 label: 'Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы',
                                 labelPosition: 'top',
-                                validate:webix.rules.isNumber(),
+                                validate: function(val){
+                                    return !isNaN(val*1);
+                                },
                                 invalidMessage: 'Поле не может быть пустым',
                                 required: true
                             },
@@ -408,7 +439,9 @@ webix.ready(function() {
                                 view: 'text', name: 'personRemoteCnt',
                                 label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
                                 invalidMessage: 'Поле не может быть пустым',
-                                validate:webix.rules.isNumber(),
+                                validate: function(val){
+                                    return !isNaN(val*1);
+                                },
                                 required: true,
                                 labelPosition: 'top'
                             },
@@ -416,7 +449,9 @@ webix.ready(function() {
                                 view: 'text', name: 'personOfficeCnt',
                                 label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
                                 labelPosition: 'top',
-                                validate:webix.rules.isNumber(),
+                                validate: function(val){
+                                    return !isNaN(val*1);
+                                },
                                 invalidMessage: 'Поле не может быть пустым',
                                 required: true
                             },
@@ -636,4 +671,5 @@ webix.ready(function() {
     })
 
     $$('form_person').bind('person_table')
+    $$('form_addr').bind('addr_table')
 })
