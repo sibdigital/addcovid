@@ -102,3 +102,24 @@ create index fki_request_addr
 	on doc_address_fact (id_request);
 
 
+create table dep_user
+(
+    id serial not null
+        constraint dep_user_pk
+            primary key,
+    id_department integer not null
+        constraint dep_user_cls_department_id_fk
+            references cls_department,
+
+    lastname varchar(100) not null,
+    firstname varchar(100) not null,
+    patronymic varchar(100),
+
+    login varchar(100) not null,
+    password varchar(100) not null
+);
+
+create unique index fki_dep_user_login
+    on dep_user (login);
+
+alter table dep_user owner to postgres;

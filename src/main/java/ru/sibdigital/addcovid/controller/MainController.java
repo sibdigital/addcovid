@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,12 +24,13 @@ public class MainController {
     private ClsDepartmentRepo clsDepartmentRepo;
 
     @GetMapping
-    public String greeting(Map<String, Object> model) {
+    public String greeting(Map<String, Object> model) throws JsonProcessingException {
 
         List<ListItemDto> listDepartment =  clsDepartmentRepo.findAll()
                 .stream()
                 .map(clsDepartment -> new ListItemDto(Long.valueOf(clsDepartment.getId()), clsDepartment.getName()))
                 .collect(Collectors.toList());
+
         model.put("listDepartment", listDepartment);
         return "index";
     }
