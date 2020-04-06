@@ -404,10 +404,12 @@ webix.ready(function() {
                                     onBeforeFileAdd: function (upload) {
                                         if (upload.type.toUpperCase() !== 'PDF') return false;
                                         let reader = new FileReader();
+                                        reader.addEventListener("load", function () { // Setting up base64 URL on image
+                                            uploadFile = window.btoa(reader.result)
+                                            $$('file').setValue(uploadFilename);
+                                        }, false);
                                         reader.readAsBinaryString(upload.file);
-                                        uploadFile = window.btoa(reader.result)
                                         uploadFilename = upload.name
-                                        $$('file').setValue(uploadFilename)
                                         return false;
                                     }
                                 }
