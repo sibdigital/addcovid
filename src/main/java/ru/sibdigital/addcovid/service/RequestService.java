@@ -7,10 +7,7 @@ import ru.sibdigital.addcovid.model.ClsOrganization;
 import ru.sibdigital.addcovid.model.DocAddressFact;
 import ru.sibdigital.addcovid.model.DocPerson;
 import ru.sibdigital.addcovid.model.DocRequest;
-import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
-import ru.sibdigital.addcovid.repository.DocAddressFactRepo;
-import ru.sibdigital.addcovid.repository.DocPersonRepo;
-import ru.sibdigital.addcovid.repository.DocRequestRepo;
+import ru.sibdigital.addcovid.repository.*;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -31,6 +28,9 @@ public class RequestService {
 
     @Autowired
     DocRequestRepo docRequestRepo;
+
+    @Autowired
+    ClsDepartmentRepo departmentRepo;
 
 
 
@@ -74,20 +74,38 @@ public class RequestService {
 
         DocRequest docRequest = DocRequest.builder()
                 .organization(organization)
+                .department(departmentRepo.getOne(postForm.getDepartmentId()))
                 .personOfficeCnt(postForm.getPersonOfficeCnt())
                 .personOfficeFactCnt(postForm.getPersonOfficeFactCnt())
                 .personRemoteCnt(postForm.getPersonRemoteCnt())
                 .personSlrySaveCnt(postForm.getPersonSlrySaveCnt())
                 .attachmentPath("")
-                .statusReview(0)
                 .docPersonSet(personSet)
                 .docAddressFact(docAddressFactSet)
+                .statusReview(0)
                 .timeReview(Timestamp.valueOf(LocalDateTime.now()))
                 .statusImport(0)
                 .timeImport(Timestamp.valueOf(LocalDateTime.now()))
+                .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
                 .build();
 
         docRequest = docRequestRepo.save(docRequest);
+
+        DocRequest finalDocRequest = docRequest;
+        docRequest.getDocAddressFact().forEach(docAddressFact -> {
+            docAddressFact.setDocRequest(finalDocRequest);
+        });
+
+        docRequest.getDocPersonSet().forEach(docPerson -> {
+            docPerson.setDocRequest(finalDocRequest);
+        });
+
+        docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
+        docPersonRepo.saveAll(docRequest.getDocPersonSet());
+
+
+
+
 
         return organization.getHashCode();
 

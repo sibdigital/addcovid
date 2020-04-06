@@ -44,7 +44,7 @@ class RequestServiceTest {
                 .organizationName("МАОУ СОШ Школа №1")
                 .organizationShortName("Школа №1")
                 .organizationInn("1234567890")
-                .organizationOgrn("1234567890123456")
+                .organizationOgrn("1234567890123")
                 .organizationAddressJur("ул. Домодедова 102")
                 .organizationOkved("Подготовка школьников")
                 .organizationOkvedAdd("Подготовка к ЕГЭ")
@@ -55,7 +55,7 @@ class RequestServiceTest {
                 .personOfficeCnt(10L)
                 .personRemoteCnt(3L)
                 .personSlrySaveCnt(6L)
-                .personOfficeCnt(1L)
+                .personOfficeFactCnt(1L)
                 .attachment(null)
                 .build();
 

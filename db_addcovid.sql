@@ -1,5 +1,6 @@
 create database addcovid;
 
+drop table cls_department;
 create table cls_department
 (
 	id integer not null
@@ -13,6 +14,7 @@ create table cls_department
 
 alter table cls_department owner to postgres;
 
+drop table cls_organization;
 create table cls_organization
 (
 	id serial not null
@@ -24,7 +26,7 @@ create table cls_organization
 	ogrn varchar(13) not null,
     hash_code text not null,
 	address_jur varchar(255) not null,
-	okved_add jsonb,
+	okved_add text,
 	okved text not null,
 	email varchar(100) not null,
 	phone varchar(100) not null,
@@ -34,6 +36,7 @@ create table cls_organization
 
 alter table cls_organization owner to postgres;
 
+drop table doc_request;
 create table doc_request
 (
 	id serial not null
@@ -62,6 +65,8 @@ alter table doc_request owner to postgres;
 create index fki_organization
 	on doc_request (id_organization);
 
+
+drop table doc_person;
 create table doc_person
 (
 	id serial not null
@@ -72,7 +77,7 @@ create table doc_person
 			references doc_request
 				on delete cascade
 		constraint fk_request
-			references cls_department,
+			references doc_request,
 	lastname varchar(100) not null,
 	firstname varchar(100) not null,
 	patronymic varchar(100),
@@ -84,6 +89,7 @@ alter table doc_person owner to postgres;
 create index fki_request
 	on doc_person (id_request);
 
+drop table  doc_address_fact;
 create table doc_address_fact
 (
 	id serial not null
