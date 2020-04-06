@@ -9,7 +9,7 @@ function view_section(title){
 }
 
 function addPerson(){
-    let values = $$('form_addr').getValues()
+    let values = $$('form_person').getValues()
     if(values.addr == '' || values.cnt == ''){
         webix.message('Фамилия, Имя - обязательные поля')
         return;
@@ -220,6 +220,7 @@ webix.ready(function() {
                                     {
                                         id: 'upload',
                                         view: 'uploader',
+                                        css: 'webix_secondary',
                                         value: 'Выбрать файл для загрузки',
                                         formData: {}
                                     },
@@ -264,7 +265,15 @@ webix.ready(function() {
                                                 editor: 'text',
                                                 width: 200}
                                         ],
-                                        data: []
+                                        data: [],
+                                        on:{
+                                            'data->onStoreUpdated': function(){
+                                                this.data.each(function(obj, i){
+                                                    obj.id = i + 1;
+                                                });
+                                            }
+                                        },
+
                                     },
                                     {
                                         view: 'form',

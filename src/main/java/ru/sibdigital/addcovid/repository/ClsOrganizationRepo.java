@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ClsOrganizationRepo extends JpaRepository<ClsOrganization, Long> {
     Optional<ClsOrganization> getFirstByHashCode(String hashCode);
+
 }
