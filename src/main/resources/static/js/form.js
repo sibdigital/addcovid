@@ -108,11 +108,25 @@ webix.ready(function() {
         width: document.body.clientWidth - 8,
         rows: [
             {
-                view: 'template',
-                template: 'ЕИС "Работающая Бурятия". Подача заявки.',
-                borderless: true,
+                view: 'toolbar',
+                //borderless: true,
                 height: 40,
-                align: 'center'
+                //align: 'center',
+                cols: [
+                    {
+/*
+                        view: 'template',
+                        width: 20,
+                        borderless: true
+*/
+                    },
+                    {
+                        view: 'label',
+                        label: '<span style="font-size: 1.5rem">ЕИС "Работающая Бурятия". Подача заявки.</span>',
+                        //css: 'main_label'
+                    },
+                    {}
+                ]
             },
             {
                 id: 'form',
