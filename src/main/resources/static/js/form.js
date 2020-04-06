@@ -12,8 +12,13 @@ function view_section(title){
 
 function addPerson(){
     let values = $$('form_person').getValues()
-    if(values.addr == '' || values.cnt == ''){
+    if(values.lastname == '' || values.firstname == ''){
         webix.message('Фамилия, Имя - обязательные поля')
+        return;
+    }
+
+    if(values.lastname.length > 100 || values.firstname.length > 100 || values.patronymic.length > 100 ){
+        webix.message('Фамилия, имя или отчество - длиннее 100 знаков')
         return;
     }
 
@@ -24,7 +29,8 @@ function addPerson(){
         //isagree: values.isagree
     }, $$('person_table').count() + 1)
 
-    if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 ){
+    let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!' || uploadFilename == '';
+    if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && !is_no_pdf){
         $$('send_btn').enable();
     }else{
         $$('send_btn').disable();
@@ -37,6 +43,11 @@ function editPerson(){
     let values = $$('form_person').getValues()
     if(values.lastname == '' || values.firstname == '') {
         webix.message('Фамилия, Имя - обязательные поля')
+        return;
+    }
+
+    if(values.lastname.length > 100 || values.firstname.length > 100 || values.patronymic.length > 100 ){
+        webix.message('Фамилия, имя или отчество - длиннее 100 знаков')
         return;
     }
 
@@ -53,7 +64,8 @@ function removePerson(){
             function () {
                 $$("person_table").remove($$("person_table").getSelectedId());
                 let cnt = $$('person_table').data.count();
-                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0){
+                let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!' || uploadFilename == '';
+                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0 && !is_no_pdf){
                     $$('send_btn').enable();
                 }else{
                     $$('send_btn').disable();
@@ -66,6 +78,10 @@ function addAddr(){
     let values = $$('form_addr').getValues()
     if(values.addressFact == '' || values.personOfficeFactCnt == ''){
         webix.message('не заполнены обязательные поля')
+        return;
+    }
+    if(values.addressFact.length > 255 ){
+        webix.message('Фактический адрес превышает 255 знаков!')
         return;
     }
     if(isNaN(values.personOfficeFactCnt * 1)) {
@@ -85,6 +101,10 @@ function editAddr(){
     let values = $$('form_addr').getValues()
     if(values.addressFact == '' || values.personOfficeFactCnt == ''){
         webix.message('обязательные поля')
+        return;
+    }
+    if(values.addressFact == '' || values.personOfficeFactCnt == ''){
+        webix.message('не заполнены обязательные поля')
         return;
     }
     if(isNaN(values.personOfficeFactCnt * 1)) {
@@ -111,6 +131,7 @@ function removeAddr(){
 
 let uploadFile = '';
 let uploadFilename = '';
+let pred_date = new Date();
 
 webix.ready(function() {
     webix.ui({
@@ -406,6 +427,11 @@ webix.ready(function() {
                                 labelPosition: 'top'
                             },
                             {
+                                view: 'label',
+                                label: 'Прикрепление файла обязательно',
+                                id: 'fl_message'
+                            },
+                            {
                                 id: 'upload',
                                 view: 'uploader',
                                 css: 'webix_secondary',
@@ -418,12 +444,19 @@ webix.ready(function() {
                                         if (upload.type.toUpperCase() !== 'PDF') {
                                             $$('no_pdf').setValue('Загружать можно только PDF-файлы!');
                                             $$('file').setValue('');
+                                            $$('send_btn').disable();
                                             return false;
                                         }
                                         let reader = new FileReader();
                                         reader.addEventListener("load", function () { // Setting up base64 URL on image
                                             uploadFile = window.btoa(reader.result);
                                             $$('no_pdf').setValue('');
+                                            let cnt = $$('person_table').data.count();
+                                            if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0){
+                                                $$('send_btn').enable();
+                                            }else{
+                                                $$('send_btn').disable();
+                                            }
                                             $$('file').setValue(uploadFilename);
                                         }, false);
                                         reader.readAsBinaryString(upload.file);
@@ -566,7 +599,8 @@ webix.ready(function() {
                         on: {
                             onChange (newv, oldv) {
                                 let cnt = $$('person_table').data.count();
-                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0){
+                                let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!' || uploadFilename == '';
+                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0 && !is_no_pdf){
                                     $$('send_btn').enable();
                                 }else{
                                     $$('send_btn').disable();
@@ -624,7 +658,8 @@ webix.ready(function() {
                         on: {
                             onChange(newv, oldv) {
                                 let cnt = $$('person_table').data.count();
-                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0){
+                                let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!' || uploadFilename == '';
+                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0 && !is_no_pdf){
                                     $$('send_btn').enable();
                                 }else{
                                     $$('send_btn').disable();
@@ -648,7 +683,45 @@ webix.ready(function() {
                                 align: 'center',
                                 click: function () {
                                     if($$('form').validate()) {
-                                        let params = $$('form').getValues()
+                                        let params = $$('form').getValues();
+
+                                        if(params.organizationInn.length > 12){
+                                            webix.message('Превышена длина ИНН', 'error')
+                                            return false
+                                        }
+
+                                        if(params.organizationOgrn.length > 13){
+                                            webix.message('Превышена длина ОГРН', 'error')
+                                            return false
+                                        }
+
+                                        if(params.organizationPhone.length > 100){
+                                            webix.message('Превышена длина номера телефона', 'error')
+                                            return false
+                                        }
+
+                                        if(params.organizationEmail.length > 100){
+                                            webix.message('Превышена длина электронной почты', 'error')
+                                            return false
+                                        }
+
+                                        if(params.organizationShortName.length > 255){
+                                            webix.message('Превышена длина краткого наименования', 'error')
+                                            return false
+                                        }
+
+                                        if(params.organizationAddressJur.length > 255){
+                                            webix.message('Превышена длина юридического адреса', 'error')
+                                            return false
+                                        }
+
+                                        let cur_date = new Date();
+                                        let dif  = Math.abs((cur_date.getTime() - pred_date.getTime()) /1000);
+                                        pred_date = new Date();
+                                        if (dif < 5){
+                                            webix.message('Слишком частое нажатие на кнопку', 'error')
+                                            return false
+                                        }
 
                                         let persons = []
                                         $$('person_table').data.each(function (obj) {
