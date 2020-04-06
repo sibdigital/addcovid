@@ -1,14 +1,12 @@
 package ru.sibdigital.addcovid.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.sibdigital.addcovid.dto.PostFormDto;
-import ru.sibdigital.addcovid.model.ClsOrganization;
-import ru.sibdigital.addcovid.model.DocAddressFact;
-import ru.sibdigital.addcovid.model.DocPerson;
-import ru.sibdigital.addcovid.model.DocRequest;
+import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
@@ -48,33 +46,7 @@ public class RequestService {
 
     public String addNewRequest(PostFormDto postForm) {
 
-        String filename = "error while upload";
-        try {
-            File uploadFolder = new File(uploadingDir);
-            if (!uploadFolder.exists()) {
-                uploadFolder.mkdirs();
-            }
-/*
-            File file = new File(String.format("%s\\%s_%s",uploadingDir, UUID.randomUUID(),postForm.getAttachment().getOriginalFilename()));
-            postForm.getAttachment().transferTo(file);
-            filename = file.getName();
-*/
 
-            byte[] valueDecoded = Base64.getDecoder().decode(postForm.getAttachment());
-
-            String inputFilename = String.format("%s\\%s_%s", uploadingDir, UUID.randomUUID(), postForm.getAttachmentFilename());
-            FileOutputStream fos;
-
-            fos = new FileOutputStream(inputFilename);
-            fos.write(valueDecoded);
-            fos.close();
-            filename = inputFilename;
-
-        } catch (IOException ex) {
-            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
-        } catch (Exception ex) {
-            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
-        }
 
         String sha256 = SHA256Generator.generate(postForm.getOrganizationInn(), postForm.getOrganizationOgrn(), postForm.getOrganizationName());
 
@@ -112,6 +84,38 @@ public class RequestService {
                     .map(personDto -> personDto.convertToDocAddressFact())
                     .collect(Collectors.toSet());
 
+
+        int importStatus = ImportStatuses.SUCCESS.getValue();
+        String filename = "error while upload";
+        try {
+            File uploadFolder = new File(uploadingDir);
+            if (!uploadFolder.exists()) {
+                uploadFolder.mkdirs();
+            }
+/*
+            File file = new File(String.format("%s\\%s_%s",uploadingDir, UUID.randomUUID(),postForm.getAttachment().getOriginalFilename()));
+            postForm.getAttachment().transferTo(file);
+            filename = file.getName();
+*/
+
+            byte[] valueDecoded = Base64.getDecoder().decode(postForm.getAttachment());
+
+            String inputFilename = String.format("%s\\%s_%s", uploadingDir, UUID.randomUUID(), postForm.getAttachmentFilename());
+            FileOutputStream fos;
+
+            fos = new FileOutputStream(inputFilename);
+            fos.write(valueDecoded);
+            fos.close();
+            filename = inputFilename;
+
+        } catch (IOException ex) {
+            importStatus = ImportStatuses.FILE_ERROR.getValue();
+            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
+        } catch (Exception ex) {
+            importStatus = ImportStatuses.FILE_ERROR.getValue();
+            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
+        }
+
             docRequest = DocRequest.builder()
                     .organization(organization)
                     .department(departmentRepo.getOne(postForm.getDepartmentId()))
@@ -124,7 +128,7 @@ public class RequestService {
                     .docAddressFact(docAddressFactSet)
                     .statusReview(0)
                     .timeReview(Timestamp.valueOf(LocalDateTime.now()))
-                    .statusImport(0)
+                    .statusImport(importStatus)
                     .timeImport(Timestamp.valueOf(LocalDateTime.now()))
                     .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
                     .isAgree(postForm.getIsAgree())
@@ -167,9 +171,19 @@ public class RequestService {
 
 
     public List<DocRequest> getRequestToBeWatchedByDepartment(Long id){
-
-        return this.docRequestRepo.getAllByDepartmentId(id).orElseGet(()->null);
+        return this.docRequestRepo.getAllByDepartmentId(id, ReviewStatuses.OPENED.getValue()).orElseGet(()->null);
     }
+
+
+    @AfterReturning
+    public DocRequest setReviewStatus(DocRequest docRequest, ReviewStatuses status){
+        docRequest.setTimeReview(Timestamp.valueOf(LocalDateTime.now()));
+        docRequest.setStatusReview(status.getValue());
+        return docRequestRepo.save(docRequest);
+    }
+
+
+
 
 
 

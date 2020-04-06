@@ -17,6 +17,7 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
     Optional<DocRequest> getTopByOrgHashCode(String sha256code);
     Optional<List<DocRequest>> getAllByDepartmentAndStatusReview(ClsDepartment department, Integer status);
 
-    @Query("SELECT dr FROM DocRequest dr WHERE  dr.department.id = :dep_id AND dr.statusReview = 0")
-    Optional<List<DocRequest>> getAllByDepartmentId(@Param("dep_id")Long departmentId);
+    @Query("SELECT dr FROM DocRequest dr WHERE  dr.department.id = :dep_id AND dr.statusReview = :status")
+    Optional<List<DocRequest>> getAllByDepartmentId(@Param("dep_id")Long departmentId, @Param("status") Integer status);
+
 }
