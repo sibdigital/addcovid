@@ -45,7 +45,7 @@ public class MainController {
     String postForm(@RequestBody PostFormDto postFormDto) {
 
         try {
-            String hash = requestService.addNewRequest(postFormDto);
+            String hash = requestService.addNewRequest(postFormDto).getOrgHashCode();
 
 //            return hash;
             return "Заявка принята. Ожидайте ответ на электронную почту.";

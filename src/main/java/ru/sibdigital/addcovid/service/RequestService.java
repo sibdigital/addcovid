@@ -44,7 +44,7 @@ public class RequestService {
     String uploadingDir;
 
 
-    public String addNewRequest(PostFormDto postForm) {
+    public DocRequest addNewRequest(PostFormDto postForm) {
 
 
 
@@ -157,7 +157,7 @@ public class RequestService {
             docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
             docPersonRepo.saveAll(docRequest.getDocPersonSet());
 
-            return docRequest.getOrgHashCode();
+            return docRequest;
         }
 
 

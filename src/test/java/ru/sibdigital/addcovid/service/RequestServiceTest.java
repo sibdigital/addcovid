@@ -82,7 +82,8 @@ class RequestServiceTest {
     @Test
     public void testAdd() {
 
-        requestService.addNewRequest(postForm);
+        DocRequest docRequest = requestService.addNewRequest(postForm);
+        Assertions.assertEquals(docRequest.getAttachmentPath(), "error while upload");
 
     }
 
@@ -103,16 +104,11 @@ class RequestServiceTest {
         for (int i = 0; i < encbytes.length; i++)
         {
             stringBuilder.append((char)encbytes[i]);
-
-
         }
         this.postForm.setAttachmentFilename("db_addcovid.sql");
         this.postForm.setAttachment(stringBuilder.toString());
-        requestService.addNewRequest(postForm);
-
-
-
-
+        DocRequest docRequest = requestService.addNewRequest(postForm);
+        Assertions.assertNotEquals(docRequest.getAttachmentPath(), "error while upload");
 
 
     }
