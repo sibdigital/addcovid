@@ -12,9 +12,9 @@
 <body>
 <div id="app"></div>
 <script th:inline="javascript">
-    let ID_DEPARTMENT = [[${id_department}]]
-    console.log(ID_DEPARTMENT)
+    const ID_DEPARTMENT = [[${id_department}]]
+    const DEPARTMENT = [[${department_name}]]
+    const USER_NAME = [[${user_lastname + " " + user_firstname}]]
 </script>
-<!--<script src="/js/requests.js"></script>-->
 </body>
 </html>

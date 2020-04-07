@@ -4,15 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.dto.ListItemDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
+import ru.sibdigital.addcovid.model.DocRequest;
 import ru.sibdigital.addcovid.repository.ClsDepartmentRepo;
 import ru.sibdigital.addcovid.service.RequestService;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,5 +51,11 @@ public class MainController {
         } catch(Exception e){
             return "Невозможно сохранить заявку";
         }
+    }
+
+
+    @GetMapping(value = "/download/{id}")
+    public void downloadFile(HttpServletResponse response, @PathVariable("id") DocRequest docRequest) throws Exception {
+        requestService.downloadFile(response, docRequest);
     }
 }

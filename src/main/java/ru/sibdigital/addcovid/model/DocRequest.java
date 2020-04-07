@@ -40,6 +40,8 @@ public class DocRequest {
     private Boolean isProtect;
     private String reqBasis;
     private String orgHashCode;
+    private String rejectComment;
+    private Long old_department_id;
 
     @OneToMany(targetEntity = DocPerson.class,mappedBy="docRequest", fetch = FetchType.EAGER)
     private Set<DocPerson> docPersonSet;
@@ -236,6 +238,26 @@ public class DocRequest {
 
     public void setDocAddressFact(Set<DocAddressFact> docAddressFact) {
         this.docAddressFact = docAddressFact;
+    }
+
+    @Basic
+    @Column(name = "reject_comment", nullable = false)
+    public String getRejectComment() {
+        return rejectComment;
+    }
+
+    public void setRejectComment(String rejectComment) {
+        this.rejectComment = rejectComment;
+    }
+
+    @Basic
+    @Column(name = "old_department_id", nullable = false)
+    public Long getOld_department_id() {
+        return old_department_id;
+    }
+
+    public void setOld_department_id(Long old_department_id) {
+        this.old_department_id = old_department_id;
     }
 
     @Override

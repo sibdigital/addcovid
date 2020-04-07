@@ -2,6 +2,7 @@ requirejs.config({
     baseUrl: 'js'
 })
 
+const DATE_FORMAT = webix.Date.dateToStr("%d.%m.%Y")
 
 function buildRoute(view) {
     return function() {
@@ -14,11 +15,12 @@ function buildRoute(view) {
     }
 }
 
+
 function buildButton(label, route) {
     return {
         view: 'button',
         value: label,
-        width: 100,
+        width: 150,
         align: 'center',
         click: function() {
             routie(route)
@@ -29,11 +31,12 @@ function buildButton(label, route) {
 require(
     [
         'views/requests',
-        'views/showform'
+        'views/showForm',
+        'views/accepted',
+        'views/rejected',
+        'utils/filter'
     ],
-    function(requests, showform) {
-
-        let itemdata = {};
+    function(requests, showform, accepted, rejected, filter) {
 
         webix.i18n.setLocale("ru-RU");
 
@@ -47,24 +50,80 @@ require(
                         view: 'toolbar',
                         height: 40,
                         cols: [
-                            {},
                             {
                                 view: 'label',
                                 label: '<span style="font-size: 1.5rem">ЕИС "Работающая Бурятия". Список заявок.</span>',
                             },
-                            {}
+                            {
+                            },
+                            {
+                                view: 'label',
+                                label: DEPARTMENT + ' (' + USER_NAME + ')',
+                                align: 'right'
+                            }
+                        ]
+                    },
+                    {
+                        view: 'toolbar',
+                        cols: [
+                            {
+                                value: 1, view: 'segmented', id:'tabbar', value: 'listView', multiview: true,
+                                width: 450,
+                                optionWidth: 150,  align: 'center', padding: 10,
+                                options: [
+                                    { value: 'Необработанные', id: 'requests'},
+                                    { value: 'Принятые', id: 'accepted'},
+                                    { value: 'Отклоненные', id: 'rejected'}
+                                ],
+                                on:{
+                                    onChange:function(id){
+                                        routie(id)
+
+                                        //$$('requests_table').clearAll();
+
+
+/*
+                                        switch(id) {
+                                            case 'requests':
+                                                //$$('requests_table').config.url.source = 'list_request/' + ID_DEPARTMENT + '/0'
+                                                //requests.rows[0].url = 'list_request/' + ID_DEPARTMENT + '/0'
+                                                buildRoute(requests.requests(0))
+                                                break
+                                            case 'accepted':
+                                                //$$('requests_table').config.url.source = 'list_request/' + ID_DEPARTMENT + '/1'
+                                                buildRoute(requests.requests(1))
+                                                break
+                                            case 'rejected':
+                                                //$$('requests_table').config.url.source = 'list_request/' + ID_DEPARTMENT + '/2'
+                                                buildRoute(requests.requests(2))
+                                                break
+                                        }
+*/
+
+                                        //$$('requests_table').load($$('requests_table').config.url)
+                                    }
+                                }
+                            },
+                            filter.searchBar('requests_table')
                         ]
                     },
                     {
                         id: 'root'
+                        //requests
                     }
                 ]
             })
+
+            // по умолчанию
+            $$('tabbar').setValue('requests');
+            //routie('requests')
+
         })
 
         routie({
-            '': buildRoute(requests),
-            // buildRoute(showform)
+            'requests': buildRoute(requests),
+            'accepted': buildRoute(accepted),
+            'rejected': buildRoute(rejected),
             'showform/:item': function(item) {
                 webix.ui({
                     id: 'root',
@@ -75,4 +134,5 @@ require(
                 }, $$('root'))
         }
         })
+
     })

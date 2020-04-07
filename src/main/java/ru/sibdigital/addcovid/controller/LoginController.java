@@ -37,10 +37,7 @@ public class LoginController {
     public String requests(Map<String, Object> model, HttpSession session) {
         //model.put();
         DepUser depUser = (DepUser) session.getAttribute("user");
-        model.put("id_department", 1);
-        if (depUser != null) {
-            model.put("id_department", 1);
-        }
+        model.put("id_department", depUser.getIdDepartment());
         return "requests";
     }
 
