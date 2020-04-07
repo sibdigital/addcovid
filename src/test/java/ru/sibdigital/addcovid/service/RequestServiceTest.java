@@ -148,4 +148,32 @@ class RequestServiceTest {
 
 
     }
+
+    @Test
+    void getLastOpenedRequestInfoByInn() {
+        DocRequest reqInfo = requestService.getLastOpenedRequestInfoByInn("1234567890");
+
+        Assertions.assertNotNull(reqInfo);
+    }
+
+    @Test
+    void getLastOpenedRequestInfoByOgrn() {
+        DocRequest reqInfo = requestService.getLastOpenedRequestInfoByOgrn("1234567890123");
+
+        Assertions.assertNotNull(reqInfo);
+    }
+
+    @Test
+    void getLasRequestInfoByInn() {
+        DocRequest reqInfo = requestService.getLasRequestInfoByInn("1234567890");
+
+        Assertions.assertNotNull(reqInfo);
+    }
+
+    @Test
+    void getLastRequestInfoByOgrn() {
+        DocRequest reqInfo = requestService.getLastRequestInfoByOgrn("1234567890123");
+
+        Assertions.assertNotNull(reqInfo);
+    }
 }

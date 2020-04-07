@@ -188,6 +188,35 @@ public class RequestService {
         return docRequestRepo.save(docRequest);
     }
 
+    public DocRequest getLastOpenedRequestInfoByInn(String inn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByInnAndStatus(inn, ReviewStatuses.OPENED.getValue()).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+
+    public DocRequest getLastOpenedRequestInfoByOgrn(String ogrn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByOgrnAndStatus(ogrn, ReviewStatuses.OPENED.getValue()).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+    public DocRequest getLasRequestInfoByInn(String inn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByInn(inn).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+
+    public DocRequest getLastRequestInfoByOgrn(String ogrn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByOgrn(ogrn).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+
+
+
 
 
 
