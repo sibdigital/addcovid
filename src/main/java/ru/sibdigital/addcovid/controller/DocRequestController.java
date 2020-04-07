@@ -10,6 +10,11 @@ import ru.sibdigital.addcovid.repository.DepUserRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.service.EmailService;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -62,5 +67,4 @@ public class DocRequestController {
 
         return docRequestRepo.save(docRequest);
     }
-
 }

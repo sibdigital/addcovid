@@ -29,7 +29,7 @@ function buildButton(label, route) {
 require(
     [
         'views/requests',
-        'views/showform'
+        'views/showForm'
     ],
     function(requests, showform) {
 

@@ -32,7 +32,6 @@ public class LoginController {
         return "login";
     }
 
-
     @GetMapping("/requests")
     public String requests(Map<String, Object> model, HttpSession session) {
         //model.put();
@@ -62,7 +61,6 @@ public class LoginController {
 
 //        if (logout != null)
 //            model.addAttribute("message", "You have been logged out successfully.");
-
 
         //model.put("id_department", depUser.getIdDepartment());
         log.debug("LoginController. Вышли в LoginController.");

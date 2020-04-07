@@ -286,11 +286,15 @@ define(function() {
                                     labelPosition: 'top'
                                 },
                                 {
-                                    paddingLeft: 10,
-                                    view: 'label',
-                                    label: '',
-                                    name: 'attachmentPath',
-                                    id: 'file'
+                                    id: 'download_btn',
+                                    view: 'button',
+                                    css: 'webix_primary',
+                                    value: 'Просмотреть загруженный файл',
+                                    align: 'center',
+                                    click: function () {
+                                        let params = this.getTopParentView().config.item
+                                        webix.html.download('/download/' + params.id, 'myfile.pdf');
+                                    }
                                 }
                             ]
                         },
