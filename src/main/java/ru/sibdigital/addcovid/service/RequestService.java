@@ -40,11 +40,11 @@ public class RequestService {
     @Autowired
     ClsDepartmentRepo departmentRepo;
 
-    @Value("upload.path")
+    @Value("${upload.path:/uploads}")
     String uploadingDir;
 
 
-    public String addNewRequest(PostFormDto postForm) {
+    public DocRequest addNewRequest(PostFormDto postForm) {
 
 
 
@@ -93,6 +93,7 @@ public class RequestService {
         int importStatus = ImportStatuses.SUCCESS.getValue();
         String filename = "error while upload";
         try {
+
             File uploadFolder = new File(uploadingDir);
             if (!uploadFolder.exists()) {
                 uploadFolder.mkdirs();
@@ -105,7 +106,7 @@ public class RequestService {
 
             byte[] valueDecoded = Base64.getDecoder().decode(postForm.getAttachment());
 
-            String inputFilename = String.format("%s\\%s_%s", uploadingDir, UUID.randomUUID(), postForm.getAttachmentFilename());
+            String inputFilename = String.format("%s/%s_%s", uploadFolder.getAbsolutePath(), UUID.randomUUID(), postForm.getAttachmentFilename());
             FileOutputStream fos;
 
             fos = new FileOutputStream(inputFilename);
@@ -156,7 +157,7 @@ public class RequestService {
             docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
             docPersonRepo.saveAll(docRequest.getDocPersonSet());
 
-            return docRequest.getOrgHashCode();
+            return docRequest;
         }
 
 
@@ -186,6 +187,35 @@ public class RequestService {
         docRequest.setStatusReview(status.getValue());
         return docRequestRepo.save(docRequest);
     }
+
+    public DocRequest getLastOpenedRequestInfoByInn(String inn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByInnAndStatus(inn, ReviewStatuses.OPENED.getValue()).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+
+    public DocRequest getLastOpenedRequestInfoByOgrn(String ogrn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByOgrnAndStatus(ogrn, ReviewStatuses.OPENED.getValue()).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+    public DocRequest getLasRequestInfoByInn(String inn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByInn(inn).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+
+    public DocRequest getLastRequestInfoByOgrn(String ogrn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByOgrn(ogrn).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+
+
 
 
 
