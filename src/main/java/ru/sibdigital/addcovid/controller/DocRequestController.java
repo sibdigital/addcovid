@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.model.DocRequest;
 import ru.sibdigital.addcovid.repository.DepUserRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
+import ru.sibdigital.addcovid.service.EmailService;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -24,6 +25,9 @@ public class DocRequestController {
 
     @Autowired
     private DocRequestRepo docRequestRepo;
+
+    @Autowired
+    private EmailService emailService;
 
     private static final Logger log = LoggerFactory.getLogger(DocRequestController.class);
 
@@ -47,6 +51,14 @@ public class DocRequestController {
     public DocRequest updateItem(@PathVariable("id") DocRequest docRequest, @RequestBody DocRequest obj){
         obj.setTimeReview(new Timestamp(System.currentTimeMillis()));
         BeanUtils.copyProperties(obj, docRequest, "id");
+
+        String text;
+        if (docRequest.getStatusReview() == 1) {
+            text = "Ваша заявка принята.";
+        } else {
+            text = "Ваша заявка отклонена.";
+        }
+        emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), "Работающая Бурятия", text);
 
         return docRequestRepo.save(docRequest);
     }
