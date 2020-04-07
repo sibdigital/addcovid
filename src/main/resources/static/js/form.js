@@ -690,7 +690,7 @@ webix.ready(function() {
                                             return false
                                         }
 
-                                        if(params.organizationOgrn.length > 13){
+                                        if(params.organizationOgrn.length > 15){
                                             webix.message('Превышена длина ОГРН', 'error')
                                             return false
                                         }
