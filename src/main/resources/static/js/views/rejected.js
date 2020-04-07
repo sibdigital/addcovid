@@ -1,11 +1,8 @@
 define(['views/showform'], function(showform) {
-
     const DATE_FORMAT = webix.Date.dateToStr("%d.%m.%Y")
-
     return {
         autowidth: true,
-        height: 800,
-        //height: document.body.clientHeight - 100,
+        height: 800, //document.body.clientHeight,
         width: document.body.clientWidth - 8,
         rows: [
             {
@@ -27,13 +24,8 @@ define(['views/showform'], function(showform) {
                     {id: "personSlrySaveCnt", header: "Численность с сохранением зп", adjust: true},
                     {id: "personOfficeCnt", header: "Численность работающих", adjust: true},
                     {id: "personRemoteCnt", header: "Численность на удаленный режим", adjust: true},
-                    {id: "timeCreate", header: "Дата заявки", adjust: true }
+                    {id: "timeCreate", header: "Дата заявки", adjust: true}
                 ],
-                scheme:{
-                    $init: function(obj){
-                        //obj.timeCreate = dateUtil.toDateFormat(obj.timeCreate);
-                    },
-                },
                 on: {
                     onBeforeLoad: function () {
                         this.showOverlay("Загружаю...");
@@ -81,9 +73,10 @@ define(['views/showform'], function(showform) {
                         $$('person_table').parse(data.docPersonSet)
 
                         queryWin.show()
+
                     }
                 },
-                url: 'list_request/' + ID_DEPARTMENT + '/0'
+                url: "list_request/" + ID_DEPARTMENT + '/2'
             },
             {
                 view: 'pager',

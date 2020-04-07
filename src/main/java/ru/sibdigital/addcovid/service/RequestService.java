@@ -10,11 +10,15 @@ import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Base64;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,10 +40,9 @@ public class RequestService {
     @Autowired
     ClsDepartmentRepo departmentRepo;
 
-    @Value("upload.path")
+    @Value("${upload.path:/uploads}")
     String uploadingDir;
 
-    public static final int BUFFER_SIZE = 4096;
 
     public String addNewRequest(PostFormDto postForm) {
 
@@ -102,7 +105,7 @@ public class RequestService {
 
             byte[] valueDecoded = Base64.getDecoder().decode(postForm.getAttachment());
 
-            String inputFilename = String.format("%s\\%s_%s", uploadingDir, UUID.randomUUID(), postForm.getAttachmentFilename());
+            String inputFilename = String.format("%s/%s_%s", uploadFolder.getAbsolutePath(), UUID.randomUUID(), postForm.getAttachmentFilename());
             FileOutputStream fos;
 
             fos = new FileOutputStream(inputFilename);
@@ -184,30 +187,40 @@ public class RequestService {
         return docRequestRepo.save(docRequest);
     }
 
-    public void downloadFile(HttpServletResponse response, DocRequest DocRequest) throws Exception {
-        File downloadFile = new File(DocRequest.getAttachmentPath());
 
-        FileInputStream inputStream = new FileInputStream(downloadFile);
-        response.setContentLength((int) downloadFile.length());
 
-        // set headers for the response
-        String headerKey = "Content-Disposition";
-        String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
-        response.setHeader(headerKey, headerValue);
-        response.setContentType("application/pdf");
 
-        // get output stream of the response
-        OutputStream outStream = response.getOutputStream();
+    public DocRequest getLastOpenedRequestInfoByInn(String inn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByInnAndStatus(inn, ReviewStatuses.OPENED.getValue()).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
 
-        byte[] buffer = new byte[BUFFER_SIZE];
-        int bytesRead = -1;
 
-        // write bytes read from the input stream into the output stream
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            outStream.write(buffer, 0, bytesRead);
-        }
+    public DocRequest getLastOpenedRequestInfoByOgrn(String ogrn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByOgrnAndStatus(ogrn, ReviewStatuses.OPENED.getValue()).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
 
-        inputStream.close();
-        outStream.close();
-    }
+    public DocRequest getLasRequestInfoByInn(String inn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByInn(inn).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+
+    public DocRequest getLastRequestInfoByOgrn(String ogrn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByOgrn(ogrn).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+
+
+
+
+
+
+
 }

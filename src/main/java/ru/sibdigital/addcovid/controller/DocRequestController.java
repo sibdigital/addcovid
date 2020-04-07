@@ -9,14 +9,9 @@ import ru.sibdigital.addcovid.model.DocRequest;
 import ru.sibdigital.addcovid.repository.DepUserRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.service.EmailService;
+import ru.sibdigital.addcovid.service.RequestService;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,22 +27,31 @@ public class DocRequestController {
     private DocRequestRepo docRequestRepo;
 
     @Autowired
+    private RequestService requestService;
+
+    @Autowired
     private EmailService emailService;
 
     private static final Logger log = LoggerFactory.getLogger(DocRequestController.class);
 
     @GetMapping("/doc_requests")
-    public Optional<List<DocRequest>> requests(Map<String, Object> model) {
+    public DocRequest requests(@RequestParam String inn,@RequestParam String ogrn, Map<String, Object> model) {
+        if(inn!=null & !inn.isBlank()){
+            return requestService.getLasRequestInfoByInn(inn);
+        }
 
-        Optional<List<DocRequest>> docRequests =  docRequestRepo.getAllByDepartmentId(3l, 0);
+        if( ogrn!=null & !ogrn.isBlank()){
+            return requestService.getLastRequestInfoByOgrn(ogrn);
+        }
 
-        return docRequests;
+        return null;
     }
 
-    @GetMapping("/list_request/{id_department}")
-    public Optional<List<DocRequest>> listRequest(@PathVariable("id_department") Long id_department) {
+    @GetMapping("/list_request/{id_department}/{status}")
+    public Optional<List<DocRequest>> listRequest(@PathVariable("id_department") Long id_department,
+                                                  @PathVariable("status") Integer status) {
 
-        Optional<List<DocRequest>> docRequests =  docRequestRepo.getAllByDepartmentId(id_department, 0);
+        Optional<List<DocRequest>> docRequests =  docRequestRepo.getAllByDepartmentId(id_department, status);
 
         return docRequests;
     }
@@ -67,4 +71,9 @@ public class DocRequestController {
 
         return docRequestRepo.save(docRequest);
     }
+
+
+
+
+
 }
