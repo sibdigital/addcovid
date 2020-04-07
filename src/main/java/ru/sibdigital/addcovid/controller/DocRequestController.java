@@ -73,7 +73,7 @@ public class DocRequestController {
             else if (docRequest.getStatusReview() == 2) {
                 text = "Ваша заявка отклонена.";
             }
-            emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), "Работающая Бурятия", text);
+            //emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), "Работающая Бурятия", text);
         }
 
         if(oldDepartmentId != docRequest.getDepartment().getId()){

@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8">
-    <title>Addcovid</title>
+    <title>ЕИС Работающая Бурятия</title>
     <link type="text/css" rel="stylesheet" href="/libs/webix.css">
     <script src="/libs/webix.min.js"></script>
     <script src="/libs/routie.min.js"></script>
@@ -15,6 +15,10 @@
     const ID_DEPARTMENT = [[${id_department}]]
     const DEPARTMENT = [[${department_name}]]
     const USER_NAME = [[${user_lastname + " " + user_firstname}]]
+
+    const winHeight = document.body.clientHeight
+    const winWidth = document.body.clientWidth
+    console.log(winHeight + ' x ' + winWidth)
 </script>
 </body>
 </html>

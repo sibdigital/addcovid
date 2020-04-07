@@ -2,41 +2,13 @@ requirejs.config({
     baseUrl: 'js'
 })
 
-const DATE_FORMAT = webix.Date.dateToStr("%d.%m.%Y")
-
-function buildRoute(view) {
-    return function() {
-        webix.ui({
-            id: 'root',
-            rows: [
-                view
-            ]
-        }, $$('root'))
-    }
-}
-
-
-function buildButton(label, route) {
-    return {
-        view: 'button',
-        value: label,
-        width: 150,
-        align: 'center',
-        click: function() {
-            routie(route)
-        }
-    }
-}
-
 require(
     [
         'views/requests',
-        'views/showForm',
-        'views/accepted',
-        'views/rejected',
+        'views/showform',
         'utils/filter'
     ],
-    function(requests, showform, accepted, rejected, filter) {
+    function(requests, showform, filter) {
 
         webix.i18n.setLocale("ru-RU");
 
@@ -44,7 +16,7 @@ require(
             webix.ui({
                 container: 'app',
                 width: document.body.clientWidth,
-                height: document.body.clientHeight,
+                height: 800, //document.body.clientHeight,
                 rows: [
                     {
                         view: 'toolbar',
@@ -77,30 +49,25 @@ require(
                                 ],
                                 on:{
                                     onChange:function(id){
-                                        routie(id)
-
-                                        //$$('requests_table').clearAll();
-
-
-/*
+                                        let status = 0
                                         switch(id) {
                                             case 'requests':
-                                                //$$('requests_table').config.url.source = 'list_request/' + ID_DEPARTMENT + '/0'
-                                                //requests.rows[0].url = 'list_request/' + ID_DEPARTMENT + '/0'
-                                                buildRoute(requests.requests(0))
+                                                status = 0
                                                 break
                                             case 'accepted':
-                                                //$$('requests_table').config.url.source = 'list_request/' + ID_DEPARTMENT + '/1'
-                                                buildRoute(requests.requests(1))
+                                                status = 1
                                                 break
                                             case 'rejected':
-                                                //$$('requests_table').config.url.source = 'list_request/' + ID_DEPARTMENT + '/2'
-                                                buildRoute(requests.requests(2))
+                                                status = 2
                                                 break
                                         }
-*/
 
-                                        //$$('requests_table').load($$('requests_table').config.url)
+                                        webix.ui({
+                                            id: 'root',
+                                            rows: [
+                                                requests(status)
+                                            ]
+                                        }, $$('root'))
                                     }
                                 }
                             },
@@ -109,30 +76,11 @@ require(
                     },
                     {
                         id: 'root'
-                        //requests
                     }
                 ]
             })
 
             // по умолчанию
             $$('tabbar').setValue('requests');
-            //routie('requests')
-
         })
-
-        routie({
-            'requests': buildRoute(requests),
-            'accepted': buildRoute(accepted),
-            'rejected': buildRoute(rejected),
-            'showform/:item': function(item) {
-                webix.ui({
-                    id: 'root',
-                    item: item,
-                    rows: [
-                        showform
-                    ]
-                }, $$('root'))
-        }
-        })
-
     })
