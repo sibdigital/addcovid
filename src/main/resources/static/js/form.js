@@ -597,6 +597,7 @@ webix.ready(function() {
                         }
                     },
                     {
+                        id: 'label_sogl',
                         view: 'label',
                         label: 'Информация мною прочитана и я согласен с ней при подаче заявки',
                         align: 'center'
@@ -638,7 +639,10 @@ webix.ready(function() {
                                         params.attachment = uploadFile
                                         params.attachmentFilename = uploadFilename
 
-                                        console.log(params);
+                                        $$('label_sogl').showProgress({
+                                            type: 'icon',
+                                            delay: 5000
+                                        })
 
                                         webix.ajax()
                                             .headers({'Content-type': 'application/json'})
@@ -646,11 +650,15 @@ webix.ready(function() {
                                                 JSON.stringify(params),
                                                 function (text, data, xhr) {
                                                     console.log(text);
-                                                    webix.message(text);
+
+                                                    webix.alert(text)
+                                                        .then(function () {
+                                                            $$('label_sogl').hideProgress()
+                                                        });
                                                 })
                                     }
                                     else {
-                                        webix.message('Не заполнены обязательные поля. Для просмотра прокрутите страницу вверх', 'error')
+                                        webix.alert('Не заполнены обязательные поля. Для просмотра прокрутите страницу вверх', 'error')
                                     }
                                 }
 
@@ -658,20 +666,13 @@ webix.ready(function() {
                         ]
                     }
                 ],
-/*
-                rules: [
-                    {
-                        email: webix.rules.isEmail(),
-                        organizationInn: webix.rules.isNumber(),
-                        organizationOgrn: webix.rules.isNumber(),
-
-                    }
-                ]
-*/
             }
         ]
     })
 
     $$('form_person').bind('person_table')
     $$('form_addr').bind('addr_table')
+
+    webix.extend($$('label_sogl'), webix.ProgressBar);
+
 })
