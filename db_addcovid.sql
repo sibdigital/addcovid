@@ -161,3 +161,9 @@ create unique index fki_dep_user_login
     on dep_user (login);
 
 alter table dep_user owner to postgres;
+
+
+alter table cls_organization alter column ogrn type varchar(15);
+alter table  doc_request alter column attachment_path type varchar(512);
+alter table doc_person add column status_import integer default 0;
+alter table doc_person add column time_import timestamp;
