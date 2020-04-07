@@ -162,6 +162,11 @@ webix.ready(function() {
                 ]
             },
             {
+                view: 'label',
+                label: '<a style="font-size: 1.5rem" href="http://работающаябурятия.рф/#top">Горячая линия</a>',
+                //css: 'main_label'
+            },
+            {
                 id: 'form',
                 view: 'form',
                 complexData: true,
