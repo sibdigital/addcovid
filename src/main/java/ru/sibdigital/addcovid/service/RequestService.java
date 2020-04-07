@@ -40,7 +40,7 @@ public class RequestService {
     @Autowired
     ClsDepartmentRepo departmentRepo;
 
-    @Value("upload.path")
+    @Value("${upload.path:/uploads}")
     String uploadingDir;
 
 
@@ -93,6 +93,7 @@ public class RequestService {
         int importStatus = ImportStatuses.SUCCESS.getValue();
         String filename = "error while upload";
         try {
+
             File uploadFolder = new File(uploadingDir);
             if (!uploadFolder.exists()) {
                 uploadFolder.mkdirs();
@@ -105,7 +106,7 @@ public class RequestService {
 
             byte[] valueDecoded = Base64.getDecoder().decode(postForm.getAttachment());
 
-            String inputFilename = String.format("%s\\%s_%s", uploadingDir, UUID.randomUUID(), postForm.getAttachmentFilename());
+            String inputFilename = String.format("%s/%s_%s", uploadFolder.getAbsolutePath(), UUID.randomUUID(), postForm.getAttachmentFilename());
             FileOutputStream fos;
 
             fos = new FileOutputStream(inputFilename);
