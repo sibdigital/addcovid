@@ -40,7 +40,7 @@ public class RequestService {
     @Autowired
     ClsDepartmentRepo departmentRepo;
 
-    @Value("upload.path")
+    @Value("${upload.path:/uploads}")
     String uploadingDir;
 
 
@@ -105,7 +105,7 @@ public class RequestService {
 
             byte[] valueDecoded = Base64.getDecoder().decode(postForm.getAttachment());
 
-            String inputFilename = String.format("%s\\%s_%s", uploadingDir, UUID.randomUUID(), postForm.getAttachmentFilename());
+            String inputFilename = String.format("%s/%s_%s", uploadFolder.getAbsolutePath(), UUID.randomUUID(), postForm.getAttachmentFilename());
             FileOutputStream fos;
 
             fos = new FileOutputStream(inputFilename);
@@ -190,7 +190,31 @@ public class RequestService {
 
 
 
+    public DocRequest getLastOpenedRequestInfoByInn(String inn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByInnAndStatus(inn, ReviewStatuses.OPENED.getValue()).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
 
+
+    public DocRequest getLastOpenedRequestInfoByOgrn(String ogrn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByOgrnAndStatus(ogrn, ReviewStatuses.OPENED.getValue()).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+    public DocRequest getLasRequestInfoByInn(String inn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByInn(inn).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
+
+
+    public DocRequest getLastRequestInfoByOgrn(String ogrn){
+        List<DocRequest> docRequests = docRequestRepo.getLastRequestByOgrn(ogrn).orElseGet(() -> null);
+        if(docRequests != null) return docRequests.get(0);
+        return null;
+    };
 
 
 

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.sibdigital.addcovid.dto.FactAddressDto;
 import ru.sibdigital.addcovid.dto.PersonDto;
@@ -12,9 +13,9 @@ import ru.sibdigital.addcovid.model.DocRequest;
 import ru.sibdigital.addcovid.model.ReviewStatuses;
 import ru.sibdigital.addcovid.repository.ClsDepartmentRepo;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -33,6 +34,9 @@ class RequestServiceTest {
     PostFormDto postForm;
     PersonDto personDto;
     FactAddressDto factAddressDto;
+
+    @Value("${upload.path:/uploads}")
+    String filePath;
 
 
 
@@ -87,7 +91,7 @@ class RequestServiceTest {
     public void testWithFile() throws IOException {
 
 
-        Path path = Paths.get("F:/JavaProjects/addcovid/db_addcovid.sql");
+        File file = new File("db_addcovid.sql");
 
 
 
@@ -95,7 +99,7 @@ class RequestServiceTest {
 
         Base64.Encoder enc = Base64.getEncoder();
         StringBuilder stringBuilder = new StringBuilder();
-        byte[] encbytes = enc.encode(Files.readAllBytes(path));
+        byte[] encbytes = enc.encode(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
         for (int i = 0; i < encbytes.length; i++)
         {
             stringBuilder.append((char)encbytes[i]);
