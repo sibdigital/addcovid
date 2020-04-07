@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.model;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -10,10 +11,14 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Table(name = "doc_request", schema = "public", catalog = "addcovid")
+@Table(name = "doc_request", schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 public class DocRequest {
 
     @Id

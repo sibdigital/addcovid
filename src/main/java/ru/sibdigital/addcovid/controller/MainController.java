@@ -36,6 +36,7 @@ public class MainController {
                 .collect(Collectors.toList());
 
         model.put("listDepartment", listDepartment);
+        
         return "index";
     }
 
