@@ -83,8 +83,10 @@ create table doc_person
 				on delete cascade,
 	lastname varchar(100),
 	firstname varchar(100),
-	patronymic varchar(100)/*,
-	is_agree boolean*/
+	patronymic varchar(100),
+	/*is_agree boolean*/
+	status_import integer default 0,
+	time_import timestamp
 )
 ;
 
