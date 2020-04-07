@@ -38,11 +38,11 @@ define(['views/showform'], function(showform) {
                         {id: "personSlrySaveCnt", header: "Численность с сохранением зп", adjust: true},
                         {id: "personOfficeCnt", header: "Численность работающих", adjust: true},
                         {id: "personRemoteCnt", header: "Численность на удаленный режим", adjust: true},
-                        {id: "timeCreate", header: "Дата заявки", adjust: true, format: DATE_FORMAT }
+                        {id: "time_Create", header: "Дата заявки", adjust: true, format: DATE_FORMAT }
                     ],
                     scheme: {
                         $init: function (obj) {
-                            obj.timeCreate = obj.timeCreate.replace("T", " ") //dateUtil.toDateFormat(obj.timeCreate);
+                            obj.time_Create = obj.timeCreate.replace("T", " ") //dateUtil.toDateFormat(obj.timeCreate);
                         },
                     },
                     on: {
