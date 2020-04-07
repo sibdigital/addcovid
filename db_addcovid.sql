@@ -23,7 +23,7 @@ create table cls_organization
 	name text,
 	short_name varchar(255),
 	inn varchar(12),
-	ogrn varchar(13),
+	ogrn varchar(15),
 	address_jur varchar(255),
 	okved_add text,
 	okved text,
