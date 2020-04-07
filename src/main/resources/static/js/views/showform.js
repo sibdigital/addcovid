@@ -165,6 +165,7 @@ define(function() {
                                             },
                                             {
                                                 cols: [
+                                                    {},
                                                     {
                                                         view: 'button',
                                                         disabled: flag_param,
@@ -323,27 +324,39 @@ define(function() {
                                         readonly: true,
                                         labelPosition: 'top'
                                     },
+                                    // {
+                                    //     paddingLeft: 10,
+                                    //     view: 'label',
+                                    //     label: '',
+                                    //     name: 'attachmentFilename',
+                                    //     id: 'filename'
+                                    // },
                                     {
-                                        paddingLeft: 10,
-                                        view: 'label',
-                                        label: '',
-                                        name: 'attachmentPath',
-                                        id: 'file'
+                                        cols: [
+                                            {
+                                                paddingLeft: 10,
+                                                view: 'label',
+                                                label: '',
+                                                name: 'attachmentPath',
+                                                id: 'file'
+                                            },
+                                            //{},
+                                            {
+                                                id: 'download_btn',
+                                                view: 'button',
+                                                width: 300,
+                                                css: 'webix_primary',
+                                                value: 'Просмотреть загруженный файл',
+                                                align: 'center',
+                                                click: function () {
+                                                    let params = this.getTopParentView().config.item
+                                                    webix.html.download('/download/' + params.id, 'myfile.pdf')
+                                                }
+                                            },
+                                        ]
                                     }
                                 ]
                             },
-                            {
-                                id: 'download_btn',
-                                view: 'button',
-                                css: 'webix_primary',
-                                value: 'Просмотреть загруженный файл',
-                                align: 'center',
-                                click: function () {
-                                    let params = this.getTopParentView().config.item
-                                    webix.html.download('/download/' + params.id, 'myfile.pdf');
-                                }
-                            },
-
                             view_section('Данные о численности работников'),
                             {
                                 type: 'space',

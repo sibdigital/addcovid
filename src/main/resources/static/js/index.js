@@ -30,7 +30,7 @@ require(
                             },
                             {
                                 view: 'label',
-                                label: DEPARTMENT + ' (' + USER_NAME + ')',
+                                label: DEPARTMENT + ' ( <a href="/logout" title="Выйти">' + USER_NAME + '</a>)',
                                 align: 'right'
                             }
                         ]
