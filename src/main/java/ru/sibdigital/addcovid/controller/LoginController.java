@@ -37,12 +37,17 @@ public class LoginController {
     public String requests(Map<String, Object> model, HttpSession session) {
         //model.put();
         DepUser depUser = (DepUser) session.getAttribute("user");
-        //model.put("user", depUser);
-        model.put("id_department", depUser.getIdDepartment().getId());
-        model.put("department_name", depUser.getIdDepartment().getName());
-        model.put("user_lastname", depUser.getLastname());
-        model.put("user_firstname", depUser.getFirstname());
-        return "requests";
+        if(depUser == null){
+            return "404";
+        }
+        else {
+            //model.put("user", depUser);
+            model.put("id_department", depUser.getIdDepartment().getId());
+            model.put("department_name", depUser.getIdDepartment().getName());
+            model.put("user_lastname", depUser.getLastname());
+            model.put("user_firstname", depUser.getFirstname());
+            return "requests";
+        }
     }
 
     @PostMapping("/authenticate")

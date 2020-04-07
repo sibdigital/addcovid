@@ -81,22 +81,25 @@ require(
 
                                         //$$('requests_table').clearAll();
 
+
 /*
                                         switch(id) {
                                             case 'requests':
                                                 //$$('requests_table').config.url.source = 'list_request/' + ID_DEPARTMENT + '/0'
-                                                requests.rows[0].url = 'list_request/' + ID_DEPARTMENT + '/0'
+                                                //requests.rows[0].url = 'list_request/' + ID_DEPARTMENT + '/0'
+                                                buildRoute(requests.requests(0))
                                                 break
                                             case 'accepted':
                                                 //$$('requests_table').config.url.source = 'list_request/' + ID_DEPARTMENT + '/1'
-                                                requests.rows[0].url = 'list_request/' + ID_DEPARTMENT + '/1'
+                                                buildRoute(requests.requests(1))
                                                 break
                                             case 'rejected':
                                                 //$$('requests_table').config.url.source = 'list_request/' + ID_DEPARTMENT + '/2'
-                                                requests.rows[0].url = 'list_request/' + ID_DEPARTMENT + '/2'
+                                                buildRoute(requests.requests(2))
                                                 break
                                         }
 */
+
                                         //$$('requests_table').load($$('requests_table').config.url)
                                     }
                                 }
@@ -105,8 +108,8 @@ require(
                         ]
                     },
                     {
-                        //id: 'root'
-                        requests
+                        id: 'root'
+                        //requests
                     }
                 ]
             })

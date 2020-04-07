@@ -36,11 +36,12 @@ public class DocRequestController {
 
     @GetMapping("/doc_requests")
     public DocRequest requests(@RequestParam String inn,@RequestParam String ogrn, Map<String, Object> model) {
-        if(inn!=null & !inn.isBlank()){
+        //if(inn!=null & !inn.isBlank()){
+        if(inn!=null & !inn.isEmpty()){
             return requestService.getLasRequestInfoByInn(inn);
         }
 
-        if( ogrn!=null & !ogrn.isBlank()){
+        if( ogrn!=null & !ogrn.isEmpty()){
             return requestService.getLastRequestInfoByOgrn(ogrn);
         }
 
@@ -59,15 +60,25 @@ public class DocRequestController {
     @PutMapping("/doc_requests/{id}")
     public DocRequest updateItem(@PathVariable("id") DocRequest docRequest, @RequestBody DocRequest obj){
         obj.setTimeReview(new Timestamp(System.currentTimeMillis()));
+
+        Integer oldStatusReview = docRequest.getStatusReview();
+        Long oldDepartmentId = docRequest.getDepartment().getId();
         BeanUtils.copyProperties(obj, docRequest, "id");
 
-        String text;
-        if (docRequest.getStatusReview() == 1) {
-            text = "Ваша заявка принята.";
-        } else {
-            text = "Ваша заявка отклонена.";
+        if(oldStatusReview != docRequest.getStatusReview()){
+            String text = "";
+            if (docRequest.getStatusReview() == 1) {
+                text = "Ваша заявка принята.";
+            }
+            else if (docRequest.getStatusReview() == 2) {
+                text = "Ваша заявка отклонена.";
+            }
+            emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), "Работающая Бурятия", text);
         }
-        emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), "Работающая Бурятия", text);
+
+        if(oldDepartmentId != docRequest.getDepartment().getId()){
+            docRequest.setOld_department_id(oldDepartmentId);
+        }
 
         return docRequestRepo.save(docRequest);
     }
