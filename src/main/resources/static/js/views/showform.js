@@ -324,13 +324,23 @@ define(function() {
                                         readonly: true,
                                         labelPosition: 'top'
                                     },
-                                    // {
-                                    //     paddingLeft: 10,
-                                    //     view: 'label',
-                                    //     label: '',
-                                    //     name: 'attachmentFilename',
-                                    //     id: 'filename'
-                                    // },
+                                    {
+                                        cols: [
+                                            {
+                                                view: "label",
+                                                label: 'Вложенный файл:',
+                                                width: 150
+                                            },
+                                            {
+                                                paddingLeft: 10,
+                                                view: 'label',
+                                                label: '',
+                                                name: 'attachmentFilename',
+                                                id: 'filename'
+                                            }
+                                        ]
+                                    },
+/*
                                     {
                                         cols: [
                                             {
@@ -355,6 +365,7 @@ define(function() {
                                             },
                                         ]
                                     }
+*/
                                 ]
                             },
                             view_section('Данные о численности работников'),

@@ -71,7 +71,7 @@ public class DocRequestController {
                 text = "Ваша заявка принята.";
             }
             else if (docRequest.getStatusReview() == 2) {
-                text = "Ваша заявка отклонена.";
+                text = "Ваша заявка отклонена по причине: " + docRequest.getRejectComment();
             }
             emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), "Работающая Бурятия", text);
         }
