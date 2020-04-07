@@ -10,9 +10,8 @@ import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Base64;
@@ -43,6 +42,7 @@ public class RequestService {
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
+    private static final int BUFFER_SIZE = 4096;
 
     public String addNewRequest(PostFormDto postForm) {
 
@@ -216,11 +216,30 @@ public class RequestService {
         return null;
     };
 
+    public void downloadFile(HttpServletResponse response, DocRequest DocRequest) throws Exception {
+        File downloadFile = new File(DocRequest.getAttachmentPath());
 
+        FileInputStream inputStream = new FileInputStream(downloadFile);
+        response.setContentLength((int) downloadFile.length());
 
+        // set headers for the response
+        String headerKey = "Content-Disposition";
+        String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
+        response.setHeader(headerKey, headerValue);
+        response.setContentType("application/pdf");
 
+        // get output stream of the response
+        OutputStream outStream = response.getOutputStream();
 
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int bytesRead = -1;
 
+        // write bytes read from the input stream into the output stream
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outStream.write(buffer, 0, bytesRead);
+        }
 
-
+        inputStream.close();
+        outStream.close();
+    }
 }
