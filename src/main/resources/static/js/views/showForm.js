@@ -326,175 +326,173 @@ define(function() {
                                     ]
                                 },
 
-                                view_section('Данные о численности работников'),
+                        view_section('Данные о численности работников'),
+                        {
+                            type: 'space',
+                            rows: [
                                 {
-                                    type: 'space',
-                                    rows: [
-                                        {
-                                            view: 'text', name: 'personSlrySaveCnt',
-                                            label: 'Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы',
-                                            labelPosition: 'top',
-                                            validate: function (val) {
-                                                return !isNaN(val * 1);
-                                            },
-                                            invalidMessage: 'Поле не может быть пустым',
-                                            readonly: true
-                                        },
-                                        {
-                                            view: 'text', name: 'personRemoteCnt',
-                                            label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
-                                            invalidMessage: 'Поле не может быть пустым',
-                                            validate: function (val) {
-                                                return !isNaN(val * 1);
-                                            },
-                                            readonly: true,
-                                            labelPosition: 'top'
-                                        },
-                                        {
-                                            view: 'text', name: 'personOfficeCnt',
-                                            label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
-                                            labelPosition: 'top',
-                                            validate: function (val) {
-                                                return !isNaN(val * 1);
-                                            },
-                                            invalidMessage: 'Поле не может быть пустым',
-                                            readonly: true
-                                        },
-                                    ]
-                                },
-                                view_section('Данные о работниках, чья деятельность предусматривает выход на работу'),
-                                {
-                                    rows: [
-                                        {
-                                            id: 'person_table',
-                                            view: 'datatable',
-                                            height: 400,
-                                            name: 'persons',
-                                            select: 'row',
-                                            resizeColumn: true,
-                                            readonly: true,
-                                            columns: [
-                                                /*
-                                                                                        {id: 'id', header: '', css: 'rank', width: 50},
-                                                */
-                                                {
-                                                    id: 'lastname',
-                                                    header: 'Фамилия',
-                                                    adjust: true,
-                                                    sort: 'string',
-                                                    fillspace: true
-                                                },
-                                                {
-                                                    id: 'firstname',
-                                                    header: 'Имя',
-                                                    adjust: true,
-                                                    sort: 'string',
-                                                    fillspace: true
-                                                },
-                                                {id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string'},
-                                                //{ id: 'isagree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
-                                            ],
-                                            data: []
-                                        },
-                                    ]
-                                },
-                                view_section('Рассмотрение заявки'),
-                                {
-                                    view: 'checkbox',
-                                    name: 'agree',
+                                    view: 'text', name: 'personSlrySaveCnt',
+                                    label: 'Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы',
                                     labelPosition: 'top',
+                                    validate: function (val) {
+                                        return !isNaN(val * 1);
+                                    },
                                     invalidMessage: 'Поле не может быть пустым',
-                                    readonly: true,
-                                    label: 'Подтверждено согласие работников на обработку персональных данных',
+                                    readonly: true
                                 },
                                 {
-                                    view: 'checkbox',
-                                    name: 'protect',
+                                    view: 'text', name: 'personRemoteCnt',
+                                    label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
+                                    invalidMessage: 'Поле не может быть пустым',
+                                    validate: function (val) {
+                                        return !isNaN(val * 1);
+                                    },
+                                    readonly: true,
+                                    labelPosition: 'top'
+                                },
+                                {
+                                    view: 'text', name: 'personOfficeCnt',
+                                    label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
                                     labelPosition: 'top',
+                                    validate: function (val) {
+                                        return !isNaN(val * 1);
+                                    },
                                     invalidMessage: 'Поле не может быть пустым',
+                                    readonly: true
+                                },
+                            ]
+                        },
+                        view_section('Данные о работниках, чья деятельность предусматривает выход на работу'),
+                        {
+                            rows: [
+                                {
+                                    id: 'person_table',
+                                    view: 'datatable',
+                                    height: 400,
+                                    name: 'persons',
+                                    select: 'row',
+                                    resizeColumn: true,
                                     readonly: true,
-                                    label: 'Подтверждено обязательное выполнение требований по защите от COVID-19',
-                                },
-                                {
-                                    cols: [
-                                        {},
+                                    columns: [
+/*
+                                        {id: 'id', header: '', css: 'rank', width: 50},
+*/
                                         {
-                                            view: 'text',
-                                            name: 'reject_comment',
-                                            label: 'Обоснование отказа',
-                                            id: 'reject_comment',
-                                            labelPosition: 'top'
-                                        }
-                                    ]
-                                },
-                                {
-                                    cols: [
-                                        {
-                                            id: 'accept_btn',
-                                            view: 'button',
-                                            css: 'webix_primary',
-                                            value: 'Принять заявку',
-                                            align: 'center',
-                                            click: function () {
-                                                let params = this.getTopParentView().config.item
-                                                params.statusReview = 1
-
-                                                webix.ajax()
-                                                    .headers({'Content-type': 'application/json'})
-                                                    .put('/doc_requests/' + params.id,
-                                                        JSON.stringify(params),
-                                                        function (text, data, xhr) {
-                                                            console.log(text);
-                                                            webix.message(text);
-
-                                                            let modal = $$('show_layout').getTopParentView();
-
-                                                            setTimeout(function () {
-                                                                modal.close();
-                                                            }, 0)
-                                                        })
-
-                                            }
+                                            id: 'lastname',
+                                            header: 'Фамилия',
+                                            adjust: true,
+                                            sort: 'string',
+                                            fillspace: true
                                         },
                                         {
-                                            id: 'reject_btn',
-                                            view: 'button',
-                                            css: 'webix_danger',
-                                            value: 'Отклонить заявку',
-                                            align: 'center',
-                                            click: function () {
+                                            id: 'firstname',
+                                            header: 'Имя',
+                                            adjust: true,
+                                            sort: 'string',
+                                            fillspace: true
+                                        },
+                                        {id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string'},
+                                        //{ id: 'isagree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
+                                    ],
+                                    data: []
+                                },
+                            ]
+                        },
+                        view_section('Рассмотрение заявки'),
+                        {
+                            view: 'checkbox',
+                            name: 'agree',
+                            labelPosition: 'top',
+                            invalidMessage: 'Поле не может быть пустым',
+                            readonly: true,
+                            label: 'Подтверждено согласие работников на обработку персональных данных',
+                        },
+                        {
+                            view: 'checkbox',
+                            name: 'protect',
+                            labelPosition: 'top',
+                            invalidMessage: 'Поле не может быть пустым',
+                            readonly: true,
+                            label: 'Подтверждено обязательное выполнение требований по защите от COVID-19',
+                        },
+                        {
+                            cols: [
+                                {},
+                                {
+                                    view: 'text',
+                                    name: 'description',
+                                    label: 'Обоснование отказа',
+                                    id: 'comment',
+                                    labelPosition: 'top'
+                                }
+                            ]
+                        },
+                        {
+                            cols: [
+                                {
+                                    id: 'accept_btn',
+                                    view: 'button',
+                                    css: 'webix_primary',
+                                    value: 'Принять заявку',
+                                    align: 'center',
+                                    click: function () {
+                                        let params = this.getTopParentView().config.item
+                                        params.statusReview = 1
 
-                                                if ($$('reject_comment').getValue() == '') {
-                                                    webix.message('Заполните обоснование отказа', 'error')
-                                                    return false
-                                                }
-                                                let params = this.getTopParentView().config.item
-                                                params.statusReview = 2
-                                                params.reject_comment = $$('reject_comment').getValue()
+                                        webix.ajax()
+                                            .headers({'Content-type': 'application/json'})
+                                            .put('/doc_requests/' + params.id,
+                                                JSON.stringify(params),
+                                                function (text, data, xhr) {
+                                                    console.log(text);
+                                                    webix.message(text);
 
-                                                webix.ajax()
-                                                    .headers({'Content-type': 'application/json'})
-                                                    .put('/doc_requests/' + params.id,
-                                                        JSON.stringify(params),
-                                                        function (text, data, xhr) {
-                                                            console.log(text);
-                                                            webix.message(text);
+                                                    let modal = $$('show_layout').getTopParentView();
 
-                                                            let modal = $$('show_layout').getTopParentView();
+                                                    setTimeout(function() {
+                                                        modal.close();
+                                                    }, 0)
+                                                })
 
-                                                            setTimeout(function () {
-                                                                modal.close();
-                                                            }, 0)
-                                                        })
-                                            }
+                                    }
+                                },
+                                {
+                                    id: 'reject_btn',
+                                    view: 'button',
+                                    css: 'webix_danger',
+                                    value: 'Отклонить заявку',
+                                    align: 'center',
+                                    click: function () {
+
+                                        if($$('comment').getValue() == '') {
+                                            webix.message('Заполните обоснование отказа', 'error')
+                                            return false
                                         }
-                                    ]
+                                        let params = this.getTopParentView().config.item
+                                        params.statusReview = 2
+                                        //params.description = $$('comment').getValue()
+
+                                        webix.ajax()
+                                            .headers({'Content-type': 'application/json'})
+                                            .put('/doc_requests/' + params.id,
+                                                JSON.stringify(params),
+                                                function (text, data, xhr) {
+                                                    console.log(text);
+                                                    webix.message(text);
+
+                                                    let modal = $$('show_layout').getTopParentView();
+
+                                                    setTimeout(function() {
+                                                        modal.close();
+                                                    }, 0)
+                                                })
+                                    }
                                 }
                             ]
                         }
                     ]
                 }
-            }
+            ]
         }
     }
 })
