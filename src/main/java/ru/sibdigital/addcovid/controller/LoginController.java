@@ -37,7 +37,11 @@ public class LoginController {
     public String requests(Map<String, Object> model, HttpSession session) {
         //model.put();
         DepUser depUser = (DepUser) session.getAttribute("user");
-        model.put("id_department", depUser.getIdDepartment());
+        //model.put("user", depUser);
+        model.put("id_department", depUser.getIdDepartment().getId());
+        model.put("department_name", depUser.getIdDepartment().getName());
+        model.put("user_lastname", depUser.getLastname());
+        model.put("user_firstname", depUser.getFirstname());
         return "requests";
     }
 
@@ -56,16 +60,6 @@ public class LoginController {
             return "login";
         }
         log.debug("LoginController. Аутентификация пройдена.");
-
-//        if (error != null)
-//            model.addAttribute("error", "Your username and password is invalid.");
-
-//        if (logout != null)
-//            model.addAttribute("message", "You have been logged out successfully.");
-
-
-        //model.put("id_department", depUser.getIdDepartment());
-        log.debug("LoginController. Вышли в LoginController.");
 
         session.setAttribute("user", depUser);
 

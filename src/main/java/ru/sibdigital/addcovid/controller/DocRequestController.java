@@ -39,10 +39,11 @@ public class DocRequestController {
         return docRequests;
     }
 
-    @GetMapping("/list_request/{id_department}")
-    public Optional<List<DocRequest>> listRequest(@PathVariable("id_department") Long id_department) {
+    @GetMapping("/list_request/{id_department}/{status}")
+    public Optional<List<DocRequest>> listRequest(@PathVariable("id_department") Long id_department,
+                                                  @PathVariable("status") Integer status) {
 
-        Optional<List<DocRequest>> docRequests =  docRequestRepo.getAllByDepartmentId(id_department, 0);
+        Optional<List<DocRequest>> docRequests =  docRequestRepo.getAllByDepartmentId(id_department, status);
 
         return docRequests;
     }
