@@ -3,6 +3,7 @@ package ru.sibdigital.addcovid.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,12 @@ public class LoginController {
     @Autowired
     private DocRequestRepo docRequestRepo;
 
+    @Value("${link.prefix}")
+    private String linkPrefix;
+
+    @Value("${link.suffix}")
+    private String linkSuffix;
+
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @GetMapping("/login")
@@ -32,13 +39,30 @@ public class LoginController {
         return "login";
     }
 
+    @GetMapping("/logout")
+    public String login(HttpSession session) {
+        session.removeAttribute("user");
+        return "redirect:/login";
+    }
+
 
     @GetMapping("/requests")
     public String requests(Map<String, Object> model, HttpSession session) {
         //model.put();
         DepUser depUser = (DepUser) session.getAttribute("user");
-        model.put("id_department", depUser.getIdDepartment());
-        return "requests";
+        if(depUser == null){
+            return "404";
+        }
+        else {
+            //model.put("user", depUser);
+            model.put("id_department", depUser.getIdDepartment().getId());
+            model.put("department_name", depUser.getIdDepartment().getName());
+            model.put("user_lastname", depUser.getLastname());
+            model.put("user_firstname", depUser.getFirstname());
+            model.put("link_prefix", linkPrefix);
+            model.put("link_suffix", linkSuffix);
+            return "requests";
+        }
     }
 
     @PostMapping("/authenticate")
@@ -56,16 +80,6 @@ public class LoginController {
             return "login";
         }
         log.debug("LoginController. Аутентификация пройдена.");
-
-//        if (error != null)
-//            model.addAttribute("error", "Your username and password is invalid.");
-
-//        if (logout != null)
-//            model.addAttribute("message", "You have been logged out successfully.");
-
-
-        //model.put("id_department", depUser.getIdDepartment());
-        log.debug("LoginController. Вышли в LoginController.");
 
         session.setAttribute("user", depUser);
 

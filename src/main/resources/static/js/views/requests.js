@@ -92,6 +92,17 @@ define(['views/showform'], function(showform) {
 
                             });
 
+                            data.attachmentFilename = data.attachmentPath.split('\\').pop().split('/').pop()
+                            //data.attachmentFilename = data.attachmentPath.substring(data.attachmentPath.lastIndexOf("/"))
+
+                            if(data.attachmentFilename != null && data.attachmentFilename != '') {
+                                data.attachmentFilename = '<a href="' + LINK_PREFIX + data.attachmentFilename + LINK_SUFFIX + '" target="_blank">'
+                                    + data.attachmentFilename + '</a>'
+                            }
+                            else {
+                                data.attachmentFilename = ''
+                            }
+
                             $$('form').parse(data)
                             $$('addr_table').parse(data.docAddressFact)
                             $$('person_table').parse(data.docPersonSet)

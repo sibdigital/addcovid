@@ -1,29 +1,26 @@
 package ru.sibdigital.addcovid.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
-import ru.sibdigital.addcovid.controller.DocRequestController;
 
 @Component
+@Slf4j
 public class EmailServiceImpl implements EmailService {
 
     @Autowired
     public JavaMailSender javaMailSender;
 
-    private static final Logger log = LoggerFactory.getLogger(EmailServiceImpl.class);
-
     public void sendSimpleMessage(String to, String subject, String text) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(to);
-            message.setFrom("rabota@govrb.ru");
             message.setSubject(subject);
             message.setText(text);
+            message.setFrom("rabota@govrb.ru");
 
             javaMailSender.send(message);
         } catch (MailException e) {
