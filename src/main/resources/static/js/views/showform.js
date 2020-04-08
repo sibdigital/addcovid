@@ -328,6 +328,7 @@ define(function() {
                                     {
                                         cols: [
                                             {
+                                                id: 'filename_label',
                                                 view: "label",
                                                 label: 'Вложенный файл:',
                                                 width: 150
