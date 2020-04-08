@@ -4,17 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.server.Session;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import ru.sibdigital.addcovid.dto.PersonDto;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import ru.sibdigital.addcovid.model.DepUser;
-import ru.sibdigital.addcovid.model.DocRequest;
 import ru.sibdigital.addcovid.repository.DepUserRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 
 import javax.servlet.http.HttpSession;
-import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -26,10 +24,10 @@ public class LoginController {
     @Autowired
     private DocRequestRepo docRequestRepo;
 
-    @Value("${link.prefix}")
+    @Value("${link.prefix:http://fs.govrb.ru}")
     private String linkPrefix;
 
-    @Value("${link.suffix}")
+    @Value("${link.suffix:}")
     private String linkSuffix;
 
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
@@ -44,7 +42,6 @@ public class LoginController {
         session.removeAttribute("user");
         return "redirect:/login";
     }
-
 
     @GetMapping("/requests")
     public String requests(Map<String, Object> model, HttpSession session) {

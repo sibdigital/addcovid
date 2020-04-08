@@ -23,7 +23,7 @@ define(['views/showform'], function(showform) {
                     select: 'row',
                     resizeColumn: true,
                     pager: 'Pager',
-                    datafetch: 30,
+                    datafetch: 16,
                     columns: [
                         {
                             id: "orgName",
@@ -64,7 +64,7 @@ define(['views/showform'], function(showform) {
                                 head: {
                                     view: 'toolbar',
                                     elements: [
-                                        {view: 'label', label: 'Просмотр запроса'},
+                                        {view: 'label', label: 'Просмотр запроса (id: ' + data.id + ')'},
                                         {
                                             view: 'icon', icon: 'wxi-close',
                                             click: function () {
@@ -119,7 +119,7 @@ define(['views/showform'], function(showform) {
                     view: 'pager',
                     id: 'Pager',
                     height: 38,
-                    size: 50,
+                    size: 16,
                     group: 5,
                     template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
                 }

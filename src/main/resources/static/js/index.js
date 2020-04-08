@@ -62,6 +62,8 @@ require(
                                                 break
                                         }
 
+                                        $$('search').setValue('')
+
                                         webix.ui({
                                             id: 'root',
                                             rows: [

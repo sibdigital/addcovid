@@ -46,11 +46,11 @@ public class DocRequest {
     @OneToMany(targetEntity = DocPerson.class,mappedBy="docRequest", fetch = FetchType.EAGER)
     private Set<DocPerson> docPersonSet;
 
-    @OneToOne(cascade = CascadeType.MERGE)
+    @OneToOne
     @JoinColumn(name = "id_department", referencedColumnName = "id")
     private ClsDepartment department;
 
-    @OneToOne(cascade = CascadeType.MERGE)
+    @OneToOne
     @JoinColumn(name = "id_organization", referencedColumnName = "id")
     private ClsOrganization organization;
 
