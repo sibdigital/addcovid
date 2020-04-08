@@ -165,6 +165,7 @@ define(function() {
                                             },
                                             {
                                                 cols: [
+                                                    {},
                                                     {
                                                         view: 'button',
                                                         disabled: flag_param,

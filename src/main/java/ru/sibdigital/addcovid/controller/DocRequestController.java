@@ -68,7 +68,7 @@ public class DocRequestController {
         if(oldStatusReview != docRequest.getStatusReview()){
             String text = "";
             if (docRequest.getStatusReview() == 1) {
-                text = "Ваша заявка принята.";
+                text = "Ваша заявление рассмотрено и одобрено.";
             }
             else if (docRequest.getStatusReview() == 2) {
                 text = "Ваша заявка отклонена по причине: " + docRequest.getRejectComment();
