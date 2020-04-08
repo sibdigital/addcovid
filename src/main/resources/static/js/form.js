@@ -736,10 +736,10 @@ webix.ready(function() {
                                             webix.message('Слишком частое нажатие на кнопку', 'error')
                                             return false
                                         }
-                                        if(!uploadFilename){
-                                            webix.message('Необходимо вложить файл', 'error')
-                                            return false
-                                        }
+                                        // if(!uploadFilename){
+                                        //     webix.message('Необходимо вложить файл', 'error')
+                                        //     return false
+                                        // }
 
                                         let persons = []
                                         $$('person_table').data.each(function (obj) {
