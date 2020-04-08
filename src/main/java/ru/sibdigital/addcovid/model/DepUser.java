@@ -20,7 +20,7 @@ public class DepUser implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DEP_USR_SEQ_GEN")
     private Long id;
 
-    @OneToOne(cascade = CascadeType.MERGE)
+    @OneToOne
     @JoinColumn(name = "id_department", referencedColumnName = "id")
     private ClsDepartment idDepartment;
     private String lastname;

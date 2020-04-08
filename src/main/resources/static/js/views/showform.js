@@ -176,7 +176,7 @@ define(function() {
                                                             if ($$('form').getValues().department.id != params.department.id) {
                                                                 webix.confirm('Переназначить заявку в выбранное министерство?')
                                                                     .then(function () {
-                                                                        console.log($$('form').getValues().department.id)
+                                                                        //console.log($$('form').getValues().department.id)
 
                                                                         params.department.id = $$('form').getValues().department.id
 
@@ -199,6 +199,7 @@ define(function() {
                                                                                         .then(function () {
                                                                                             $$('show_layout').hideProgress()
                                                                                             this.disabled = false
+                                                                                            modal.config.isSubmit = true
                                                                                             setTimeout(function () {
                                                                                                 modal.close();
                                                                                             }, 0)
@@ -327,6 +328,7 @@ define(function() {
                                     {
                                         cols: [
                                             {
+                                                id: 'filename_label',
                                                 view: "label",
                                                 label: 'Вложенный файл:',
                                                 width: 150
@@ -340,34 +342,35 @@ define(function() {
                                             }
                                         ]
                                     },
-/*
-                                    {
-                                        cols: [
-                                            {
-                                                paddingLeft: 10,
-                                                view: 'label',
-                                                label: '',
-                                                name: 'attachmentPath',
-                                                id: 'file'
-                                            },
-                                            //{},
-                                            {
-                                                id: 'download_btn',
-                                                view: 'button',
-                                                width: 300,
-                                                css: 'webix_primary',
-                                                value: 'Просмотреть загруженный файл',
-                                                align: 'center',
-                                                click: function () {
-                                                    let params = this.getTopParentView().config.item
-                                                    webix.html.download('/download/' + params.id, 'myfile.pdf')
+                                    /*
+                                                {
+                                                    cols: [
+                                                        {
+                                                            paddingLeft: 10,
+                                                            view: 'label',
+                                                            label: '',
+                                                            name: 'attachmentPath',
+                                                            id: 'file'
+                                                        },
+                                                        //{},
+                                                        {
+                                                            id: 'download_btn',
+                                                            view: 'button',
+                                                            width: 300,
+                                                            css: 'webix_primary',
+                                                            value: 'Просмотреть загруженный файл',
+                                                            align: 'center',
+                                                            click: function () {
+                                                                let params = this.getTopParentView().config.item
+                                                                webix.html.download('/download/' + params.id, 'myfile.pdf')
+                                                            }
+                                                        },
+                                                    ]
                                                 }
-                                            },
-                                        ]
-                                    }
-*/
+                                    */
                                 ]
                             },
+
                             view_section('Данные о численности работников'),
                             {
                                 type: 'space',
@@ -458,8 +461,8 @@ define(function() {
                                     {},
                                     {
                                         view: 'textarea',
-                                        disabled: flag_param,
-                                        name: 'reject_comment',
+                                        readonly: flag_param,
+                                        name: 'rejectComment',
                                         label: 'Обоснование отказа',
                                         id: 'reject_comment',
                                         labelPosition: 'top',
