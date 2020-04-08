@@ -23,9 +23,9 @@ function addPerson(){
     }
 
     $$('person_table').add({
-        lastname: values.lastname,
-        firstname: values.firstname,
-        patronymic: values.patronymic,
+        lastname: values.lastname.trim(),
+        firstname: values.firstname.trim(),
+        patronymic: values.patronymic.trim(),
         //isagree: values.isagree
     }, $$('person_table').count() + 1)
 
@@ -491,7 +491,7 @@ webix.ready(function() {
                                 label: 'Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы',
                                 labelPosition: 'top',
                                 validate: function(val){
-                                    return !isNaN(val*1);
+                                    return !isNaN(val*1) && (val.trim() !== '')
                                 },
                                 invalidMessage: 'Поле не может быть пустым',
                                 required: true
@@ -501,7 +501,7 @@ webix.ready(function() {
                                 label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
                                 invalidMessage: 'Поле не может быть пустым',
                                 validate: function(val){
-                                    return !isNaN(val*1);
+                                    return !isNaN(val*1) && (val.trim() !== '')
                                 },
                                 required: true,
                                 labelPosition: 'top'
@@ -511,7 +511,7 @@ webix.ready(function() {
                                 label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
                                 labelPosition: 'top',
                                 validate: function(val){
-                                    return !isNaN(val*1);
+                                    return !isNaN(val*1) && (val.trim() !== '')
                                 },
                                 invalidMessage: 'Поле не может быть пустым',
                                 required: true
@@ -724,6 +724,10 @@ webix.ready(function() {
                                             webix.message('Слишком частое нажатие на кнопку', 'error')
                                             return false
                                         }
+                                        if(!uploadFilename){
+                                            webix.message('Необходимо вложить файл', 'error')
+                                            return false
+                                        }
 
                                         let persons = []
                                         $$('person_table').data.each(function (obj) {
@@ -746,10 +750,16 @@ webix.ready(function() {
                                         })
                                         params.addressFact = addrs
 
+                                        params.organizationInn = params.organizationInn.trim()
+                                        params.organizationOgrn  = params.organizationOgrn.trim()
+
                                         params.attachment = uploadFile
                                         params.attachmentFilename = uploadFilename
 
-                                        console.log(params);
+                                        $$('label_sogl').showProgress({
+                                            type: 'icon',
+                                            delay: 5000
+                                        })
 
                                         webix.ajax()
                                             .headers({'Content-type': 'application/json'})
@@ -790,4 +800,6 @@ webix.ready(function() {
 
     $$('form_person').bind('person_table')
     $$('form_addr').bind('addr_table')
+
+    webix.extend($$('label_sogl'), webix.ProgressBar);
 })
