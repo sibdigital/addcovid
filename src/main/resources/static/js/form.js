@@ -687,6 +687,9 @@ webix.ready(function() {
                                     if($$('form').validate()) {
                                         let params = $$('form').getValues();
 
+                                        params.organizationInn = params.organizationInn.trim();
+                                        params.organizationOgrn = params.organizationOgrn.trim();
+
                                         if(params.organizationInn.length > 12){
                                             webix.message('Превышена длина ИНН', 'error')
                                             return false
@@ -705,6 +708,15 @@ webix.ready(function() {
                                         if(params.organizationEmail.length > 100){
                                             webix.message('Превышена длина электронной почты', 'error')
                                             return false
+                                        }else{
+                                            let bad_val = params.organizationEmail.indexOf("*") > -1
+                                                || params.organizationEmail.indexOf("+") > -1
+                                                || params.organizationEmail.indexOf('"') > -1;
+
+                                            if(bad_val == true){
+                                                webix.message('Недопустимые символы в адресе электронной почты', 'error')
+                                                return false
+                                            }
                                         }
 
                                         if(params.organizationShortName.length > 255){
