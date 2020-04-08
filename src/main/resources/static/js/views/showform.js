@@ -459,7 +459,7 @@ define(function() {
                                     {
                                         view: 'textarea',
                                         disabled: flag_param,
-                                        name: 'reject_comment',
+                                        name: 'rejectComment',
                                         label: 'Обоснование отказа',
                                         id: 'reject_comment',
                                         labelPosition: 'top',
