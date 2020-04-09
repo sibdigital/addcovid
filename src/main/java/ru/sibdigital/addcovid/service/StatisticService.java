@@ -10,4 +10,5 @@ public interface StatisticService {
     Map getTotalStatistic();
 
     List<Map<String, Object>> getDepartmentRequestStatistic();
+
 }

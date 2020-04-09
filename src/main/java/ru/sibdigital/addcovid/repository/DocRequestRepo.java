@@ -39,36 +39,39 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
 
 
 
-    @Query(nativeQuery = true, value = "SELECT count(*) FROM ( SELECT DISTINCT firstname, lastname, patronymic FROM doc_person WHERE id_request IN (SELECT id FROM doc_request WHERE status_review = 1)) AS s;")
-    public Long getTotalApprovedPeople();
+
+
 
 
     @Query(nativeQuery = true, value = "select d.name, d.id, coalesce(neobr, 0) as neobr, coalesce(utv, 0) as utv, coalesce(otkl, 0) as otkl from cls_department as d" +
-            "                                                                                                              left join ( select id_department, max(neobr) as neobr, max(utv) as utv, max(otkl) as otkl" +
-            "                                                                                                                          from (" +
-            "                                                                                                                                   select id_department," +
-            "                                                                                                                                          status_review," +
-            "                                                                                                                                          sum(neobr) as neobr," +
-            "                                                                                                                                          sum(utv)   as utv," +
-            "                                                                                                                                          sum(otkl)  as otkl" +
-            "                                                                                                                                   from (" +
-            "                                                                                                                                            select id_department, status_review, 0 as neobr, 1 as utv, 0 as otkl" +
-            "                                                                                                                                            from doc_request" +
-            "                                                                                                                                            where status_review = 1" +
-            "                                                                                                                                            union" +
-            "                                                                                                                                            select id_department, status_review, 0 as neobr, 0 as utv, 1 as otkl" +
-            "                                                                                                                                            from doc_request" +
-            "                                                                                                                                            where status_review = 2" +
-            "                                                                                                                                            union" +
-            "                                                                                                                                            select id_department, status_review, 1 as neobr, 0 as utv, 0 as otkl" +
-            "                                                                                                                                            from doc_request" +
-            "                                                                                                                                            where status_review <> 2" +
-            "                                                                                                                                              and status_review <> 1" +
-            "                                                                                                                                        ) as s" +
-            "                                                                                                                                   group by id_department, status_review" +
-            "                                                                                                                               ) as m group by id_department" +
+            "                  left join ( select id_department, max(neobr) as neobr, max(utv) as utv, max(otkl) as otkl" +
+            "                              from (" +
+            "                                       select id_department," +
+            "                                              sum(neobr) as neobr," +
+            "                                              sum(utv)   as utv," +
+            "                                              sum(otkl)  as otkl" +
+            "                                       from (" +
+            "                                                select id_department, 0 as neobr, 1 as utv, 0 as otkl" +
+            "                                                from doc_request" +
+            "                                                where status_review = 1" +
+            "                                                union all" +
+            "                                                select id_department, 0 as neobr, 0 as utv, 1 as otkl" +
+            "                                                from doc_request" +
+            "                                                where status_review = 2" +
+            "                                                union all" +
+            "                                                select id_department, 1 as neobr, 0 as utv, 0 as otkl" +
+            "                                                from doc_request" +
+            "                                                where status_review <> 2" +
+            "                                                  and status_review <> 1" +
+            "                                            ) as s" +
+            "                                       group by id_department" +
+            "                                   ) as m group by id_department" +
             ") as ss on d.id = ss.id_department order by d.id")
     public List<Map<String, Object>> getRequestStatisticForEeachDepartment();
+    
+    
+    @Query(nativeQuery = true, value = "SELECT date_trunc('day',doc_request.time_create), COUNT(*) AS totel FROM doc_request GROUP BY date_trunc('day',doc_request.time_create);")
+    public List<Map<String, Object>> getStatisticForEachDay();
     
     
     
