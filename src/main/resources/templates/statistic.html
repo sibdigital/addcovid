@@ -1,73 +1,136 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>ЕИС "Работающая Бурятия"</title>
-    <link type="text/css" rel="stylesheet" href="/libs/webix.css">
-    <script src="/libs/webix.min.js"></script>
-    <style>body {margin: 0}</style>
+    <title>Комитет информационных технологий</title>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+
+    <script src="js/popper.min.js"></script>
+    <script src="js/jquery-3.4.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-<div id="app"></div>
+<div th:insert="navbar-boots"></div>
+
+<div class="container">
+    <div class="row my-2">
+        <div class="col">
+            <div class="table-responsive-sm">
+                <table class="table" id="totalTable">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col" class="text-center" style="width: 70%"></th>
+                        <th scope="col" class="text-center" style="width: 30%">Заявки</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="totalBody">
+
+                    </tbody>
+                </table>
+
+                <span class="text-center" style="display:none" id="noResults">Нет результатов</span>
+            </div>
+        </div>
+    </div>
+    <div class="dropdown-divider"></div>
+    <div class="row my-2">
+        <div class="col">
+            <div class="table-responsive-sm">
+                <table class="table" id="depTable">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col" class="text-center" style="width: 60%">ИОГВ</th>
+                        <th scope="col" class="text-center" style="width: 20%">Тип</th>
+                        <th scope="col" class="text-center" style="width: 20%">Кол-во</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="depBody">
+
+                    </tbody>
+                </table>
+
+                <span class="text-center" style="display:none" id="noResults2">Нет результатов</span>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script th:inline="javascript">
-    let totalStatistic = [[${totalStatistic}]] || ''
-    let departmentStatistic = [[${departmentStatistic}]] || ''
 
-    console.log(totalStatistic)
-    console.log(departmentStatistic)
+    const totalStatistic = [[${totalStatistic}]]
+    const departmentStatistic = [[${departmentStatistic}]]
 
-    webix.ui(
-        {
-            rows: [
-                {
-                    view: 'toolbar',
-                    height: 40,
-                    cols: [
-                        {},
-                        {
-                            view: 'label',
-                            label: '<span style="font-size: 1.5rem">ЕИС "Работающая Бурятия". Статистика.</span>',
-                        },
-                        {}
-                    ]
-                },
-                {},
-                {
-                    cols: [
-                        {},
-                        {
-                            // container: 'login',
-                            // view: "form",
-                            // id: "log_form",
-                            // width: 400,
-                            // height: 200,
-                            // margintop: 50,
-                            // elements: [
-                            //     {view: "text", label: "Имя пользователя", name: "login", labelWidth: 150},
-                            //     {view: "text", type: "password", label: "Пароль", name: "password", labelWidth: 150},
-                            //     {
-                            //         margin: 5, cols: [
-                            //             {view: "button", value: "Войти", css: "webix_primary", click: submit},
-                            //             //{ view:"button", value:"Cancel"}
-                            //         ]
-                            //     },
-                            //     {
-                            //         view: 'label',
-                            //         label: message //'<span style="color: red;"' + message + '</span>'
-                            //     }
-                            // ]
-                        },
-                        {}
-                    ]
-                },
-                {}
-            ]
-        });
-    function submit(){
-        //webix.message(JSON.stringify($$("log_form").getValues(), null, 2));
-        webix.send("authenticate", $$("log_form").getValues());
+    let total = 0
+    let html
+
+
+    const dtf = new Intl.DateTimeFormat('ru', { year: 'numeric', month: '2-digit', day: '2-digit' })
+
+    function formatDate(date) {
+        const [{ value: mo },,{ value: da },,{ value: ye }] = dtf.formatToParts(new Date(date.replace('T', ' ')))
+        return `${mo}.${da}.${ye}`
     }
+
+    function insertRow(firstCol, secondCol, cssClass=""){
+        html = `<tr>
+            <td class="${cssClass}"> ${ firstCol } </td>
+            <td class="${cssClass}"> ${ secondCol } </td>
+        </tr>`;
+
+        $("#totalBody").append(html);
+    }
+
+    insertRow("Всего людей в утвержденных заявках", totalStatistic.totalApprovedPeople, "text-center font-weight-bold");
+    insertRow("Всего людей в заявках", totalStatistic.totalPeople, "text-center font-weight-bold");
+
+
+    for (let i = 0; i < totalStatistic.forEachDayStatistic.length; i++) {
+
+        total += totalStatistic.forEachDayStatistic[i].total
+        insertRow("За " + formatDate(totalStatistic.forEachDayStatistic[i].date), totalStatistic.forEachDayStatistic[i].total, "text-center")
+    }
+
+    insertRow('ВСЕГО ЗАЯВОК', total, "text-center font-weight-bold")
+
+
+    function insertSecondRow(name, neobr, utv, otkl, cssClass=""){
+        const totalInARow = neobr + utv + otkl;
+        html = `<tr>
+            <td class="${cssClass}" rowspan="4"> ${ name } </td>
+            <td class="${cssClass}"> Необработано </td>
+            <td class="${cssClass}"> ${ neobr } </td>
+
+        </tr>
+        <tr>
+            <td class="${cssClass}"> Утверждено </td>
+            <td class="${cssClass}"> ${ utv } </td>
+        </tr>
+        <tr>
+            <td class="${cssClass}"> Отклонено </td>
+            <td class="${cssClass}"> ${ otkl } </td>
+        </tr>
+        <tr>
+            <td class="text-center font-weight-bold"> Всего </td>
+            <td class="text-center font-weight-bold"> ${ totalInARow } </td>
+        </tr>`;
+
+        $("#depBody").append(html);
+    }
+
+    for (let i = 0; i < departmentStatistic.length; i++) {
+        insertSecondRow(departmentStatistic[i].name, departmentStatistic[i].neobr, departmentStatistic[i].utv, departmentStatistic[i].otkl, "text-center")
+    }
+
+
+
 </script>
+
 </body>
 </html>
