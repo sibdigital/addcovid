@@ -20,13 +20,14 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
 
 //    @Query("SELECT dr FROM DocRequest dr WHERE  dr.department.id = :dep_id AND dr.statusReview = :status")
     @Query(value = "SELECT dr.* FROM doc_request dr, cls_organization org WHERE  dr.id_organization = org.id " +
-            " and dr.id_department = :dep_id AND dr.status_review = :status limit 100" , nativeQuery = true)
+            " and dr.id_department = :dep_id AND dr.status_review = :status ORDER BY dr.time_create ASC limit 100" , nativeQuery = true)
     Optional<List<DocRequest>> getAllByDepartmentId(@Param("dep_id")Long departmentId, @Param("status") Integer status);
+
 
     @Query(value = "SELECT dr.* FROM doc_request dr, cls_organization org WHERE  dr.id_organization = org.id " +
             " and dr.id_department = :dep_id AND dr.status_review = :status " +
-            " and (org.inn = :innOrName or lower(trim(org.name)) like %:innOrName%) limit 100" ,
-           // " ORDER BY dr.timeCreate DESC ",
+            " and (trim(org.inn) like %:innOrName% or lower(trim(org.name)) like %:innOrName%) " +
+            " ORDER BY dr.time_create ASC  limit 100",
             nativeQuery = true)
     Optional<List<DocRequest>> getFirst100RequestByDepartmentIdAndStatusAndInnOrName(@Param("dep_id")Long departmentId, @Param("status")
             Integer status, @Param("innOrName")String innOrName);
