@@ -82,6 +82,17 @@ define(['views/showform'], function(showform) {
                                 //body: showform.showform(true),
                                 body: showform(status == 0 ? false : true),
                                 on: {
+                                    'onShow': function () {
+                                        let person_table_data = new webix.DataCollection({
+                                            url: 'doc_persons/' + data.id
+                                        })
+                                        $$('person_table').sync(person_table_data);
+
+                                        let addr_table_data = new webix.DataCollection({
+                                            url: 'doc_address_fact/' + data.id
+                                        })
+                                        $$('addr_table').sync(addr_table_data);
+                                    },
                                     'onHide': function () {
                                         if(this.config.isSubmit) {
                                             $$('requests_table').clearAll();
@@ -105,8 +116,8 @@ define(['views/showform'], function(showform) {
                             }
 
                             $$('form').parse(data)
-                            $$('addr_table').parse(data.docAddressFact)
-                            $$('person_table').parse(data.docPersonSet)
+                            //$$('addr_table').parse(data.docAddressFact)
+                            //$$('person_table').parse(data.docPersonSet)
 
                             webix.extend($$('show_layout'), webix.ProgressBar);
 

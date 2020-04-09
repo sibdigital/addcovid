@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,11 +19,13 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
     Optional<DocRequest> getTopByOrgHashCode(String sha256code);
     Optional<List<DocRequest>> getAllByDepartmentAndStatusReview(ClsDepartment department, Integer status);
 
-//    @Query("SELECT dr FROM DocRequest dr WHERE  dr.department.id = :dep_id AND dr.statusReview = :status")
+    @EntityGraph(attributePaths = {"docPersonSet", "organization", "department" ,"docAddressFact"})
+    Optional<List<DocRequest>> findFirst100ByDepartmentAndStatusReviewOrderByTimeCreate(ClsDepartment department, Integer status);
+
+    //@Query("SELECT dr FROM DocRequest dr WHERE dr.department.id = :dep_id AND dr.statusReview = :status")
     @Query(value = "SELECT dr.* FROM doc_request dr, cls_organization org WHERE  dr.id_organization = org.id " +
             " and dr.id_department = :dep_id AND dr.status_review = :status ORDER BY dr.time_create ASC limit 100" , nativeQuery = true)
     Optional<List<DocRequest>> getAllByDepartmentId(@Param("dep_id")Long departmentId, @Param("status") Integer status);
-
 
     @Query(value = "SELECT dr.* FROM doc_request dr, cls_organization org WHERE  dr.id_organization = org.id " +
             " and dr.id_department = :dep_id AND dr.status_review = :status " +
@@ -78,6 +81,77 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
     public List<Map<String, Object>> getRequestStatisticForEeachDepartment();
     
     
-    
+
+    /*
+select
+        docrequest0_.id as id1_5_0_,
+        clsdepartm1_.id as id1_0_1_,
+        clsorganiz2_.id as id1_1_2_,
+        docpersons3_.id as id1_4_3_,
+        docaddress4_.id as id1_3_4_,
+        docrequest0_.attachment_path as attachme2_5_0_,
+        docrequest0_.id_department as id_depa17_5_0_,
+        docrequest0_.is_agree as is_agree3_5_0_,
+        docrequest0_.is_protect as is_prote4_5_0_,
+        docrequest0_.old_department_id as old_depa5_5_0_,
+        docrequest0_.org_hash_code as org_hash6_5_0_,
+        docrequest0_.id_organization as id_orga18_5_0_,
+        docrequest0_.person_office_cnt as person_o7_5_0_,
+        docrequest0_.person_remote_cnt as person_r8_5_0_,
+        docrequest0_.person_slry_save_cnt as person_s9_5_0_,
+        docrequest0_.reject_comment as reject_10_5_0_,
+        docrequest0_.req_basis as req_bas11_5_0_,
+        docrequest0_.status_import as status_12_5_0_,
+        docrequest0_.status_review as status_13_5_0_,
+        docrequest0_.time_create as time_cr14_5_0_,
+        docrequest0_.time_import as time_im15_5_0_,
+        docrequest0_.time_review as time_re16_5_0_,
+        clsdepartm1_.description as descript2_0_1_,
+        clsdepartm1_.name as name3_0_1_,
+        clsdepartm1_.status_import as status_i4_0_1_,
+        clsdepartm1_.time_import as time_imp5_0_1_,
+        clsorganiz2_.address_jur as address_2_1_2_,
+        clsorganiz2_.email as email3_1_2_,
+        clsorganiz2_.inn as inn4_1_2_,
+        clsorganiz2_.name as name5_1_2_,
+        clsorganiz2_.ogrn as ogrn6_1_2_,
+        clsorganiz2_.okved as okved7_1_2_,
+        clsorganiz2_.okved_add as okved_ad8_1_2_,
+        clsorganiz2_.phone as phone9_1_2_,
+        clsorganiz2_.short_name as short_n10_1_2_,
+        clsorganiz2_.status_import as status_11_1_2_,
+        clsorganiz2_.time_import as time_im12_1_2_,
+        docpersons3_.id_request as id_reque5_4_3_,
+        docpersons3_.firstname as firstnam2_4_3_,
+        docpersons3_.lastname as lastname3_4_3_,
+        docpersons3_.patronymic as patronym4_4_3_,
+        docpersons3_.id_request as id_reque5_4_0__,
+        docpersons3_.id as id1_4_0__,
+        docaddress4_.address_fact as address_2_3_4_,
+        docaddress4_.id_request as id_reque4_3_4_,
+        docaddress4_.person_office_fact_cnt as person_o3_3_4_,
+        docaddress4_.id_request as id_reque4_3_1__,
+        docaddress4_.id as id1_3_1__
+    from
+        public.doc_request docrequest0_
+    left outer join
+        public.cls_department clsdepartm1_
+            on docrequest0_.id_department=clsdepartm1_.id
+    left outer join
+        public.cls_organization clsorganiz2_
+            on docrequest0_.id_organization=clsorganiz2_.id
+    left outer join
+        public.doc_person docpersons3_
+            on docrequest0_.id=docpersons3_.id_request
+    left outer join
+        public.doc_address_fact docaddress4_
+            on docrequest0_.id=docaddress4_.id_request
+    where
+        docrequest0_.id_department=?
+        and docrequest0_.status_review=?
+    order by
+        docrequest0_.time_create asc
+    * */
+
 
 }
