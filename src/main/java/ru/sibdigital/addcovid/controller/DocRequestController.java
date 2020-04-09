@@ -58,10 +58,11 @@ public class DocRequestController {
 
     @GetMapping("/list_request/{id_department}/{status}")
     public Optional<List<DocRequestPrs>> listRequest(@PathVariable("id_department") ClsDepartment department,
-                                                           //public List<DocRequest> listRequest(@PathVariable("id_department") ClsDepartment department,
-                                                           @PathVariable("status") Integer status) {
-        Optional<List<DocRequestPrs>> docRequests =  docRequestPrsRepo.findFirst100ByDepartmentAndStatusReviewOrderByTimeCreate(department, status);
-        return docRequests;
+                                                     //public List<DocRequest> listRequest(@PathVariable("id_department") ClsDepartment department,
+                                                     @PathVariable("status") Integer status) {
+
+            Optional<List<DocRequestPrs>> docRequests = docRequestPrsRepo.findFirst100ByDepartmentAndStatusReviewOrderByTimeCreate(department, status);
+            return docRequests;
     }
 
   //  @GetMapping("/list_requestByInnAndName/{id_department}/{status}/{innOrName}")
@@ -74,7 +75,14 @@ public class DocRequestController {
     }
 
     @PutMapping("/doc_requests/{id}")
-    public DocRequest updateItem(@PathVariable("id") DocRequest docRequest, @RequestBody DocRequest obj){
+    public DocRequest updateItem(@PathVariable("id") DocRequest docRequest,
+                                 @RequestBody DocRequest obj,
+                                 @RequestHeader("Authorization") String token){
+
+        if(!requestService.isTokenValid(Integer.valueOf(token.replace("Bearer", "").trim()))) {
+            return null;
+        }
+
         obj.setTimeReview(new Timestamp(System.currentTimeMillis()));
 
         Integer oldStatusReview = docRequest.getStatusReview();
@@ -108,9 +116,4 @@ public class DocRequestController {
     public Optional<List<DocAddressFact>> getListAddress(@PathVariable("id_request") Long id_request){
         return docAddressFactRepo.findByDocRequest(id_request);
     }
-
-
-
-
-
 }

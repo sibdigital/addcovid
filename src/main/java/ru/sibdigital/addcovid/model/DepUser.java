@@ -112,6 +112,7 @@ public class DepUser implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, lastname, firstname, patronymic, login, password);
+        //return Objects.hash(id, lastname, firstname, patronymic, login, password);
+        return Objects.hash(login, password);
     }
 }

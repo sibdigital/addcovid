@@ -36,6 +36,9 @@ public class RequestService {
     @Autowired
     ClsDepartmentRepo departmentRepo;
 
+    @Autowired
+    private DepUserRepo depUserRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
@@ -243,5 +246,13 @@ public class RequestService {
 
         inputStream.close();
         outStream.close();
+    }
+
+    public boolean isTokenValid(Integer hash_code){
+        Iterator<DepUser> iter = depUserRepo.findAll().iterator();
+        while(iter.hasNext()) {
+            if(hash_code == iter.next().hashCode()) return true;
+        }
+        return false;
     }
 }

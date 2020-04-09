@@ -187,9 +187,14 @@ define(function() {
                                                                         })
 
                                                                         webix.ajax()
-                                                                            .headers({'Content-type': 'application/json'})
+                                                                            .headers(
+                                                                                {'Content-type': 'application/json',
+                                                                                    'Authorization': 'Bearer ' + TOKEN
+                                                                                }
+                                                                            )
                                                                             .put('/doc_requests/' + params.id,
-                                                                                JSON.stringify(params),
+                                                                                JSON.stringify(params))
+                                                                            .then(
                                                                                 function (text, data, xhr) {
                                                                                     let modal = $$('show_layout').getTopParentView();
                                                                                     webix.alert("Заявка переназначена")
@@ -201,6 +206,13 @@ define(function() {
                                                                                             }, 0)
                                                                                         });
                                                                                 })
+                                                                            .catch(function () {
+                                                                                webix.alert("Не удалось произвести переназначение")
+                                                                                    .then(function () {
+                                                                                        $$('show_layout').hideProgress()
+                                                                                        this.disabled = false
+                                                                                    });
+                                                                            })
                                                                     })
                                                             }
                                                         }
@@ -485,11 +497,13 @@ define(function() {
                                             })
 
                                             webix.ajax()
-                                                .headers({'Content-type': 'application/json'})
+                                                .headers(
+                                                    {'Content-type': 'application/json',
+                                                        'Authorization': 'Bearer ' + TOKEN }
+                                                )
                                                 .put('/doc_requests/' + params.id,
-                                                    JSON.stringify(params),
-                                                    function (text, data, xhr) {
-
+                                                    JSON.stringify(params))
+                                                .then(function (text, data, xhr) {
                                                         let obj = JSON.parse(text)
                                                         let modal = $$('show_layout').getTopParentView();
 
@@ -517,6 +531,12 @@ define(function() {
                                                                 })
                                                         }
                                                     })
+                                                .catch(function (text, data, xhr) {
+                                                    webix.alert("Не удалось изменить статус")
+                                                        .then(function () {
+                                                            $$('show_layout').hideProgress()
+                                                        })
+                                            })
                                         }
                                     },
                                     {
@@ -542,14 +562,17 @@ define(function() {
                                             })
 
                                             webix.ajax()
-                                                .headers({'Content-type': 'application/json'})
+                                                .headers(
+                                                    {'Content-type': 'application/json',
+                                                     'Authorization': 'Bearer ' + TOKEN
+                                                    }
+                                                )
                                                 .put('/doc_requests/' + params.id,
-                                                    JSON.stringify(params),
-                                                    function (text, data, xhr) {
-                                                        let obj = JSON.parse(text)
+                                                    JSON.stringify(params),)
+                                                .then(function (text, data, xhr) {
                                                         let modal = $$('show_layout').getTopParentView();
 
-                                                        if(obj) {
+                                                        if(text.status == 200) {
                                                             webix.alert("Заявка отклонена")
                                                                 .then(function () {
                                                                     $$('show_layout').hideProgress()
@@ -568,6 +591,12 @@ define(function() {
                                                                 })
                                                         }
                                                     })
+                                                .catch(function (text) {
+                                                    webix.alert("Не удалось изменить статус")
+                                                        .then(function () {
+                                                            $$('show_layout').hideProgress()
+                                                        })
+                                                })
                                         }
                                     }
                                 ]

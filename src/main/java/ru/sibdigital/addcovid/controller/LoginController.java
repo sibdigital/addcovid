@@ -58,14 +58,23 @@ public class LoginController {
             model.put("user_firstname", depUser.getFirstname());
             model.put("link_prefix", linkPrefix);
             model.put("link_suffix", linkSuffix);
+            model.put("token", session.getAttribute("token"));
             return "requests";
         }
+    }
+
+    @GetMapping("/authenticate")
+    public String authenticateGet(){
+        return "404";
     }
 
     @PostMapping("/authenticate")
     //public String login(Model model, String error, String logout) {
     public String authenticate(@ModelAttribute("log_form") DepUser inputDepUser, Map<String, Object> model, HttpSession session) {
-        log.debug("вошли в LoginController.");
+
+        if(inputDepUser == null){
+            return "login";
+        }
 
         DepUser depUser = depUserRepo.findByLogin(inputDepUser.getLogin().toLowerCase());
 
@@ -79,6 +88,7 @@ public class LoginController {
         log.debug("LoginController. Аутентификация пройдена.");
 
         session.setAttribute("user", depUser);
+        session.setAttribute("token", depUser.hashCode());
 
         return "redirect:/requests";
     }
