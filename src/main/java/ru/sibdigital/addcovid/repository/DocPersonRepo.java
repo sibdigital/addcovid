@@ -8,6 +8,9 @@ import ru.sibdigital.addcovid.model.DocPerson;
 
 import java.util.Map;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface DocPersonRepo extends JpaRepository<DocPerson, Long> {
 
@@ -43,4 +46,6 @@ public interface DocPersonRepo extends JpaRepository<DocPerson, Long> {
             ") as ss on d.id_request = ss.id_req;")
     public Map<String, Long> getTotalPeopleStatistic();
 
+    @Query(nativeQuery = true, value = "select * from doc_person where id_request = :id_request")
+    public Optional<List<DocPerson>> findByDocRequest(Long id_request);
 }

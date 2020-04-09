@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,7 +24,6 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
             "select dr.* FROM doc_request dr  where dr.id_department = 1 AND dr.status_review = 0 ORDER BY dr.id ASC limit 10\n" +
             ") as dr inner join cls_organization org on dr.id_organization = org.id " , nativeQuery = true)
     Optional<List<DocRequest>> getAllByDepartmentId(@Param("dep_id")Long departmentId, @Param("status") Integer status);
-
 
     @Query(value = "SELECT dr.* FROM doc_request dr, cls_organization org WHERE  dr.id_organization = org.id " +
             " and dr.id_department = :dep_id AND dr.status_review = :status " +
@@ -80,8 +80,8 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
     
     @Query(nativeQuery = true, value = "SELECT date_trunc('day',doc_request.time_create) as date, COUNT(*) AS total FROM doc_request GROUP BY date_trunc('day',doc_request.time_create);")
     public List<Map<String, Object>> getStatisticForEachDay();
-    
-    
-    
+
+
+
 
 }
