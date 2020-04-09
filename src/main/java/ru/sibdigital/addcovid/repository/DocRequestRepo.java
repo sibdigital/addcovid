@@ -50,7 +50,7 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
 
 
 
-    @Query(nativeQuery = true, value = "select d.name, d.id, coalesce(neobr, 0) as neobr, coalesce(utv, 0) as utv, coalesce(otkl, 0) as otkl from cls_department as d" +
+    @Query(nativeQuery = true, value = "select d.name, d.id, coalesce(neobr, 0) as awaiting, coalesce(utv, 0) as accepted, coalesce(otkl, 0) as declined from cls_department as d" +
             "                  left join ( select id_department, max(neobr) as neobr, max(utv) as utv, max(otkl) as otkl" +
             "                              from (" +
             "                                       select id_department," +

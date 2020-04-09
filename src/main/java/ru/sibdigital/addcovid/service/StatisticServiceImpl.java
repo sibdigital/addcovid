@@ -23,8 +23,14 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     public Map<String, Object> getTotalStatistic(){
         Map<String, Object> statistic = new HashMap(5);
-        statistic.put("totalPeople", docPersonRepo.getTotalPeople());
-        statistic.put("totalApprovedPeople", docPersonRepo.getTotalApprovedPeople());
+
+        Map<String, Object> peopleStatistic = new HashMap<>(3);
+        peopleStatistic.put("accepted",docPersonRepo.getTotalApprovedPeopleByReviewStatus(1));
+        peopleStatistic.put("declined",docPersonRepo.getTotalApprovedPeopleByReviewStatus(2));
+        peopleStatistic.put("awaiting",docPersonRepo.getTotalApprovedPeopleByReviewStatus(0));
+
+
+        statistic.put("peopleStatistic", peopleStatistic);
         statistic.put("forEachDayStatistic", docRequestRepo.getStatisticForEachDay());
         return statistic;
     }
@@ -33,7 +39,7 @@ public class StatisticServiceImpl implements StatisticService {
     public List<Map<String, Object>> getDepartmentRequestStatistic(){
         List<Map<String, Object>> rawStatistic = docRequestRepo.getRequestStatisticForEeachDepartment();
         /*statistic.put("totalPeople", docPersonRepo.getTotalPeople());
-        statistic.put("totalApprovedPeople", docPersonRepo.getTotalApprovedPeople());*/
+        statistic.put("totalApprovedPeople", docPersonRepo.getTotalApprovedPeopleByReviewStatus());*/
         return rawStatistic;
     }
 
