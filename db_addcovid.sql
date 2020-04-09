@@ -62,8 +62,8 @@ create table doc_request
     is_agree boolean ,
     is_protect boolean,
     org_hash_code text,
-    reject_comment: text,
-    old_department_id: integer
+    reject_comment text,
+    old_department_id integer
 )
 ;
 

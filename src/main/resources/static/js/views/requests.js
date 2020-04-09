@@ -101,6 +101,7 @@ define(['views/showform'], function(showform) {
                             }
                             else {
                                 data.attachmentFilename = ''
+                                $$('filename_label').hide()
                             }
 
                             $$('form').parse(data)

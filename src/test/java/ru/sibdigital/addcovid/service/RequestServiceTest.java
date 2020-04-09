@@ -79,7 +79,7 @@ class RequestServiceTest {
                 .build();
     }
 
-    @Test
+    //@Test
     public void testAdd() {
 
         requestService.addNewRequest(postForm);
@@ -87,7 +87,7 @@ class RequestServiceTest {
     }
 
 
-    @Test
+    //@Test
     public void testWithFile() throws IOException {
 
 
@@ -117,7 +117,7 @@ class RequestServiceTest {
 
     }
 
-    @Test
+    //@Test
     void getLastRequestInfoByInnAndOgrnAndOrganizationName() {
         DocRequest lastRequest =
                 requestService.getLastRequestInfoByInnAndOgrnAndOrganizationName(
@@ -133,14 +133,14 @@ class RequestServiceTest {
 
     }
 
-    @Test
+    //@Test
     void getRequestToBeWatchedByDepartment() {
         List<DocRequest> docRequests = requestService.getRequestToBeWatchedByDepartment(1L);
         Assertions.assertNotNull(docRequests);
     }
 
 
-    @Test
+    //@Test
     void setReviewStatus() {
         DocRequest lastRequest = requestService.getLastRequestInfoByInnAndOgrnAndOrganizationName(postForm.getOrganizationInn(), postForm.getOrganizationOgrn(), postForm.getOrganizationName());
         DocRequest docRequest = requestService.setReviewStatus(lastRequest, ReviewStatuses.CONFIRMED);
