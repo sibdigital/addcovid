@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>ЕИС "Работающая Бурятия"</title>
+    <link type="text/css" rel="stylesheet" href="/libs/webix.css">
+    <script src="/libs/webix.min.js"></script>
+    <style>body {margin: 0}</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script th:inline="javascript">
+    let totalStatistic = [[${totalStatistic}]] || ''
+    let departmentStatistic = [[${departmentStatistic}]] || ''
+
+    console.log(totalStatistic)
+    console.log(departmentStatistic)
+
+    webix.ui(
+        {
+            rows: [
+                {
+                    view: 'toolbar',
+                    height: 40,
+                    cols: [
+                        {},
+                        {
+                            view: 'label',
+                            label: '<span style="font-size: 1.5rem">ЕИС "Работающая Бурятия". Статистика.</span>',
+                        },
+                        {}
+                    ]
+                },
+                {},
+                {
+                    cols: [
+                        {},
+                        {
+                            // container: 'login',
+                            // view: "form",
+                            // id: "log_form",
+                            // width: 400,
+                            // height: 200,
+                            // margintop: 50,
+                            // elements: [
+                            //     {view: "text", label: "Имя пользователя", name: "login", labelWidth: 150},
+                            //     {view: "text", type: "password", label: "Пароль", name: "password", labelWidth: 150},
+                            //     {
+                            //         margin: 5, cols: [
+                            //             {view: "button", value: "Войти", css: "webix_primary", click: submit},
+                            //             //{ view:"button", value:"Cancel"}
+                            //         ]
+                            //     },
+                            //     {
+                            //         view: 'label',
+                            //         label: message //'<span style="color: red;"' + message + '</span>'
+                            //     }
+                            // ]
+                        },
+                        {}
+                    ]
+                },
+                {}
+            ]
+        });
+    function submit(){
+        //webix.message(JSON.stringify($$("log_form").getValues(), null, 2));
+        webix.send("authenticate", $$("log_form").getValues());
+    }
+</script>
+</body>
+</html>
