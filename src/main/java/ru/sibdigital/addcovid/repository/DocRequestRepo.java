@@ -19,12 +19,10 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
     Optional<DocRequest> getTopByOrgHashCode(String sha256code);
     Optional<List<DocRequest>> getAllByDepartmentAndStatusReview(ClsDepartment department, Integer status);
 
-    @EntityGraph(attributePaths = {"docPersonSet", "organization", "department" ,"docAddressFact"})
-    Optional<List<DocRequest>> findFirst100ByDepartmentAndStatusReviewOrderByTimeCreate(ClsDepartment department, Integer status);
-
-    //@Query("SELECT dr FROM DocRequest dr WHERE dr.department.id = :dep_id AND dr.statusReview = :status")
-    @Query(value = "SELECT dr.* FROM doc_request dr, cls_organization org WHERE  dr.id_organization = org.id " +
-            " and dr.id_department = :dep_id AND dr.status_review = :status ORDER BY dr.time_create ASC limit 100" , nativeQuery = true)
+//    @Query("SELECT dr FROM DocRequest dr WHERE  dr.department.id = :dep_id AND dr.statusReview = :status")
+    @Query(value = "explain select dr.* from (\n" +
+            "select dr.* FROM doc_request dr  where dr.id_department = 1 AND dr.status_review = 0 ORDER BY dr.id ASC limit 10\n" +
+            ") as dr inner join cls_organization org on dr.id_organization = org.id " , nativeQuery = true)
     Optional<List<DocRequest>> getAllByDepartmentId(@Param("dep_id")Long departmentId, @Param("status") Integer status);
 
     @Query(value = "SELECT dr.* FROM doc_request dr, cls_organization org WHERE  dr.id_organization = org.id " +

@@ -92,7 +92,19 @@ public class DocRequestController {
         if(oldStatusReview != docRequest.getStatusReview()){
             String text = "";
             if (docRequest.getStatusReview() == 1) {
-                text = "Ваша заявление рассмотрено и одобрено.";
+                boolean massAcept = true;
+                if (massAcept == true){
+                    final Optional<List<DocRequest>> lastRequestByInn =
+                            docRequestRepo.getLastRequestByInnAndStatus(docRequest.getOrganization().getInn(), 0);
+                    if (lastRequestByInn.isPresent()){
+                        final List<DocRequest> docRequests = lastRequestByInn.get();
+                        for (DocRequest dr: docRequests){
+                            dr.setStatusReview(docRequest.getStatusReview());
+                        }
+                        docRequestRepo.saveAll(docRequests);
+                    }
+                }
+                text = "Ваше заявление рассмотрено и одобрено.";
             }
             else if (docRequest.getStatusReview() == 2) {
                 text = "Ваша заявка отклонена по причине: " + docRequest.getRejectComment();
