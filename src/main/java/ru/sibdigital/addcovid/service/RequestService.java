@@ -14,10 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -207,6 +204,11 @@ public class RequestService {
         List<DocRequest> docRequests = docRequestRepo.getLastRequestByInn(inn).orElseGet(() -> null);
         if(docRequests != null) return docRequests.get(0);
         return null;
+    };
+
+    public Optional<List<DocRequest>> getFirst100RequestInfoByDepartmentIdAndStatusAndInnOrName(Long departmentId, Integer status, String innOrName){
+        //return docRequestRepo.getFirst100RequestByDepartmentIdAndStatusAndInnOrName(departmentId, status, innOrName).orElseGet(() -> null);
+        return docRequestRepo.getFirst100RequestByDepartmentIdAndStatusAndInnOrName(departmentId, status, innOrName);
     };
 
 
