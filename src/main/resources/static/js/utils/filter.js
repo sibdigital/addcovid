@@ -30,22 +30,19 @@ define(function () {
                     onEnter: function () {
                         let text = this.getValue().toLowerCase();
                         let table = $$(tablename);
+
+                        $$('tabbar').callEvent('onChange', [$$('tabbar').getValue()])
+/*
                         if (!text) {
-                            //table.filter()
                             table.clearAll()
                             table.load(table.config.url)
                         }
                         else {
-                            //url = 'list_requestByInnAndName/' + ID_DEPARTMENT + '/' + status + '/' + text
-                            oldUrl = table.config.url
-                            filterUrl = oldUrl + '/' +  text
                             table.clearAll();
-                            table.load(filterUrl)
-                           // table.config.url =
+                            table.load(table.config.url + '/' +  text)
                         }
+*/
                     }
-
-
                 }
             }
         }

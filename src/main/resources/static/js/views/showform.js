@@ -180,10 +180,7 @@ define(function() {
                                                             if ($$('form').getValues().department.id != params.department.id) {
                                                                 webix.confirm('Переназначить заявку в выбранное министерство?')
                                                                     .then(function () {
-                                                                        //console.log($$('form').getValues().department.id)
-
                                                                         params.department.id = $$('form').getValues().department.id
-
                                                                         $$('show_layout').showProgress({
                                                                             type: 'icon',
                                                                             delay: 5000
@@ -194,16 +191,11 @@ define(function() {
                                                                             .put('/doc_requests/' + params.id,
                                                                                 JSON.stringify(params),
                                                                                 function (text, data, xhr) {
-                                                                                    // console.log(text);
-                                                                                    // console.log(data)
-
                                                                                     let modal = $$('show_layout').getTopParentView();
-
                                                                                     webix.alert("Заявка переназначена")
                                                                                         .then(function () {
                                                                                             $$('show_layout').hideProgress()
                                                                                             this.disabled = false
-                                                                                            modal.config.isSubmit = true
                                                                                             setTimeout(function () {
                                                                                                 modal.close();
                                                                                             }, 0)
@@ -492,9 +484,6 @@ define(function() {
                                                 delay: 5000
                                             })
 
-                                            this.disabled = true
-                                            $$('reject_btn').disabled = true
-
                                             webix.ajax()
                                                 .headers({'Content-type': 'application/json'})
                                                 .put('/doc_requests/' + params.id,
@@ -504,14 +493,13 @@ define(function() {
                                                         let obj = JSON.parse(text)
                                                         let modal = $$('show_layout').getTopParentView();
 
-                                                        modal.config.isSubmit = true
-
                                                         if(obj) {
                                                             webix.alert("Заявка принята")
                                                                 .then(function () {
                                                                     $$('show_layout').hideProgress()
-                                                                    $$('reject_btn').disabled = false
-                                                                    this.disabled = false
+
+                                                                    $$('requests_table').remove(params.id)
+
                                                                     setTimeout(function () {
                                                                         modal.close();
                                                                     }, 0)
@@ -529,7 +517,6 @@ define(function() {
                                                                 })
                                                         }
                                                     })
-
                                         }
                                     },
                                     {
@@ -554,9 +541,6 @@ define(function() {
                                                 delay: 5000
                                             })
 
-                                            // this.disabled = true
-                                            // $$('accept_btn').disabled = true
-
                                             webix.ajax()
                                                 .headers({'Content-type': 'application/json'})
                                                 .put('/doc_requests/' + params.id,
@@ -565,14 +549,13 @@ define(function() {
                                                         let obj = JSON.parse(text)
                                                         let modal = $$('show_layout').getTopParentView();
 
-                                                        modal.config.isSubmit = true
-
                                                         if(obj) {
                                                             webix.alert("Заявка отклонена")
                                                                 .then(function () {
                                                                     $$('show_layout').hideProgress()
-                                                                    // $$('accept_btn').disabled = false
-                                                                    // this.disabled = false
+
+                                                                    $$('requests_table').remove(params.id)
+
                                                                     setTimeout(function () {
                                                                         modal.close();
                                                                     }, 0)
@@ -582,11 +565,6 @@ define(function() {
                                                             webix.alert("Не удалось изменить статус")
                                                                 .then(function () {
                                                                     $$('show_layout').hideProgress()
-                                                                    //$$('accept_btn').disabled = false
-                                                                    //this.disabled = false
-                                                                    // setTimeout(function () {
-                                                                    //     modal.close();
-                                                                    // }, 0)
                                                                 })
                                                         }
                                                     })

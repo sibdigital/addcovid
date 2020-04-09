@@ -62,12 +62,19 @@ require(
                                                 break
                                         }
 
-                                        $$('search').setValue('')
+                                        let search_text = $$('search').getValue()
+                                        if(search_text){
+                                            //$$('search').callEvent('onEnter')
+                                            req_tbl_url = 'list_request/' + ID_DEPARTMENT + '/' + status + '/' + search_text
+                                        }
+                                        else {
+                                            req_tbl_url = 'list_request/' + ID_DEPARTMENT + '/' + status
+                                        }
 
                                         webix.ui({
                                             id: 'root',
                                             rows: [
-                                                requests(status)
+                                                requests(req_tbl_url)
                                             ]
                                         }, $$('root'))
                                     }

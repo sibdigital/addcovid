@@ -60,12 +60,7 @@ public class DocRequestController {
     public Optional<List<DocRequestPrs>> listRequest(@PathVariable("id_department") ClsDepartment department,
                                                            //public List<DocRequest> listRequest(@PathVariable("id_department") ClsDepartment department,
                                                            @PathVariable("status") Integer status) {
-
-        //Optional<List<DocRequestPrs>> docRequests =  docRequestPrsRepo.getAllByDepartmentId(department.getId(), status);
-        //List<DocRequestPrs> docRequests =  docRequestPrsRepo.getDtoByDepartmentId(department.getId(), status);
-
         Optional<List<DocRequestPrs>> docRequests =  docRequestPrsRepo.findFirst100ByDepartmentAndStatusReviewOrderByTimeCreate(department, status);
-
         return docRequests;
     }
 
@@ -74,9 +69,7 @@ public class DocRequestController {
     public Optional<List<DocRequestPrs>> listRequestByInnAndName(@PathVariable("id_department") Long id_department,
                                                   @PathVariable("status") Integer status, @PathVariable("innOrName") String innOrName) {
 
-        //Optional<List<DocRequest>> docRequests =  requestService.getFirst100RequestInfoByDepartmentIdAndStatusAndInnOrName(id_department, status, innOrName);
         Optional<List<DocRequestPrs>> docRequests =  docRequestPrsRepo.getFirst100RequestByDepartmentIdAndStatusAndInnOrName(id_department, status, innOrName);
-
         return docRequests;
     }
 
