@@ -21,8 +21,8 @@ public class StatisticServiceImpl implements StatisticService {
     DocRequestRepo docRequestRepo;
 
     @Override
-    public Map getTotalStatistic(){
-        Map statistic = new HashMap(5);
+    public Map<String, Object> getTotalStatistic(){
+        Map<String, Object> statistic = new HashMap(5);
         statistic.put("totalPeople", docPersonRepo.getTotalPeople());
         statistic.put("totalApprovedPeople", docPersonRepo.getTotalApprovedPeople());
         statistic.put("forEachDayStatistic", docRequestRepo.getStatisticForEachDay());
