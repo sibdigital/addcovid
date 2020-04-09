@@ -36,6 +36,8 @@ function addPerson(){
         $$('send_btn').disable();
     }
 
+    $$('clearPersonsBtn').enable();
+
     $$('form_person').clear()
 }
 
@@ -65,11 +67,29 @@ function removePerson(){
                 $$("person_table").remove($$("person_table").getSelectedId());
                 let cnt = $$('person_table').data.count();
                 let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!';
+
+                if(cnt>0){
+                    $$('clearPersonsBtn').enable();
+                }else {
+                    $$('clearPersonsBtn').disable();
+                }
+
                 if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0 && !is_no_pdf){
                     $$('send_btn').enable();
                 }else{
                     $$('send_btn').disable();
                 }
+            }
+        )
+}
+
+function clearPersons(){
+    webix.confirm('Вы действительно хотите очистить данные о ваших работниках?')
+        .then(
+            function () {
+                $$("person_table").clearAll();
+                $$('send_btn').disable();
+                $$('clearPersonsBtn').disable();
             }
         )
 }
@@ -571,7 +591,8 @@ webix.ready(function() {
                                             cols: [
                                                 {view: 'button', value: 'Добавить', width: 150, click: addPerson },
                                                 {view: 'button', value: 'Изменить', width: 150, click: editPerson },
-                                                {view: 'button', value: 'Удалить', width: 150, click: removePerson}
+                                                {view: 'button', value: 'Удалить', width: 150, click: removePerson},
+                                                {view: 'button', value: 'Очистить', id: 'clearPersonsBtn', width: 150, disabled: true, click: clearPersons}
                                             ]
                                         }
                                     ]
