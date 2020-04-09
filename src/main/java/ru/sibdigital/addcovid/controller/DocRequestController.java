@@ -57,6 +57,16 @@ public class DocRequestController {
         return docRequests;
     }
 
+  //  @GetMapping("/list_requestByInnAndName/{id_department}/{status}/{innOrName}")
+    @GetMapping("/list_request/{id_department}/{status}/{innOrName}")
+    public Optional<List<DocRequest>> listRequestByInnAndName(@PathVariable("id_department") Long id_department,
+                                                  @PathVariable("status") Integer status, @PathVariable("innOrName") String innOrName) {
+
+        Optional<List<DocRequest>> docRequests =  requestService.getFirst100RequestInfoByDepartmentIdAndStatusAndInnOrName(id_department, status, innOrName);
+
+        return docRequests;
+    }
+
     @PutMapping("/doc_requests/{id}")
     public DocRequest updateItem(@PathVariable("id") DocRequest docRequest, @RequestBody DocRequest obj){
         obj.setTimeReview(new Timestamp(System.currentTimeMillis()));
