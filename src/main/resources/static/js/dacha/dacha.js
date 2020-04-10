@@ -8,70 +8,32 @@ function view_section(title){
     }
 }
 
-function addAddr(){
-    let values = $$('form_addr').getValues()
-    if(values.address == '' || values.district == ''){
-        webix.message('не заполнены обязательные поля')
-        return;
-    }
-
-    $$('addr_table').add({
-        district: values.district,
-        address: values.address,
-    }, $$('addr_table').count() + 1)
-
-    $$('form_addr').clear()
-}
-
-function editAddr(){
-    let values = $$('form_addr').getValues()
-    if(values.address == '' || values.district == ''){
-        webix.message('не заполнены обязательные поля')
-        return;
-    }
-
-    $$('form_addr').save()
-}
-
-function removeAddr(){
-    if(!$$("addr_table").getSelectedId()){
-        webix.message("Ничего не выбрано!");
-        return;
-    }
-    webix.confirm('Вы действительно хотите удалить выбранную запись?')
-        .then(
-            function () {
-                $$("addr_table").remove($$("addr_table").getSelectedId());
-            }
-        )
-}
-
-let district_options = {
-"1" : "Баргузинский",
-"2" : "Баунтовский ",
-"3" : "Бичурский",
-"4" : "Джидинский",
-"5" : "Еравнинский",
-"6" : "Заиграевский",
-"7" : "Закаменский",
-"8" : "Иволгинский",
-"9" : "Кабанский",
-"10" : "Кижингинский",
-"11" : "Курумканский",
-"12" : "Кяхтинский",
-"13" : "Муйский",
-"14" : "Мухоршибирский",
-"15" : "Окинский",
-"16" : "Прибайкальский",
-"17" : "Северо-Байкальский",
-"18" : "Селенгинский",
-"19" : "Тарбагатайский",
-"20" : "Тункинский",
-"21" : "Хоринский",
-"22" : "Советский",
-"23" : "Железнодорожный",
-"24" : "Октябрьский"
-}
+let district_options = [
+    { id: 1, value: 'Баргузинский'},
+    { id: 2, value: 'Баунтовский '},
+    { id: 3, value: 'Бичурский'},
+    { id: 4, value: 'Джидинский'},
+    { id: 5, value: 'Еравнинский'},
+    { id: 6, value: 'Заиграевский'},
+    { id: 7, value: 'Закаменский'},
+    { id: 8, value: 'Иволгинский'},
+    { id: 9, value: 'Кабанский'},
+    { id: 10, value: 'Кижингинский'},
+    { id: 11, value: 'Курумканский'},
+    { id: 12, value: 'Кяхтинский'},
+    { id: 13, value: 'Муйский'},
+    { id: 14, value: 'Мухоршибирский'},
+    { id: 15, value: 'Окинский'},
+    { id: 16, value: 'Прибайкальский'},
+    { id: 17, value: 'Северо-Байкальский'},
+    { id: 18, value: 'Селенгинский'},
+    { id: 19, value: 'Тарбагатайский'},
+    { id: 20, value: 'Тункинский'},
+    { id: 21, value: 'Хоринский'},
+    { id: 22, value: 'Советский'},
+    { id: 23, value: 'Железнодорожный'},
+    { id: 24, value: 'Октябрьский'}
+]
 
 webix.ready(function() {
     webix.ui({
@@ -86,7 +48,7 @@ webix.ready(function() {
                 cols: [
                     {
                         view: 'label',
-                        label: '<span style="font-size: 1.5rem">ЕИС "Работающая Бурятия". Подача заявки для дачников.</span>',
+                        label: '<span style="font-size: 1.5rem">ЕИС "Работающая Бурятия". Форма подача заявки для дачников.</span>',
                     }
                 ]
             },
@@ -166,10 +128,52 @@ webix.ready(function() {
                     view_section('Адресная информация'),
                     {
                         view: 'button',
+                        type: 'icon',
+                        icon: 'wxi-plus',
                         label: 'Добавить адрес',
                         click: function () {
-                            $$('addr_table').myadd({})
+                            $$('addform').show()
+                            $$('district').focus()
                         }
+                    },
+                    {
+                        view: 'form',
+                        id: 'addform',
+                        elements: [
+                            {
+                                cols: [
+                                    {
+                                        id: 'district',
+                                        view: 'combo', name: 'district', width: 250, label: 'Район',
+                                        labelPosition: 'top',
+                                        invalidMessage: 'Поле не может быть пустым',
+                                        required: true,
+                                        options: district_options
+                                    },
+                                    {view: 'text', name: 'address', label: 'ДНТ/Адрес', labelPosition: 'top', required: true }
+                                ]
+                            },
+                            {
+                                cols: [
+                                    {
+                                        view: 'button', label: 'Добавить', css: 'webix_primary',
+                                        click: function () {
+                                            if($$('addform').validate()) {
+                                                $$('addr_table').add($$('addform').getValues(), $$('addform').count + 1)
+                                                $$('addform').clear()
+                                                $$('addform').hide()
+                                            }
+                                        }
+                                    },
+                                    { view: 'button', label: 'Cancel', css: 'webix_danger',
+                                        click: function () {
+                                            $$('addform').clear()
+                                            $$('addform').hide()
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
                     },
                     {
                         rows: [
@@ -207,6 +211,7 @@ webix.ready(function() {
                                     }
                                 },
                             },
+/*
                             {
                                 view: 'form',
                                 id: 'form_addr',
@@ -258,28 +263,10 @@ webix.ready(function() {
                                     }
                                 ]
                             }
+*/
                         ]
                     },
                     view_section('Подача заявки'),
-/*
-                    {
-                        view: 'textarea',
-                        height: 200,
-                        readonly: true,
-                        value: 'СОГЛАСИЕ на обработку персональных данных (далее – «Согласие»)\n' +
-                            'Настоящим я, во исполнение требований Федерального закона от 27.07.2006 г. № 152-ФЗ «О персональных данных» (с изменениями и дополнениями) свободно, своей волей и в своем интересе даю свое согласие: Администрации Главы РБ и Правительства Республики Бурятия, юридический адрес: 670001, г. Улан-Удэ, ул. Ленина, д.54, ИНН 0323082280 (далее - Администрация), на обработку, с использованием средств автоматизации или без использования таких средств, персональных данных (фамилия, имя отчество сотрудников организации), включая сбор, запись, систематизацию, удаление и уничтожение персональных данных при подаче заявки с предоставлением сведений о численности работников организаций и индивидуальных предпринимателей.\n' +
-                            'Настоящим я уведомлен Администрацией о том, что предполагаемыми пользователями персональных данных сотрудников моей организации являются работники Администрации.\n' +
-                            'Я ознакомлен(а), что: настоящее согласие на обработку персональных данных моей организации являются бессрочным и может быть отозвано посредством направления в адрес Администрации письменного заявления.\n'
-                    },
-                    {
-                        view: 'checkbox',
-                        name: 'isAgree',
-                        labelPosition: 'top',
-                        invalidMessage: 'Поле не может быть пустым',
-                        required: true,
-                        label: 'Подтверждаю согласие на обработку персональных данных',
-                    },
-*/
                     {
                         view: 'textarea',
                         height: 200,
@@ -353,11 +340,17 @@ webix.ready(function() {
                                         $$('addr_table').data.each(function (obj) {
                                             let addr = {
                                                 address: obj.address,
-                                                district: obj.district
+                                                district: district_options[obj.district - 1].value
                                             }
                                             addrs.push(addr)
                                         })
                                         params.addrList = addrs
+
+                                        if(addrs.length == 0){
+                                            webix.message('Не заполнена адресная часть', 'error')
+                                            $$('addr_table').focus()
+                                            return false
+                                        }
 
                                         $$('label_sogl').showProgress({
                                             type: 'icon',
@@ -366,24 +359,16 @@ webix.ready(function() {
 
                                         webix.ajax()
                                             .headers({'Content-type': 'application/json'})
-                                            .post('/dacha', JSON.stringify(params))
-                                            .then( function (text, data, xhr) {
-                                                    webix.alert(
-                                                        text
-                                                    )
+                                            .post('/dacha',
+                                                JSON.stringify(params),
+                                                function (data) {
+                                                    webix.alert(data)
                                                         .then(function () {
                                                             $$('label_sogl').hideProgress()
                                                             $$('form').clear()
+                                                            $$('addr_table').clearAll()
                                                             $$('lastname').focus()
                                                         });
-                                                })
-                                            .catch(function () {
-                                                webix.alert(text)
-                                                    .then(function () {
-                                                        $$('label_sogl').hideProgress()
-                                                        $$('form').clear()
-                                                        $$('lastname').focus()
-                                                    });
                                             })
                                     }
                                     else {
@@ -407,19 +392,6 @@ webix.ready(function() {
             }
         ]
     })
-
-    //$$('form_addr').bind('addr_table')
-
-    webix.protoUI({
-        name: "mydatatable",
-        myadd: function(){
-            webix.message("your own method");
-        },
-        $init: function(config){
-            this.data.add = function(){ webix.message("rewrite default"); }
-        },
-    }, webix.ui.datatable);
-
+    $$('addform').hide()
     webix.extend($$('label_sogl'), webix.ProgressBar);
-
 })

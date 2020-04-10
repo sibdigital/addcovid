@@ -21,6 +21,10 @@ import java.util.Objects;
         property = "id"
 )
 public class DocDacha {
+    @Id
+    @Column(name = "id", nullable = false)
+    @SequenceGenerator(name = "DOC_SEQ_GEN", sequenceName = "doc_dacha_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DOC_SEQ_GEN")
     private int id;
     private String lastname;
     private String firstname;
@@ -34,10 +38,10 @@ public class DocDacha {
     private Integer statusReview;
     private Timestamp timeReview;
     private String rejectComment;
+
+    @OneToMany(targetEntity = DocDachaAddr.class, mappedBy="docDachaByIdDocDacha", fetch = FetchType.EAGER)
     private Collection<DocDachaAddr> docDachaAddrs;
 
-    @Id
-    @Column(name = "id")
     public int getId() {
         return id;
     }
@@ -191,7 +195,6 @@ public class DocDacha {
         return Objects.hash(id, lastname, firstname, patronymic, age, isAgree, isProtect, timeCreate, statusImport, timeImport, statusReview, timeReview, rejectComment);
     }
 
-    @OneToMany(mappedBy = "docDachaByIdDocDacha")
     public Collection<DocDachaAddr> getDocDachaAddrs() {
         return docDachaAddrs;
     }

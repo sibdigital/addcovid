@@ -13,13 +13,17 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class DocDachaAddr {
+    @Id
+    @Column(name = "id", nullable = false)
+    @SequenceGenerator(name = "DOC_SEQ_GEN", sequenceName = "doc_dacha_addr_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DOC_SEQ_GEN")
     private int id;
     private String district;
     private String address;
+    @ManyToOne
+    @JoinColumn(name = "id_doc_dacha", nullable = false)
     private DocDacha docDachaByIdDocDacha;
 
-    @Id
-    @Column(name = "id")
     public int getId() {
         return id;
     }
@@ -48,8 +52,6 @@ public class DocDachaAddr {
         this.address = address;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_doc_dacha", referencedColumnName = "id", nullable = false)
     public DocDacha getDocDachaByIdDocDacha() {
         return docDachaByIdDocDacha;
     }
