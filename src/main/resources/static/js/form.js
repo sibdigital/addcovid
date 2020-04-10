@@ -1,7 +1,5 @@
 webix.i18n.setLocale("ru-RU");
 
-let flag = 0
-
 function view_section(title){
     return {
         view: 'template',
@@ -463,61 +461,65 @@ webix.ready(function() {
                     {
                         view: 'scrollview',
                         type: 'space',
-                        height: 600,
+                        height: 500,
                         scroll: 'y',
                         body: {
                             rows: [
-                            {
-                                id: 'person_table',
-                                view: 'datatable',
-                                height: 400,
-                                name: 'persons',
-                                select: 'row',
-                                resizeColumn:true,
-                                readonly: true,
-                                columns: [
-                                    { id: 'id', header: '', css: 'rank', width: 50 },
-                                    { id: 'lastname', header: 'Фамилия', adjust: true, sort: 'string', fillspace: true },
-                                    { id: 'firstname', header: 'Имя', adjust: true, sort: 'string', fillspace: true },
-                                    { id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string' },
-                                    //{ id: 'isagree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
-                                ],
-                                on:{
-                                    'data->onStoreUpdated': function(){
-                                        this.data.each(function(obj, i){
-                                            obj.id = i + 1;
-                                        });
-                                    }
+                                {
+                                    view: 'form',
+                                    id: 'form_person',
+                                    elements: [
+                                        {
+                                            //type: 'space',
+                                            //margin: 0,
+                                            view: 'fieldset',
+                                            label: 'Введите ФИО работника и нажмите "Добавить"',
+                                            body: {
+                                                cols: [
+                                                    {view: 'text', name: 'lastname', inputWidth: '250', label: 'Фамилия', labelPosition: 'top' },
+                                                    {view: 'text', name: 'firstname', inputWidth: '250', label: 'Имя', labelPosition: 'top'},
+                                                    {view: 'text', name: 'patronymic', inputWidth: '250', label: 'Отчество', labelPosition: 'top'},
+                                                    {
+                                                        rows: [
+                                                            {},
+                                                            {
+                                                                cols:[
+                                                                    {view: 'button', value: 'Добавить', width: 150, click: addPerson },
+                                                                    {view: 'icon', icon: 'wxi-pencil', click: editPerson, tooltip: 'Изменить' },
+                                                                    {view: 'icon', icon: 'wxi-trash', click: removePerson, tooltip: 'Удалить' }
+                                                                ]
+                                                            },
+                                                        ]
+                                                    },
+                                                ]
+                                            }
+                                        }
+                                    ]
                                 },
-                                data: []
-                            },
-                            {
-                                view: 'form',
-                                id: 'form_person',
-                                elements: [
-                                    {
-                                        type: 'space',
-                                        margin: 0,
-                                        cols: [
-                                            {view: 'text', name: 'lastname', inputWidth: '250', label: 'Фамилия', labelPosition: 'top' },
-                                            {view: 'text', name: 'firstname', inputWidth: '250', label: 'Имя', labelPosition: 'top'},
-                                            {view: 'text', name: 'patronymic', inputWidth: '250', label: 'Отчество', labelPosition: 'top'},
-                                            //{view: 'checkbox', label: 'Согласие', name: 'isagree', id: 'agree_checkbox'},
-                                            {},
-                                        ]
+                                {
+                                    id: 'person_table',
+                                    view: 'datatable',
+                                    height: 400,
+                                    name: 'persons',
+                                    select: 'row',
+                                    resizeColumn:true,
+                                    readonly: true,
+                                    columns: [
+                                        { id: 'id', header: '', css: 'rank', width: 50 },
+                                        { id: 'lastname', header: 'Фамилия', adjust: true, sort: 'string', fillspace: true },
+                                        { id: 'firstname', header: 'Имя', adjust: true, sort: 'string', fillspace: true },
+                                        { id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string' },
+                                    ],
+                                    on:{
+                                        'data->onStoreUpdated': function(){
+                                            this.data.each(function(obj, i){
+                                                obj.id = i + 1;
+                                            });
+                                        }
                                     },
-                                    {
-                                        //type: 'space',
-                                        margin: 5,
-                                        cols: [
-                                            {view: 'button', value: 'Добавить', width: 150, click: addPerson },
-                                            {view: 'button', value: 'Изменить', width: 150, click: editPerson },
-                                            {view: 'button', value: 'Удалить', width: 150, click: removePerson}
-                                        ]
-                                    }
-                                ]
-                            }
-                        ]
+                                    data: []
+                                }
+                            ]
                         }
                     },
                     view_section('Подача заявки'),
@@ -537,12 +539,6 @@ webix.ready(function() {
                         invalidMessage: 'Поле не может быть пустым',
                         required: true,
                         label: 'Подтверждаю согласие работников на обработку персональных данных',
-                        on: {
-                            'change': function (newv, oldv) {
-                                flag = flag + newv
-                                //if(flag == 2) $$('send_btn').disabled = false
-                            }
-                        }
                     },
                     {
                         view: 'textarea',
@@ -589,12 +585,6 @@ webix.ready(function() {
                         invalidMessage: 'Поле не может быть пустым',
                         required: true,
                         label: 'Подтверждаю обязательное выполнение требований по защите от COVID-19',
-                        on: {
-                            'change': function (newv, oldv) {
-                                flag = flag + newv
-                                //if(flag == 2) $$('send_btn').disabled = false
-                            }
-                        }
                     },
                     {
                         id: 'label_sogl',
