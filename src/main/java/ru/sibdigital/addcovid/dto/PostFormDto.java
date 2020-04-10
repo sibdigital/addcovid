@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -13,7 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 public class PostFormDto {
     private Long organizationId;
-    private long departmentId;
+    
+    private Long departmentId;
 
     private String organizationName;
     private String  organizationShortName;
@@ -34,11 +36,38 @@ public class PostFormDto {
     private Long personSlrySaveCnt;
     private Long personOfficeFactCnt;
 
-    //private MultipartFile attachment;
+    private MultipartFile attachmentMultiPart;
     private String attachment;
     private String attachmentFilename;
 
     private Boolean isAgree;
     private Boolean isProtect;
     private String reqBasis;
+    
+    
+    
+    //Checker section
+    private String departmentIdStatus = "OK";
+    private String organizationNameStatus = "OK";
+    private String  organizationShortNameStatus = "OK";
+    private String  organizationInnStatus = "OK";
+    private String  organizationOgrnStatus = "OK";
+    private String  organizationAddressJurStatus = "OK";
+    private String organizationOkvedAddStatus = "OK";
+    private String  organizationOkvedStatus = "OK";
+    private String  organizationEmailStatus = "OK";
+    private String  organizationPhoneStatus = "OK";
+
+    private String personOfficeCntStatus = "OK";
+    private String personRemoteCntStatus = "OK";
+    private String personSlrySaveCntStatus = "OK";
+    private String personOfficeFactCntStatus = "OK";
+    private String attachmentMultiPartStatus = "OK";
+    private String isAgreeStatus = "OK";
+    private String isProtectStatus = "OK";
+    private String reqBasisStatus = "OK";
+
+    private String addressFactStatus = "OK";
+    private String personsStatus = "OK";
+    
 }
