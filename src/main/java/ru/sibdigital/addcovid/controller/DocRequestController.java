@@ -40,6 +40,9 @@ public class DocRequestController {
     @Autowired
     private DocAddressFactRepo docAddressFactRepo;
 
+    @Autowired
+    private ClsDepartmentRepo clsDepartmentRepo;
+
     private static final Logger log = LoggerFactory.getLogger(DocRequestController.class);
 
     @GetMapping("/doc_requests")
@@ -83,17 +86,19 @@ public class DocRequestController {
             return null;
         }
 
-        obj.setTimeReview(new Timestamp(System.currentTimeMillis()));
+        Boolean changeFlag = false;
 
-        Integer oldStatusReview = docRequest.getStatusReview();
-        Long oldDepartmentId = docRequest.getDepartment().getId();
-        BeanUtils.copyProperties(obj, docRequest, "id");
-
-        if(oldStatusReview != docRequest.getStatusReview()){
+        if(docRequest.getStatusReview() != obj.getStatusReview()){
             String text = "";
+
+            docRequest.setStatusReview(obj.getStatusReview());
+            docRequest.setTimeReview(new Timestamp(System.currentTimeMillis()));
+
+            changeFlag = true;
+
             if (docRequest.getStatusReview() == 1) {
-                boolean massAcept = true;
-                if (massAcept == true){
+                boolean massAcсept = true;
+                if (massAcсept == true){
                     final Optional<List<DocRequest>> lastRequestByInn =
                             docRequestRepo.getLastRequestByInnAndStatus(docRequest.getOrganization().getInn(), 0);
                     if (lastRequestByInn.isPresent()){
@@ -112,11 +117,15 @@ public class DocRequestController {
             emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), "Работающая Бурятия", text);
         }
 
-        if(oldDepartmentId != docRequest.getDepartment().getId()){
+        Long oldDepartmentId = docRequest.getDepartment().getId();
+        if(oldDepartmentId != obj.getDepartment().getId()){
+            ClsDepartment clsDepartment = clsDepartmentRepo.getOne(obj.getDepartment().getId());
+            docRequest.setDepartment(clsDepartment);
             docRequest.setOld_department_id(oldDepartmentId);
+            changeFlag = true;
         }
 
-        return docRequestRepo.save(docRequest);
+        return changeFlag ? docRequestRepo.save(docRequest) : null;
     }
 
     @GetMapping("/doc_persons/{id_request}")
