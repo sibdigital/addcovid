@@ -23,9 +23,9 @@ function addPerson(){
     }
 
     $$('person_table').add({
-        lastname: values.lastname,
-        firstname: values.firstname,
-        patronymic: values.patronymic,
+        lastname: values.lastname.trim(),
+        firstname: values.firstname.trim(),
+        patronymic: values.patronymic.trim(),
         //isagree: values.isagree
     }, $$('person_table').count() + 1)
 
@@ -35,6 +35,8 @@ function addPerson(){
     }else{
         $$('send_btn').disable();
     }
+
+    $$('clearPersonsBtn').enable();
 
     $$('form_person').clear()
 }
@@ -65,11 +67,29 @@ function removePerson(){
                 $$("person_table").remove($$("person_table").getSelectedId());
                 let cnt = $$('person_table').data.count();
                 let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!';
+
+                if(cnt>0){
+                    $$('clearPersonsBtn').enable();
+                }else {
+                    $$('clearPersonsBtn').disable();
+                }
+
                 if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0 && !is_no_pdf){
                     $$('send_btn').enable();
                 }else{
                     $$('send_btn').disable();
                 }
+            }
+        )
+}
+
+function clearPersons(){
+    webix.confirm('Вы действительно хотите очистить данные о ваших работниках?')
+        .then(
+            function () {
+                $$("person_table").clearAll();
+                $$('send_btn').disable();
+                $$('clearPersonsBtn').disable();
             }
         )
 }
@@ -160,6 +180,11 @@ webix.ready(function() {
                     },
                     {}
                 ]
+            },
+            {
+                view: 'label',
+                label: '<a style="font-size: 1.5rem" href="http://работающаябурятия.рф/#top" target="_blank">Горячая линия</a>',
+                //css: 'main_label'
             },
             {
                 id: 'form',
@@ -257,21 +282,22 @@ webix.ready(function() {
                                         invalidMessage: 'Поле не может быть пустым',
                                         required: true,
                                         options: [
-                                            { id: 1, value: 'Мин.фин РБ (Нет курируемых предприятий/организаций)'},
+                                            { id: 4, value: 'Минпром РБ (1. Машиностроение и металообработка...)'},
                                             { id: 2, value: 'Мин.экон РБ (В сфере финансовой, страховой деятельности)'},
                                             { id: 3, value: 'Мин.имущества РБ ("оценочная деятельность, деятельность кадастровых инженеров")'},
-                                            { id: 4, value: 'Минпром РБ (1. Машиностроение и металообработка...)'},
                                             { id: 5, value: 'Мин.природных ресурсов РБ (Предприятия добывающей промышленности, имеющие непрерывный )'},
                                             { id: 6, value: 'Мин.сельхоз РБ'},
                                             { id: 7, value: 'Мин.строй РБ (Строительство: Организации (в том числе работающие с ними по договорам подряда и/или оказания услуг юридические лица и индивидуальные предприниматели):)'},
                                             { id: 8, value: 'Мин.транс РБ (Сфера транспорта, энергетики, связи и дорожного хозяйства, а также в области энергосбережения и повышения энергетической эффективности в сфере транспорта, энергетики, связи и дорожного хозяйства)'},
                                             { id: 9, value: 'Мин.соцзащиты РБ (Организации социального обслуживания населения)'},
-                                            { id: 10, value: 'Мин.здрав РБ (Организации по техническому обслуживанию медецинского оборудования)'},
+                                            { id: 10, value: 'Мин.здрав РБ (Организации по техническому обслуживанию медицинского оборудования)'},
                                             { id: 11, value: 'Мин.культ РБ (Нет курируемых предприятий/организаций)'},
                                             { id: 12, value: 'Мин.обр РБ (1. учреждения дошкольного образования, где функционируют дежурные группы. 2. Учреждения среднего общего образования, где очно-заочное обучение для 9,11 классов.)'},
                                             { id: 13, value: 'Мин.спорта РБ (1. Содержание, эксплуатация и обеспечение безопасности на спортивных объектов 2. Строительство спортивных объектов 3. Волонтерская деятельность)'},
                                             { id: 14, value: 'Мин.туризма РБ (1. Санаторно-курортная сфера 2. Гостиничный комплекс 3. Туроператоры, турагентства, экскурсоводы")'},
+                                            { id: 1, value: 'Мин.фин РБ (Нет курируемых предприятий/организаций)'},
                                             { id: 15, value: 'РАЛХ (Выполнение мероприятий по использованию, охране, защите, воспроизводству лесов, лесозаготовка, лесопереработка)'},
+                                            { id: 16, value: 'Управление ветеринарии (Ветеринарные клиники, ветеринарные аптеки, ветеринарные кабинеты, зоомагазины, организации, занимающиеся отловом животных без владельцев)'},
                                         ]
                                     },
                                     {
@@ -427,11 +453,6 @@ webix.ready(function() {
                                 labelPosition: 'top'
                             },
                             {
-                                view: 'label',
-                                label: 'Прикрепление файла обязательно',
-                                id: 'fl_message'
-                            },
-                            {
                                 id: 'upload',
                                 view: 'uploader',
                                 css: 'webix_secondary',
@@ -490,7 +511,7 @@ webix.ready(function() {
                                 label: 'Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы',
                                 labelPosition: 'top',
                                 validate: function(val){
-                                    return !isNaN(val*1);
+                                    return !isNaN(val*1) && (val.trim() !== '')
                                 },
                                 invalidMessage: 'Поле не может быть пустым',
                                 required: true
@@ -500,7 +521,7 @@ webix.ready(function() {
                                 label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
                                 invalidMessage: 'Поле не может быть пустым',
                                 validate: function(val){
-                                    return !isNaN(val*1);
+                                    return !isNaN(val*1) && (val.trim() !== '')
                                 },
                                 required: true,
                                 labelPosition: 'top'
@@ -510,7 +531,7 @@ webix.ready(function() {
                                 label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
                                 labelPosition: 'top',
                                 validate: function(val){
-                                    return !isNaN(val*1);
+                                    return !isNaN(val*1) && (val.trim() !== '')
                                 },
                                 invalidMessage: 'Поле не может быть пустым',
                                 required: true
@@ -570,7 +591,8 @@ webix.ready(function() {
                                             cols: [
                                                 {view: 'button', value: 'Добавить', width: 150, click: addPerson },
                                                 {view: 'button', value: 'Изменить', width: 150, click: editPerson },
-                                                {view: 'button', value: 'Удалить', width: 150, click: removePerson}
+                                                {view: 'button', value: 'Удалить', width: 150, click: removePerson},
+                                                {view: 'button', value: 'Очистить', id: 'clearPersonsBtn', width: 150, disabled: true, click: clearPersons}
                                             ]
                                         }
                                     ]
@@ -668,6 +690,7 @@ webix.ready(function() {
                         }
                     },
                     {
+                        id: 'label_sogl',
                         view: 'label',
                         label: 'Информация мною прочитана и я согласен с ней при подаче заявки',
                         align: 'center'
@@ -684,6 +707,9 @@ webix.ready(function() {
                                 click: function () {
                                     if($$('form').validate()) {
                                         let params = $$('form').getValues();
+
+                                        params.organizationInn = params.organizationInn.trim();
+                                        params.organizationOgrn = params.organizationOgrn.trim();
 
                                         if(params.organizationInn.length > 12){
                                             webix.message('Превышена длина ИНН', 'error')
@@ -703,6 +729,15 @@ webix.ready(function() {
                                         if(params.organizationEmail.length > 100){
                                             webix.message('Превышена длина электронной почты', 'error')
                                             return false
+                                        }else{
+                                            let bad_val = params.organizationEmail.indexOf("*") > -1
+                                                || params.organizationEmail.indexOf("+") > -1
+                                                || params.organizationEmail.indexOf('"') > -1;
+
+                                            if(bad_val == true){
+                                                webix.message('Недопустимые символы в адресе электронной почты', 'error')
+                                                return false
+                                            }
                                         }
 
                                         if(params.organizationShortName.length > 255){
@@ -722,6 +757,10 @@ webix.ready(function() {
                                             webix.message('Слишком частое нажатие на кнопку', 'error')
                                             return false
                                         }
+                                        // if(!uploadFilename){
+                                        //     webix.message('Необходимо вложить файл', 'error')
+                                        //     return false
+                                        // }
 
                                         let persons = []
                                         $$('person_table').data.each(function (obj) {
@@ -744,10 +783,16 @@ webix.ready(function() {
                                         })
                                         params.addressFact = addrs
 
+                                        params.organizationInn = params.organizationInn.trim()
+                                        params.organizationOgrn  = params.organizationOgrn.trim()
+
                                         params.attachment = uploadFile
                                         params.attachmentFilename = uploadFilename
 
-                                        console.log(params);
+                                        $$('label_sogl').showProgress({
+                                            type: 'icon',
+                                            delay: 5000
+                                        })
 
                                         webix.ajax()
                                             .headers({'Content-type': 'application/json'})
@@ -755,7 +800,12 @@ webix.ready(function() {
                                                 JSON.stringify(params),
                                                 function (text, data, xhr) {
                                                     console.log(text);
-                                                    webix.message(text);
+                                                    webix.alert(text)
+                                                        .then(function () {
+                                                            $$('label_sogl').hideProgress();
+                                                            webix.message(text);
+                                                        });
+
                                                 })
                                     }
                                     else {
@@ -783,4 +833,6 @@ webix.ready(function() {
 
     $$('form_person').bind('person_table')
     $$('form_addr').bind('addr_table')
+
+    webix.extend($$('label_sogl'), webix.ProgressBar);
 })
