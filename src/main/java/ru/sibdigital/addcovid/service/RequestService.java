@@ -115,10 +115,8 @@ public class RequestService {
             filename = inputFilename;
 
         } catch (IOException ex) {
-            importStatus = ImportStatuses.FILE_ERROR.getValue();
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         } catch (Exception ex) {
-            importStatus = ImportStatuses.FILE_ERROR.getValue();
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         }
 
