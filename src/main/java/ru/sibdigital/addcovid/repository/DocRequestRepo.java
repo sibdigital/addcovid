@@ -77,7 +77,7 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
     public List<Map<String, Object>> getRequestStatisticForEeachDepartment();
     
     
-    @Query(nativeQuery = true, value = "SELECT date_trunc('day',doc_request.time_create) as date, COUNT(*) AS total FROM doc_request GROUP BY date_trunc('day',doc_request.time_create);")
+    @Query(nativeQuery = true, value = "SELECT date_trunc('day',doc_request.time_create) as date, COUNT(*) AS total FROM doc_request GROUP BY date_trunc('day',doc_request.time_create) ORDER BY date_trunc('day',doc_request.time_create);")
     public List<Map<String, Object>> getStatisticForEachDay();
     
     
