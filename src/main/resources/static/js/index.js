@@ -8,7 +8,10 @@ require(
         'views/showform',
         'utils/filter'
     ],
-    function(requests, showform, filter) {
+    function(requests
+             , showform
+             , filter
+    ) {
 
         webix.i18n.setLocale("ru-RU");
 
@@ -62,12 +65,20 @@ require(
                                                 break
                                         }
 
-                                        $$('search').setValue('')
+                                        let search_text = $$('search').getValue()
+                                        if(search_text){
+                                            //$$('search').callEvent('onEnter')
+                                            req_tbl_url = 'list_request/' + ID_DEPARTMENT + '/' + status + '/' + search_text
+                                        }
+                                        else {
+                                            req_tbl_url = 'list_request/' + ID_DEPARTMENT + '/' + status
+                                            //req_tbl_url = 'resource->/list_request/' + ID_DEPARTMENT + '/' + status
+                                        }
 
                                         webix.ui({
                                             id: 'root',
                                             rows: [
-                                                requests(status)
+                                                requests(req_tbl_url)
                                             ]
                                         }, $$('root'))
                                     }
