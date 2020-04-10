@@ -175,7 +175,7 @@ define(function() {
                                                         disabled: flag_param,
                                                         label: 'Переназначить',
                                                         css: 'webix_primary',
-                                                        click: function f() {
+                                                        click: function() {
                                                             let params = this.getTopParentView().config.item
                                                             if ($$('form').getValues().department.id != params.department.id) {
                                                                 webix.confirm('Переназначить заявку в выбранное министерство?')
@@ -201,6 +201,9 @@ define(function() {
                                                                                         .then(function () {
                                                                                             $$('show_layout').hideProgress()
                                                                                             this.disabled = false
+
+                                                                                            $$('requests_table').remove(params.id)
+
                                                                                             setTimeout(function () {
                                                                                                 modal.close();
                                                                                             }, 0)
