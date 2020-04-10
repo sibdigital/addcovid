@@ -90,7 +90,6 @@ public class RequestService {
                     .collect(Collectors.toSet());
 
 
-        int importStatus = ImportStatuses.SUCCESS.getValue();
         String filename = "error while upload";
         try {
 
@@ -132,7 +131,7 @@ public class RequestService {
                     .docAddressFact(docAddressFactSet)
                     .statusReview(0)
                     .timeReview(Timestamp.valueOf(LocalDateTime.now()))
-                    .statusImport(importStatus)
+                    .statusImport(ImportStatuses.SUCCESS.getValue())
                     .timeImport(Timestamp.valueOf(LocalDateTime.now()))
                     .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
                     .isAgree(postForm.getIsAgree())
