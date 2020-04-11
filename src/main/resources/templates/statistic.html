@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Комитет информационных технологий</title>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+
+    <link type="text/css" rel="stylesheet" href="/js/">
+    <script src="/libs/webix.min.js"></script>
+
+
+    <script src="/libs/popper.min.js"></script>
+    <script src="/libs/jquery-3.4.1.min.js"></script>
+    <script src="/libs/bootstrap.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="/libs/webix.css">
+    <script src="/libs/webix.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<div th:insert="navbar-boots"></div>
+<div id="chart-dep">
+
+</div>
+<div class="container">
+    <div class="row my-2">
+        <div class="col">
+            <div class="table-responsive-sm">
+                <table class="table" id="totalTable">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col" class="text-center" style="width: 70%"></th>
+                        <th scope="col" class="text-center" style="width: 30%">Заявки</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="totalBody">
+
+                    </tbody>
+                    <span class="text-center" style="display:none" id="noResults">Нет результатов</span>
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+    <div class="dropdown-divider"></div>
+
+
+    <div class="row my-2">
+        <div class="col">
+            <div class="table-responsive-sm">
+                <table class="table" id="depTable">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col" class="text-center" style="width: 60%">ИОГВ</th>
+                        <th scope="col" class="text-center" style="width: 20%">Тип</th>
+                        <th scope="col" class="text-center" style="width: 20%">Кол-во</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="depBody">
+
+                    </tbody>
+                    <span class="text-center" style="display:none" id="noResults1">Нет результатов</span>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+
+    const totalStatistic = [[${totalStatistic}]]
+    const departmentStatistic = [[${departmentStatistic}]]
+
+    let total = 0
+
+    const dtf = new Intl.DateTimeFormat('ru', { year: 'numeric', month: '2-digit', day: '2-digit' })
+
+    function formatDate(date) {
+        const [{ value: mo },,{ value: da },,{ value: ye }] = dtf.formatToParts(date)
+        return `${mo}.${da}.${ye}`
+    }
+
+    function insertRow(firstCol, secondCol, cssClass=""){
+        const html = `<tr>
+            <td class="${cssClass}"> ${ firstCol } </td>
+            <td class="${cssClass}"> ${ secondCol } </td>
+        </tr>`;
+
+        $("#totalBody").append(html);
+    }
+
+
+
+
+    totalStatistic.peopleStatistic.total = totalStatistic.peopleStatistic.accepted + totalStatistic.peopleStatistic.declined + totalStatistic.peopleStatistic.awaiting;
+    insertRow("Всего людей в утвержденных заявках", totalStatistic.peopleStatistic.accepted, "text-center font-weight-bold");
+    insertRow("Всего людей в заявках", totalStatistic.peopleStatistic.total, "text-center font-weight-bold");
+
+
+    for (let i = 0; i < totalStatistic.forEachDayStatistic.length; i++) {
+
+        total += totalStatistic.forEachDayStatistic[i].total
+        totalStatistic.forEachDayStatistic[i].date = new Date(totalStatistic.forEachDayStatistic[i].date.replace('T', ' '))
+        if(totalStatistic.forEachDayStatistic[i].date ){
+
+        }
+        insertRow("За " + formatDate(totalStatistic.forEachDayStatistic[i].date), totalStatistic.forEachDayStatistic[i].total, "text-center")
+    }
+
+    insertRow('ВСЕГО ЗАЯВОК', total, "text-center font-weight-bold")
+    let totalAwaiting = 0, totalAccepted = 0, totalDeclined = 0;
+    function insertSecondRow(name, awaiting, accepted, declined, cssClass=""){
+        const totalInARow = awaiting + accepted + declined;
+        totalAwaiting += awaiting;
+        totalAccepted += accepted;
+        totalDeclined += declined;
+
+        const html = `<tr>
+            <td class="${cssClass}" rowspan="4"> ${ name } </td>
+            <td class="${cssClass}"> Необработано </td>
+            <td class="${cssClass}"> ${ awaiting } </td>
+
+        </tr>
+        <tr>
+            <td class="${cssClass}"> Утверждено </td>
+            <td class="${cssClass}"> ${ accepted } </td>
+        </tr>
+        <tr>
+            <td class="${cssClass}"> Отклонено </td>
+            <td class="${cssClass}"> ${ declined } </td>
+        </tr>
+        <tr>
+            <td class="text-center font-weight-bold"> Всего </td>
+            <td class="text-center font-weight-bold"> ${ totalInARow } </td>
+        </tr>`;
+
+        $("#depBody").append(html);
+    }
+
+    for (let i = 0; i < departmentStatistic.length; i++) {
+        insertSecondRow(departmentStatistic[i].name, departmentStatistic[i].awaiting, departmentStatistic[i].accepted, departmentStatistic[i].declined, "text-center")
+    }
+
+    chartData = {
+        depStatistic: [
+            { value:totalDeclined, legend:"Отказано", color: "#ee3639" },
+            { value:totalAwaiting, legend:"Ожидают", color: "#ee9e36" },
+            { value:totalAccepted, legend:"Утвердили", color: "#a9ee36" },
+        ],
+        personStatistic: [
+            { value:totalStatistic.peopleStatistic.declined, legend:"Отказано", color: "#ee3639" },
+            { value:totalStatistic.peopleStatistic.awaiting, legend:"Ожидают", color: "#ee9e36" },
+            { value:totalStatistic.peopleStatistic.accepted, legend:"Утвердили", color: "#a9ee36" },
+        ]
+    }
+
+    webix.ready(function() {
+        webix.ui({
+            container: 'chart-dep',
+            width: document.body.clientWidth,
+            type:'clean',
+            height:250,
+            rows: [{
+                cols: [
+                    {
+                        rows:[
+                            {
+                                template:"<div style='width:100%;text-align:center'>Заявки</div>",
+                                height:30
+                            },
+                            {
+                                view: "chart",
+                                type:"pie",
+                                value:"#value#",
+                                color:"#color#",
+                                label:"#legend#",
+                                pieInnerText:"#value#",
+                                shadow:0,
+                                data:chartData.depStatistic
+                            },
+                            {
+                                template:`<div style='width:100%;text-align:center'>Всего: ${total}</div>`,
+                                height:30
+                            },
+                        ]
+                    },
+                    {
+                        rows:[
+                            {
+                                template:"<div style='width:100%;text-align:center'>Люди</div>",
+                                height:30
+                            },
+                            {
+                                view: "chart",
+                                type:"pie",
+                                value:"#value#",
+                                color:"#color#",
+                                label:"#legend#",
+                                pieInnerText:"#value#",
+                                shadow:0,
+                                data:chartData.personStatistic
+                            },
+                            {
+                                template:`<div style='width:100%;text-align:center'>Всего: ${totalStatistic.peopleStatistic.total}</div>`,
+                                height:30
+                            },
+                        ]
+                    }
+
+                ]
+            }
+            ]
+        })
+    });
+
+</script>
+
+</body>
+</html>

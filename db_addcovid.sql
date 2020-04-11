@@ -61,7 +61,9 @@ create table doc_request
     req_basis text default '',
     is_agree boolean ,
     is_protect boolean,
-    org_hash_code text
+    org_hash_code text,
+    reject_comment text,
+    old_department_id integer
 )
 ;
 
@@ -167,3 +169,42 @@ alter table cls_organization alter column ogrn type varchar(15);
 alter table  doc_request alter column attachment_path type varchar(512);
 alter table doc_person add column status_import integer default 0;
 alter table doc_person add column time_import timestamp;
+
+create table if not exists doc_dacha
+(
+    id serial not null
+        constraint doc_dacha_pk
+            primary key,
+    lastname varchar(100),
+    firstname varchar(100),
+    patronymic varchar(100),
+    age integer,
+    is_agree boolean,
+    is_protect boolean,
+    time_create timestamp,
+    status_import integer,
+    time_import timestamp,
+    status_review integer,
+    time_review timestamp,
+    reject_comment text,
+    phone varchar(100),
+    email varchar(100)
+);
+
+alter table doc_dacha owner to postgres;
+
+create table if not exists doc_dacha_addr
+(
+    id serial not null
+        constraint doc_dacha_addr_pk
+            primary key,
+    id_doc_dacha integer not null
+        constraint doc_dacha_addr_doc_dacha_id_fk
+            references doc_dacha
+            on delete cascade,
+    district varchar(255),
+    address text
+);
+
+alter table doc_dacha_addr owner to postgres;
+

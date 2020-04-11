@@ -10,9 +10,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import ru.sibdigital.addcovid.dto.ListItemDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
+import ru.sibdigital.addcovid.model.DocDacha;
+import ru.sibdigital.addcovid.model.DocRequest;
 import ru.sibdigital.addcovid.repository.ClsDepartmentRepo;
+import ru.sibdigital.addcovid.service.DachaService;
 import ru.sibdigital.addcovid.service.RequestService;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,6 +30,9 @@ public class MainController {
 
     @Autowired
     private RequestService requestService;
+
+    @Autowired
+    private DachaService dachaService;
 
     @GetMapping
     public String greeting(Map<String, Object> model) throws JsonProcessingException {
@@ -49,6 +56,31 @@ public class MainController {
 
 //            return hash;
             return "Заявка принята. Ожидайте ответ на электронную почту.";
+        } catch(Exception e){
+            return "Невозможно сохранить заявку";
+        }
+    }
+
+    @GetMapping(value = "/download/{id}")
+    public void downloadFile(HttpServletResponse response, @PathVariable("id") DocRequest docRequest) throws Exception {
+        requestService.downloadFile(response, docRequest);
+    }
+
+    private String addError(String field, String msg){
+        return "{'field': '" + field + "', 'msg': '" + msg + "'}";
+    }
+
+    @GetMapping("/dacha")
+    public String dacha(Map<String, Object> model) throws JsonProcessingException {
+        return "dacha";
+    }
+
+    @PostMapping("/dacha")
+    public @ResponseBody
+    String dachaPostForm(@RequestBody DachaDto dachaDto) {
+        try {
+            DocDacha docDacha = dachaService.addNewRequest(dachaDto);
+            return "Заявка принята";
         } catch(Exception e){
             return "Невозможно сохранить заявку";
         }

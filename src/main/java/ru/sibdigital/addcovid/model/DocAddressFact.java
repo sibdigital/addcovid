@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class DocAddressFact {
     private String addressFact;
     private Long personOfficeFactCnt;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name="id_request", nullable=false)
     private DocRequest docRequestAddressFact;

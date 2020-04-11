@@ -10,15 +10,11 @@ import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,9 +36,13 @@ public class RequestService {
     @Autowired
     ClsDepartmentRepo departmentRepo;
 
+    @Autowired
+    private DepUserRepo depUserRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
+    private static final int BUFFER_SIZE = 4096;
 
     public DocRequest addNewRequest(PostFormDto postForm) {
 
@@ -90,6 +90,7 @@ public class RequestService {
                     .collect(Collectors.toSet());
 
 
+        //int importStatus = ImportStatuses.SUCCESS.getValue();
         String filename = "error while upload";
         try {
 
@@ -114,8 +115,10 @@ public class RequestService {
             filename = inputFilename;
 
         } catch (IOException ex) {
+            //importStatus = ImportStatuses.FILE_ERROR.getValue();
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         } catch (Exception ex) {
+            //importStatus = ImportStatuses.FILE_ERROR.getValue();
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         }
 
@@ -131,7 +134,7 @@ public class RequestService {
                     .docAddressFact(docAddressFactSet)
                     .statusReview(0)
                     .timeReview(Timestamp.valueOf(LocalDateTime.now()))
-                    .statusImport(ImportStatuses.SUCCESS.getValue())
+                    .statusImport(0)
                     .timeImport(Timestamp.valueOf(LocalDateTime.now()))
                     .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
                     .isAgree(postForm.getIsAgree())
@@ -185,6 +188,9 @@ public class RequestService {
         return docRequestRepo.save(docRequest);
     }
 
+
+
+
     public DocRequest getLastOpenedRequestInfoByInn(String inn){
         List<DocRequest> docRequests = docRequestRepo.getLastRequestByInnAndStatus(inn, ReviewStatuses.OPENED.getValue()).orElseGet(() -> null);
         if(docRequests != null) return docRequests.get(0);
@@ -204,6 +210,11 @@ public class RequestService {
         return null;
     };
 
+    public Optional<List<DocRequest>> getFirst100RequestInfoByDepartmentIdAndStatusAndInnOrName(Long departmentId, Integer status, String innOrName){
+        //return docRequestRepo.getFirst100RequestByDepartmentIdAndStatusAndInnOrName(departmentId, status, innOrName).orElseGet(() -> null);
+        return docRequestRepo.getFirst100RequestByDepartmentIdAndStatusAndInnOrName(departmentId, status, innOrName);
+    };
+
 
     public DocRequest getLastRequestInfoByOgrn(String ogrn){
         List<DocRequest> docRequests = docRequestRepo.getLastRequestByOgrn(ogrn).orElseGet(() -> null);
@@ -211,19 +222,38 @@ public class RequestService {
         return null;
     };
 
+    public void downloadFile(HttpServletResponse response, DocRequest DocRequest) throws Exception {
+        File downloadFile = new File(DocRequest.getAttachmentPath());
 
+        FileInputStream inputStream = new FileInputStream(downloadFile);
+        response.setContentLength((int) downloadFile.length());
 
+        // set headers for the response
+        String headerKey = "Content-Disposition";
+        String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
+        response.setHeader(headerKey, headerValue);
+        response.setContentType("application/pdf");
 
+        // get output stream of the response
+        OutputStream outStream = response.getOutputStream();
 
+        byte[] buffer = new byte[BUFFER_SIZE];
+        int bytesRead = -1;
 
+        // write bytes read from the input stream into the output stream
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outStream.write(buffer, 0, bytesRead);
+        }
 
+        inputStream.close();
+        outStream.close();
+    }
 
-
-
-
-
-
-
-
-
+    public boolean isTokenValid(Integer hash_code){
+        Iterator<DepUser> iter = depUserRepo.findAll().iterator();
+        while(iter.hasNext()) {
+            if(hash_code == iter.next().hashCode()) return true;
+        }
+        return false;
+    }
 }

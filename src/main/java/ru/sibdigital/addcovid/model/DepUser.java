@@ -20,11 +20,9 @@ public class DepUser implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DEP_USR_SEQ_GEN")
     private Long id;
 
-    private Long idDepartment;
-
-
-
-
+    @OneToOne
+    @JoinColumn(name = "id_department", referencedColumnName = "id")
+    private ClsDepartment idDepartment;
     private String lastname;
     private String firstname;
     private String patronymic;
@@ -39,11 +37,11 @@ public class DepUser implements Serializable {
         this.id = id;
     }
 
-    public Long getIdDepartment() {
+    public ClsDepartment getIdDepartment() {
         return idDepartment;
     }
 
-    public void setIdDepartment(Long idDepartment) {
+    public void setIdDepartment(ClsDepartment idDepartment) {
         this.idDepartment = idDepartment;
     }
 
@@ -114,6 +112,7 @@ public class DepUser implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, lastname, firstname, patronymic, login, password);
+        //return Objects.hash(id, lastname, firstname, patronymic, login, password);
+        return Objects.hash(login, password);
     }
 }
