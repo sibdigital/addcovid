@@ -131,6 +131,7 @@ webix.ready(function() {
                         type: 'icon',
                         icon: 'wxi-plus',
                         label: 'Добавить адрес',
+                        id: 'add_btn',
                         click: function () {
                             $$('addform').show()
                             $$('district').focus()
@@ -150,22 +151,40 @@ webix.ready(function() {
                                         required: true,
                                         options: district_options
                                     },
-                                    {view: 'text', name: 'address', label: 'ДНТ/Адрес', labelPosition: 'top', required: true }
+                                    {
+                                        id: 'address_text',
+                                        view: 'text',
+                                        name: 'address',
+                                        label: 'ДНТ/Адрес',
+                                        labelPosition: 'top',
+                                        required: true }
                                 ]
                             },
                             {
                                 cols: [
                                     {
                                         view: 'button', label: 'Добавить', css: 'webix_primary',
+                                        type: 'icon', icon: 'wxi-check',
                                         click: function () {
                                             if($$('addform').validate()) {
-                                                $$('addr_table').add($$('addform').getValues(), $$('addform').count + 1)
-                                                $$('addform').clear()
-                                                $$('addform').hide()
+                                                let find = $$('addr_table').find(function(obj){
+                                                    return (obj.district == $$('addform').getValues().district)
+                                                        && (obj.address.toLowerCase().indexOf($$('addform').getValues().address) != -1)
+                                                })
+                                                if(find.length == 0) {
+                                                    $$('addr_table').add($$('addform').getValues(), $$('addform').count + 1)
+                                                    $$('addform').clear()
+                                                    $$('addform').hide()
+                                                }
+                                                else {
+                                                    webix.message('Адрес повторяется', 'error')
+                                                }
                                             }
                                         }
                                     },
-                                    { view: 'button', label: 'Очистить', css: 'webix_danger',
+                                    {
+                                        view: 'button', label: 'Очистить', css: 'webix_danger',
+                                        type: 'icon', icon: 'wxi-close',
                                         click: function () {
                                             $$('addform').clear()
                                             $$('addform').hide()
@@ -222,59 +241,6 @@ webix.ready(function() {
                                     }
                                 }
                             },
-/*
-                            {
-                                view: 'form',
-                                id: 'form_addr',
-                                elements: [
-                                    {
-                                        type: 'space',
-                                        cols: [
-                                            {
-                                                view: 'combo', name: 'district', width: 250, label: 'Район', labelPosition: 'top',
-                                                invalidMessage: 'Поле не может быть пустым',
-                                                required: true,
-                                                options: [
-                                                    { id: 1, value: 'Баргузинский'},
-                                                    { id: 2, value: 'Баунтовский '},
-                                                    { id: 3, value: 'Бичурский'},
-                                                    { id: 4, value: 'Джидинский'},
-                                                    { id: 5, value: 'Еравнинский'},
-                                                    { id: 6, value: 'Заиграевский'},
-                                                    { id: 7, value: 'Закаменский'},
-                                                    { id: 8, value: 'Иволгинский'},
-                                                    { id: 9, value: 'Кабанский'},
-                                                    { id: 10, value: 'Кижингинский'},
-                                                    { id: 11, value: 'Курумканский'},
-                                                    { id: 12, value: 'Кяхтинский'},
-                                                    { id: 13, value: 'Муйский'},
-                                                    { id: 14, value: 'Мухоршибирский'},
-                                                    { id: 15, value: 'Окинский'},
-                                                    { id: 16, value: 'Прибайкальский'},
-                                                    { id: 17, value: 'Северо-Байкальский'},
-                                                    { id: 18, value: 'Селенгинский'},
-                                                    { id: 19, value: 'Тарбагатайский'},
-                                                    { id: 20, value: 'Тункинский'},
-                                                    { id: 21, value: 'Хоринский'},
-                                                    { id: 22, value: 'Советский'},
-                                                    { id: 23, value: 'Железнодорожный'},
-                                                    { id: 24, value: 'Октябрьский'}
-                                                ]
-                                            },
-                                            {view: 'text', name: 'address', label: 'ДНТ/Адрес', labelPosition: 'top', required: true },
-                                        ]
-                                    },
-                                    {
-                                        margin: 5,
-                                        cols: [
-                                            {view: 'button', value: 'Добавить', width: 150, click: addAddr },
-                                            {view: 'button', value: 'Изменить', width: 150, click: editAddr },
-                                            {view: 'button', value: 'Удалить', width: 150, click: removeAddr}
-                                        ]
-                                    }
-                                ]
-                            }
-*/
                         ]
                     },
                     view_section('Подача заявки'),
@@ -340,6 +306,11 @@ webix.ready(function() {
                                     if($$('form').validate()) {
                                         let params = $$('form').getValues()
 
+                                        if(params.age >= 65){
+                                            webix.alert("Заявка не может быть одобрена. Вам предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
+                                            return false;
+                                        }
+
                                         let addrs = []
                                         $$('addr_table').data.each(function (obj) {
                                             let addr = {
@@ -348,13 +319,25 @@ webix.ready(function() {
                                             }
                                             addrs.push(addr)
                                         })
-                                        params.addrList = addrs
 
-                                        if(addrs.length == 0){
+                                        if($$('address_text').getValue() && $$('district').getValue()){
+                                            if($$('addr_table').find(function(obj){
+                                                return (obj.district == $$('district').getValue())
+                                                    && (obj.address.toLowerCase().indexOf($$('address_text').getValue()) != -1)
+                                                        }).length == 0
+                                            ) {
+                                                addrs.push({
+                                                    address: $$('address_text').getValue(),
+                                                    district: district_options[$$('district').getValue() - 1].value
+                                                })
+                                            }
+                                        }
+                                        else {
                                             webix.message('Не заполнена адресная часть', 'error')
-                                            $$('addr_table').focus()
+                                            $$('add_btn').focus()
                                             return false
                                         }
+                                        params.addrList = addrs
 
                                         $$('label_sogl').showProgress({
                                             type: 'icon',
@@ -370,6 +353,8 @@ webix.ready(function() {
                                                         .then(function () {
                                                             $$('label_sogl').hideProgress()
                                                             $$('form').clear()
+                                                            $$('addform').clear()
+                                                            $$('addform').hide()
                                                             $$('addr_table').clearAll()
                                                             $$('lastname').focus()
                                                         });

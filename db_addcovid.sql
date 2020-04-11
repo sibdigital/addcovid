@@ -161,3 +161,43 @@ create unique index fki_dep_user_login
     on dep_user (login);
 
 alter table dep_user owner to postgres;
+
+
+create table if not exists doc_dacha
+(
+    id serial not null
+        constraint doc_dacha_pk
+            primary key,
+    lastname varchar(100),
+    firstname varchar(100),
+    patronymic varchar(100),
+    age integer,
+    is_agree boolean,
+    is_protect boolean,
+    time_create timestamp,
+    status_import integer,
+    time_import timestamp,
+    status_review integer,
+    time_review timestamp,
+    reject_comment text,
+    phone varchar(100),
+    email varchar(100)
+);
+
+alter table doc_dacha owner to postgres;
+
+create table if not exists doc_dacha_addr
+(
+    id serial not null
+        constraint doc_dacha_addr_pk
+            primary key,
+    id_doc_dacha integer not null
+        constraint doc_dacha_addr_doc_dacha_id_fk
+            references doc_dacha
+            on delete cascade,
+    district varchar(255),
+    address text
+);
+
+alter table doc_dacha_addr owner to postgres;
+
