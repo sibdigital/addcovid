@@ -165,7 +165,7 @@ webix.ready(function() {
                                             }
                                         }
                                     },
-                                    { view: 'button', label: 'Cancel', css: 'webix_danger',
+                                    { view: 'button', label: 'Очистить', css: 'webix_danger',
                                         click: function () {
                                             $$('addform').clear()
                                             $$('addform').hide()
