@@ -50,14 +50,23 @@ public class MainController {
     String postForm(@RequestBody PostFormDto postFormDto) {
 
         try {
-            String hash = requestService.addNewRequest(postFormDto).getOrgHashCode();
+            //валидация
+            String errors = validate(postFormDto);
+            if(errors.isEmpty()){
+                DocRequest docRequest = requestService.addNewRequest(postFormDto);
 
 //            return hash;
-            return "Заявка принята. Ожидайте ответ на электронную почту.";
+                return "Заявка принята. Ожидайте ответ на электронную почту.";
+            }
+            else {
+                return "[" + errors + "]";
+            }
+
         } catch(Exception e){
             return "Невозможно сохранить заявку";
         }
     }
+
 
     @GetMapping(value = "/download/{id}")
     public void downloadFile(HttpServletResponse response, @PathVariable("id") DocRequest docRequest) throws Exception {
@@ -66,6 +75,23 @@ public class MainController {
 
     private String addError(String field, String msg){
         return "{'field': '" + field + "', 'msg': '" + msg + "'}";
+    }
+
+    private String validate(PostFormDto postFormDto){
+        String errors = "";
+/*
+        if(postFormDto.getPersonOfficeCnt() == null || postFormDto.getPersonOfficeCnt() < 0){
+            errors = errors + addError("personOfficeCnt", "д.б.>0");
+        }
+        if(postFormDto.getPersonRemoteCnt() == null || postFormDto.getPersonRemoteCnt() < 0){
+            errors = errors + addError("personRemoteCnt", "д.б.<>0");
+        }
+        if(postFormDto.getPersonSlrySaveCnt() == null || postFormDto.getPersonSlrySaveCnt() < 0){
+            errors = errors + addError("personSlrySaveCnt", "д.б.<>0");
+        }
+*/
+        //if(postFormDto.getOrganizationInn().length() < )
+        return errors;
     }
 
     @GetMapping("/dacha")
@@ -78,7 +104,7 @@ public class MainController {
     String dachaPostForm(@RequestBody DachaDto dachaDto) {
         try {
             DocDacha docDacha = dachaService.addNewRequest(dachaDto);
-            return "Заявка принята";
+            return "Ваша заявка внесена в базу данных дачников";
         } catch(Exception e){
             return "Невозможно сохранить заявку";
         }

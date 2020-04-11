@@ -26,13 +26,13 @@ let district_options = [
     { id: 15, value: 'Окинский'},
     { id: 16, value: 'Прибайкальский'},
     { id: 17, value: 'Северо-Байкальский'},
-    { id: 18, value: 'Селенгинский'},
-    { id: 19, value: 'Тарбагатайский'},
-    { id: 20, value: 'Тункинский'},
-    { id: 21, value: 'Хоринский'},
-    { id: 22, value: 'Советский'},
-    { id: 23, value: 'Железнодорожный'},
-    { id: 24, value: 'Октябрьский'}
+    { id: 18, value: 'г. Северобайкальск'},
+    { id: 19, value: 'Селенгинский'},
+    { id: 20, value: 'г. Гусиноозерск'},
+    { id: 21, value: 'Тарбагатайский'},
+    { id: 22, value: 'Тункинский'},
+    { id: 23, value: 'Хоринский'},
+    { id: 24, value: 'г.Улан-Удэ'},
 ]
 
 webix.ready(function() {
@@ -44,11 +44,26 @@ webix.ready(function() {
         rows: [
             {
                 view: 'toolbar',
-                height: 40,
-                cols: [
+                autoheight: true,
+                id: 't1',
+                rows: [
                     {
-                        view: 'label',
-                        label: '<span style="font-size: 1.5rem">ЕИС "Работающая Бурятия". Форма подача заявки для дачников.</span>',
+                        responsive: 't1',
+                        css: 'webix_dark',
+                        cols: [
+                            {
+                                view: 'label',
+                                width: 300,
+                                label: '<span style="font-size: 1.3rem">ЕИС "Работающая Бурятия". </span>',
+                                tooltip: 'Форма подача заявки для дачников'
+                            },
+                            {
+                                view: 'label',
+                                minWidth: 400,
+                                autoheight: true,
+                                label: '<span style="font-size: 1.3rem">Форма подача заявки для дачников.</span>',
+                            }
+                        ]
                     }
                 ]
             },
@@ -127,124 +142,196 @@ webix.ready(function() {
                             }
                         ]
                     },
-                    view_section('Адресная информация'),
+                    view_section('Адрес убытия'),
                     {
-                        view: 'button',
-                        type: 'icon',
-                        icon: 'wxi-plus',
-                        label: 'Добавить адрес',
-                        id: 'add_btn',
-                        click: function () {
-                            $$('addform').show()
-                            $$('district').focus()
-                        }
-                    },
-                    {
-                        view: 'form',
-                        id: 'addform',
-                        elements: [
+                        type: 'space',
+                        margin: 5,
+                        id: 'a2',
+                        rows: [
                             {
+                                responsive: 'a2',
                                 cols: [
                                     {
-                                        id: 'district',
-                                        view: 'combo', name: 'district', width: 250, label: 'Район',
+                                        id: 'raion',
+                                        view: 'combo', name: 'raion',
+                                        minWidth: 350,
+                                        label: 'Район',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
                                         required: true,
-                                        options: district_options
-                                    },
-                                    {
-                                        id: 'address_text',
-                                        view: 'text',
-                                        name: 'address',
-                                        label: 'ДНТ/Адрес',
-                                        labelPosition: 'top',
-                                        required: true }
-                                ]
-                            },
-                            {
-                                cols: [
-                                    {
-                                        view: 'button', label: 'Добавить', css: 'webix_primary',
-                                        type: 'icon', icon: 'wxi-check',
-                                        click: function () {
-                                            if($$('addform').validate()) {
-                                                let find = $$('addr_table').find(function(obj){
-                                                    return (obj.district == $$('addform').getValues().district)
-                                                        && (obj.address.toLowerCase().indexOf($$('addform').getValues().address) != -1)
-                                                })
-                                                if(find.length == 0) {
-                                                    $$('addr_table').add($$('addform').getValues(), $$('addform').count + 1)
-                                                    $$('addform').clear()
-                                                    $$('addform').hide()
-                                                }
-                                                else {
-                                                    webix.message('Адрес повторяется', 'error')
+                                        options: district_options,
+                                        on: {
+                                            onChange: function (newv, oldv) {
+                                                if (newv == 18 || newv == 20 || newv == 24) {
+                                                    $$('naspunkt').setValue(district_options[newv - 1].value)
                                                 }
                                             }
                                         }
                                     },
                                     {
-                                        view: 'button', label: 'Очистить', css: 'webix_danger',
-                                        type: 'icon', icon: 'wxi-close',
-                                        click: function () {
-                                            $$('addform').clear()
-                                            $$('addform').hide()
-                                        }
+                                        id: 'naspunkt',
+                                        view: 'text',
+                                        name: 'naspunkt',
+                                        minwidth: 350,
+                                        label: 'Населенный пункт',
+                                        labelPosition: 'top',
+                                        required: true
                                     }
                                 ]
-                            }
-                        ]
-                    },
-                    {
-                        rows: [
-                            {
-                                view: 'datatable', name: 'addressDacha', label: '', labelPosition: 'top',
-                                height: 200,
-                                select: 'row',
-                                editable: true,
-                                id: 'addr_table',
-                                columns: [
-                                    { id: 'id', header: '', css: 'rank'},
-                                    {
-                                        id: 'district',
-                                        header: 'Район',
-                                        width: 300,
-                                        options: district_options,
-                                        editor: 'select'
-                                    },
-                                    {
-                                        id: 'address',
-                                        header: 'ДНТ/Адрес',
-                                        fillspace: true,
-                                        editor: 'text'
-                                    },
-                                    {
-                                        id: 'action',
-                                        header: '',
-                                        width: 80,
-                                        template: '<button class="delete_btn">X</button>'
-                                    }
-                                ],
-                                data: [],
-                                myadd: function() {
-                                    webix.message('asdf')
-                                },
-                                on:{
-                                    'data->onStoreUpdated': function(){
-                                        this.data.each(function(obj, i){
-                                            obj.id = i + 1;
-                                        });
-                                    },
-                                },
-                                onClick:{
-                                    delete_btn: function(ev, id){
-                                        this.remove(id);
-                                    }
-                                }
                             },
                         ]
                     },
+
+                    view_section('Адресная информация'),
+                    {
+                        type: 'space',
+                        margin: 5,
+                        rows: [
+                            {
+                                view: 'button',
+                                type: 'icon',
+                                icon: 'wxi-plus',
+                                label: 'Добавить адрес',
+                                id: 'add_btn',
+                                click: function () {
+                                    $$('addform').show()
+                                    $$('district').focus()
+                                }
+                            },
+                            {
+                                view: 'form',
+                                id: 'addform',
+                                elements: [
+                                    {
+                                        id: 'a1',
+                                        rows: [
+                                            {
+                                                responsive: 'a1',
+                                                cols: [
+                                                    {
+                                                        id: 'district',
+                                                        view: 'combo', name: 'district',
+                                                        width: 250,
+                                                        label: 'Район',
+                                                        labelPosition: 'top',
+                                                        invalidMessage: 'Поле не может быть пустым',
+                                                        required: true,
+                                                        options: district_options
+                                                    },
+                                                    {
+                                                        id: 'address_text',
+                                                        minWidth: 250,
+                                                        view: 'text',
+                                                        name: 'address',
+                                                        label: 'ДНТ/Адрес',
+                                                        labelPosition: 'top',
+                                                        required: true,
+                                                        invalidMessage: 'Поле не может быть пустым',
+                                                        on: {
+                                                            onEnter: function () {
+                                                                if($$('addform').validate()) {
+                                                                    let find = $$('addr_table').find(function(obj){
+                                                                        return (obj.district == $$('addform').getValues().district)
+                                                                            && (obj.address.toLowerCase().indexOf($$('addform').getValues().address) != -1)
+                                                                    })
+                                                                    if(find.length == 0) {
+                                                                        $$('addr_table').add($$('addform').getValues(), $$('addform').count + 1)
+                                                                        $$('addform').clear()
+                                                                        $$('addform').hide()
+                                                                    }
+                                                                    else {
+                                                                        webix.message('Адрес повторяется', 'error')
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        cols: [
+                                            {
+                                                id: 'add_chk_btn',
+                                                view: 'button', label: 'Добавить', css: 'webix_primary',
+                                                type: 'icon', icon: 'wxi-check',
+                                                click: function () {
+                                                    $$('address_text').callEvent('onEnter')
+                                                }
+                                            },
+                                            {
+                                                view: 'button', label: 'Очистить', css: 'webix_danger',
+                                                type: 'icon', icon: 'wxi-close',
+                                                click: function () {
+                                                    $$('addform').clear()
+                                                    $$('addform').hide()
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                rows: [
+                                    {
+                                        view: 'datatable',
+                                        id: 'addr_table',
+                                        name: 'addressDacha',
+                                        height: 200,
+                                        select: 'row',
+                                        autowidth: true,
+                                        editable: true,
+                                        scroll: 'xy',
+                                        columns: [
+                                            // { id: 'id', header: '', css: 'rank', autowidth: true },
+                                            {
+                                                id: 'district',
+                                                header: 'Район',
+                                                //width: 300,
+                                                options: district_options,
+                                                adjust: true,
+                                                editor: 'select',
+                                            },
+                                            {
+                                                id: 'address',
+                                                header: 'ДНТ/Адрес',
+                                                //adjust: true,
+                                                fillspace: true,
+                                                editor: 'text'
+                                            },
+                                            {
+                                                id: 'action',
+                                                header: '',
+                                                autowidth: true,
+                                                maxWidth: 50,
+                                                //adjust: true,
+                                                template: function(obj){
+                                                    return "<div class='webix_el_button'><button class='delete_btn' style='cursor: pointer'>X</button></div>";
+                                                }
+                                            }
+                                        ],
+                                        data: [],
+/*
+                                        on:{
+                                            'data->onStoreUpdated': function(){
+                                                this.data.each(function(obj, i){
+                                                    obj.id = i + 1;
+                                                });
+                                            },
+                                        },
+*/
+                                        onClick:{
+                                            delete_btn: function(ev, id){
+                                                this.remove(id);
+                                            }
+                                        }
+                                    },
+                                ]
+                            },
+                        ]
+                    },
+
                     view_section('Подача заявки'),
                     {
                         view: 'template',
@@ -292,6 +379,15 @@ webix.ready(function() {
                         },
                         required: true,
                         label:  'Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия',
+                        on: {
+                            onChange(newv, oldv) {
+                                if (newv == 1){
+                                    $$('send_btn').enable();
+                                }else{
+                                    $$('send_btn').disable();
+                                }
+                            }
+                        }
                     },
                     {
                         id: 'label_sogl',
@@ -306,13 +402,13 @@ webix.ready(function() {
                                 view: 'button',
                                 css: 'webix_primary',
                                 value: 'Подать заявку',
-                                //disabled: true,
+                                disabled: true,
                                 align: 'center',
                                 click: function () {
                                     if($$('form').validate()) {
                                         let params = $$('form').getValues()
 
-                                        if(params.age >= 65){
+                                        if(params.age > 65){
                                             webix.alert("Заявка не может быть одобрена. Вам предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
                                             return false;
                                         }
@@ -344,6 +440,8 @@ webix.ready(function() {
                                             return false
                                         }
                                         params.addrList = addrs
+
+                                        params.raion = district_options[params.raion - 1].value
 
                                         $$('label_sogl').showProgress({
                                             type: 'icon',
@@ -387,6 +485,7 @@ webix.ready(function() {
             }
         ]
     })
+
     $$('addform').hide()
     webix.extend($$('label_sogl'), webix.ProgressBar);
 })

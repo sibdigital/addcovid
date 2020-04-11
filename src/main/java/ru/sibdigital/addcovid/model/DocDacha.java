@@ -40,6 +40,8 @@ public class DocDacha {
     private String rejectComment;
     private String email;
     private String phone;
+    private String raion;
+    private String naspunkt;
 
     @OneToMany(targetEntity = DocDachaAddr.class, mappedBy="docDachaByIdDocDacha", fetch = FetchType.EAGER)
     private Collection<DocDachaAddr> docDachaAddrs;
@@ -219,6 +221,22 @@ public class DocDacha {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getRaion() {
+        return raion;
+    }
+
+    public void setRaion(String raion) {
+        this.raion = raion;
+    }
+
+    public String getNaspunkt() {
+        return naspunkt;
+    }
+
+    public void setNaspunkt(String naspunkt) {
+        this.naspunkt = naspunkt;
     }
 
 }
