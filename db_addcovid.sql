@@ -208,3 +208,7 @@ create table if not exists doc_dacha_addr
 
 alter table doc_dacha_addr owner to postgres;
 
+alter table doc_person add column inn varchar(12);
+alter table doc_person add column short_name varchar(255);
+alter table doc_person add column status_review integer;
+	,
