@@ -21,6 +21,8 @@ public class DachaDto {
     private Boolean isProtect;
     private String email;
     private String phone;
+    private String raion;
+    private String naspunkt;
 
     List<DachaAddrDto> addrList;
 }

@@ -48,6 +48,8 @@ public class DachaService {
                 .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
                 .email(dachaDto.getEmail())
                 .phone(dachaDto.getPhone())
+                .raion(dachaDto.getRaion())
+                .naspunkt(dachaDto.getNaspunkt())
                 .build();
 
         docDacha = docDachaRepo.save(docDacha);

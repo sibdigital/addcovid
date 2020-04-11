@@ -188,7 +188,9 @@ create table if not exists doc_dacha
     time_review timestamp,
     reject_comment text,
     phone varchar(100),
-    email varchar(100)
+    email varchar(100),
+    raion varchar(100),
+    naspunkt varchar(255)
 );
 
 alter table doc_dacha owner to postgres;
