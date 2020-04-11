@@ -222,3 +222,18 @@ create view v_doc_person_and_org_info as (
                                                          where dr.status_review = 1
     ) as org using (id_request)
 );
+
+CREATE TABLE public.reg_statistic (
+    id serial not null
+    constraint reg_statistic_pk
+    primary key,
+    lastname character varying(100),
+    firstname character varying(100),
+    patronymic character varying(100),
+    inn character varying(15),
+    reg_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    additional_info text,
+    results integer NOT NULL
+);
+
+ALTER TABLE public.reg_statistic OWNER TO postgres;
