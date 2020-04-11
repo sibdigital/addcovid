@@ -46,6 +46,8 @@ public class DachaService {
                 .statusImport(0)
                 .timeImport(Timestamp.valueOf(LocalDateTime.now()))
                 .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
+                .email(dachaDto.getEmail())
+                .phone(dachaDto.getPhone())
                 .build();
 
         docDacha = docDachaRepo.save(docDacha);

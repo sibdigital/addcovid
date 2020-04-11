@@ -104,7 +104,7 @@ public class MainController {
     String dachaPostForm(@RequestBody DachaDto dachaDto) {
         try {
             DocDacha docDacha = dachaService.addNewRequest(dachaDto);
-            return "Заявка принята. Ожидайте ответ на электронную почту.";
+            return "Заявка принята";
         } catch(Exception e){
             return "Невозможно сохранить заявку";
         }

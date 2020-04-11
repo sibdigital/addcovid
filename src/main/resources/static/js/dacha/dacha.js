@@ -197,6 +197,12 @@ webix.ready(function() {
                                         header: 'ДНТ/Адрес',
                                         fillspace: true,
                                         editor: 'text'
+                                    },
+                                    {
+                                        id: 'action',
+                                        header: '',
+                                        width: 80,
+                                        template: '<button class="delete_btn">X</button>'
                                     }
                                 ],
                                 data: [],
@@ -208,8 +214,13 @@ webix.ready(function() {
                                         this.data.each(function(obj, i){
                                             obj.id = i + 1;
                                         });
-                                    }
+                                    },
                                 },
+                                onClick:{
+                                    delete_btn: function(ev, id){
+                                        this.remove(id);
+                                    }
+                                }
                             },
 /*
                             {

@@ -19,6 +19,8 @@ public class DachaDto {
     private Integer age;
     private Boolean isAgree;
     private Boolean isProtect;
+    private String email;
+    private String phone;
 
     List<DachaAddrDto> addrList;
 }

@@ -38,6 +38,8 @@ public class DocDacha {
     private Integer statusReview;
     private Timestamp timeReview;
     private String rejectComment;
+    private String email;
+    private String phone;
 
     @OneToMany(targetEntity = DocDachaAddr.class, mappedBy="docDachaByIdDocDacha", fetch = FetchType.EAGER)
     private Collection<DocDachaAddr> docDachaAddrs;
@@ -202,4 +204,21 @@ public class DocDacha {
     public void setDocDachaAddrs(Collection<DocDachaAddr> docDachaAddrsById) {
         this.docDachaAddrs = docDachaAddrsById;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
 }
