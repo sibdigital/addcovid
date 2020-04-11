@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Комитет информационных технологий</title>
+
+
+    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css">
+    <!-- Compiled and minified CSS -->
+
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="/libs/popper.min.js"></script>
+    <script src="/libs/jquery-3.4.1.min.js"></script>
+    <script src="/libs/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+<div th:insert="~{navbar-bootstrap::frag ('Протокол загрузки')}"></div>
+
+<div th:if="${errorMessage != null}">
+    <div  class="alert alert-danger" role="alert">
+        <span th:text="${errorMessage}"></span>
+    </div>
+</div>
+
+<div th:if="${checkProtocol.isSuccess()}">
+    <div  class="alert alert-warning" role="alert">
+        <span>Ваша заявка загружена успешно, однако при обработке документа определены неточности.</span>
+        <span>Просмотрите протокол. Если обнаружите ошибку: исправьте свой файл и загрузите все документы снова <a href="/upload">сюда</a></span>
+    </div>
+</div>
+<div th:els="${!checkProtocol.isSuccess()}">
+    <div  class="alert alert-danger" role="alert">
+        <span>Ваша заявка содержит ошибки. Изучите протокол, исправьте свой файл и загрузите все документы снова <a href="/upload">сюда</a></span>
+    </div>
+</div>
+
+
+
+
+
+
+
+<div class="container">
+
+
+
+    <div class="col" >
+        <div class="row justify-content-center mt-2">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <div class="row">
+                            <div class="col-12 col-md-6"><span>ДАННЫЕ О ВАШЕЙ ОРГАНИЗАЦИИ</span></div>
+                            <div class="col-12 col-md-6">
+                                <span class="btn  btn-success">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('success')}"></span></span>
+                                <span class="btn  btn-danger">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('error')}"></span></span>
+                                <span class="btn  btn-info">Всего <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('success')+checkProtocol.getStatistic().get('info').get('error')}"></span></span>
+                            </div>
+                        </div>
+
+
+                    </h5>
+                    <div class="table-responsive-sm">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col" style="width: 60%"></th>
+                                <th scope="col" style="width: 40%"></th>
+                                <th scope="col" style="width: 40%"></th>
+                                <!--                                <th scope="col">Имя</th>-->
+                                <!--                                <th scope="col">Отчество</th>-->
+                                <!--                                <th scope="col">Статус</th>-->
+                            </tr>
+                            </thead>
+
+                            <tbody>
+                            <tr >
+                                <td ><span>Полное наименование организации/фамилия, имя, отчество индивидуального предпринимателя</span></td>
+                                <td><span th:text="${postFormDto.getOrganizationName()}"></span></td>
+                                <td th:class="${postFormDto.getOrganizationNameStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getOrganizationNameStatus()}"></span></td>
+                            </tr>
+                            <tr>
+                                <td ><span>Краткое наименование организации</span></td>
+                                <td><span th:text="${postFormDto.getOrganizationShortName()}"></span></td>
+                                <td th:class="${postFormDto.getOrganizationShortNameStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getOrganizationShortNameStatus()}"></span></td>
+                            </tr>
+                            <tr>
+                                <td ><span>ИНН</span></td>
+                                <td><span th:text="${postFormDto.getOrganizationInn()}"></span></td>
+                                <td th:class="${postFormDto.getOrganizationInnStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getOrganizationInnStatus()}"></span></td>
+                            </tr>
+                            <tr>
+                                <td ><span>ОГРН</span></td>
+                                <td><span th:text="${postFormDto.getOrganizationOgrn()}"></span></td>
+                                <td th:class="${postFormDto.getOrganizationOgrnStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getOrganizationOgrnStatus()}"></span></td>
+                            </tr>
+                            <tr>
+                                <td ><span>e-mail</span></td>
+                                <td><span th:text="${postFormDto.getOrganizationEmail()}"></span></td>
+                                <td th:class="${postFormDto.getOrganizationEmailStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getOrganizationEmailStatus()}"></span></td>
+                            </tr>
+                            <tr>
+                                <td ><span>Телефон</span></td>
+                                <td><span th:text="${postFormDto.getOrganizationPhone()}"></span></td>
+                                <td th:class="${postFormDto.getOrganizationPhoneStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getOrganizationPhoneStatus()}"></span></td>
+                            </tr>
+                            <tr>
+                                <td ><span>Основной вид осуществляемой деятельности (отрасль)</span></td>
+                                <td><span th:text="${postFormDto.getOrganizationOkved()}"></span></td>
+                                <td th:class="${postFormDto.getOrganizationOkvedStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getOrganizationOkvedStatus()}"></span></td>
+                            </tr>
+                            <tr>
+                                <td ><span>Дополнительные виды осуществляемой деятельности</span></td>
+                                <td><span th:text="${postFormDto.getOrganizationOkvedAdd()}"></span></td>
+                                <td th:class="${postFormDto.getOrganizationOkvedAddStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getOrganizationOkvedAddStatus()}"></span></td>
+                            </tr>
+                            <tr>
+                                <td ><span>Юридический адрес</span></td>
+                                <td><span th:text="${postFormDto.getOrganizationAddressJur()}"></span></td>
+                                <td th:class="${postFormDto.getOrganizationAddressJurStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getOrganizationAddressJurStatus()}"></span></td>
+                            </tr>
+                            <tr>
+                                <td ><span>Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы</span></td>
+                                <td><span th:text="${postFormDto.getPersonSlrySaveCnt()}"></span></td>
+                                <td th:class="${postFormDto.getPersonSlrySaveCntStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getPersonSlrySaveCntStatus()}"></span></td>
+                            </tr>
+                            <tr>
+                                <td ><span>Суммарная численность работников, подлежащих переводу на дистанционный режим работы</span></td>
+                                <td><span th:text="${postFormDto.getPersonRemoteCnt()}"></span></td>
+                                <td th:class="${postFormDto.getPersonRemoteCntStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getPersonRemoteCntStatus()}"></span></td>
+                            </tr>
+                            <tr>
+                                <td ><span>Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)</span></td>
+                                <td><span th:text="${postFormDto.getPersonOfficeCnt()}"></span></td>
+                                <td th:class="${postFormDto.getPersonOfficeCntStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${postFormDto.getPersonOfficeCntStatus()}"></span></td>
+
+
+                                <!--                                    <td th:class="${data.get('status') == 'OK' ? 'bg-success' : (data.get('status') == 'ERROR' ? 'bg-danger' : 'bg-warning') }"><span th:text="${data.get('status')}"></span></td>-->
+                            </tr>
+                            <!--                            </div>-->
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-2">
+            <div class="col" >
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <div class="row">
+                                <div class="col-12 col-md-6"><span>КУРИРУЮЩЕЕ МИНИСТЕРСТВО</span></div>
+                                <div class="col-12 col-md-6">
+                                    <span th:if="${postFormDto.getDepartmentIdStatus() == 'OK'}" class="btn  btn-success">Успешно <span class="badge badge-light" >1</span></span>
+                                    <span th:if="${postFormDto.getDepartmentIdStatus() != 'OK'}" class="btn  btn-danger">С ошибкой <span class="badge badge-light">1</span></span>
+                                </div>
+                            </div>
+                        </h5>
+                        <div class="table-responsive-sm">
+                            <ul class="list-group">
+                                <li class="list-group-item active">Вы выбрали следующее министерство:</li>
+                                <li class="list-group-item">
+                                    <div class="table-responsive-sm">
+                                        <table class="table">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col" style="width: 20%">№</th>
+                                                <th scope="col" style="width: 80%">Наименование</th>
+                                            </tr>
+                                            </thead>
+
+                                            <tbody>
+                                            <tr th:each="data, dataState : ${checkProtocol.getCheckedDeparts()}" th:class="${dataState.index != 0 ? 'bg-danger' : ''}">
+                                                <td><span th:text="${data.get('id')}"></span></td>
+                                                <td><span th:text="${data.get('name')}"></span></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </li>
+                                <li th:class="${postFormDto.getDepartmentIdStatus() == 'OK' ? 'list-group-item bg-success text-center' : 'list-group-item bg-danger'}" ><span th:text="${postFormDto.getDepartmentIdStatus()}"></span></li>
+                            </ul>
+                            <span></span>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center mt-2">
+            <div class="col" >
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <div class="row">
+                                <div class="col-12 col-md-6"><span>АДРЕСНАЯ ИНФОРМАЦИЯ</span></div>
+                                <div class="col-12 col-md-6">
+                                    <span class="btn  btn-success">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('success')}"></span></span>
+                                    <span class="btn  btn-danger">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('error')}"></span></span>
+                                    <span class="btn  btn-warning">Пустых строк <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('empty')}"></span></span>
+                                    <span class="btn  btn-info">Всего адресов <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('success')+checkProtocol.getStatistic().get('address').get('error')}"></span></span>
+                                </div>
+                            </div>
+                        </h5>
+                        <div class="table-responsive-sm">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col" style="width: 60%">Фактический адрес осуществления деятельности</th>
+                                    <th scope="col" style="width: 20%">Численность работников, не подлежащих переводу на дистанционный режим работы, осуществляющих деятельность  фактическому адресу</th>
+                                    <th scope="col" style="width: 20%">Сттутс</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                <tr th:each="data, dataState : ${postFormDto.getAddressFact()}">
+                                    <td><span th:text="${data.getAddressFact()}"></span></td>
+                                    <td><span th:text="${data.getPersonOfficeFactCnt()}"></span></td>
+                                    <td th:class="${data.getStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${data.getStatus()}"></span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col" >
+        <div class="row justify-content-center mt-2">
+            <div class="col" >
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <div class="row">
+                                <div class="col-12 col-md-6"><span>РАБОТНИКИ ВЫХОДЯЩИЕ НА РАБОТУ</span></div>
+                                <div class="col-12 col-md-6">
+                                    <span class="btn  btn-success">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('success')}"></span></span>
+                                    <span class="btn  btn-danger">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('error')}"></span></span>
+                                    <span class="btn  btn-warning">Пустых строк <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('empty')}"></span></span>
+                                    <span class="btn  btn-info">Всего людей <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('success')+checkProtocol.getStatistic().get('people').get('error')}"></span></span>
+                                </div>
+                            </div>
+                        </h5>
+                        <div class="table-responsive-sm">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col" style="width: 25%">Фамилия</th>
+                                    <th scope="col" style="width: 25%">Имя</th>
+                                    <th scope="col" style="width: 25%">Отчество</th>
+                                    <th scope="col" style="width: 25%">Статус</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                <tr th:each="data, dataState : ${postFormDto.getPersons()}">
+                                    <td><span th:text="${data.getLastname()}"></span></td>
+                                    <td><span th:text="${data.getFirstname()}"></span></td>
+                                    <td><span th:text="${data.getPatronymic()}"></span></td>
+                                    <td th:class="${data.getStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${data.getStatus()}"></span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function getName (str, component){
+            if (str.lastIndexOf('\\')){
+                var i = str.lastIndexOf('\\')+1;
+            }
+            else{
+                var i = str.lastIndexOf('/')+1;
+            }
+            var filename = str.slice(i);
+            var uploaded = document.getElementById(component);
+            uploaded.innerHTML = filename;
+        }
+    </script>
+</div>
+
+</body>
+</html>
+

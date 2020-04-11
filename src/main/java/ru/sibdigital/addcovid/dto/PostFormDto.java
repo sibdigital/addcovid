@@ -69,5 +69,7 @@ public class PostFormDto {
 
     private String addressFactStatus = "OK";
     private String personsStatus = "OK";
-    
+
+
+
 }
