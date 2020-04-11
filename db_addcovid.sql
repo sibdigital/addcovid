@@ -210,7 +210,15 @@ create table if not exists doc_dacha_addr
 
 alter table doc_dacha_addr owner to postgres;
 
-alter table doc_person add column inn varchar(12);
-alter table doc_person add column short_name varchar(255);
-alter table doc_person add column status_review integer;
-	,
+create view v_doc_person_and_org_info as (
+    select pers.*,  org.inn, org.short_name from (
+                                                     select *
+                                                     from doc_person as dp
+                                                 ) as pers
+                                                     inner join ( select
+                                                                      dr.id as id_request, co.inn, co.short_name
+                                                                  from doc_request dr
+                                                                           inner join cls_organization as co on dr.id_organization = co.id
+                                                         where dr.status_review = 1
+    ) as org using (id_request)
+);
