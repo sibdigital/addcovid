@@ -102,6 +102,7 @@ webix.ready(function() {
                                         invalidMessage: 'Поле не может быть пустым',
                                         required: true
                                     },
+/*
                                     {
                                         view: 'text',
                                         name: 'email',
@@ -121,6 +122,7 @@ webix.ready(function() {
                                         // invalidMessage: 'Поле не может быть пустым',
                                         // required: true
                                     }
+*/
                                 ]
                             }
                         ]
@@ -332,7 +334,7 @@ webix.ready(function() {
                                                 })
                                             }
                                         }
-                                        else {
+                                        else if(addrs.length == 0) {
                                             webix.message('Не заполнена адресная часть', 'error')
                                             $$('add_btn').focus()
                                             return false
