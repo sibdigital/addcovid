@@ -13,6 +13,7 @@ import ru.sibdigital.addcovid.model.DocAddressFact;
 public class FactAddressDto {
     private String addressFact;
     private Long personOfficeFactCnt;
+    private String status;
 
     public DocAddressFact convertToDocAddressFact(){
         return DocAddressFact.builder()

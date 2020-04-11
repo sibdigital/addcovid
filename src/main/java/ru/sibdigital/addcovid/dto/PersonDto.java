@@ -15,6 +15,7 @@ public class PersonDto {
     private String firstname;
     private String patronymic;
     //private Boolean isAgree;
+    private String status;
 
    public DocPerson convertToPersonEntity(){
        return DocPerson.builder().firstname(this.firstname)

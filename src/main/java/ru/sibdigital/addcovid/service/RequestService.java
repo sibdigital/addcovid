@@ -90,7 +90,6 @@ public class RequestService {
                     .collect(Collectors.toSet());
 
 
-        int importStatus = ImportStatuses.SUCCESS.getValue();
         String filename = "error while upload";
         try {
 
@@ -115,10 +114,8 @@ public class RequestService {
             filename = inputFilename;
 
         } catch (IOException ex) {
-            importStatus = ImportStatuses.FILE_ERROR.getValue();
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         } catch (Exception ex) {
-            importStatus = ImportStatuses.FILE_ERROR.getValue();
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         }
 
@@ -134,7 +131,7 @@ public class RequestService {
                     .docAddressFact(docAddressFactSet)
                     .statusReview(0)
                     .timeReview(Timestamp.valueOf(LocalDateTime.now()))
-                    .statusImport(importStatus)
+                    .statusImport(ImportStatuses.SUCCESS.getValue())
                     .timeImport(Timestamp.valueOf(LocalDateTime.now()))
                     .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
                     .isAgree(postForm.getIsAgree())
