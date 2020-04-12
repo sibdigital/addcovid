@@ -3,8 +3,11 @@ package ru.sibdigital.addcovid.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.dto.DachaDto;
 import ru.sibdigital.addcovid.dto.ListItemDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
@@ -67,6 +70,10 @@ public class MainController {
         }
     }
 
+    @PostMapping(value = "/uploadpart", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> uploadFile(@RequestParam(value = "upload") MultipartFile file){
+        return ResponseEntity.ok().body(requestService.uploadFile(file));
+    }
 
     @GetMapping(value = "/download/{id}")
     public void downloadFile(HttpServletResponse response, @PathVariable("id") DocRequest docRequest) throws Exception {

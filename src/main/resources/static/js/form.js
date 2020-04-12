@@ -472,18 +472,21 @@ webix.ready(function() {
                                 id: 'upload',
                                 view: 'uploader',
                                 css: 'webix_secondary',
-                                value: 'Загрузить PDF-файл с пояснением обоснования',
+                                value: 'Загрузить PDF-файл(-ы) с пояснением обоснования',
                                 autosend: false,
+                                upload: '/uploadpart',
                                 required: true,
-                                multiple: false,
+                                multiple: true,
+                                link: 'filelist',
                                 on: {
                                     onBeforeFileAdd: function (upload) {
                                         if (upload.type.toUpperCase() !== 'PDF') {
                                             $$('no_pdf').setValue('Загружать можно только PDF-файлы!');
-                                            $$('file').setValue('');
+                                            //$$('file').setValue('');
                                             $$('send_btn').disable();
                                             return false;
                                         }
+/*
                                         let reader = new FileReader();
                                         reader.addEventListener("load", function () { // Setting up base64 URL on image
                                             uploadFile = window.btoa(reader.result);
@@ -498,7 +501,16 @@ webix.ready(function() {
                                         }, false);
                                         reader.readAsBinaryString(upload.file);
                                         uploadFilename = upload.name
-                                        return false;
+*/
+                                        //return false;
+
+                                        if($$('file').getValue()){
+                                            $$('file').setValue($$('file').getValue() + ',' + upload.name)
+                                        }
+                                        else {
+                                            $$('file').setValue(upload.name)
+                                        }
+                                        return true
                                     }
                                 }
                             },
@@ -705,10 +717,15 @@ webix.ready(function() {
                                 view: 'button',
                                 css: 'webix_primary',
                                 value: 'Подать заявку',
-                                disabled: true,
+                                //disabled: true,
+
+                                disabled: false,
+
                                 align: 'center',
                                 click: function () {
+
                                     if($$('form').validate()) {
+
                                         let params = $$('form').getValues();
 
                                         params.organizationInn = params.organizationInn.trim();
@@ -789,27 +806,51 @@ webix.ready(function() {
                                         params.organizationInn = params.organizationInn.trim()
                                         params.organizationOgrn  = params.organizationOgrn.trim()
 
-                                        params.attachment = uploadFile
-                                        params.attachmentFilename = uploadFilename
+                                        //params.attachment = uploadFile
+                                        //params.attachmentFilename = uploadFilename
 
                                         $$('label_sogl').showProgress({
                                             type: 'icon',
                                             delay: 5000
                                         })
 
-                                        webix.ajax()
-                                            .headers({'Content-type': 'application/json'})
-                                            .post('/',
-                                                JSON.stringify(params),
-                                                function (text, data, xhr) {
-                                                    console.log(text);
-                                                    webix.alert(text)
-                                                        .then(function () {
-                                                            $$('label_sogl').hideProgress();
-                                                            webix.message(text);
-                                                        });
 
-                                                })
+                                        $$('upload').send(function(response) {
+                                            let uploadedFiles = []
+                                            $$('upload').files.data.each(function (obj) {
+                                                let status = obj.status
+                                                let name = obj.name
+                                                if(status == 'server'){
+                                                    let sname = obj.sname
+                                                    uploadedFiles.push(sname)
+                                                }
+                                            })
+
+                                            if(uploadedFiles.length != $$('upload').files.data.count()) {
+                                                webix.message('Не удалось загрузить PDF-файлы.')
+                                                return false
+                                            }
+                                            console.log(uploadedFiles)
+                                            params.attachment = uploadedFiles.join(',')
+                                            console.log(params)
+
+                                            webix.ajax()
+                                                .headers({'Content-type': 'application/json'})
+                                                //.headers({'Content-type': 'application/x-www-form-urlencoded'})
+                                                .post('/',
+                                                    JSON.stringify(params),
+                                                    //params,
+                                                    function (text, data, xhr) {
+                                                        console.log(text);
+                                                        webix.alert(text)
+                                                            .then(function () {
+                                                                $$('label_sogl').hideProgress();
+                                                                webix.message(text);
+                                                            });
+
+                                                    })
+                                        })
+
                                     }
                                     else {
                                         webix.message('Не заполнены обязательные поля. Для просмотра прокрутите страницу вверх', 'error')
@@ -818,6 +859,10 @@ webix.ready(function() {
 
                             }
                         ]
+                    },
+                    {
+                        view:'list',  id:'filelist', type:'uploader',
+                        autoheight: true, borderless: true
                     }
                 ],
                 /*
