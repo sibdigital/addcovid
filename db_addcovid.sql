@@ -210,7 +210,7 @@ create table if not exists doc_dacha_addr
 
 alter table doc_dacha_addr owner to postgres;
 
-create view v_doc_person_and_org_info as (
+create or replace view v_doc_person_and_org_info as (
     select pers.*,  org.inn, org.short_name from (
                                                      select *
                                                      from doc_person as dp

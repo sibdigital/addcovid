@@ -469,17 +469,28 @@ webix.ready(function() {
                                 labelPosition: 'top'
                             },
                             {
+                                view: 'label',
+                                label: '<span  style="text-align: center; color: red">Для загрузки нескольких файлов сожмите их в ZIP-архив и загрузите его</span>',
+                                //css: 'main_label'
+                            },
+                            {
+                                view: 'label',
+                                label: '<span  style="text-align: center; color: red">Максимальный размер загружаемого PDF-файла или ZIP-архива не должен превышать 60 Мб</span>',
+                                //css: 'main_label'
+                            },
+                            {
                                 id: 'upload',
                                 view: 'uploader',
                                 css: 'webix_secondary',
-                                value: 'Загрузить PDF-файл с пояснением обоснования',
+                                value: 'Загрузить PDF-файл или ZIP-архив с пояснением обоснования',
                                 autosend: false,
                                 required: true,
                                 multiple: false,
+                                accept: 'application/pdf, application/zip',
                                 on: {
                                     onBeforeFileAdd: function (upload) {
-                                        if (upload.type.toUpperCase() !== 'PDF') {
-                                            $$('no_pdf').setValue('Загружать можно только PDF-файлы!');
+                                        if (upload.type.toUpperCase() !== 'PDF' && upload.type.toUpperCase() !== 'ZIP') {
+                                            $$('no_pdf').setValue('Загружать можно только PDF-файлы и ZIP-архивы!');
                                             $$('file').setValue('');
                                             $$('send_btn').disable();
                                             return false;
