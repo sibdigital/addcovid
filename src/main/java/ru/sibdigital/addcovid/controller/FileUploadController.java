@@ -8,11 +8,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.parser.CheckProtocol;
 import ru.sibdigital.addcovid.parser.ExcelParser;
@@ -37,24 +39,35 @@ public class FileUploadController {
     @RequestMapping("/upload")
     public String forwardUpload(Model model) {
         //this.getClass().getClassLoader().getResource("template.xlsx");
-        model.addAttribute("errorMessage", null);
+        //model.addAttribute("errorMessage", null);
         return "upload";
     }
 
+    @RequestMapping("/upload/protocol")
+    public String uploadProtocol(ModelMap model) {
+
+        if(model.size() == 0) {
+            return "redirect:/upload";
+        }
+
+        //this.getClass().getClassLoader().getResource("template.xlsx");
+        return "upload_protocol";
+    }
+
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public String uploadFiles(@RequestParam("excelFile") MultipartFile excelFile,
-                              @RequestParam("pdfFile") MultipartFile pdfFile,
-                              @RequestParam("isAgreed") boolean isAgreed,
-                              @RequestParam("isProtected") boolean isProtected,
-                              Model model) throws IOException {
+    public String  uploadFiles(@RequestParam("excelFile") MultipartFile excelFile,
+                                    @RequestParam("pdfFile") MultipartFile pdfFile,
+                                    @RequestParam("isAgreed") boolean isAgreed,
+                                    @RequestParam("isProtected") boolean isProtected,
+                                    RedirectAttributes rm) throws IOException {
 
         if( !isAgreed ){
-            model.addAttribute("errorMessage", "Нужно принять соглашение на обработку персональных данных");
-            return "upload";
+            rm.addFlashAttribute("errorMessage", "Нужно принять соглашение на обработку персональных данных");
+            return "redirect:/upload";
         }
         if( !isProtected){
-            model.addAttribute("errorMessage", "Нужно принять соглашение об обязательном выполнение требований по защите от COVID-19");
-            return "upload";
+            rm.addFlashAttribute("errorMessage", "Нужно принять соглашение об обязательном выполнение требований по защите от COVID-19");
+            return "redirect:/upload";
         }
 
 
@@ -80,18 +93,16 @@ public class FileUploadController {
                 requestService.addNewRequest(postFormDto);
             }
 
-            model.addAttribute("checkProtocol",checkProtocol);
-            model.addAttribute("postFormDto",checkProtocol.getPostFormDto());
-            return "upload_protocol";
-
-
+            rm.addFlashAttribute("checkProtocol",checkProtocol);
+            rm.addFlashAttribute("postFormDto",checkProtocol.getPostFormDto());
+            return "redirect:/upload/protocol";
 
 
         } catch (IOException ex){
-            model.addAttribute("errorMessage", ex.getMessage());
+            rm.addFlashAttribute("errorMessage", ex.getMessage());
             log.error(ex.getMessage());
         } catch (Exception ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
+            rm.addFlashAttribute("errorMessage", ex.getMessage());
             log.error(ex.getMessage());
         }
 
@@ -102,7 +113,7 @@ public class FileUploadController {
 //            protocols.add(uploadAuditor.auditFile(f));
 //        }
 //        model.addAttribute("protocols", protocols);
-        return "upload";
+        return "redirect:/upload";
     }
 
     @RequestMapping(value="/download/template", method=RequestMethod.GET)
