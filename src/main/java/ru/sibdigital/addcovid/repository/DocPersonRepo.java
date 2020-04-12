@@ -6,9 +6,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.sibdigital.addcovid.model.DocPerson;
 
-import java.util.Map;
-
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Repository

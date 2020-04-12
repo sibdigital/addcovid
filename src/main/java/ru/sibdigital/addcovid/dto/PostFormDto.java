@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class PostFormDto {
     private Long personSlrySaveCnt;
     private Long personOfficeFactCnt;
 
-    private MultipartFile attachmentMultiPart;
+//    private MultipartFile attachmentMultiPart;
     private String attachment;
     private String attachmentFilename;
 
@@ -69,5 +68,7 @@ public class PostFormDto {
 
     private String addressFactStatus = "OK";
     private String personsStatus = "OK";
-    
+
+
+
 }

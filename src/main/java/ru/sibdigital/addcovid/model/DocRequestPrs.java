@@ -10,7 +10,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "doc_request", schema = "public")

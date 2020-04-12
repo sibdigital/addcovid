@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Комитет информационных технологий</title>
+
+
+    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css">
+    <!-- Compiled and minified CSS -->
+
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="/libs/popper.min.js"></script>
+    <script src="/libs/jquery-3.4.1.min.js"></script>
+    <script src="/libs/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+<div th:insert="~{navbar-bootstrap::frag ('Импорт Excel')}"></div>
+
+<div th:if="${errorMessage != null}">
+    <div  class="alert alert-primary" role="alert">
+        <span th:text="${errorMessage}"></span>
+    </div>
+</div>
+
+
+
+
+
+<div class="container" onload="checkFields()">
+    <form name="upload" enctype="multipart/form-data" action="/upload" method="POST">
+        <ul class="list-group">
+            <li class="list-group-item"><a download style="text-align: center;" href="/download/template" target="_blank">Скачать шаблон</a></li>
+            <li class="list-group-item"><span>Заполните его</span></li>
+            <li class="list-group-item">
+                <div><span>Прикрепите заполненный шаблон: </span>
+                    <input hidden="true" id="fileInput" type="file" name="excelFile" onchange="getName(this.value, 'excel-button-label'); checkFields();" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                    <label for="fileInput" class="btn btn-primary">
+                        <i class="material-icons">note_add</i>
+                        <span id="excel-button-label">Загрузить файл</span>
+                    </label>
+                    <div id="excel-file-form-label"></div>
+                </div>
+            </li>
+            <li class="list-group-item">
+                <div><span>Загрузить PDF-файл с пояснением обоснования: </span>
+                    <input hidden="true" id="pdfFile" type="file" name="pdfFile" onchange="getName(this.value, 'pdf-button-label'); checkFields();" accept="application/pdf">
+                    <label for="pdfFile" class="btn btn-primary">
+                        <i class="material-icons">picture_as_pdf</i>
+                        <span id="pdf-button-label">Загрузить файл</span>
+                    </label>
+                </div>
+            </li>
+            <li class="list-group-item">
+
+                <div id='fake_textarea' style="overflow: auto; width: 100%; height: 200px" contenteditable>
+                    <p style="text-align: center;"><strong>ПРЕДПИСАНИЕ&nbsp;Управления Роспотребнадзора по Республике Бурятия</strong></p>
+                    <p style="text-align: center;"><strong>о проведении дополнительных санитарно-противоэпидемических (профилактических) мероприятий</strong></p>
+                    <p style="text-align: right;">&laquo;10&raquo; апреля 2020 г. №60 г. Улан-Удэ</p>
+                    <p>В целях обеспечения санитарно-эпидемиологического благополучия населения, предупреждения распространения случаев новой коронавирусной инфекции (COVID-19), руководствуясь ч.2 ст.50 Федерального закона от 30.03.1999 № 52-ФЗ &laquo;О санитарно-эпидемиологическом благополучии населения&raquo;; постановлениями Главного государственного санитарного врача Российской Федерации о дополнительных мерах по снижению рисков завоза и распространения новой коронавирусной инфекции (COVID-2019), СП 3.4.2318-08 &laquo;Санитарная охрана территории Российской Федерации&raquo;, утв. постановлением Главного государственного санитарного врача РФ №3 22.01.2008; СП 3.1./3.2.3146-13 &laquo;Общие требования по профилактике инфекционных и паразитарных болезней&raquo;, утв. постановлением Главного государственного санитарного врача РФ 16.12.2013 №65; СП 3.5.1378-03 &laquo;Санитарно-эпидемиологические требования к организации и осуществлению дезинфекционной деятельности&raquo;, утв. постановлением Главного государственного санитарного врача РФ 09.06.2003 №131</p>
+                    <p style="text-align: center;"><strong>ПРЕДПИСЫВАЮ: </strong></p>
+                    <p>1. Обеспечить при входе работников в организацию (предприятие) &ndash; возможность обработки рук кожными антисептиками, предназначенными для этих целей или дезинфицирующими салфетками с установлением контроля за соблюдением этой гигиенической процедуры;</p>
+                    <p>2. Проводить контроль температуры тела работников перед началом рабочего дня при входе в организацию (предприятие), а также при необходимости в течение рабочего дня, с обязательным отстранением от нахождения на рабочем месте лиц с повышенной температурой тела и с признаками инфекционного заболевания, в том числе ОРВИ;</p>
+                    <p>3. Проводить качественную уборку помещений с применением дезинфицирующих средств, зарегистрированных в установленном порядке, уделив особое внимание дезинфекции дверных ручек, выключателей, поручней, столов, оборудования и других контактных поверхностей, мест общего пользования с кратностью каждые 2 часа;</p>
+                    <p>4. Проводить дезинфекцию наружных поверхностей эксплуатируемых зданий и объектов (площадки у входа, наружные двери, поручни, малые архитектурные формы, урны) с кратностью каждые 2 часа;</p>
+                    <p>5. Обеспечить использование рабочих растворов дезинфицирующих средств в соответствии с инструкцией по их применению, выбирая режимы, предусмотренные для обеззараживания объектов при вирусных инфекциях;</p>
+                    <p>6. Предусмотреть в помещениях туалетов промаркированные дозаторы с дезинфицирующими средствами, активными в отношении вирусов;</p>
+                    <p>7. Обеспечить регулярное проветривание рабочих помещений с периодичностью каждые 2 часа;</p>
+                    <p>8. Обеспечить персонал средствами индивидуальной защиты, по возможности антисептическими средствами для обработки рук и осуществлять контроль за их использованием;</p>
+                    <p>9. Соблюдать социальное дистанцирование (не менее 1,5 метров между людьми), специальный режим допуска и нахождения в помещениях и на прилегающей территории организаций, довести до каждого работника информацию о необходимости соблюдения указанных режимов.</p>
+                    <p>Ответственность за выполнение предписания возлагается на хозяйствующий субъект, получивший в ЕИС &laquo;Работающая Бурятия&raquo; разрешение на работу в период самоизоляции.</p>
+                    <p style="text-align: center;">должность, фамилия, имя, отчество должностного лица либо гражданина</p>
+                    <p>О мерах, принятых во исполнение предписания сообщить в адрес Управления Роспотребнадзора по Республике Бурятия не позднее 3х дней с момента получения в ЕИС &laquo;Работающая Бурятия&raquo; разрешения на работу по электронной почте: <a href="mailto:org@03.rospotrebnadzor.ru. ">org@03.rospotrebnadzor.ru. </a></p>
+                    <p>Невыполнение в установленный срок настоящего предписания влечет административную ответственность в соответствии с частью 1 статьи 19.4 Кодекса Российской Федерации об административных правонарушениях.</p>
+                    <p>Предписание может быть обжаловано в суд общей юрисдикции, Арбитражный суд, в вышестоящий орган государственного контроля (надзора), вышестоящему должностному лицу в установленном законодательством порядке.</p>
+
+                </div>
+
+               </textarea>
+            </li>
+            <li class="list-group-item">
+                <span>
+                    Подтверждаю обязательное выполнение требований по защите от COVID-19
+                    <span class="text-danger">*</span>
+                    : <input id="protect-checkbox" type="checkbox" name="isProtected" aria-label="Checkbox for following text input" onchange="changeComboBox(this); checkFields();">
+                </span>
+            </li>
+            <li class="list-group-item">
+
+                <textarea style="width: 100%" rows="7">
+                    СОГЛАСИЕ на обработку персональных данных (далее – «Согласие»)
+                    Настоящим я, во исполнение требований Федерального закона от 27.07.2006 г. № 152-ФЗ «О персональных данных» (с изменениями и дополнениями) свободно, своей волей и в своем интересе даю свое согласие: Администрации Главы РБ и Правительства Республики Бурятия, юридический адрес: 670001, г. Улан-Удэ, ул. Ленина, д.54, ИНН 0323082280 (далее - Администрация), на обработку, с использованием средств автоматизации или без использования таких средств, персональных данных (фамилия, имя отчество сотрудников организации), включая сбор, запись, систематизацию, удаление и уничтожение персональных данных при подаче заявки с предоставлением сведений о численности работников организаций и индивидуальных предпринимателей.
+                    Настоящим я уведомлен Администрацией о том, что предполагаемыми пользователями персональных данных сотрудников моей организации являются работники Администрации.
+                    Я ознакомлен(а), что: настоящее согласие на обработку персональных данных моей организации являются бессрочным и может быть отозвано посредством направления в адрес Администрации письменного заявления.
+                </textarea>
+            </li>
+            <li class="list-group-item">
+                <span>
+                    Подтверждаю согласие работников на обработку персональных данных
+                    <span class="text-danger">*</span>
+                    : <input id="agreed-checkbox" type="checkbox" name="isAgreed"  aria-label="Checkbox for following text input" onchange="changeComboBox(this); checkFields();"></span>
+
+            </li>
+        </ul>
+        <li class="list-group-item" style="align-items: center; justify-content: center">
+            <div style="width:100%" class="mx-auto">
+                <input type="submit" id="submit-button" disabled="true"  hidden="true">
+                <label id="submit-button-label" for="submit-button" disabled="true"   class="btn btn-secondary">
+                    <i class="material-icons">check</i>
+                    <span id="confirm-button-label">Отправить</span>
+                </label>
+            </div>
+        </li>
+    </form>
+    <!--    <li class="list-group-item" style="align-items: center; justify-content: center">-->
+    <!--        <div style="width:100%; justify-content: center">-->
+    <!--            <button id="submit-button" type="button" class="btn btn-primary" onclick="submit()"><i class="material-icons">check</i> Отправить</button>-->
+    <!--            <div id="error-message"></div>-->
+    <!--        </div>-->
+    <!--    </li>-->
+    <div>
+
+    </div>
+    <script>
+
+        let excelUploaded = false;
+        let pdfUploaded = false;
+        let isAgreeChecked = false;
+        let isProtectedChecked = false;
+
+        const buttonSubmit = document.getElementById('submit-button')
+        const buttonSubmitLabel = document.getElementById('submit-button-label')
+        function checkFields() {
+
+
+            const isDisabled = !(excelUploaded & pdfUploaded & isAgreeChecked & isProtectedChecked)
+
+            if(isDisabled) {
+                console.log(buttonSubmitLabel.classList)
+                buttonSubmitLabel.classList.remove('btn-primary')
+                buttonSubmitLabel.classList.add('btn-secondary')
+            } else {
+                console.log(buttonSubmitLabel.classList)
+                buttonSubmitLabel.classList.add('btn-primary')
+                buttonSubmitLabel.classList.remove('btn-secondary')
+            }
+
+
+
+            buttonSubmit.disabled = isDisabled
+            buttonSubmitLabel.disabled = isDisabled
+
+
+        }
+
+        function getName (str, component){
+            let i = 0;
+            if (str.lastIndexOf('\\')){
+                i = str.lastIndexOf('\\')+1;
+            }
+            else{
+                i = str.lastIndexOf('/')+1;
+            }
+            let filename = str.slice(i);
+            let uploaded = document.getElementById(component);
+            uploaded.innerHTML = filename;
+
+            if(component === 'excel-button-label'){
+                excelUploaded = true
+            }
+
+            if(component === 'pdf-button-label'){
+                pdfUploaded = true
+            }
+
+
+
+        }
+
+        function changeComboBox(component) {
+            if(component.id === 'agreed-checkbox'){
+                isAgreeChecked = component.checked;
+            }
+
+            if(component.id === 'protect-checkbox'){
+                isProtectedChecked = component.checked;
+            }
+        }
+
+    </script>
+</div>
+
+</body>
+</html>
+
