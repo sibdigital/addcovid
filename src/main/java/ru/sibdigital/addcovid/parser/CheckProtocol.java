@@ -19,7 +19,7 @@ public class CheckProtocol {
     private List<Integer> personsEmptyRowsInExcel;
     private List<Integer> addressesEmptyRowsInExcel;
     private List<Map<String,String>> checkedDeparts;
-    private String globalMessage;
+    private String globalMessage = "OK";
     private boolean success = true;
     private Map<String, Map<String, Integer>> statistic = new HashMap<>(3);
 

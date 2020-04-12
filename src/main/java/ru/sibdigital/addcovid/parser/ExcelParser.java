@@ -138,11 +138,17 @@ public class ExcelParser {
         if(sheetPeopleRowsIterator == null) {
             throw new IOException("Неизвестная ошибка при обработке страницы: " + SHEET_NAMES[SHEET_PEOPLE_INDEX]);
         }
-
+        StringBuilder stringBuilder = new StringBuilder();
         checkProtocol = this.parseSheetWithDepartment(sheetDepartmentRowsIterator, checkProtocol, fmt);
         checkProtocol = this.parseSheetWithOrganizationInfo(sheets[SHEET_ORGANIZATION_INFO_INDEX], checkProtocol, fmt);
-        checkProtocol = this.parseSheetWithAddresses(sheetAddressesRowsIterator, checkProtocol, fmt);
-        checkProtocol = this.parseSheetWithPeople(sheetPeopleRowsIterator, checkProtocol, fmt);
+        checkProtocol = this.parseSheetWithAddresses(sheetAddressesRowsIterator, checkProtocol, fmt, stringBuilder);
+        checkProtocol = this.parseSheetWithPeople(sheetPeopleRowsIterator, checkProtocol, fmt, stringBuilder);
+        String globalMessage = stringBuilder.toString();
+
+
+        if(globalMessage.length() != 0){
+            checkProtocol.setGlobalMessage(globalMessage);
+        }
 
 
         return checkProtocol;
@@ -430,7 +436,7 @@ public class ExcelParser {
 
     }
 
-    private CheckProtocol parseSheetWithAddresses(Iterator<Row> rowIterator, CheckProtocol checkProtocol, DataFormatter fmt) {
+    private CheckProtocol parseSheetWithAddresses(Iterator<Row> rowIterator, CheckProtocol checkProtocol, DataFormatter fmt, StringBuilder warningStringBuilder) {
         int success = 0;
         int error = 0;
         Row row;
@@ -467,6 +473,7 @@ public class ExcelParser {
             if(StringUtils.isBlank(addressInfo.getAddressFact()) && addressInfo.getPersonOfficeFactCnt() == null){
                 emptyRows.add(i+1);
                 emptyRowCounter++;
+
             } else{
                 errorString = new StringBuilder();
                 boolean skip = false;
@@ -503,6 +510,16 @@ public class ExcelParser {
             checkProtocol.getPostFormDto().setAddressFactStatus("Список не может быть пустым!");
         }
 
+        if(!emptyRows.isEmpty()){
+            warningStringBuilder.append(String.format("На листе %s имеются пустые строки на позициях: ", SHEET_NAMES[SHEET_ADDRESSES_INDEX]));
+            for (Integer rowInd: emptyRows) {
+                warningStringBuilder.append(rowInd);
+                warningStringBuilder.append(", ");
+            }
+            warningStringBuilder.replace(warningStringBuilder.length()-2, warningStringBuilder.length(), "; ");
+
+        }
+
         Map<String, Integer> statistic = new HashMap<>(3);
         statistic.put("success", success);
         statistic.put("error", error);
@@ -517,12 +534,12 @@ public class ExcelParser {
 
     }
 
-    private CheckProtocol parseSheetWithPeople(Iterator<Row> rowIterator, CheckProtocol checkProtocol, DataFormatter fmt) {
+    private CheckProtocol parseSheetWithPeople(Iterator<Row> rowIterator, CheckProtocol checkProtocol, DataFormatter fmt, StringBuilder warningStringBuilder) {
 
         int success = 0;
         int error = 0;
 
-        Row row;
+        Row row = null;
         StringBuilder errorString;
         List<Integer> emptyRows = new ArrayList<>(750);
 
@@ -596,7 +613,15 @@ public class ExcelParser {
         statistic.put("success", success);
         statistic.put("error", error);
         statistic.put("empty", emptyRows.size());
+        if(!emptyRows.isEmpty()){
+            warningStringBuilder.append(String.format("На листе %s имеются пустые строки на позициях: ", SHEET_NAMES[SHEET_PEOPLE_INDEX]));
+            for (Integer rowInd: emptyRows) {
+                warningStringBuilder.append(rowInd);
+                warningStringBuilder.append(", ");
+            }
+            warningStringBuilder.replace(warningStringBuilder.length()-2, warningStringBuilder.length(), "; ");
 
+        }
 
         checkProtocol.getStatistic().put("people", statistic);
         checkProtocol.getPostFormDto().setPersons(persons);
