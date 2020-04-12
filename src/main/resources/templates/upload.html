@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Комитет информационных технологий</title>
+    <title>ЕИС Работающая Бурятия</title>
 
 
     <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css">
@@ -30,7 +30,7 @@
 
 
 
-<div class="container" onload="checkFields()">
+<div class="container" onload="checkOnLoad()">
     <form name="upload" enctype="multipart/form-data" action="/upload" method="POST">
         <ul class="list-group">
             <li class="list-group-item"><a download style="text-align: center;" href="/download/template" target="_blank">Скачать шаблон</a></li>
@@ -46,8 +46,8 @@
                 </div>
             </li>
             <li class="list-group-item">
-                <div><span>Загрузить PDF-файл с пояснением обоснования: </span>
-                    <input hidden="true" id="pdfFile" type="file" name="pdfFile" onchange="getName(this.value, 'pdf-button-label'); checkFields();" accept="application/pdf">
+                <div><span>Загрузить PDF-файл или ZIP-архив с пояснением обоснования: </span>
+                    <input hidden="true" id="pdfFile" type="file" name="pdfFile" onchange="getName(this.value, 'pdf-button-label'); checkFields();" accept="application/pdf, application/zip">
                     <label for="pdfFile" class="btn btn-primary">
                         <i class="material-icons">picture_as_pdf</i>
                         <span id="pdf-button-label">Загрузить файл</span>
@@ -83,7 +83,7 @@
             </li>
             <li class="list-group-item">
                 <span>
-                    Подтверждаю обязательное выполнение требований по защите от COVID-19
+                    Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия
                     <span class="text-danger">*</span>
                     : <input id="protect-checkbox" type="checkbox" name="isProtected" aria-label="Checkbox for following text input" onchange="changeComboBox(this); checkFields();">
                 </span>
@@ -113,6 +113,7 @@
                     <span id="confirm-button-label">Отправить</span>
                 </label>
             </div>
+            <span style="text-align: center; color: red">Загрузка файла занимает несколько минут. Не перезагружайте и не закрывайте страницу, дождитесь окончания загрузки</span>
         </li>
     </form>
     <!--    <li class="list-group-item" style="align-items: center; justify-content: center">-->
@@ -131,12 +132,21 @@
         let isAgreeChecked = false;
         let isProtectedChecked = false;
 
-        const buttonSubmit = document.getElementById('submit-button')
-        const buttonSubmitLabel = document.getElementById('submit-button-label')
+        const buttonSubmit = document.getElementById('submit-button');
+        const buttonSubmitLabel = document.getElementById('submit-button-label');
+
+        function checkOnLoad() {
+            document.getElementById('agreed-checkbox').checked = false;
+            document.getElementById('protect-checkbox').checked = false;
+            checkFields();
+        }
+
         function checkFields() {
 
+            let agreed = document.getElementById('agreed-checkbox');
+            let protect = document.getElementById('protect-checkbox');
 
-            const isDisabled = !(excelUploaded & pdfUploaded & isAgreeChecked & isProtectedChecked)
+            const isDisabled = !(excelUploaded && agreed.checked && protect.checked)
 
             if(isDisabled) {
                 console.log(buttonSubmitLabel.classList)

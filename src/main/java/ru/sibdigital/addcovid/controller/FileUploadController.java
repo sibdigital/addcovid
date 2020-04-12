@@ -2,6 +2,7 @@ package ru.sibdigital.addcovid.controller;
 
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,9 +19,13 @@ import ru.sibdigital.addcovid.parser.CheckProtocol;
 import ru.sibdigital.addcovid.parser.ExcelParser;
 import ru.sibdigital.addcovid.service.RequestService;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Base64;
+import java.util.UUID;
 
 @Log4j
 @Controller
@@ -31,6 +36,9 @@ public class FileUploadController {
 
     @Autowired
     RequestService requestService;
+
+    @Value("${upload_xls.path:/upload_xls}")
+    String uploadingDir;
 
     private Base64.Encoder enc = Base64.getEncoder();
 
@@ -49,18 +57,18 @@ public class FileUploadController {
                               Model model) throws IOException {
 
         if( !isAgreed ){
-            model.addAttribute("errorMessage", "Нужно принять соглашение на обработку персональных данных");
+            model.addAttribute("errorMessage", "Необходимо принять соглашение на обработку персональных данных");
             return "upload";
         }
         if( !isProtected){
-            model.addAttribute("errorMessage", "Нужно принять соглашение об обязательном выполнение требований по защите от COVID-19");
+            model.addAttribute("errorMessage", "Необходимо принять предписание Управления Роспотребнадзора по Республике Бурятия");
             return "upload";
         }
 
 
         try{
+            saveFile(excelFile);
             CheckProtocol checkProtocol = excelParser.parseFile(excelFile);
-
 
             StringBuilder stringBuilder = new StringBuilder();
             byte[] encbytes = enc.encode(pdfFile.getBytes());
@@ -103,6 +111,30 @@ public class FileUploadController {
 //        }
 //        model.addAttribute("protocols", protocols);
         return "upload";
+    }
+
+    private void saveFile(MultipartFile pdfFile){
+        try {
+            String name = pdfFile.getOriginalFilename();
+
+            File uploadFolder = new File(uploadingDir);
+            if (!uploadFolder.exists()) {
+                uploadFolder.mkdirs();
+            }
+
+            String fname = name.length() > 50 ? (pdfFile.getName().substring(0, 50) + ".xls") : name;
+            String inputFilename = String.format("%s/%s_%s", uploadFolder.getAbsolutePath(), String.valueOf(System.currentTimeMillis()), fname);
+
+            File f = new File(inputFilename);
+            pdfFile.transferTo(f);
+
+        } catch (IOException ex) {
+            //importStatus = ImportStatuses.FILE_ERROR.getValue();
+            log.error(String.format("xls file was not saved cause: %s", ex.getMessage()));
+        } catch (Exception ex) {
+            //importStatus = ImportStatuses.FILE_ERROR.getValue();
+            log.error(String.format("xls file was not saved cause: %s", ex.getMessage()));
+        }
     }
 
     @RequestMapping(value="/download/template", method=RequestMethod.GET)
