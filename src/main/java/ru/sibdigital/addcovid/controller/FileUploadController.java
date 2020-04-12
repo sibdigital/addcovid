@@ -70,12 +70,12 @@ public class FileUploadController {
                                     RedirectAttributes rm) throws IOException {
 
         if( !isAgreed ){
-            model.addAttribute("errorMessage", "Необходимо принять соглашение на обработку персональных данных");
-            return "upload";
+            rm.addFlashAttribute("errorMessage", "Необходимо принять соглашение на обработку персональных данных");
+            return "redirect:/upload";
         }
         if( !isProtected){
-            model.addAttribute("errorMessage", "Необходимо принять предписание Управления Роспотребнадзора по Республике Бурятия");
-            return "upload";
+            rm.addFlashAttribute("errorMessage", "Необходимо принять предписание Управления Роспотребнадзора по Республике Бурятия");
+            return "redirect:/upload";
         }
 
 

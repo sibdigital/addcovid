@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Комитет информационных технологий</title>
+    <title>Результат загрузки</title>
 
 
     <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css">
@@ -27,16 +27,16 @@
 </div>
 <div th:if="${checkProtocol.isSuccess() && checkProtocol.getGlobalMessage() == 'OK'}">
     <div  class="alert alert-success" role="alert">
-        <span>Ваша заявка успешно отпралена!</span>
+        <span>Ваша заявка успешно отправлена! Ожидайте ответ по электронной почте.</span>
     </div>
 </div>
 <div th:if="${checkProtocol.isSuccess() && checkProtocol.getGlobalMessage() != 'OK'}">
-    <div  class="alert alert-warning" role="alert">
-        <span>Ваша заявка отпралена успешно, однако при обработке документа определены неточности:</span>
+    <div  class="alert alert-success" role="alert">
+        <span>Ваша заявка успешно отправлена! Ожидайте ответ по электронной почте.</span>
         <br>
-        <span th:text="${checkProtocol.getGlobalMessage()}"></span>
+        <!--<span th:text="${checkProtocol.getGlobalMessage()}"></span> -->
         <br>
-        <span>Если обнаружите ошибку: исправьте свой файл и загрузите все документы снова <a href="/upload">сюда</a></span>
+        <!--<span>Если обнаружите ошибку: исправьте свой файл и загрузите все документы снова <a href="/upload">сюда</a></span> -->
     </div>
 </div>
 <div th:if="${!checkProtocol.isSuccess()}">

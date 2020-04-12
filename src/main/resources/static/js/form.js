@@ -199,7 +199,7 @@ webix.ready(function() {
             },
             {
                 view: 'label',
-                label: '<span  style="text-align: center;">Ссылка на для загрузки данных по форме шаблона будет добавлена на форме заявки с 13.04.2020 г</span>',
+                label: '<span  style="text-align: center;">Ссылка для загрузки данных по форме шаблона будет добавлена на форме заявки с 9.00 13.04.2020 г</span>',
                 //css: 'main_label'
             },
             {

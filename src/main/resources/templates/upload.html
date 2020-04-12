@@ -105,10 +105,16 @@
 
             </li>
         </ul>
+        <li id='progress-biv' class="list-group-item" style="align-items: center; justify-content: center; visibility: hidden">
+            <span style="text-align: center; color: darkblue">Файл обрабатывается, не закрывайте страницу, дождитесь формирования протокола</span>
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+            </div>
+        </li>
         <li class="list-group-item" style="align-items: center; justify-content: center">
             <div style="width:100%" class="mx-auto">
                 <input type="submit" id="submit-button" disabled="true"  hidden="true">
-                <label id="submit-button-label" for="submit-button" disabled="true"   class="btn btn-secondary">
+                <label id="submit-button-label" for="submit-button" disabled="true"   class="btn btn-secondary" onclick="progress()">
                     <i class="material-icons">check</i>
                     <span id="confirm-button-label">Отправить</span>
                 </label>
@@ -144,7 +150,9 @@
         // }
 
 
-
+        function progress() {
+            document.getElementById('progress-biv').style = "align-items: center; justify-content: center; visibility: visible";
+        }
 
         function checkFields() {
 
