@@ -725,8 +725,13 @@ webix.ready(function() {
                                         params.organizationInn = params.organizationInn.trim();
                                         params.organizationOgrn = params.organizationOgrn.trim();
 
-                                        if(params.organizationInn.length > 12){
+                                        if(params.organizationInn.length > 12 ){
                                             webix.message('Превышена длина ИНН', 'error')
+                                            return false
+                                        }
+
+                                        if(params.organizationInn.length == 0 ){
+                                            webix.message('Заполните ИНН', 'error')
                                             return false
                                         }
 
