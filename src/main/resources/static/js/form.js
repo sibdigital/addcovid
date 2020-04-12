@@ -217,6 +217,7 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationName',
+                                        id: 'organizationName',
                                         label: 'Полное наименование организации/фамилия, имя, отчество индивидуального предпринимателя',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
@@ -515,10 +516,8 @@ webix.ready(function() {
                                 }
                             },
                             {
-                                paddingLeft: 10,
-                                view: 'label',
-                                label: '',
-                                id: 'file'
+                                view:'list',  id:'filelist', type:'uploader',
+                                autoheight: true, borderless: true
                             },
                             {
                                 paddingLeft: 10,
@@ -777,10 +776,11 @@ webix.ready(function() {
                                             webix.message('Слишком частое нажатие на кнопку', 'error')
                                             return false
                                         }
-                                        // if(!uploadFilename){
-                                        //     webix.message('Необходимо вложить файл', 'error')
-                                        //     return false
-                                        // }
+                                        if(!$$('upload').files.data.count()){
+                                            webix.message('Необходимо вложить файл', 'error')
+                                            $$('upload').focus()
+                                            return false
+                                        }
 
                                         let persons = []
                                         $$('person_table').data.each(function (obj) {
@@ -828,6 +828,7 @@ webix.ready(function() {
 
                                             if(uploadedFiles.length != $$('upload').files.data.count()) {
                                                 webix.message('Не удалось загрузить PDF-файлы.')
+                                                $$('upload').focus()
                                                 return false
                                             }
                                             console.log(uploadedFiles)
@@ -842,27 +843,41 @@ webix.ready(function() {
                                                     //params,
                                                     function (text, data, xhr) {
                                                         console.log(text);
-                                                        webix.alert(text)
-                                                            .then(function () {
-                                                                $$('label_sogl').hideProgress();
-                                                                webix.message(text);
-                                                            });
 
+                                                        webix.confirm({                                                        title:"Заявка внесена",
+                                                            ok: "Закрыть",
+                                                            cancel: "Внести еще одну заявку",
+                                                            text: text
+                                                        })
+                                                        .then(function () {
+                                                            $$('label_sogl').hideProgress();
+                                                            webix.send('http://работающаябурятия.рф')
+                                                        })
+                                                        .fail(function(){
+                                                            $$('label_sogl').hideProgress()
+                                                            $$('form').clear()
+                                                            $$('upload').setValue()
+                                                            $$('form_person').clear()
+                                                            $$('form_addr').clear()
+                                                            $$('addr_table').clearAll()
+                                                            $$('person_table').clearAll()
+                                                            $$('organizationName').focus()
+                                                        });
                                                     })
                                         })
-
                                     }
                                     else {
                                         webix.message('Не заполнены обязательные поля. Для просмотра прокрутите страницу вверх', 'error')
                                     }
                                 }
-
                             }
                         ]
                     },
                     {
-                        view:'list',  id:'filelist', type:'uploader',
-                        autoheight: true, borderless: true
+                        paddingLeft: 10,
+                        view: 'label',
+                        label: '',
+                        id: 'file'
                     }
                 ],
                 /*

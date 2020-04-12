@@ -277,7 +277,7 @@ public class RequestService {
                     UUID.randomUUID(), part.getOriginalFilename()));
             part.transferTo(file);
 
-            return "{ \"status\": \"server\", \"sname\": \"" + String.format("%s/%s", uploadingDir, file.getName()) + "\" }";
+            return "{ \"status\": \"server\", \"sname\": \"" + String.format("/%s/%s", uploadingDir, file.getName()) + "\" }";
 
         } catch (IOException ex){
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
