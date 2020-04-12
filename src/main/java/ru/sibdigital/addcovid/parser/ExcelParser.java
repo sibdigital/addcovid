@@ -490,6 +490,9 @@ public class ExcelParser {
 
                 }
 
+                addresses.add(addressInfo);
+                emptyRowCounter = 0;
+
                 if(skip) {
                     checkProtocol.setSuccess( false );
                     error++;
@@ -499,8 +502,6 @@ public class ExcelParser {
 
                 success++;
                 addressInfo.setStatus("OK");
-                addresses.add(addressInfo);
-                emptyRowCounter = 0;
             }
             ++i;
         }
@@ -585,6 +586,9 @@ public class ExcelParser {
                     skip=true;
                 }
 
+                persons.add(personInfo);
+                emptyRowCounter = 0;
+
                 if(skip) {
                     checkProtocol.setSuccess( false );
                     error++;
@@ -595,8 +599,7 @@ public class ExcelParser {
                 success++;
                 personInfo.setStatus("OK");
 
-                persons.add(personInfo);
-                emptyRowCounter = 0;
+
             }
             ++i;
         }

@@ -67,9 +67,9 @@
                             </span>
                         </div>
                         <div class="col-xs-12 col-md-6">
-                            <span class="btn  btn-info float-right" style="margin: 0 2px;">Всего <span class="badge badge-light">11</span></span>
-                            <span class="btn btn-danger float-right" style="margin: 0 2px;">C ошибкой <span class="badge badge-light">0</span></span>
-                            <span class="btn btn-success float-right" style="margin: 0 2px;">Успешно <span class="badge badge-light">11</span></span>
+                            <span class="btn  btn-info float-right" style="margin: 0 2px;">Всего <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('error')} + ${checkProtocol.getStatistic().get('info').get('success')}"></span></span>
+                            <span class="btn btn-danger float-right" style="margin: 0 2px;">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('error')}"></span></span>
+                            <span class="btn btn-success float-right" style="margin: 0 2px;">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('success')}"></span></span>
                         </div>
                     </h5>
                     <div class="table-responsive-sm">

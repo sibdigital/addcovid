@@ -30,7 +30,7 @@
 
 
 
-<div class="container" onload="checkOnLoad()">
+<div class="container" onload="checkFields()">
     <form name="upload" enctype="multipart/form-data" action="/upload" method="POST">
         <ul class="list-group">
             <li class="list-group-item"><a download style="text-align: center;" href="/download/template" target="_blank">Скачать шаблон</a></li>
@@ -127,33 +127,52 @@
     </div>
     <script>
 
-        let excelUploaded = false;
-        let pdfUploaded = false;
-        let isAgreeChecked = false;
-        let isProtectedChecked = false;
 
-        const buttonSubmit = document.getElementById('submit-button');
-        const buttonSubmitLabel = document.getElementById('submit-button-label');
+        const buttonSubmit = document.getElementById('submit-button')
+        const buttonSubmitLabel = document.getElementById('submit-button-label')
 
-        function checkOnLoad() {
-            document.getElementById('agreed-checkbox').checked = false;
-            document.getElementById('protect-checkbox').checked = false;
-            checkFields();
-        }
+        const fileInputElement = document.getElementById('fileInput')
+        const pdfFile = document.getElementById('pdfFile')
+        const agreedElement = document.getElementById('agreed-checkbox')
+        const protectElement = document.getElementById('protect-checkbox')
+
+        const excelButtonLabel= document.getElementById('excel-button-label')
+        const pdfButtonLabel= document.getElementById('pdf-button-label')
+
+        // if(component === 'pdf-button-label'){
+        //     pdfUploaded = true
+        // }
+
+
+
 
         function checkFields() {
 
-            let agreed = document.getElementById('agreed-checkbox');
-            let protect = document.getElementById('protect-checkbox');
 
-            const isDisabled = !(excelUploaded && agreed.checked && protect.checked)
+            const isDisabled = !(!!fileInputElement.value && agreedElement.checked && protectElement.checked)
+            console.log( 'total', isDisabled)
+
+
+
+
+            console.log('fileInputElement', fileInputElement.value, !!fileInputElement.value)
+            if(!fileInputElement.value){
+                excelButtonLabel.innerHTML = 'Загрузить файл';
+            }
+
+            console.log('pdfFile', pdfFile.value, !!pdfFile.value)
+            if(!pdfFile.value){
+                pdfButtonLabel.innerHTML = 'Загрузить файл';
+            }
+
+
+
+
 
             if(isDisabled) {
-                console.log(buttonSubmitLabel.classList)
                 buttonSubmitLabel.classList.remove('btn-primary')
                 buttonSubmitLabel.classList.add('btn-secondary')
             } else {
-                console.log(buttonSubmitLabel.classList)
                 buttonSubmitLabel.classList.add('btn-primary')
                 buttonSubmitLabel.classList.remove('btn-secondary')
             }
@@ -182,9 +201,9 @@
                 excelUploaded = true
             }
 
-            if(component === 'pdf-button-label'){
-                pdfUploaded = true
-            }
+            // if(component === 'pdf-button-label'){
+            //     pdfUploaded = true
+            // }
 
 
 
@@ -199,6 +218,8 @@
                 isProtectedChecked = component.checked;
             }
         }
+
+        checkFields();
 
     </script>
 </div>
