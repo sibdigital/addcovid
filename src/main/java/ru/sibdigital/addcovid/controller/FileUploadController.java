@@ -2,11 +2,16 @@ package ru.sibdigital.addcovid.controller;
 
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.parser.CheckProtocol;
@@ -14,6 +19,7 @@ import ru.sibdigital.addcovid.parser.ExcelParser;
 import ru.sibdigital.addcovid.service.RequestService;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Base64;
 
 @Log4j
@@ -70,9 +76,9 @@ public class FileUploadController {
             postFormDto.setIsAgree(isAgreed);
             postFormDto.setIsProtect(isProtected);
 
-//            if(checkProtocol.isSuccess()) {
-//                requestService.addNewRequest(postFormDto);
-//            }
+            if(checkProtocol.isSuccess()) {
+                requestService.addNewRequest(postFormDto);
+            }
 
             model.addAttribute("checkProtocol",checkProtocol);
             model.addAttribute("postFormDto",checkProtocol.getPostFormDto());
@@ -97,6 +103,20 @@ public class FileUploadController {
 //        }
 //        model.addAttribute("protocols", protocols);
         return "upload";
+    }
+
+    @RequestMapping(value="/download/template", method=RequestMethod.GET)
+    @ResponseBody
+    public ResponseEntity downloadFile() {
+
+        URL url = getClass().getClassLoader().getResource("template.xlsx");
+        UrlResource resource = new UrlResource(url);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                .body(resource);
+
+
     }
 
 }

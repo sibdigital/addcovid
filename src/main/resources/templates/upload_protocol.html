@@ -60,22 +60,17 @@
         <div class="col" >
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">
-
-                        <div class="col-12 col-md-6"><span class="float-left">ДАННЫЕ О ВАШЕЙ ОРГАНИЗАЦИИ</span></div>
-                        <div class="col-12 col-md-6">
-                            <span class="btn  btn-success float-right">
-                                    Успешно
-                                    <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('success')}"/>
-                                </span>
-                            <span class="btn  btn-danger float-right">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('error')}"></span></span>
-                            <span class="btn  btn-info float-right">Всего <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('success')+checkProtocol.getStatistic().get('info').get('error')}"></span></span>
-
+                    <h5 class="row">
+                        <div class="col-xs-12 col-md-6" style="display: flex;">
+                            <span class="" style="margin: auto; margin-left: 0;">
+                                ДАННЫЕ О ВАШЕЙ ОРГАНИЗАЦИИ
+                            </span>
                         </div>
-
-
-
-
+                        <div class="col-xs-12 col-md-6">
+                            <span class="btn  btn-info float-right" style="margin: 0 2px;">Всего <span class="badge badge-light">11</span></span>
+                            <span class="btn btn-danger float-right" style="margin: 0 2px;">C ошибкой <span class="badge badge-light">0</span></span>
+                            <span class="btn btn-success float-right" style="margin: 0 2px;">Успешно <span class="badge badge-light">11</span></span>
+                        </div>
                     </h5>
                     <div class="table-responsive-sm">
                         <table class="table">
@@ -84,9 +79,6 @@
                                 <th scope="col" style="width: 60%"></th>
                                 <th scope="col" style="width: 40%"></th>
                                 <th scope="col" style="width: 40%"></th>
-                                <!--                                <th scope="col">Имя</th>-->
-                                <!--                                <th scope="col">Отчество</th>-->
-                                <!--                                <th scope="col">Статус</th>-->
                             </tr>
                             </thead>
 
@@ -168,13 +160,15 @@
             <div class="col" >
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">
-                            <div class="row">
-                                <div class="col-12 col-md-6"><span>КУРИРУЮЩЕЕ МИНИСТЕРСТВО</span></div>
-                                <div class="col-12 col-md-6">
-                                    <span th:if="${postFormDto.getDepartmentIdStatus() == 'OK'}" class="btn  btn-success">Успешно <span class="badge badge-light" >1</span></span>
-                                    <span th:if="${postFormDto.getDepartmentIdStatus() != 'OK'}" class="btn  btn-danger">С ошибкой <span class="badge badge-light">1</span></span>
-                                </div>
+                        <h5 class="row">
+                            <div class="col-md-6" style="display: flex;">
+                            <span class="" style="margin: auto; margin-left: 0;">
+                                КУРИРУЮЩЕЕ МИНИСТЕРСТВО
+                            </span>
+                            </div>
+                            <div class="col-md-6">
+                                <span th:if="${postFormDto.getDepartmentIdStatus() == 'OK'}" class="btn  btn-success float-right">Успешно <span class="badge badge-light" >1</span></span>
+                                <span th:if="${postFormDto.getDepartmentIdStatus() != 'OK'}" class="btn  btn-danger float-right">С ошибкой <span class="badge badge-light">1</span></span>
                             </div>
                         </h5>
                         <div class="table-responsive-sm">
@@ -210,15 +204,17 @@
             <div class="col" >
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">
-                            <div class="row">
-                                <div class="col-12 col-md-6"><span>АДРЕСНАЯ ИНФОРМАЦИЯ</span></div>
-                                <div class="col-12 col-md-6">
-                                    <span class="btn  btn-success">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('success')}"></span></span>
-                                    <span class="btn  btn-danger">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('error')}"></span></span>
-                                    <span class="btn  btn-warning">Пустых строк <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('empty')}"></span></span>
-                                    <span class="btn  btn-info">Всего адресов <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('success')+checkProtocol.getStatistic().get('address').get('error')}"></span></span>
-                                </div>
+                        <h5 class="row">
+                            <div class="col-md-4" style="display: flex;">
+                            <span class="" style="margin: auto; margin-left: 0;">
+                                АДРЕСНАЯ ИНФОРМАЦИЯ
+                            </span>
+                            </div>
+                            <div class="col-md-8">
+                                <span class="btn  btn-danger float-right">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('error')}"></span></span>
+                                <span class="btn  btn-success float-right">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('success')}"></span></span>
+                                <span class="btn  btn-info float-right">Всего адресов <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('success')+checkProtocol.getStatistic().get('address').get('error')}"></span></span>
+                                <span class="btn  btn-warning float-right">Пустых строк <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('empty')}"></span></span>
                             </div>
                         </h5>
                         <div class="table-responsive-sm">
@@ -256,17 +252,20 @@
                 <div class="col" >
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">
-                                <div class="row">
-                                    <div class="col-12 col-md-6"><span>РАБОТНИКИ ВЫХОДЯЩИЕ НА РАБОТУ</span></div>
-                                    <div class="col-12 col-md-6">
-                                        <span class="btn  btn-success">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('success')}"></span></span>
-                                        <span class="btn  btn-danger">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('error')}"></span></span>
-                                        <span class="btn  btn-warning">Пустых строк <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('empty')}"></span></span>
-                                        <span class="btn  btn-info">Всего людей <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('success')+checkProtocol.getStatistic().get('people').get('error')}"></span></span>
-                                    </div>
+                            <h5 class="row">
+                                <div class="col-md-4" style="display: flex;">
+                            <span class="" style="margin: auto; margin-left: 0;">
+                                РАБОТНИКИ ВЫХОДЯЩИЕ НА РАБОТУ
+                            </span>
+                                </div>
+                                <div class="col-md-8">
+                                    <span class="btn  btn-info float-right">Всего людей <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('success')+checkProtocol.getStatistic().get('people').get('error')}"></span></span>
+                                    <span class="btn  btn-warning float-right">Пустых строк <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('empty')}"></span></span>
+                                    <span class="btn  btn-danger float-right">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('error')}"></span></span>
+                                    <span class="btn  btn-success float-right">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('people').get('success')}"></span></span>
                                 </div>
                             </h5>
+
                             <div class="table-responsive-sm">
                                 <table class="table">
                                     <thead>
