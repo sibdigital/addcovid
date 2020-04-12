@@ -127,7 +127,7 @@
     <script>
 
         let excelUploaded = false;
-        let pdfUploaded = false;
+        let pdfUploaded = true;
         let isAgreeChecked = false;
         let isProtectedChecked = false;
 
@@ -172,9 +172,9 @@
                 excelUploaded = true
             }
 
-            if(component === 'pdf-button-label'){
-                pdfUploaded = true
-            }
+            // if(component === 'pdf-button-label'){
+            //     pdfUploaded = true
+            // }
 
 
 
@@ -189,6 +189,8 @@
                 isProtectedChecked = component.checked;
             }
         }
+
+        checkFields();
 
     </script>
 </div>
