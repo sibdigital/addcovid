@@ -30,14 +30,14 @@
 
 
 
-<div class="container" onload="updateFiles();">
+<div class="container" onload="checkFields()">
     <form name="upload" enctype="multipart/form-data" action="/upload" method="POST">
         <ul class="list-group">
             <li class="list-group-item"><a href="/" download>Скачайте шаблон excel</a></li>
             <li class="list-group-item"><span>Заполните его</span></li>
             <li class="list-group-item">
                 <div><span>Прикрепите заполненный шаблон: </span>
-                    <input hidden="true" id="fileInput" type="file" name="excelFile" onchange="getName(this.value, 'excel-button-label');" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                    <input hidden="true" id="fileInput" type="file" name="excelFile" onchange="getName(this.value, 'excel-button-label'); checkFields();" accept="application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
                     <label for="fileInput" class="btn btn-primary">
                         <i class="material-icons">note_add</i>
                         <span id="excel-button-label">Загрузить файл</span>
@@ -47,7 +47,7 @@
             </li>
             <li class="list-group-item">
                 <div><span>Загрузить PDF-файл с пояснением обоснования: </span>
-                    <input hidden="true" id="pdfFile" type="file" name="pdfFile" onchange="getName(this.value, 'pdf-button-label');" accept="application/pdf">
+                    <input hidden="true" id="pdfFile" type="file" name="pdfFile" onchange="getName(this.value, 'pdf-button-label'); checkFields();" accept="application/pdf">
                     <label for="pdfFile" class="btn btn-primary">
                         <i class="material-icons">picture_as_pdf</i>
                         <span id="pdf-button-label">Загрузить файл</span>
@@ -94,7 +94,7 @@
                 <span>
                     Подтверждаю обязательное выполнение требований по защите от COVID-19
                     <span class="text-danger">*</span>
-                    : <input id="protect-checkbox" type="checkbox" name="isProtected" aria-label="Checkbox for following text input">
+                    : <input id="protect-checkbox" type="checkbox" name="isProtected" aria-label="Checkbox for following text input" onchange="changeComboBox(this); checkFields();">
                 </span>
             </li>
             <li class="list-group-item">
@@ -110,36 +110,107 @@
                 <span>
                     Подтверждаю согласие работников на обработку персональных данных
                     <span class="text-danger">*</span>
-                    : <input id="agreed-checkbox" type="checkbox" name="isAgreed" aria-label="Checkbox for following text input"></span>
-
-            </li>
-            <li class="list-group-item" style="align-items: center; justify-content: center">
-                <div style="width:100%; justify-content: center">
-                    <input hidden="true" id="confirm" type="submit">
-                    <label for="confirm" class="btn btn-primary">
-                        <i class="material-icons">check</i>
-                        <span id="confirm-button-label">Отправить</span>
-                    </label>
-                </div>
+                    : <input id="agreed-checkbox" type="checkbox" name="isAgreed"  aria-label="Checkbox for following text input" onchange="changeComboBox(this); checkFields();"></span>
 
             </li>
         </ul>
-
+        <li class="list-group-item" style="align-items: center; justify-content: center">
+            <div style="width:100%" class="mx-auto">
+                <input type="submit" id="submit-button" disabled="true"  hidden="true">
+                <label id="submit-button-label" for="submit-button" disabled="true"   class="btn btn-secondary">
+                    <i class="material-icons">check</i>
+                    <span id="confirm-button-label">Отправить</span>
+                </label>
+            </div>
+        </li>
     </form>
+    <!--    <li class="list-group-item" style="align-items: center; justify-content: center">-->
+    <!--        <div style="width:100%; justify-content: center">-->
+    <!--            <button id="submit-button" type="button" class="btn btn-primary" onclick="submit()"><i class="material-icons">check</i> Отправить</button>-->
+    <!--            <div id="error-message"></div>-->
+    <!--        </div>-->
+    <!--    </li>-->
     <div>
 
     </div>
     <script>
+
+        let excelUploaded = false;
+        let pdfUploaded = false;
+        let isAgreeChecked = false;
+        let isProtectedChecked = false;
+
+        const buttonSubmit = document.getElementById('submit-button')
+        const buttonSubmitLabel = document.getElementById('submit-button-label')
+        function checkFields() {
+
+            console.log(excelUploaded)
+            console.log(pdfUploaded)
+            console.log(isProtectedChecked)
+            console.log(isAgreeChecked)
+            const isDisabled = !(excelUploaded & pdfUploaded & isAgreeChecked & isProtectedChecked)
+            console.log(buttonSubmitLabel)
+
+            if(isDisabled) {
+                console.log(buttonSubmitLabel.classList)
+                buttonSubmitLabel.classList.remove('btn-primary')
+                buttonSubmitLabel.classList.add('btn-secondary')
+            } else {
+                console.log(buttonSubmitLabel.classList)
+                buttonSubmitLabel.classList.add('btn-primary')
+                buttonSubmitLabel.classList.remove('btn-secondary')
+            }
+
+
+
+            buttonSubmit.disabled = isDisabled
+            buttonSubmitLabel.disabled = isDisabled
+            console.log(buttonSubmit.disabled)
+            console.log(buttonSubmitLabel.disabled)
+
+        }
+
         function getName (str, component){
+            let i = 0;
             if (str.lastIndexOf('\\')){
-                var i = str.lastIndexOf('\\')+1;
+                i = str.lastIndexOf('\\')+1;
             }
             else{
-                var i = str.lastIndexOf('/')+1;
+                i = str.lastIndexOf('/')+1;
             }
-            var filename = str.slice(i);
-            var uploaded = document.getElementById(component);
+            let filename = str.slice(i);
+            let uploaded = document.getElementById(component);
             uploaded.innerHTML = filename;
+
+            if(component === 'excel-button-label'){
+                excelUploaded = true
+            }
+
+            if(component === 'pdf-button-label'){
+                pdfUploaded = true
+            }
+
+
+
+        }
+
+        function changeComboBox(component) {
+            if(component.id === 'agreed-checkbox'){
+                isAgreeChecked = component.checked;
+            }
+
+            if(component.id === 'protect-checkbox'){
+                isProtectedChecked = component.checked;
+            }
+        }
+
+        function submit (){
+            const isProtected = document.getElementById('protect-checkbox');
+            const isAgreed = document.getElementById('agreed-checkbox');
+
+
+
+            return false
         }
     </script>
 </div>
