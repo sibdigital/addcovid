@@ -409,7 +409,7 @@ webix.ready(function() {
                                         let params = $$('form').getValues()
 
                                         if(params.age > 65){
-                                            webix.alert("Заявка не может быть одобрена. Вам предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
+                                            webix.alert("Заявка не может быть одобрена. Вы старше 65 лет и Вам предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
                                             return false;
                                         }
 
@@ -453,15 +453,21 @@ webix.ready(function() {
                                             .post('/dacha',
                                                 JSON.stringify(params),
                                                 function (data) {
-                                                    webix.alert(data)
-                                                        .then(function () {
-                                                            $$('label_sogl').hideProgress()
-                                                            $$('form').clear()
-                                                            $$('addform').clear()
-                                                            $$('addform').hide()
-                                                            $$('addr_table').clearAll()
-                                                            $$('lastname').focus()
-                                                        });
+                                                    webix.confirm({
+                                                        title:"Заявка внесена",
+                                                        ok:"Закрыть",
+                                                        cancel:"Внести еще одного человека",
+                                                        text:data
+                                                    }).then(function(result){
+                                                        window.location.replace('http://работающаябурятия.рф');
+                                                    }).fail(function(){
+                                                        $$('label_sogl').hideProgress()
+                                                        $$('form').clear()
+                                                        $$('addform').clear()
+                                                        $$('addform').hide()
+                                                        $$('addr_table').clearAll()
+                                                        $$('lastname').focus()
+                                                    });
                                             })
                                     }
                                     else {
