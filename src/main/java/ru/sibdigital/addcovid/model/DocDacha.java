@@ -12,7 +12,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 @Entity
-@Table(name = "doc_dacha", schema = "public", catalog = "addcovid")
+@Table(name = "doc_dacha", schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
