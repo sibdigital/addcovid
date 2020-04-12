@@ -62,12 +62,18 @@
                 <div class="card-body">
                     <h5 class="card-title">
 
-                           <span>ДАННЫЕ О ВАШЕЙ ОРГАНИЗАЦИИ</span>
-                            <div class="statistic-right">
-                                <span class="btn  btn-success">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('success')}"></span></span>
-                                <span class="btn  btn-danger">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('error')}"></span></span>
-                                <span class="btn  btn-info">Всего <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('success')+checkProtocol.getStatistic().get('info').get('error')}"></span></span>
-                            </div>
+                        <div class="col-12 col-md-6"><span class="float-left">ДАННЫЕ О ВАШЕЙ ОРГАНИЗАЦИИ</span></div>
+                        <div class="col-12 col-md-6">
+                            <span class="btn  btn-success float-right">
+                                    Успешно
+                                    <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('success')}"/>
+                                </span>
+                            <span class="btn  btn-danger float-right">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('error')}"></span></span>
+                            <span class="btn  btn-info float-right">Всего <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('success')+checkProtocol.getStatistic().get('info').get('error')}"></span></span>
+
+                        </div>
+
+
 
 
                     </h5>
@@ -159,84 +165,84 @@
 
 
         <div class="row justify-content-center mt-2">
-        <div class="col" >
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <div class="row">
-                            <div class="col-12 col-md-6"><span>КУРИРУЮЩЕЕ МИНИСТЕРСТВО</span></div>
-                            <div class="col-12 col-md-6">
-                                <span th:if="${postFormDto.getDepartmentIdStatus() == 'OK'}" class="btn  btn-success">Успешно <span class="badge badge-light" >1</span></span>
-                                <span th:if="${postFormDto.getDepartmentIdStatus() != 'OK'}" class="btn  btn-danger">С ошибкой <span class="badge badge-light">1</span></span>
-                            </div>
-                        </div>
-                    </h5>
-                    <div class="table-responsive-sm">
-                        <ul class="list-group">
-                            <li class="list-group-item active">Вы выбрали следующее министерство:</li>
-                            <li class="list-group-item">
-                                <div class="table-responsive-sm">
-                                    <table class="table">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col" style="width: 20%">№</th>
-                                            <th scope="col" style="width: 80%">Наименование</th>
-                                        </tr>
-                                        </thead>
-
-                                        <tbody>
-                                        <tr th:each="data, dataState : ${checkProtocol.getCheckedDeparts()}" th:class="${dataState.index != 0 ? 'bg-danger' : ''}">
-                                            <td><span th:text="${data.get('id')}"></span></td>
-                                            <td><span th:text="${data.get('name')}"></span></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
+            <div class="col" >
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <div class="row">
+                                <div class="col-12 col-md-6"><span>КУРИРУЮЩЕЕ МИНИСТЕРСТВО</span></div>
+                                <div class="col-12 col-md-6">
+                                    <span th:if="${postFormDto.getDepartmentIdStatus() == 'OK'}" class="btn  btn-success">Успешно <span class="badge badge-light" >1</span></span>
+                                    <span th:if="${postFormDto.getDepartmentIdStatus() != 'OK'}" class="btn  btn-danger">С ошибкой <span class="badge badge-light">1</span></span>
                                 </div>
-                            </li>
-                            <li th:class="${postFormDto.getDepartmentIdStatus() == 'OK' ? 'list-group-item bg-success text-center' : 'list-group-item bg-danger'}" ><span th:text="${postFormDto.getDepartmentIdStatus()}"></span></li>
-                        </ul>
-                        <span></span>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col" >
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <div class="row">
-                            <div class="col-12 col-md-6"><span>АДРЕСНАЯ ИНФОРМАЦИЯ</span></div>
-                            <div class="col-12 col-md-6">
-                                <span class="btn  btn-success">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('success')}"></span></span>
-                                <span class="btn  btn-danger">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('error')}"></span></span>
-                                <span class="btn  btn-warning">Пустых строк <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('empty')}"></span></span>
-                                <span class="btn  btn-info">Всего адресов <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('success')+checkProtocol.getStatistic().get('address').get('error')}"></span></span>
                             </div>
-                        </div>
-                    </h5>
-                    <div class="table-responsive-sm">
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th scope="col" style="width: 60%">Фактический адрес осуществления деятельности</th>
-                                <th scope="col" style="width: 20%">Численность работников, не подлежащих переводу на дистанционный режим работы, осуществляющих деятельность  фактическому адресу</th>
-                                <th scope="col" style="width: 20%">Сттутс</th>
-                            </tr>
-                            </thead>
+                        </h5>
+                        <div class="table-responsive-sm">
+                            <ul class="list-group">
+                                <li class="list-group-item active">Вы выбрали следующее министерство:</li>
+                                <li class="list-group-item">
+                                    <div class="table-responsive-sm">
+                                        <table class="table">
+                                            <thead>
+                                            <tr>
+                                                <th scope="col" style="width: 20%">№</th>
+                                                <th scope="col" style="width: 80%">Наименование</th>
+                                            </tr>
+                                            </thead>
 
-                            <tbody>
-                            <tr th:each="data, dataState : ${postFormDto.getAddressFact()}">
-                                <td><span th:text="${data.getAddressFact()}"></span></td>
-                                <td><span th:text="${data.getPersonOfficeFactCnt()}"></span></td>
-                                <td th:class="${data.getStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${data.getStatus()}"></span></td>
-                            </tr>
-                            </tbody>
-                        </table>
+                                            <tbody>
+                                            <tr th:each="data, dataState : ${checkProtocol.getCheckedDeparts()}" th:class="${dataState.index != 0 ? 'bg-danger' : ''}">
+                                                <td><span th:text="${data.get('id')}"></span></td>
+                                                <td><span th:text="${data.get('name')}"></span></td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </li>
+                                <li th:class="${postFormDto.getDepartmentIdStatus() == 'OK' ? 'list-group-item bg-success text-center' : 'list-group-item bg-danger'}" ><span th:text="${postFormDto.getDepartmentIdStatus()}"></span></li>
+                            </ul>
+                            <span></span>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <div class="col" >
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <div class="row">
+                                <div class="col-12 col-md-6"><span>АДРЕСНАЯ ИНФОРМАЦИЯ</span></div>
+                                <div class="col-12 col-md-6">
+                                    <span class="btn  btn-success">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('success')}"></span></span>
+                                    <span class="btn  btn-danger">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('error')}"></span></span>
+                                    <span class="btn  btn-warning">Пустых строк <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('empty')}"></span></span>
+                                    <span class="btn  btn-info">Всего адресов <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('address').get('success')+checkProtocol.getStatistic().get('address').get('error')}"></span></span>
+                                </div>
+                            </div>
+                        </h5>
+                        <div class="table-responsive-sm">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th scope="col" style="width: 60%">Фактический адрес осуществления деятельности</th>
+                                    <th scope="col" style="width: 20%">Численность работников, не подлежащих переводу на дистанционный режим работы, осуществляющих деятельность  фактическому адресу</th>
+                                    <th scope="col" style="width: 20%">Сттутс</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                <tr th:each="data, dataState : ${postFormDto.getAddressFact()}">
+                                    <td><span th:text="${data.getAddressFact()}"></span></td>
+                                    <td><span th:text="${data.getPersonOfficeFactCnt()}"></span></td>
+                                    <td th:class="${data.getStatus() == 'OK' ? 'bg-success' : 'bg-danger'}"><span th:text="${data.getStatus()}"></span></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
