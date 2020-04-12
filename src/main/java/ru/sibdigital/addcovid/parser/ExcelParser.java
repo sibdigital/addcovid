@@ -71,7 +71,6 @@ public class ExcelParser {
         return parseFile(name, inputStream);
     }
 
-
     public CheckProtocol parseFile(File file) throws IOException {
         FileInputStream inputStream = new FileInputStream(file);
         String name = file.getName();

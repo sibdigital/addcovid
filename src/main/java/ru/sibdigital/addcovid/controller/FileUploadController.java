@@ -67,6 +67,7 @@ public class FileUploadController {
                                     @RequestParam("pdfFile") MultipartFile pdfFile,
                                     @RequestParam("isAgreed") boolean isAgreed,
                                     @RequestParam("isProtected") boolean isProtected,
+                                    @RequestParam("reqBasis") String reqBasis,
                                     RedirectAttributes rm) throws IOException {
 
         if( !isAgreed ){
@@ -80,8 +81,12 @@ public class FileUploadController {
 
 
         try{
-            saveFile(excelFile);
-            CheckProtocol checkProtocol = excelParser.parseFile(excelFile);
+            File savedFile = saveFile(excelFile);
+            if(savedFile == null){
+                rm.addFlashAttribute("errorMessage", "Невозможно прочитать файл!");
+                return "redirect:/upload";
+            }
+            CheckProtocol checkProtocol = excelParser.parseFile(savedFile);
 
 
             StringBuilder stringBuilder = new StringBuilder();
@@ -97,6 +102,7 @@ public class FileUploadController {
             postFormDto.setAttachment(stringBuilder.toString());
             postFormDto.setIsAgree(isAgreed);
             postFormDto.setIsProtect(isProtected);
+            postFormDto.setReqBasis(reqBasis);
 
             if(checkProtocol.isSuccess()) {
                 requestService.addNewRequest(postFormDto);
@@ -125,7 +131,8 @@ public class FileUploadController {
         return "redirect:/upload";
     }
 
-    private void saveFile(MultipartFile pdfFile){
+    private File  saveFile(MultipartFile pdfFile){
+        File f = null;
         try {
             String name = pdfFile.getOriginalFilename();
 
@@ -137,7 +144,7 @@ public class FileUploadController {
             String fname = name.length() > 50 ? (pdfFile.getName().substring(0, 50) + ".xls") : name;
             String inputFilename = String.format("%s/%s_%s", uploadFolder.getAbsolutePath(), String.valueOf(System.currentTimeMillis()), fname);
 
-            File f = new File(inputFilename);
+            f = new File(inputFilename);
             pdfFile.transferTo(f);
 
         } catch (IOException ex) {
@@ -147,6 +154,7 @@ public class FileUploadController {
             //importStatus = ImportStatuses.FILE_ERROR.getValue();
             log.error(String.format("xls file was not saved cause: %s", ex.getMessage()));
         }
+        return f;
     }
 
     @RequestMapping(value="/download/template", method=RequestMethod.GET)
