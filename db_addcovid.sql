@@ -210,3 +210,30 @@ create table if not exists doc_dacha_addr
 
 alter table doc_dacha_addr owner to postgres;
 
+create view v_doc_person_and_org_info as (
+    select pers.*,  org.inn, org.short_name from (
+                                                     select *
+                                                     from doc_person as dp
+                                                 ) as pers
+                                                     inner join ( select
+                                                                      dr.id as id_request, co.inn, co.short_name
+                                                                  from doc_request dr
+                                                                           inner join cls_organization as co on dr.id_organization = co.id
+                                                         where dr.status_review = 1
+    ) as org using (id_request)
+);
+
+CREATE TABLE public.reg_statistic (
+    id serial not null
+    constraint reg_statistic_pk
+    primary key,
+    lastname character varying(100),
+    firstname character varying(100),
+    patronymic character varying(100),
+    inn character varying(15),
+    reg_time timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    additional_info text,
+    results integer NOT NULL
+);
+
+ALTER TABLE public.reg_statistic OWNER TO postgres;
