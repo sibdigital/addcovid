@@ -62,8 +62,8 @@
                 <div class="card-body">
                     <h5 class="card-title">
 
-                           <span class="mr-auto">ДАННЫЕ О ВАШЕЙ ОРГАНИЗАЦИИ</span>
-                            <div class="my-2 my-lg-0">
+                           <span>ДАННЫЕ О ВАШЕЙ ОРГАНИЗАЦИИ</span>
+                            <div class="statistic-right">
                                 <span class="btn  btn-success">Успешно <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('success')}"></span></span>
                                 <span class="btn  btn-danger">C ошибкой <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('error')}"></span></span>
                                 <span class="btn  btn-info">Всего <span class="badge badge-light" th:text="${checkProtocol.getStatistic().get('info').get('success')+checkProtocol.getStatistic().get('info').get('error')}"></span></span>
