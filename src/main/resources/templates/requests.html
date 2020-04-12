@@ -1,14 +1,28 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8">
-    <title>Addcovid</title>
-    <link type="text/css" rel="stylesheet" href="/libs/webix.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ЕИС Работающая Бурятия</title>
+    <link type="text/css" rel="stylesheet" href="/libs/webix.min.css">
     <script src="/libs/webix.min.js"></script>
+    <script src="/libs/routie.min.js"></script>
+    <script data-main="js/index" src="/libs/require.min.js"></script>
     <style>body {margin: 0}</style>
 </head>
 <body>
 <div id="app"></div>
-<script src="/js/requests.js"></script>
+<script th:inline="javascript">
+    const ID_DEPARTMENT = [[${id_department}]]
+    const DEPARTMENT = [[${department_name}]]
+    const USER_NAME = [[${user_lastname + " " + user_firstname}]]
+    const LINK_PREFIX = [[${link_prefix}]]
+    const LINK_SUFFIX = [[${link_suffix}]]
+    const TOKEN = [[${token}]]
+
+    const winHeight = document.body.clientHeight
+    const winWidth = document.body.clientWidth
+    console.log(winHeight + ' x ' + winWidth)
+</script>
 </body>
 </html>

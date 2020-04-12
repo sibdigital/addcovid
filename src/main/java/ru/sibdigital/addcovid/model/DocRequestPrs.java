@@ -1,16 +1,15 @@
 package ru.sibdigital.addcovid.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "doc_request", schema = "public")
@@ -21,7 +20,7 @@ import java.util.Set;
         generator = ObjectIdGenerators.PropertyGenerator.class,
         property = "id"
 )
-public class DocRequest {
+public class DocRequestPrs implements Serializable {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -45,9 +44,9 @@ public class DocRequest {
     private String rejectComment;
     private Long old_department_id;
 
-    @JsonIgnore
-    @OneToMany(targetEntity = DocPerson.class, mappedBy="docRequest", fetch = FetchType.LAZY)
-    private Set<DocPerson> docPersonSet;
+//    @JsonIgnore
+//    @OneToMany(targetEntity = DocPerson.class, mappedBy="docRequest", fetch = FetchType.LAZY)
+//    private Set<DocPerson> docPersonSet;
 
     @OneToOne
     @JoinColumn(name = "id_department", referencedColumnName = "id")
@@ -57,8 +56,8 @@ public class DocRequest {
     @JoinColumn(name = "id_organization", referencedColumnName = "id")
     private ClsOrganization organization;
 
-    @OneToMany(targetEntity = DocAddressFact.class, mappedBy="docRequestAddressFact", fetch = FetchType.EAGER)
-    private Set<DocAddressFact> docAddressFact;
+//    @OneToMany(targetEntity = DocAddressFact.class, mappedBy="docRequestAddressFact", fetch = FetchType.EAGER)
+//    private Set<DocAddressFact> docAddressFact;
 
 /*    @SequenceGenerator(name = "REQUEST_SEQ", sequenceName = "doc_request_id_seq")*/
     public Long getId() {
@@ -210,14 +209,14 @@ public class DocRequest {
     public void setTimeReview(Timestamp timeReview) {
         this.timeReview = timeReview;
     }
-
-    public Set<DocPerson> getDocPersonSet() {
-        return docPersonSet;
-    }
-
-    public void setDocPersonSet(Set<DocPerson> docPersonSet) {
-        this.docPersonSet = docPersonSet;
-    }
+//
+//    public Set<DocPerson> getDocPersonSet() {
+//        return docPersonSet;
+//    }
+//
+//    public void setDocPersonSet(Set<DocPerson> docPersonSet) {
+//        this.docPersonSet = docPersonSet;
+//    }
 
     public ClsDepartment getDepartment() {
         return department;
@@ -235,13 +234,13 @@ public class DocRequest {
         this.organization = organization;
     }
 
-    public Set<DocAddressFact> getDocAddressFact() {
-        return docAddressFact;
-    }
-
-    public void setDocAddressFact(Set<DocAddressFact> docAddressFact) {
-        this.docAddressFact = docAddressFact;
-    }
+//    public Set<DocAddressFact> getDocAddressFact() {
+//        return docAddressFact;
+//    }
+//
+//    public void setDocAddressFact(Set<DocAddressFact> docAddressFact) {
+//        this.docAddressFact = docAddressFact;
+//    }
 
     @Basic
     @Column(name = "reject_comment", nullable = false)
@@ -267,7 +266,7 @@ public class DocRequest {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DocRequest that = (DocRequest) o;
+        DocRequestPrs that = (DocRequestPrs) o;
         return Objects.equals(id, that.id) &&
                 Objects.equals(personOfficeCnt, that.personOfficeCnt) &&
                 Objects.equals(personRemoteCnt, that.personRemoteCnt) &&
@@ -282,14 +281,14 @@ public class DocRequest {
                 Objects.equals(isProtect, that.isProtect) &&
                 Objects.equals(reqBasis, that.reqBasis) &&
                 Objects.equals(orgHashCode, that.orgHashCode) &&
-                Objects.equals(docPersonSet, that.docPersonSet) &&
+                //Objects.equals(docPersonSet, that.docPersonSet) &&
                 Objects.equals(department, that.department) &&
-                Objects.equals(organization, that.organization) &&
-                Objects.equals(docAddressFact, that.docAddressFact);
+                Objects.equals(organization, that.organization); // &&
+//                Objects.equals(docAddressFact, that.docAddressFact);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview, isAgree, isProtect, reqBasis, orgHashCode, docPersonSet, department, organization, docAddressFact);
+        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview, isAgree, isProtect, reqBasis, orgHashCode, department, organization);
     }
 }
