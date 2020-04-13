@@ -17,17 +17,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.sibdigital.addcovid.dto.PostFormDto;
+import ru.sibdigital.addcovid.model.ClsExcel;
 import ru.sibdigital.addcovid.parser.CheckProtocol;
 import ru.sibdigital.addcovid.parser.ExcelParser;
+import ru.sibdigital.addcovid.repository.ClsExcelRepo;
 import ru.sibdigital.addcovid.service.RequestService;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.UUID;
 
 @Log4j
 @Controller
@@ -39,6 +41,9 @@ public class FileUploadController {
     @Autowired
     RequestService requestService;
 
+    @Autowired
+    ClsExcelRepo excelRepo;
+
     @Value("${upload_xls.path:/upload_xls}")
     String uploadingDir;
 
@@ -48,18 +53,32 @@ public class FileUploadController {
     public String forwardUpload(Model model) {
         //this.getClass().getClassLoader().getResource("template.xlsx");
         //model.addAttribute("errorMessage", null);
+
+        model.addAttribute("errorMessage", model.getAttribute("errorMessage")); //hack to inject value inside html
+
         return "upload";
     }
 
     @RequestMapping("/upload/protocol")
     public String uploadProtocol(ModelMap model) {
 
-        if(model.size() == 0) {
+        model.addAttribute("errorMessage", model.getAttribute("errorMessage")); //hack to inject value inside html
+
+        CheckProtocol checkProtocol = (CheckProtocol) model.getAttribute("checkProtocol");  //hack to inject value inside html
+
+
+        if (model.getAttribute("checkProtocol") == null){
             return "redirect:/upload";
         }
 
-        //this.getClass().getClassLoader().getResource("template.xlsx");
+
+        model.addAttribute("checkProtocol", checkProtocol);
+        model.addAttribute("postFormDto", checkProtocol.getPostFormDto()); //hack to inject value inside html
+
+
         return "upload_protocol";
+
+
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
@@ -79,9 +98,10 @@ public class FileUploadController {
             return "redirect:/upload";
         }
 
-
+        ClsExcel excelRecord = ClsExcel.builder().timeUpload(Timestamp.valueOf(LocalDateTime.now())).build();
         try{
             File savedFile = saveFile(excelFile);
+            excelRecord.setName(savedFile.getName());
             if(savedFile == null){
                 rm.addFlashAttribute("errorMessage", "Невозможно прочитать файл!");
                 return "redirect:/upload";
@@ -106,46 +126,56 @@ public class FileUploadController {
 
             if(checkProtocol.isSuccess()) {
                 requestService.addNewRequest(postFormDto);
+                excelRecord.setStatus(0);
+            } else {
+                excelRecord.setStatus(1);
+                excelRecord.setDescription(checkProtocol.getErrors());
             }
 
             rm.addFlashAttribute("checkProtocol",checkProtocol);
             rm.addFlashAttribute("postFormDto",checkProtocol.getPostFormDto());
+            excelRepo.save(excelRecord);
             return "redirect:/upload/protocol";
 
 
         } catch (IOException ex){
             rm.addFlashAttribute("errorMessage", ex.getMessage());
-            log.error(ex.getMessage());
-        } catch (Exception ex) {
+            log.error("ERROR", ex);
+            excelRecord.setStatus(1);
+            excelRecord.setDescription(ex.getMessage());
+            excelRepo.save(excelRecord);
+
+        }  catch (Exception ex) {
             rm.addFlashAttribute("errorMessage", ex.getMessage());
-            log.error(ex.getMessage());
+            log.error("ERROR", ex);
+            if(ex instanceof SQLException){
+
+            } else {
+                excelRecord.setStatus(1);
+                excelRecord.setDescription(ex.getMessage());
+                excelRepo.save(excelRecord);
+            }
         }
 
 
-
-//        List<UploadProtocol> protocols = new ArrayList<>(uploadedFiles.length);
-//        for(MultipartFile f : uploadedFiles) {
-//            protocols.add(uploadAuditor.auditFile(f));
-//        }
-//        model.addAttribute("protocols", protocols);
         return "redirect:/upload";
     }
 
-    private File  saveFile(MultipartFile pdfFile){
+    private File  saveFile(MultipartFile excelFile){
         File f = null;
         try {
-            String name = pdfFile.getOriginalFilename();
+            String name = excelFile.getOriginalFilename();
 
             File uploadFolder = new File(uploadingDir);
             if (!uploadFolder.exists()) {
                 uploadFolder.mkdirs();
             }
 
-            String fname = name.length() > 50 ? (pdfFile.getName().substring(0, 50) + ".xls") : name;
+            String fname = name.length() > 50 ? (excelFile.getName().substring(0, 50) + ".xls") : name;
             String inputFilename = String.format("%s/%s_%s", uploadFolder.getAbsolutePath(), String.valueOf(System.currentTimeMillis()), fname);
 
             f = new File(inputFilename);
-            pdfFile.transferTo(f);
+            excelFile.transferTo(f);
 
         } catch (IOException ex) {
             //importStatus = ImportStatuses.FILE_ERROR.getValue();

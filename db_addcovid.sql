@@ -237,3 +237,19 @@ CREATE TABLE public.reg_statistic (
 );
 
 ALTER TABLE public.reg_statistic OWNER TO postgres;
+
+create table if not exists cls_excel
+(
+    id serial not null
+        constraint cls_excel_pkey
+            primary key,
+    name text,
+    status integer,
+    description text,
+    time_upload timestamp not null
+)
+;
+
+alter table cls_excel owner to postgres
+;
+
