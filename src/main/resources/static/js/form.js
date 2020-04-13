@@ -483,8 +483,11 @@ webix.ready(function() {
                                 view: 'uploader',
                                 css: 'webix_secondary',
                                 value: 'Загрузить PDF-файл или ZIP-архив с пояснением обоснования',
+                                width: 400,
+                                height: 60,
                                 autosend: false,
                                 required: true,
+                                align: 'center',
                                 multiple: false,
                                 accept: 'application/pdf, application/zip',
                                 on: {

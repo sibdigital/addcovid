@@ -72,76 +72,7 @@ webix.ready(function() {
                 view: 'form',
                 complexData: true,
                 elements: [
-                    view_section('Ваши данные'),
-                    {
-                        type: 'space',
-                        margin: 5,
-                        cols: [
-                            {
-                                rows: [
-                                    {
-                                        view: 'text',
-                                        id: 'lastname',
-                                        name: 'lastname',
-                                        label: 'Фамилия',
-                                        labelPosition: 'top',
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true
-                                    },
-                                    {
-                                        view: 'text',
-                                        name: 'firstname',
-                                        id: 'firstname',
-                                        label: 'Имя',
-                                        labelPosition: 'top',
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true
-                                    },
-                                    {
-                                        view: 'text',
-                                        name: 'patronymic',
-                                        id: 'patronymic',
-                                        label: 'Отчество',
-                                        labelPosition: 'top',
-                                    },
-                                    {
-                                        view: 'text',
-                                        name: 'age',
-                                        id: 'age',
-                                        label: 'Возраст (на момент заполнения)',
-                                        validate: function(val){
-                                            return !isNaN(val*1) && (val.trim() != '') && (val > 0) && (val < 100);
-                                        },
-                                        attributes: { type:"number" },
-                                        labelPosition: 'top',
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true
-                                    },
-/*
-                                    {
-                                        view: 'text',
-                                        name: 'email',
-                                        label: 'e-mail',
-                                        labelPosition: 'top',
-                                        validate: function(val){
-                                            if(val) return webix.rules.isEmail
-                                            else return true
-                                        },
-                                        invalidMessage: 'Введите корректный e-mail',
-                                    },
-                                    {
-                                        view: 'text',
-                                        name: 'phone',
-                                        label: 'Телефон',
-                                        labelPosition: 'top',
-                                        // invalidMessage: 'Поле не может быть пустым',
-                                        // required: true
-                                    }
-*/
-                                ]
-                            }
-                        ]
-                    },
+                    //view_section('Данные ДНТ/СНТ'),
                     view_section('Адрес убытия'),
                     {
                         type: 'space',
@@ -154,7 +85,8 @@ webix.ready(function() {
                                     {
                                         id: 'raion',
                                         view: 'combo', name: 'raion',
-                                        minWidth: 350,
+                                        //minWidth: 350,
+                                        width: 250,
                                         label: 'Район',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
@@ -182,152 +114,204 @@ webix.ready(function() {
                         ]
                     },
 
-                    view_section('Адресная информация'),
+                    view_section('Адрес ДНТ/СНТ'),
                     {
                         type: 'space',
                         margin: 5,
+                        id: 'a1',
                         rows: [
                             {
-                                view: 'button',
-                                type: 'icon',
-                                icon: 'wxi-plus',
-                                label: 'Добавить адрес',
-                                id: 'add_btn',
-                                click: function () {
-                                    $$('addform').show()
-                                    $$('district').focus()
-                                }
-                            },
-                            {
-                                view: 'form',
-                                id: 'addform',
-                                elements: [
+                                responsive: 'a1',
+                                cols: [
                                     {
-                                        id: 'a1',
-                                        rows: [
-                                            {
-                                                responsive: 'a1',
-                                                cols: [
-                                                    {
-                                                        id: 'district',
-                                                        view: 'combo', name: 'district',
-                                                        width: 250,
-                                                        label: 'Район',
-                                                        labelPosition: 'top',
-                                                        invalidMessage: 'Поле не может быть пустым',
-                                                        required: true,
-                                                        options: district_options
-                                                    },
-                                                    {
-                                                        id: 'address_text',
-                                                        minWidth: 250,
-                                                        view: 'text',
-                                                        name: 'address',
-                                                        label: 'ДНТ/Адрес',
-                                                        labelPosition: 'top',
-                                                        required: true,
-                                                        invalidMessage: 'Поле не может быть пустым',
-                                                        on: {
-                                                            onEnter: function () {
-                                                                if($$('addform').validate()) {
-                                                                    let find = $$('addr_table').find(function(obj){
-                                                                        return (obj.district == $$('addform').getValues().district)
-                                                                            && (obj.address.toLowerCase().indexOf($$('addform').getValues().address) != -1)
-                                                                    })
-                                                                    if(find.length == 0) {
-                                                                        $$('addr_table').add($$('addform').getValues(), $$('addform').count + 1)
-                                                                        $$('addform').clear()
-                                                                        $$('addform').hide()
-                                                                    }
-                                                                    else {
-                                                                        webix.message('Адрес повторяется', 'error')
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        ]
+                                        id: 'district',
+                                        view: 'combo', name: 'district',
+                                        width: 250,
+                                        label: 'Район',
+                                        labelPosition: 'top',
+                                        invalidMessage: 'Поле не может быть пустым',
+                                        required: true,
+                                        options: district_options
                                     },
                                     {
-                                        cols: [
+                                        id: 'address_text',
+                                        minWidth: 250,
+                                        view: 'text',
+                                        name: 'address',
+                                        label: 'ДНТ/Адрес',
+                                        labelPosition: 'top',
+                                        required: true,
+                                        invalidMessage: 'Поле не может быть пустым',
+                                        /*
+                                                                                        on: {
+                                                                                            onEnter: function () {
+                                                                                                if($$('addform').validate()) {
+                                                                                                    let find = $$('addr_table').find(function(obj){
+                                                                                                        return (obj.district == $$('addform').getValues().district)
+                                                                                                            && (obj.address.toLowerCase().indexOf($$('addform').getValues().address) != -1)
+                                                                                                    })
+                                                                                                    if(find.length == 0) {
+                                                                                                        $$('addr_table').add($$('addform').getValues(), $$('addform').count + 1)
+                                                                                                        $$('addform').clear()
+                                                                                                        $$('addform').hide()
+                                                                                                    }
+                                                                                                    else {
+                                                                                                        webix.message('Адрес повторяется', 'error')
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                        */
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+
+                    view_section('Список дачников'),
+                    {
+                        view: 'button',
+                        type: 'icon',
+                        icon: 'wxi-plus',
+                        label: 'Добавить дачника',
+                        width: 250,
+                        id: 'add_btn',
+                        click: function () {
+                            $$('addform').show()
+                            $$('lastname').focus()
+                        }
+                    },
+                    {
+                        view: 'form',
+                        id: 'addform',
+                        elements: [
+                            {
+                                type: 'space',
+                                margin: 5,
+                                cols: [
+                                    {
+                                        rows: [
                                             {
-                                                id: 'add_chk_btn',
-                                                view: 'button', label: 'Добавить', css: 'webix_primary',
-                                                type: 'icon', icon: 'wxi-check',
-                                                click: function () {
-                                                    $$('address_text').callEvent('onEnter')
-                                                }
+                                                view: 'text',
+                                                id: 'lastname',
+                                                name: 'lastname',
+                                                label: 'Фамилия',
+                                                labelPosition: 'top',
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true
                                             },
                                             {
-                                                view: 'button', label: 'Очистить', css: 'webix_danger',
-                                                type: 'icon', icon: 'wxi-close',
-                                                click: function () {
-                                                    $$('addform').clear()
-                                                    $$('addform').hide()
-                                                }
-                                            }
+                                                view: 'text',
+                                                name: 'firstname',
+                                                id: 'firstname',
+                                                label: 'Имя',
+                                                labelPosition: 'top',
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true
+                                            },
+                                            {
+                                                view: 'text',
+                                                name: 'patronymic',
+                                                id: 'patronymic',
+                                                label: 'Отчество',
+                                                labelPosition: 'top',
+                                            },
+                                            {
+                                                view: 'text',
+                                                name: 'age',
+                                                id: 'age',
+                                                label: 'Возраст (на момент заполнения)',
+                                                validate: function(val){
+                                                    return !isNaN(val*1) && (val.trim() != '') && (val > 0) && (val < 100);
+                                                },
+                                                attributes: { type:"number" },
+                                                labelPosition: 'top',
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true
+                                            },
                                         ]
                                     }
                                 ]
                             },
+
                             {
-                                rows: [
+
+
+                                cols: [
                                     {
-                                        view: 'datatable',
-                                        id: 'addr_table',
-                                        name: 'addressDacha',
-                                        height: 200,
-                                        select: 'row',
-                                        autowidth: true,
-                                        editable: true,
-                                        scroll: 'xy',
-                                        columns: [
-                                            // { id: 'id', header: '', css: 'rank', autowidth: true },
-                                            {
-                                                id: 'district',
-                                                header: 'Район',
-                                                //width: 300,
-                                                options: district_options,
-                                                adjust: true,
-                                                editor: 'select',
-                                            },
-                                            {
-                                                id: 'address',
-                                                header: 'ДНТ/Адрес',
-                                                //adjust: true,
-                                                fillspace: true,
-                                                editor: 'text'
-                                            },
-                                            {
-                                                id: 'action',
-                                                header: '',
-                                                autowidth: true,
-                                                maxWidth: 50,
-                                                //adjust: true,
-                                                template: function(obj){
-                                                    return "<div class='webix_el_button'><button class='delete_btn' style='cursor: pointer'>X</button></div>";
-                                                }
-                                            }
-                                        ],
-                                        data: [],
-/*
-                                        on:{
-                                            'data->onStoreUpdated': function(){
-                                                this.data.each(function(obj, i){
-                                                    obj.id = i + 1;
-                                                });
-                                            },
-                                        },
-*/
-                                        onClick:{
-                                            delete_btn: function(ev, id){
-                                                this.remove(id);
-                                            }
+                                        id: 'add_chk_btn',
+                                        view: 'button', label: 'Добавить', css: 'webix_primary',
+                                        type: 'icon', icon: 'wxi-check',
+                                        click: function () {
+                                            $$('address_text').callEvent('onEnter')
                                         }
                                     },
+                                    {
+                                        view: 'button', label: 'Очистить', css: 'webix_danger',
+                                        type: 'icon', icon: 'wxi-close',
+                                        click: function () {
+                                            $$('addform').clear()
+                                            $$('addform').hide()
+                                        }
+                                    }
                                 ]
+                            }
+                        ]
+                    },
+                    {
+                        rows: [
+                            {
+                                view: 'datatable',
+                                id: 'addr_table',
+                                name: 'addressDacha',
+                                height: 200,
+                                select: 'row',
+                                autowidth: true,
+                                editable: true,
+                                scroll: 'xy',
+                                columns: [
+                                    // { id: 'id', header: '', css: 'rank', autowidth: true },
+                                    {
+                                        id: 'district',
+                                        header: 'Фамилия',
+                                        //width: 300,
+                                        options: district_options,
+                                        adjust: true,
+                                        editor: 'select',
+                                    },
+                                    {
+                                        id: 'address',
+                                        header: 'ДНТ/Адрес',
+                                        //adjust: true,
+                                        fillspace: true,
+                                        editor: 'text'
+                                    },
+                                    {
+                                        id: 'action',
+                                        header: '',
+                                        autowidth: true,
+                                        maxWidth: 50,
+                                        //adjust: true,
+                                        template: function(obj){
+                                            return "<div class='webix_el_button'><button class='delete_btn' style='cursor: pointer'>X</button></div>";
+                                        }
+                                    }
+                                ],
+                                data: [],
+/*
+                                on:{
+                                    'data->onStoreUpdated': function(){
+                                        this.data.each(function(obj, i){
+                                            obj.id = i + 1;
+                                        });
+                                    },
+                                },
+*/
+                                onClick:{
+                                    delete_btn: function(ev, id){
+                                        this.remove(id);
+                                    }
+                                }
                             },
                         ]
                     },
