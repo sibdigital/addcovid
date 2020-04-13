@@ -274,7 +274,7 @@ public class RequestService {
             }
 
             File file = new File(String.format("%s/%s_%s", uploadFolder.getAbsolutePath(),
-                    UUID.randomUUID(), part.getOriginalFilename()));
+                    UUID.randomUUID(), part.getOriginalFilename().replace(",", "_")));
             part.transferTo(file);
 
             return "{ \"status\": \"server\", \"sname\": \"" + String.format("/%s/%s", uploadingDir, file.getName()) + "\" }";

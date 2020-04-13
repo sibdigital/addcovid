@@ -474,12 +474,12 @@ webix.ready(function() {
                             },
                             {
                                 view: 'label',
-                                label: '<span  style="text-align: center; color: red">Для загрузки нескольких файлов сожмите их в ZIP-архив и загрузите его</span>',
+                                label: '<span  style="text-align: center; color: red">Для загрузки нескольких файлов выбирайте их с зажатой клавишей Ctrl или заранее сожмите в ZIP-архив и загрузите его</span>',
                                 //css: 'main_label'
                             },
                             {
                                 view: 'label',
-                                label: '<span  style="text-align: center; color: red">Максимальный размер загружаемого PDF-файла или ZIP-архива не должен превышать 60 Мб</span>',
+                                label: '<span  style="text-align: center; color: red">Общий размер загружаемых файлов не должен превышать 60 Мб</span>',
                                 //css: 'main_label'
                             },
                             {
@@ -846,7 +846,7 @@ webix.ready(function() {
                                             })
 
                                             if(uploadedFiles.length != $$('upload').files.data.count()) {
-                                                webix.message('Не удалось загрузить PDF-файлы.')
+                                                webix.message('Не удалось загрузить файлы.')
                                                 $$('upload').focus()
                                                 return false
                                             }
@@ -870,7 +870,7 @@ webix.ready(function() {
                                                         })
                                                         .then(function () {
                                                             $$('label_sogl').hideProgress();
-                                                            webix.send('http://работающаябурятия.рф')
+                                                            window.location.replace('http://работающаябурятия.рф');
                                                         })
                                                         .fail(function(){
                                                             $$('label_sogl').hideProgress()
