@@ -143,7 +143,7 @@ webix.ready(function() {
                             }
                         ]
                     },
-                    view_section('Адрес убытия (откуда вы едете на дачу)'),
+                    view_section('Адрес откуда вы выезжаете на дачу)'),
                     {
                         type: 'space',
                         margin: 5,
@@ -183,7 +183,7 @@ webix.ready(function() {
                         ]
                     },
 
-                    view_section('Расположение дачи/ДНТ'),
+                    view_section('Место вашего следования (где находится ваша дача или дом)'),
                     {
                         type: 'space',
                         margin: 5,

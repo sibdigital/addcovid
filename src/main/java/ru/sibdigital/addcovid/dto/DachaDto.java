@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.sibdigital.addcovid.model.DocDachaPerson;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -13,16 +16,22 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class DachaDto {
     private Integer id;
-    private String lastname;
-    private String firstname;
-    private String patronymic;
-    private Integer age;
-    private Boolean isAgree;
-    private Boolean isProtect;
-    private String email;
-    private String phone;
+    private String district;
+    private String address;
+    private LocalDate validDate;
+    private String link;
     private String raion;
     private String naspunkt;
+    private Boolean isAgree;
+    private Boolean isProtect;
+    private Timestamp timeCreate;
+    private Integer statusImport;
+    private Timestamp timeImport;
+    private Integer statusReview;
+    private Timestamp timeReview;
+    private String rejectComment;
+    private String phone;
+    private String email;
 
-    List<DachaAddrDto> addrList;
+    List<DachaPersonDto> personList;
 }
