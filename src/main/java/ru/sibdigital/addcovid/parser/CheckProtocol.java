@@ -26,4 +26,23 @@ public class CheckProtocol {
     public CheckProtocol(PostFormDto postFormDto) {
         this.postFormDto = postFormDto;
     }
+
+    public String getErrors() {
+        StringBuilder mapAsString = new StringBuilder();
+        statistic.entrySet().stream().forEach(stringMapEntry -> {
+            mapAsString.append(stringMapEntry.getKey());
+            mapAsString.append(": ");
+            stringMapEntry.getValue().entrySet().stream().forEach(stringIntegerEntry -> {
+                mapAsString.append(stringIntegerEntry.getKey());
+                mapAsString.append("=");
+                mapAsString.append(stringIntegerEntry.getValue());
+                mapAsString.append(", ");
+            });
+            mapAsString.replace(mapAsString.length()-2, mapAsString.length(),"");
+            mapAsString.append("\n");
+        });
+        mapAsString.append("department: size:");
+        mapAsString.append(checkedDeparts.size());
+        return mapAsString.toString();
+    }
 }

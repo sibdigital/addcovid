@@ -92,6 +92,11 @@ public class ExcelParser {
 
     private CheckProtocol readXLSFile(InputStream inputStream) throws IOException {
         HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
+
+        if(workbook.getNumberOfSheets() <= SHEET_NAMES.length) {
+            throw new IOException(String.format("Неверное содержание файла: файл должен содержать %d листа", SHEET_NAMES.length));
+        }
+
         // Get first sheet from the workbook
         Sheet sheetOrganizationInfo = workbook.getSheetAt(SHEET_ORGANIZATION_INFO_INDEX);
         Sheet sheetAddressesInfo = workbook.getSheetAt(SHEET_ADDRESSES_INDEX);
@@ -104,6 +109,10 @@ public class ExcelParser {
     private CheckProtocol readXLSXFile(InputStream inputStream) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
         // Get first sheet from the workbook
+
+        if(workbook.getNumberOfSheets() <= SHEET_NAMES.length) {
+            throw new IOException(String.format("Неверное содержание файла: файл должен содержать %d листа", SHEET_NAMES.length));
+        }
 
         Sheet sheetOrganizationInfo = workbook.getSheetAt(SHEET_ORGANIZATION_INFO_INDEX);
         Sheet sheetAddressesInfo = workbook.getSheetAt(SHEET_ADDRESSES_INDEX);
@@ -323,9 +332,9 @@ public class ExcelParser {
             success++;
         }
 
-//        cell = sheet.getRow(2).getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // *Основной вид осуществляемой деятельности (отрасль)
-//        text = fmt.formatCellValue(cell).trim();
-//        postFormDto.setOrganizationOkvedAdd(text);
+        cell = sheet.getRow(2).getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // *Дополнительные виды осуществляемой деятельности (через запятую)
+        text = fmt.formatCellValue(cell).trim();
+        postFormDto.setOrganizationOkvedAdd(text);
 //
 //        cell = sheet.getRow(3).getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // *Номер Министерства, курирующее вашу деятельность (берется № из листа Справочник министерств)
 //
@@ -478,12 +487,14 @@ public class ExcelParser {
                 boolean skip = false;
 
                 if(StringUtils.isBlank(addressInfo.getAddressFact())){
+                    log.info("parseSheetWithAddresses: addressInfo.getAddressFact setted success as false, row: ", row.getRowNum()+1);
                     errorString.append(String.format("%s - не может быть пустым;", ADDRESS_COLUMNS_NAMES[0]));
                     checkProtocol.setSuccess(false);
                     skip=true;
                 }
 
                 if(addressInfo.getPersonOfficeFactCnt() == null){
+                    log.info("parseSheetWithAddresses: addressInfo.getPersonOfficeFactCnt setted success as false, row: ", row.getRowNum()+1);
                     errorString.append(String.format("%s - либо пустое, либо не может быть преобразовано в число", ADDRESS_COLUMNS_NAMES[1]));
                     checkProtocol.setSuccess(false);
                     skip=true;
@@ -575,12 +586,13 @@ public class ExcelParser {
             } else{
 
                 if(StringUtils.isBlank(personInfo.getFirstname())) {
+                    log.info("parseSheetWithPeople: personInfo.getFirstname setted success as false, row: ", row.getRowNum()+1);
                     errorString.append(String.format("Поле \"%s\" не может быть пустым",PEOPLE_COLUMNS_NAMES[0]));
                     checkProtocol.setSuccess(false);
                     skip=true;
                 }
                 if(StringUtils.isBlank(personInfo.getLastname())) {
-
+                    log.info("parseSheetWithPeople: personInfo.getLastname setted success as false, row: ", row.getRowNum()+1);
                     errorString.append(String.format("Поле \"%s\" не может быть пустым",PEOPLE_COLUMNS_NAMES[1]));
                     checkProtocol.setSuccess(false);
                     skip=true;
@@ -673,9 +685,11 @@ public class ExcelParser {
         if(checkedDeparts.size() == 0) {
             checkProtocol.getPostFormDto().setDepartmentId(null);
             checkProtocol.setSuccess( false );
+            log.info("checkedDeparts checkedDeparts.size() == 0 setted success as false");
             checkProtocol.getPostFormDto().setDepartmentIdStatus("Не выбрано Курирующее министерство");
         }
         if(checkedDeparts.size() > 1) {
+            log.info("checkedDeparts checkedDeparts.size() > 1 setted success as false");
             checkProtocol.getPostFormDto().setDepartmentId(null);
             checkProtocol.setSuccess( false );
             checkProtocol.getPostFormDto().setDepartmentIdStatus("Нельзя выбирать больше одного курирующего министерства");

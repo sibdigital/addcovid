@@ -30,12 +30,13 @@
         <span>Ваша заявка успешно отправлена! Ожидайте ответ по электронной почте.</span>
     </div>
 </div>
+
 <div th:if="${checkProtocol.isSuccess() && checkProtocol.getGlobalMessage() != 'OK'}">
     <div  class="alert alert-success" role="alert">
         <span>Ваша заявка успешно отправлена! Ожидайте ответ по электронной почте.</span>
-        <br>
+<!--        <br>-->
         <!--<span th:text="${checkProtocol.getGlobalMessage()}"></span> -->
-        <br>
+<!--        <br>-->
         <!--<span>Если обнаружите ошибку: исправьте свой файл и загрузите все документы снова <a href="/upload">сюда</a></span> -->
     </div>
 </div>
@@ -223,7 +224,7 @@
                                 <tr>
                                     <th scope="col" style="width: 60%">Фактический адрес осуществления деятельности</th>
                                     <th scope="col" style="width: 20%">Численность работников, не подлежащих переводу на дистанционный режим работы, осуществляющих деятельность  фактическому адресу</th>
-                                    <th scope="col" style="width: 20%">Сттутс</th>
+                                    <th scope="col" style="width: 20%">Статус</th>
                                 </tr>
                                 </thead>
 
@@ -235,6 +236,9 @@
                                 </tr>
                                 </tbody>
                             </table>
+                            <div th:if="${postFormDto.getAddressFactStatus() != 'OK'}" class="alert bg-danger" role="alert">
+                                <span th:text="${postFormDto.getAddressFactStatus()}"></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -286,6 +290,9 @@
                                     </tr>
                                     </tbody>
                                 </table>
+                                <div th:if="${postFormDto.getPersonsStatus() != 'OK'}" class="alert bg-danger" role="alert">
+                                    <span th:text="${postFormDto.getPersonsStatus()}"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
