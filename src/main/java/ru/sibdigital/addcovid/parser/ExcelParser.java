@@ -480,6 +480,7 @@ public class ExcelParser {
                 if(StringUtils.isBlank(addressInfo.getAddressFact())){
                     errorString.append(String.format("%s - не может быть пустым;", ADDRESS_COLUMNS_NAMES[0]));
                     checkProtocol.setSuccess(false);
+                    skip=true;
                 }
 
                 if(addressInfo.getPersonOfficeFactCnt() == null){
