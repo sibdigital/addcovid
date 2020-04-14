@@ -47,6 +47,9 @@ public class FileUploadController {
     @Value("${upload_xls.path:/upload_xls}")
     String uploadingDir;
 
+    @Value("${upload.path:/upload}")
+    String uploadingAttacchmentDir;
+
     private Base64.Encoder enc = Base64.getEncoder();
 
     @RequestMapping("/upload")
@@ -109,17 +112,19 @@ public class FileUploadController {
             CheckProtocol checkProtocol = excelParser.parseFile(savedFile);
 
 
-            StringBuilder stringBuilder = new StringBuilder();
-            byte[] encbytes = enc.encode(pdfFile.getBytes());
-            for (int i = 0; i < encbytes.length; i++)
-            {
-                stringBuilder.append((char)encbytes[i]);
-            }
+            //вынужденная мера из-за конфлитка с реализацией RequestServic
+            File f = saveAttachment(pdfFile);
+//            StringBuilder stringBuilder = new StringBuilder();
+//            byte[] encbytes = enc.encode(pdfFile.getBytes());
+//            for (int i = 0; i < encbytes.length; i++)
+//            {
+//                stringBuilder.append((char)encbytes[i]);
+//            }
 
             PostFormDto postFormDto = checkProtocol.getPostFormDto();
 
             postFormDto.setAttachmentFilename(pdfFile.getOriginalFilename());
-            postFormDto.setAttachment(stringBuilder.toString());
+            postFormDto.setAttachment(f.getName());
             postFormDto.setIsAgree(isAgreed);
             postFormDto.setIsProtect(isProtected);
             postFormDto.setReqBasis(reqBasis);
@@ -159,6 +164,28 @@ public class FileUploadController {
 
 
         return "redirect:/upload";
+    }
+
+    private File saveAttachment(MultipartFile pdfFile){
+        File file = null;
+        String filename = "error while upload";
+        try {
+            File uploadFolder = new File(uploadingAttacchmentDir);
+            if (!uploadFolder.exists()) {
+                uploadFolder.mkdirs();
+            }
+
+            file = new File(String.format("%s\\%s_%s",uploadingAttacchmentDir, String.valueOf(System.currentTimeMillis()), pdfFile.getOriginalFilename()));
+            pdfFile.transferTo(file);
+
+        } catch (IOException ex) {
+            //importStatus = ImportStatuses.FILE_ERROR.getValue();
+            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
+        } catch (Exception ex) {
+            //importStatus = ImportStatuses.FILE_ERROR.getValue();
+            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
+        }
+        return file;
     }
 
     private File  saveFile(MultipartFile excelFile){
