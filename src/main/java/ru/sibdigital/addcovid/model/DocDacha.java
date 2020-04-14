@@ -26,7 +26,7 @@ public class DocDacha {
     @Column(name = "id", nullable = false)
     @SequenceGenerator(name = "DOC_DACHA_SEQ_GEN", sequenceName = "doc_dacha_id_seq", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DOC_DACHA_SEQ_GEN")
-    private int id;
+    private Integer id;
     private String district;
     private String address;
     private LocalDate validDate;
@@ -47,11 +47,11 @@ public class DocDacha {
     @OneToMany(targetEntity = DocDachaPerson.class, mappedBy = "docDachaByIdDocDacha", fetch = FetchType.LAZY)
     private Collection<DocDachaPerson> docDachaPersons;
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

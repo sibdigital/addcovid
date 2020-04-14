@@ -10,8 +10,8 @@ function view_section(title){
 
 let district_options = [
     { id: 24, value: 'г.Улан-Удэ'},
-    { id: 20, value: 'г. Гусиноозерск'},
-    { id: 18, value: 'г. Северобайкальск'},
+    { id: 20, value: 'г.Гусиноозерск'},
+    { id: 18, value: 'г.Северобайкальск'},
     { id: 1, value: 'Баргузинский'},
     { id: 2, value: 'Баунтовский'},
     { id: 3, value: 'Бичурский'},
@@ -36,7 +36,29 @@ let district_options = [
 
 ]
 
+function getOptionsValue(index){
+    //district_options.(newv - 1).value
+    let result = -1
+    district_options.forEach(item => {
+        if(item.id == index) {
+            result = item.value
+        }
+    })
+    return result
+}
+
+function equalsRow(obj){
+    let l = (obj.lastname.toLowerCase().indexOf($$('addform').getValues().lastname.toLowerCase()) == 0)
+    let f = (obj.firstname.toLowerCase().indexOf($$('addform').getValues().firstname.toLowerCase()) == 0)
+    let p = (obj.patronymic.toLowerCase().indexOf($$('addform').getValues().patronymic.toLowerCase()) == 0)
+    let a = (obj.age == $$('addform').getValues().age)
+    return l && f && p && a
+}
+
 webix.ready(function() {
+
+    webix.i18n.setLocale("ru-RU");
+
     webix.ui({
         container: 'app',
         autowidth: true,
@@ -73,11 +95,10 @@ webix.ready(function() {
                 view: 'form',
                 complexData: true,
                 elements: [
-                    //view_section('Данные ДНТ/СНТ'),
-                    view_section('Адрес убытия'),
+                    view_section('Адрес (откуда вы выезжаете на дачу)'),
                     {
                         type: 'space',
-                        margin: 5,
+                        //margin: 5,
                         id: 'a2',
                         rows: [
                             {
@@ -96,7 +117,7 @@ webix.ready(function() {
                                         on: {
                                             onChange: function (newv, oldv) {
                                                 if (newv == 18 || newv == 20 || newv == 24) {
-                                                    $$('naspunkt').setValue(district_options[newv - 1].value)
+                                                    $$('naspunkt').setValue(getOptionsValue(newv))
                                                 }
                                             }
                                         }
@@ -105,9 +126,10 @@ webix.ready(function() {
                                         id: 'naspunkt',
                                         view: 'text',
                                         name: 'naspunkt',
-                                        minwidth: 350,
+                                        minwidth: 250,
                                         label: 'Населенный пункт',
                                         labelPosition: 'top',
+                                        invalidMessage: 'Поле не может быть пустым',
                                         required: true
                                     }
                                 ]
@@ -115,10 +137,10 @@ webix.ready(function() {
                         ]
                     },
 
-                    view_section('Адрес ДНТ/СНТ'),
+                    view_section('Место вашего следования (где находится ваша дача или дом)'),
                     {
                         type: 'space',
-                        margin: 5,
+                        //margin: 5,
                         id: 'a1',
                         rows: [
                             {
@@ -132,10 +154,17 @@ webix.ready(function() {
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
                                         required: true,
-                                        options: district_options
+                                        options: district_options,
+                                        on: {
+                                            onChange: function (newv, oldv) {
+                                                if (newv == 18 || newv == 20 || newv == 24) {
+                                                    $$('address').setValue(getOptionsValue(newv))
+                                                }
+                                            }
+                                        }
                                     },
                                     {
-                                        id: 'address_text',
+                                        id: 'address',
                                         minWidth: 250,
                                         view: 'text',
                                         name: 'address',
@@ -143,30 +172,20 @@ webix.ready(function() {
                                         labelPosition: 'top',
                                         required: true,
                                         invalidMessage: 'Поле не может быть пустым',
-                                        /*
-                                                                                        on: {
-                                                                                            onEnter: function () {
-                                                                                                if($$('addform').validate()) {
-                                                                                                    let find = $$('addr_table').find(function(obj){
-                                                                                                        return (obj.district == $$('addform').getValues().district)
-                                                                                                            && (obj.address.toLowerCase().indexOf($$('addform').getValues().address) != -1)
-                                                                                                    })
-                                                                                                    if(find.length == 0) {
-                                                                                                        $$('addr_table').add($$('addform').getValues(), $$('addform').count + 1)
-                                                                                                        $$('addform').clear()
-                                                                                                        $$('addform').hide()
-                                                                                                    }
-                                                                                                    else {
-                                                                                                        webix.message('Адрес повторяется', 'error')
-                                                                                                    }
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                        */
                                     }
                                 ]
                             }
                         ]
+                    },
+
+                    view_section('Срок действия разрешения'),
+                    {
+                        view: 'datepicker',
+                        id: 'validDate',
+                        name: 'validDate',
+                        value: new Date(),
+                        format: webix.i18n.dateFormatStr,
+                        required: true
                     },
 
                     view_section('Список дачников'),
@@ -180,8 +199,26 @@ webix.ready(function() {
                         click: function () {
                             $$('addform').show()
                             $$('lastname').focus()
+                            $$('add_btn').hide();
+                            $$('close_btn').show();
                         }
                     },
+                    {
+                        view: 'button',
+                        type: 'icon',
+                        css: 'webix_danger',
+                        icon: 'wxi-close',
+                        label: 'Закрыть',
+                        width: 250,
+                        id: 'close_btn',
+                        click: function () {
+                            $$('addform').clear()
+                            $$('addform').hide()
+                            $$('close_btn').hide()
+                            $$('add_btn').show()
+                        }
+                    },
+
                     {
                         view: 'form',
                         id: 'addform',
@@ -189,9 +226,11 @@ webix.ready(function() {
                             {
                                 type: 'space',
                                 margin: 5,
-                                cols: [
+                                id: 'a4',
+                                rows: [
                                     {
-                                        rows: [
+                                        responsive: 'a4',
+                                        cols: [
                                             {
                                                 view: 'text',
                                                 id: 'lastname',
@@ -199,6 +238,7 @@ webix.ready(function() {
                                                 label: 'Фамилия',
                                                 labelPosition: 'top',
                                                 invalidMessage: 'Поле не может быть пустым',
+                                                minWidth: 200,
                                                 required: true
                                             },
                                             {
@@ -208,6 +248,7 @@ webix.ready(function() {
                                                 label: 'Имя',
                                                 labelPosition: 'top',
                                                 invalidMessage: 'Поле не может быть пустым',
+                                                minWidth: 200,
                                                 required: true
                                             },
                                             {
@@ -215,6 +256,7 @@ webix.ready(function() {
                                                 name: 'patronymic',
                                                 id: 'patronymic',
                                                 label: 'Отчество',
+                                                minWidth: 200,
                                                 labelPosition: 'top',
                                             },
                                             {
@@ -223,68 +265,103 @@ webix.ready(function() {
                                                 id: 'age',
                                                 label: 'Возраст (на момент заполнения)',
                                                 validate: function(val){
-                                                    return !isNaN(val*1) && (val.trim() != '') && (val > 0) && (val < 100);
+                                                    return !isNaN(val*1) && (val.trim() != '') && (val >= 0) && (val < 100);
                                                 },
                                                 attributes: { type:"number" },
                                                 labelPosition: 'top',
                                                 invalidMessage: 'Поле не может быть пустым',
-                                                required: true
+                                                minWidth: 50,
+                                                required: true,
+                                                on: {
+                                                    onEnter: function () {
+                                                        if($$('addform').validate()) {
+                                                            if($$('age').getValue() > 65){
+                                                                webix.alert("Данные не могут быть введены. Людям старше 65 лет предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
+                                                                return false;
+                                                            }
+
+                                                            let find = $$('person_table').find(function(obj){
+                                                                return equalsRow(obj)
+                                                            })
+                                                            if(find.length == 0) {
+                                                                $$('person_table').add($$('addform').getValues(), $$('addform').count + 1)
+                                                                $$('addform').clear()
+                                                                $$('lastname').focus()
+                                                                //$$('addform').hide()
+                                                            }
+                                                            else {
+                                                                webix.message('Повтор записи', 'error')
+                                                                $$('lastname').focus()
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                rows: [
+                                                    {},
+                                                    {
+                                                        id: 'add_chk_btn',
+                                                        view: 'button', label: '', css: 'webix_primary',
+                                                        type: 'icon', icon: 'wxi-check',
+                                                        width: 50,
+                                                        height: 50,
+                                                        align: 'center',
+                                                        click: function () {
+                                                            $$('age').callEvent('onEnter')
+                                                        }
+                                                    }
+                                                ]
                                             },
                                         ]
                                     }
                                 ]
                             },
-
-                            {
-
-
-                                cols: [
-                                    {
-                                        id: 'add_chk_btn',
-                                        view: 'button', label: 'Добавить', css: 'webix_primary',
-                                        type: 'icon', icon: 'wxi-check',
-                                        click: function () {
-                                            $$('address_text').callEvent('onEnter')
-                                        }
-                                    },
-                                    {
-                                        view: 'button', label: 'Очистить', css: 'webix_danger',
-                                        type: 'icon', icon: 'wxi-close',
-                                        click: function () {
-                                            $$('addform').clear()
-                                            $$('addform').hide()
-                                        }
-                                    }
-                                ]
-                            }
                         ]
                     },
                     {
                         rows: [
                             {
                                 view: 'datatable',
-                                id: 'addr_table',
-                                name: 'addressDacha',
+                                id: 'person_table',
+                                name: 'personList',
                                 height: 200,
                                 select: 'row',
                                 autowidth: true,
                                 editable: true,
-                                scroll: 'xy',
                                 columns: [
                                     // { id: 'id', header: '', css: 'rank', autowidth: true },
                                     {
-                                        id: 'district',
+                                        id: 'lastname',
                                         header: 'Фамилия',
                                         //width: 300,
-                                        options: district_options,
                                         adjust: true,
-                                        editor: 'select',
+                                        editor: 'text',
                                     },
                                     {
-                                        id: 'address',
-                                        header: 'ДНТ/Адрес',
-                                        //adjust: true,
-                                        fillspace: true,
+                                        id: 'firstname',
+                                        header: 'Имя',
+                                        adjust: true,
+                                        //fillspace: true,
+                                        editor: 'text'
+                                    },
+                                    {
+                                        id: 'patronymic',
+                                        header: 'Отчество',
+                                        adjust: true,
+                                        //fillspace: true,
+                                        editor: 'text'
+                                    },
+                                    {
+                                        id: 'age',
+                                        header: 'Возраст',
+                                        adjust: true,
+                                        //fillspace: true,
+                                        //attributes: { type:"number" },
+                                        validate: function(val){
+                                            return !isNaN(val*1) && (val.trim() != '') && (val >= 0) && (val < 100);
+                                        },
+
                                         editor: 'text'
                                     },
                                     {
@@ -393,40 +470,33 @@ webix.ready(function() {
                                     if($$('form').validate()) {
                                         let params = $$('form').getValues()
 
-                                        if(params.age > 65){
-                                            webix.alert("Заявка не может быть одобрена. Вы старше 65 лет и Вам предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
-                                            return false;
-                                        }
-
-                                        let addrs = []
-                                        $$('addr_table').data.each(function (obj) {
-                                            let addr = {
-                                                address: obj.address,
-                                                district: district_options[obj.district - 1].value
-                                            }
-                                            addrs.push(addr)
-                                        })
-
-                                        if($$('address_text').getValue() && $$('district').getValue()){
-                                            if($$('addr_table').find(function(obj){
-                                                return (obj.district == $$('district').getValue())
-                                                    && (obj.address.toLowerCase().indexOf($$('address_text').getValue()) != -1)
-                                                        }).length == 0
-                                            ) {
-                                                addrs.push({
-                                                    address: $$('address_text').getValue(),
-                                                    district: district_options[$$('district').getValue() - 1].value
-                                                })
+                                        if($$('lastname').getValue() && $$('firstname').getValue()
+                                            && $$('patronymic').getValue() && $$('age').getValue())
+                                        {
+                                            if($$('person_table').find(function(obj){
+                                                equalsRow(obj)
+                                            }).length == 0)
+                                            {
+                                                $$('age').callEvent('onEnter')
                                             }
                                         }
-                                        else if(addrs.length == 0) {
-                                            webix.message('Не заполнена адресная часть', 'error')
+                                        else if($$('person_table').data.pull.length == 0) {
+                                            webix.message('Не заполнен список дачников', 'error')
                                             $$('add_btn').focus()
                                             return false
                                         }
-                                        params.addrList = addrs
 
-                                        params.raion = district_options[params.raion - 1].value
+                                        params.personList = []
+                                        for(key in $$('person_table').data.pull) {
+                                            let row = $$('person_table').data.pull[key]
+                                            delete(row.id)
+                                            params.personList.push(row)
+                                        }
+
+                                        params.validDate = webix.i18n.dateFormatStr(params.validDate)
+
+                                        params.raion = getOptionsValue(params.raion)
+                                        params.district = getOptionsValue(params.district)
 
                                         $$('label_sogl').showProgress({
                                             type: 'icon',
@@ -441,7 +511,7 @@ webix.ready(function() {
                                                     webix.confirm({
                                                         title:"Заявка внесена",
                                                         ok:"Закрыть",
-                                                        cancel:"Внести еще одного человека",
+                                                        cancel:"Внести еще заявку",
                                                         text:data
                                                     }).then(function(result){
                                                         window.location.replace('http://работающаябурятия.рф');
@@ -450,7 +520,9 @@ webix.ready(function() {
                                                         $$('form').clear()
                                                         $$('addform').clear()
                                                         $$('addform').hide()
-                                                        $$('addr_table').clearAll()
+                                                        $$('add_btn').show()
+                                                        $$('close_btn').hide()
+                                                        $$('person_table').clearAll()
                                                         $$('lastname').focus()
                                                     });
                                             })
@@ -478,5 +550,6 @@ webix.ready(function() {
     })
 
     $$('addform').hide()
+    $$('close_btn').hide()
     webix.extend($$('label_sogl'), webix.ProgressBar);
 })

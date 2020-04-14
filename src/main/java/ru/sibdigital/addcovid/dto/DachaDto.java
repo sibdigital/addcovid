@@ -4,10 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.sibdigital.addcovid.model.DocDachaPerson;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -18,7 +16,7 @@ public class DachaDto {
     private Integer id;
     private String district;
     private String address;
-    private LocalDate validDate;
+    private String validDate;
     private String link;
     private String raion;
     private String naspunkt;

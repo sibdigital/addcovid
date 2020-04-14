@@ -23,20 +23,20 @@ public class DocDachaPerson {
     @Column(name = "id", nullable = false)
     @SequenceGenerator(name = "DOC_DACHA_PERSON_SEQ_GEN", sequenceName = "doc_dacha_person_id_seq", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DOC_DACHA_PERSON_SEQ_GEN")
-    private int id;
+    private Integer id;
     private String lastname;
     private String firstname;
     private String patronymic;
     private Integer age;
+    @ManyToOne
+    @JoinColumn(name = "id_doc_dacha", referencedColumnName = "id", nullable = false)
     private DocDacha docDachaByIdDocDacha;
 
-    @Id
-    @Column(name = "id")
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -97,8 +97,6 @@ public class DocDachaPerson {
         return Objects.hash(id, lastname, firstname, patronymic, age);
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_doc_dacha", referencedColumnName = "id", nullable = false)
     public DocDacha getDocDachaByIdDocDacha() {
         return docDachaByIdDocDacha;
     }
