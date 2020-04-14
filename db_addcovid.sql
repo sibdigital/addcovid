@@ -207,7 +207,7 @@ create table if not exists doc_dacha_person
     lastname varchar(100),
     firstname varchar(100),
     patronymic varchar(100),
-    age integer,
+    age integer
 );
 
 -- create table if not exists doc_dacha_addr
