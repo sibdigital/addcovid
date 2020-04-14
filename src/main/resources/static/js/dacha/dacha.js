@@ -95,7 +95,7 @@ webix.ready(function() {
                 view: 'form',
                 complexData: true,
                 elements: [
-                    view_section('Адрес (откуда вы выезжаете на дачу)'),
+                    view_section('Откуда вы выезжаете'),
                     {
                         type: 'space',
                         //margin: 5,
@@ -127,7 +127,7 @@ webix.ready(function() {
                                         view: 'text',
                                         name: 'naspunkt',
                                         minwidth: 250,
-                                        label: 'Населенный пункт',
+                                        label: 'Населенный пункт/ДНТ/СНТ',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
                                         required: true
@@ -137,7 +137,7 @@ webix.ready(function() {
                         ]
                     },
 
-                    view_section('Место вашего следования (где находится ваша дача или дом)'),
+                    view_section('Куда вы следуете'),
                     {
                         type: 'space',
                         //margin: 5,
@@ -168,7 +168,7 @@ webix.ready(function() {
                                         minWidth: 250,
                                         view: 'text',
                                         name: 'address',
-                                        label: 'ДНТ/Адрес',
+                                        label: 'Населенный пункт/ДНТ/СНТ',
                                         labelPosition: 'top',
                                         required: true,
                                         invalidMessage: 'Поле не может быть пустым',
