@@ -328,7 +328,7 @@ webix.ready(function() {
                                 height: 200,
                                 select: 'row',
                                 autowidth: true,
-                                editable: true,
+                                editable: false,
                                 columns: [
                                     // { id: 'id', header: '', css: 'rank', autowidth: true },
                                     {
@@ -477,7 +477,11 @@ webix.ready(function() {
                                                 equalsRow(obj)
                                             }).length == 0)
                                             {
-                                                $$('age').callEvent('onEnter')
+                                                if($$('age').getValue() > 65){
+                                                    webix.alert("Данные не могут быть введены. Людям старше 65 лет предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
+                                                    return false;
+                                                }
+                                                //$$('age').callEvent('onEnter')
                                             }
                                         }
                                         else if($$('person_table').data.pull.length == 0) {

@@ -268,3 +268,4 @@ create table if not exists cls_excel
 alter table cls_excel owner to postgres
 ;
 
+alter table  doc_request alter column attachment_path type text;
