@@ -183,7 +183,8 @@ webix.ready(function() {
             },
             {
                 view: 'label',
-                label: '<a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/#top" target="_blank">Горячая линия</a>',
+                label: '<a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/#top" target="_blank">Горячая линия. </a>'
+                + '&nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/doc.pdf" target="_blank">Инструкция по заполнению формы </a>',
                 //css: 'main_label'
             },
             {
@@ -194,12 +195,14 @@ webix.ready(function() {
             {
                 view: 'label',
                 label: '<span  style="text-align: center;">При подаче заявки на 100 и более человек обязательно используйте шаблон для заполнения! ' +
-                    '<a  style="text-align: center;" href="http://работающаябурятия.рф/zayvka.xlsx" target="_blank">Скачать шаблон</a> </span>'
+                    '<a  style="text-align: center;" href="http://работающаябурятия.рф/zayvka.xlsx" target="_blank">Скачать шаблон </a>&nbsp&nbsp&nbsp' +
+                    '<a  style="text-align: center;" href="http://работающаябурятия.рф/doc_excel.pdf" target="_blank">Инструкция по заполнению шаблона Excel </a></span>'
                 //css: 'main_label'
             },
             {
                 view: 'label',
-                label: '<span  style="text-align: center;">Ссылка для загрузки данных по форме шаблона будет добавлена на форме заявки с 9.00 13.04.2020 г</span>',
+                label: '<span  style="text-align: center;">' +
+                    '<a  style="text-align: center;" href="http://form.govrb.ru/upload" target="_blank">Форма ввода с шаблоном Excel</a>  </span>'
                 //css: 'main_label'
             },
             {
@@ -217,6 +220,7 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationName',
+                                        id: 'organizationName',
                                         label: 'Полное наименование организации/фамилия, имя, отчество индивидуального предпринимателя',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
@@ -470,26 +474,25 @@ webix.ready(function() {
                             },
                             {
                                 view: 'label',
-                                label: '<span  style="text-align: center; color: red">Для загрузки нескольких файлов сожмите их в ZIP-архив и загрузите его</span>',
+                                label: '<span  style="text-align: center; color: red">Для загрузки нескольких файлов выбирайте их с зажатой клавишей Ctrl или заранее сожмите в ZIP-архив и загрузите его</span>',
                                 //css: 'main_label'
                             },
                             {
                                 view: 'label',
-                                label: '<span  style="text-align: center; color: red">Максимальный размер загружаемого PDF-файла или ZIP-архива не должен превышать 60 Мб</span>',
+                                label: '<span  style="text-align: center; color: red">Общий размер загружаемых файлов не должен превышать 60 Мб</span>',
                                 //css: 'main_label'
                             },
                             {
                                 id: 'upload',
                                 view: 'uploader',
                                 css: 'webix_secondary',
-                                value: 'Загрузить PDF-файл или ZIP-архив с пояснением обоснования',
-                                width: 400,
-                                height: 60,
+                                value: 'Загрузить PDF-файл(-ы) или ZIP-архив(-ы)  с пояснением обоснования',
                                 autosend: false,
+                                upload: '/uploadpart',
                                 required: true,
-                                align: 'center',
-                                multiple: false,
                                 accept: 'application/pdf, application/zip',
+                                multiple: true,
+                                link: 'filelist',
                                 on: {
                                     onBeforeFileAdd: function (upload) {
                                         if (upload.type.toUpperCase() !== 'PDF' && upload.type.toUpperCase() !== 'ZIP') {
@@ -498,6 +501,7 @@ webix.ready(function() {
                                             $$('send_btn').disable();
                                             return false;
                                         }
+/*
                                         let reader = new FileReader();
                                         reader.addEventListener("load", function () { // Setting up base64 URL on image
                                             uploadFile = window.btoa(reader.result);
@@ -512,15 +516,22 @@ webix.ready(function() {
                                         }, false);
                                         reader.readAsBinaryString(upload.file);
                                         uploadFilename = upload.name
-                                        return false;
+*/
+                                        //return false;
+
+                                        if($$('file').getValue()){
+                                            $$('file').setValue($$('file').getValue() + ',' + upload.name)
+                                        }
+                                        else {
+                                            $$('file').setValue(upload.name)
+                                        }
+                                        return true
                                     }
                                 }
                             },
                             {
-                                paddingLeft: 10,
-                                view: 'label',
-                                label: '',
-                                id: 'file'
+                                view:'list',  id:'filelist', type:'uploader',
+                                autoheight: true, borderless: true
                             },
                             {
                                 paddingLeft: 10,
@@ -719,10 +730,15 @@ webix.ready(function() {
                                 view: 'button',
                                 css: 'webix_primary',
                                 value: 'Подать заявку',
-                                disabled: true,
+                                //disabled: true,
+
+                                disabled: false,
+
                                 align: 'center',
                                 click: function () {
+
                                     if($$('form').validate()) {
+
                                         let params = $$('form').getValues();
 
                                         params.organizationInn = params.organizationInn.trim();
@@ -779,8 +795,9 @@ webix.ready(function() {
                                             webix.message('Слишком частое нажатие на кнопку', 'error')
                                             return false
                                         }
-                                        // if(!uploadFilename){
+                                        // if(!$$('upload').files.data.count()){
                                         //     webix.message('Необходимо вложить файл', 'error')
+                                        //     $$('upload').focus()
                                         //     return false
                                         // }
 
@@ -808,35 +825,78 @@ webix.ready(function() {
                                         params.organizationInn = params.organizationInn.trim()
                                         params.organizationOgrn  = params.organizationOgrn.trim()
 
-                                        params.attachment = uploadFile
-                                        params.attachmentFilename = uploadFilename
+                                        //params.attachment = uploadFile
+                                        //params.attachmentFilename = uploadFilename
 
                                         $$('label_sogl').showProgress({
                                             type: 'icon',
                                             delay: 5000
                                         })
 
-                                        webix.ajax()
-                                            .headers({'Content-type': 'application/json'})
-                                            .post('/',
-                                                JSON.stringify(params),
-                                                function (text, data, xhr) {
-                                                    console.log(text);
-                                                    webix.alert(text)
+
+                                        $$('upload').send(function(response) {
+                                            let uploadedFiles = []
+                                            $$('upload').files.data.each(function (obj) {
+                                                let status = obj.status
+                                                let name = obj.name
+                                                if(status == 'server'){
+                                                    let sname = obj.sname
+                                                    uploadedFiles.push(sname)
+                                                }
+                                            })
+
+                                            if(uploadedFiles.length != $$('upload').files.data.count()) {
+                                                webix.message('Не удалось загрузить файлы.')
+                                                $$('upload').focus()
+                                                return false
+                                            }
+                                            console.log(uploadedFiles)
+                                            params.attachment = uploadedFiles.join(',')
+                                            console.log(params)
+
+                                            webix.ajax()
+                                                .headers({'Content-type': 'application/json'})
+                                                //.headers({'Content-type': 'application/x-www-form-urlencoded'})
+                                                .post('/',
+                                                    JSON.stringify(params),
+                                                    //params,
+                                                    function (text, data, xhr) {
+                                                        console.log(text);
+
+                                                        webix.confirm({                                                        title:"Заявка внесена",
+                                                            ok: "Закрыть",
+                                                            cancel: "Внести еще одну заявку",
+                                                            text: text
+                                                        })
                                                         .then(function () {
                                                             $$('label_sogl').hideProgress();
-                                                            webix.message(text);
+                                                            window.location.replace('http://работающаябурятия.рф');
+                                                        })
+                                                        .fail(function(){
+                                                            $$('label_sogl').hideProgress()
+                                                            $$('form').clear()
+                                                            $$('upload').setValue()
+                                                            $$('form_person').clear()
+                                                            $$('form_addr').clear()
+                                                            $$('addr_table').clearAll()
+                                                            $$('person_table').clearAll()
+                                                            $$('organizationName').focus()
                                                         });
-
-                                                })
+                                                    })
+                                        })
                                     }
                                     else {
                                         webix.message('Не заполнены обязательные поля. Для просмотра прокрутите страницу вверх', 'error')
                                     }
                                 }
-
                             }
                         ]
+                    },
+                    {
+                        paddingLeft: 10,
+                        view: 'label',
+                        label: '',
+                        id: 'file'
                     }
                 ],
                 /*

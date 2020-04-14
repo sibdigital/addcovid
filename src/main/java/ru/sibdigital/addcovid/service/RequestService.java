@@ -5,6 +5,7 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.*;
@@ -46,8 +47,6 @@ public class RequestService {
 
     public DocRequest addNewRequest(PostFormDto postForm) {
 
-
-
         String sha256 = SHA256Generator.generate(postForm.getOrganizationInn(), postForm.getOrganizationOgrn(), postForm.getOrganizationName());
 
         DocRequest docRequest = null;
@@ -58,7 +57,6 @@ public class RequestService {
             docRequest = null;
         }
         ClsOrganization organization;
-
 
         if (docRequest != null) {
             organization = docRequest.getOrganization();
@@ -91,6 +89,7 @@ public class RequestService {
 
 
         //int importStatus = ImportStatuses.SUCCESS.getValue();
+/*
         String filename = "error while upload";
         try {
 
@@ -98,11 +97,13 @@ public class RequestService {
             if (!uploadFolder.exists()) {
                 uploadFolder.mkdirs();
             }
+*/
 /*
             File file = new File(String.format("%s\\%s_%s",uploadingDir, UUID.randomUUID(),postForm.getAttachment().getOriginalFilename()));
             postForm.getAttachment().transferTo(file);
             filename = file.getName();
-*/
+*//*
+
 
             byte[] valueDecoded = Base64.getDecoder().decode(postForm.getAttachment());
 
@@ -121,6 +122,9 @@ public class RequestService {
             //importStatus = ImportStatuses.FILE_ERROR.getValue();
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         }
+*/
+
+            String files = postForm.getAttachment();
 
             docRequest = DocRequest.builder()
                     .organization(organization)
@@ -129,7 +133,7 @@ public class RequestService {
                     //.personOfficeFactCnt(postForm.getPersonOfficeFactCnt())
                     .personRemoteCnt(postForm.getPersonRemoteCnt())
                     .personSlrySaveCnt(postForm.getPersonSlrySaveCnt())
-                    .attachmentPath(filename)
+                    .attachmentPath(files)
                     .docPersonSet(personSet)
                     .docAddressFact(docAddressFactSet)
                     .statusReview(0)
@@ -223,6 +227,10 @@ public class RequestService {
     };
 
     public void downloadFile(HttpServletResponse response, DocRequest DocRequest) throws Exception {
+
+        //TODO сделать проверку на наличие нескольких вложений
+        // и собрать в архив
+
         File downloadFile = new File(DocRequest.getAttachmentPath());
 
         FileInputStream inputStream = new FileInputStream(downloadFile);
@@ -255,5 +263,27 @@ public class RequestService {
             if(hash_code == iter.next().hashCode()) return true;
         }
         return false;
+    }
+
+    public String uploadFile(MultipartFile part){
+        try {
+
+            File uploadFolder = new File(uploadingDir);
+            if (!uploadFolder.exists()) {
+                uploadFolder.mkdirs();
+            }
+
+            File file = new File(String.format("%s/%s_%s", uploadFolder.getAbsolutePath(),
+                    UUID.randomUUID(), part.getOriginalFilename().replace(",", "_")));
+            part.transferTo(file);
+
+            return "{ \"status\": \"server\", \"sname\": \"" + String.format("/%s/%s", uploadingDir, file.getName()) + "\" }";
+
+        } catch (IOException ex){
+            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
+        } catch (Exception ex) {
+            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
+        }
+        return "{ \"status\": \"error\" }";
     }
 }

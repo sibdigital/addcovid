@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -23,13 +24,15 @@ import java.util.Objects;
 public class DocDacha {
     @Id
     @Column(name = "id", nullable = false)
-    @SequenceGenerator(name = "DOC_SEQ_GEN", sequenceName = "doc_dacha_id_seq", allocationSize = 1, schema = "public")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DOC_SEQ_GEN")
+    @SequenceGenerator(name = "DOC_DACHA_SEQ_GEN", sequenceName = "doc_dacha_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DOC_DACHA_SEQ_GEN")
     private int id;
-    private String lastname;
-    private String firstname;
-    private String patronymic;
-    private Integer age;
+    private String district;
+    private String address;
+    private LocalDate validDate;
+    private String link;
+    private String raion;
+    private String naspunkt;
     private Boolean isAgree;
     private Boolean isProtect;
     private Timestamp timeCreate;
@@ -38,13 +41,11 @@ public class DocDacha {
     private Integer statusReview;
     private Timestamp timeReview;
     private String rejectComment;
-    private String email;
     private String phone;
-    private String raion;
-    private String naspunkt;
+    private String email;
 
-    @OneToMany(targetEntity = DocDachaAddr.class, mappedBy="docDachaByIdDocDacha", fetch = FetchType.EAGER)
-    private Collection<DocDachaAddr> docDachaAddrs;
+    @OneToMany(targetEntity = DocDachaPerson.class, mappedBy = "docDachaByIdDocDacha", fetch = FetchType.LAZY)
+    private Collection<DocDachaPerson> docDachaPersons;
 
     public int getId() {
         return id;
@@ -55,43 +56,63 @@ public class DocDacha {
     }
 
     @Basic
-    @Column(name = "lastname")
-    public String getLastname() {
-        return lastname;
+    @Column(name = "district")
+    public String getDistrict() {
+        return district;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    @Basic
-    @Column(name = "firstname")
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setDistrict(String district) {
+        this.district = district;
     }
 
     @Basic
-    @Column(name = "patronymic")
-    public String getPatronymic() {
-        return patronymic;
+    @Column(name = "address")
+    public String getAddress() {
+        return address;
     }
 
-    public void setPatronymic(String patronymic) {
-        this.patronymic = patronymic;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     @Basic
-    @Column(name = "age")
-    public Integer getAge() {
-        return age;
+    @Column(name = "valid_date")
+    public LocalDate getValidDate() {
+        return validDate;
     }
 
-    public void setAge(Integer age) {
-        this.age = age;
+    public void setValidDate(LocalDate validDate) {
+        this.validDate = validDate;
+    }
+
+    @Basic
+    @Column(name = "link")
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
+    }
+
+    @Basic
+    @Column(name = "raion")
+    public String getRaion() {
+        return raion;
+    }
+
+    public void setRaion(String raion) {
+        this.raion = raion;
+    }
+
+    @Basic
+    @Column(name = "naspunkt")
+    public String getNaspunkt() {
+        return naspunkt;
+    }
+
+    public void setNaspunkt(String naspunkt) {
+        this.naspunkt = naspunkt;
     }
 
     @Basic
@@ -174,47 +195,8 @@ public class DocDacha {
         this.rejectComment = rejectComment;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DocDacha that = (DocDacha) o;
-        return id == that.id &&
-                Objects.equals(lastname, that.lastname) &&
-                Objects.equals(firstname, that.firstname) &&
-                Objects.equals(patronymic, that.patronymic) &&
-                Objects.equals(age, that.age) &&
-                Objects.equals(isAgree, that.isAgree) &&
-                Objects.equals(isProtect, that.isProtect) &&
-                Objects.equals(timeCreate, that.timeCreate) &&
-                Objects.equals(statusImport, that.statusImport) &&
-                Objects.equals(timeImport, that.timeImport) &&
-                Objects.equals(statusReview, that.statusReview) &&
-                Objects.equals(timeReview, that.timeReview) &&
-                Objects.equals(rejectComment, that.rejectComment);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, lastname, firstname, patronymic, age, isAgree, isProtect, timeCreate, statusImport, timeImport, statusReview, timeReview, rejectComment);
-    }
-
-    public Collection<DocDachaAddr> getDocDachaAddrs() {
-        return docDachaAddrs;
-    }
-
-    public void setDocDachaAddrs(Collection<DocDachaAddr> docDachaAddrsById) {
-        this.docDachaAddrs = docDachaAddrsById;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
+    @Basic
+    @Column(name = "phone")
     public String getPhone() {
         return phone;
     }
@@ -223,20 +205,50 @@ public class DocDacha {
         this.phone = phone;
     }
 
-    public String getRaion() {
-        return raion;
+    @Basic
+    @Column(name = "email")
+    public String getEmail() {
+        return email;
     }
 
-    public void setRaion(String raion) {
-        this.raion = raion;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public String getNaspunkt() {
-        return naspunkt;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DocDacha docDacha = (DocDacha) o;
+        return id == docDacha.id &&
+                Objects.equals(district, docDacha.district) &&
+                Objects.equals(address, docDacha.address) &&
+                Objects.equals(validDate, docDacha.validDate) &&
+                Objects.equals(link, docDacha.link) &&
+                Objects.equals(raion, docDacha.raion) &&
+                Objects.equals(naspunkt, docDacha.naspunkt) &&
+                Objects.equals(isAgree, docDacha.isAgree) &&
+                Objects.equals(isProtect, docDacha.isProtect) &&
+                Objects.equals(timeCreate, docDacha.timeCreate) &&
+                Objects.equals(statusImport, docDacha.statusImport) &&
+                Objects.equals(timeImport, docDacha.timeImport) &&
+                Objects.equals(statusReview, docDacha.statusReview) &&
+                Objects.equals(timeReview, docDacha.timeReview) &&
+                Objects.equals(rejectComment, docDacha.rejectComment) &&
+                Objects.equals(phone, docDacha.phone) &&
+                Objects.equals(email, docDacha.email);
     }
 
-    public void setNaspunkt(String naspunkt) {
-        this.naspunkt = naspunkt;
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, district, address, validDate, link, raion, naspunkt, isAgree, isProtect, timeCreate, statusImport, timeImport, statusReview, timeReview, rejectComment, phone, email);
     }
 
+    public Collection<DocDachaPerson> getDocDachaPersons() {
+        return docDachaPersons;
+    }
+
+    public void setDocDachaPersons(Collection<DocDachaPerson> docDachaPersons) {
+        this.docDachaPersons = docDachaPersons;
+    }
 }

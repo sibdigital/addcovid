@@ -5,12 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.sibdigital.addcovid.dto.DachaDto;
 import ru.sibdigital.addcovid.model.DocDacha;
-import ru.sibdigital.addcovid.model.DocDachaAddr;
-import ru.sibdigital.addcovid.repository.DocDachaAddrRepo;
+import ru.sibdigital.addcovid.model.DocDachaPerson;
+import ru.sibdigital.addcovid.repository.DocDachaPersonRepo;
 import ru.sibdigital.addcovid.repository.DocDachaRepo;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,25 +23,28 @@ public class DachaService {
     private DocDachaRepo docDachaRepo;
 
     @Autowired
-    DocDachaAddrRepo docDachaAddrRepo;
+    DocDachaPersonRepo docDachaPersonRepo;
 
     public DocDacha addNewRequest(DachaDto dachaDto) {
 
         DocDacha docDacha = null;
 
-        List<DocDachaAddr> docDachaAddr = dachaDto.getAddrList()
-                .stream()
-                .map(docDachaDto -> docDachaDto.convertToDocDachaAddr())
-                .collect(Collectors.toList());
+        List<DocDachaPerson> docDachaPersons = new ArrayList<>();
+        if (dachaDto.getPersonList() != null) {
+            docDachaPersons = dachaDto.getPersonList()
+                    .stream()
+                    .map(docDachaDto -> docDachaDto.convertToDocDachaPerson())
+                    .collect(Collectors.toList());
+        }
 
         docDacha = DocDacha.builder()
-                .lastname(dachaDto.getLastname())
-                .firstname(dachaDto.getFirstname())
-                .patronymic(dachaDto.getPatronymic())
-                .age(dachaDto.getAge())
                 .isAgree(dachaDto.getIsAgree())
                 .isProtect(dachaDto.getIsProtect())
-                .docDachaAddrs(docDachaAddr)
+                .validDate(dachaDto.getValidDate())
+                .link(dachaDto.getLink())
+                .raion(dachaDto.getRaion())
+                .naspunkt(dachaDto.getNaspunkt())
+                .docDachaPersons(docDachaPersons)
                 .statusReview(0)
                 .timeReview(Timestamp.valueOf(LocalDateTime.now()))
                 .statusImport(0)
@@ -56,12 +60,12 @@ public class DachaService {
 
         DocDacha finalDocDacha = docDacha;
 
-        docDacha.getDocDachaAddrs().forEach(item -> {
+        docDacha.getDocDachaPersons().forEach(item -> {
             item.setDocDachaByIdDocDacha(finalDocDacha);
         });
 
 
-        docDachaAddrRepo.saveAll(docDacha.getDocDachaAddrs());
+        docDachaPersonRepo.saveAll(docDacha.getDocDachaPersons());
 
         return docDacha;
     }

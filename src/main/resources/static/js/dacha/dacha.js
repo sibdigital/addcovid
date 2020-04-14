@@ -9,8 +9,11 @@ function view_section(title){
 }
 
 let district_options = [
+    { id: 24, value: 'г.Улан-Удэ'},
+    { id: 20, value: 'г. Гусиноозерск'},
+    { id: 18, value: 'г. Северобайкальск'},
     { id: 1, value: 'Баргузинский'},
-    { id: 2, value: 'Баунтовский '},
+    { id: 2, value: 'Баунтовский'},
     { id: 3, value: 'Бичурский'},
     { id: 4, value: 'Джидинский'},
     { id: 5, value: 'Еравнинский'},
@@ -26,13 +29,11 @@ let district_options = [
     { id: 15, value: 'Окинский'},
     { id: 16, value: 'Прибайкальский'},
     { id: 17, value: 'Северо-Байкальский'},
-    { id: 18, value: 'г. Северобайкальск'},
     { id: 19, value: 'Селенгинский'},
-    { id: 20, value: 'г. Гусиноозерск'},
     { id: 21, value: 'Тарбагатайский'},
     { id: 22, value: 'Тункинский'},
     { id: 23, value: 'Хоринский'},
-    { id: 24, value: 'г.Улан-Удэ'},
+
 ]
 
 webix.ready(function() {

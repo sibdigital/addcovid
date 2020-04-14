@@ -175,10 +175,12 @@ create table if not exists doc_dacha
     id serial not null
         constraint doc_dacha_pk
             primary key,
-    lastname varchar(100),
-    firstname varchar(100),
-    patronymic varchar(100),
-    age integer,
+    district varchar(255), --район дачи
+    address text,        -- ДНТ/СНТ, населенный пункт дачи
+    valid_date TIMESTAMP WITHOUT TIME ZONE, --дата действия
+    link varchar(255),
+    raion varchar(100), -- район убытия
+    naspunkt text, -- населенный пункт убытия
     is_agree boolean,
     is_protect boolean,
     time_create timestamp,
@@ -188,14 +190,12 @@ create table if not exists doc_dacha
     time_review timestamp,
     reject_comment text,
     phone varchar(100),
-    email varchar(100),
-    raion varchar(100),
-    naspunkt varchar(255)
+    email varchar(100)
 );
 
 alter table doc_dacha owner to postgres;
 
-create table if not exists doc_dacha_addr
+create table if not exists doc_dacha_person
 (
     id serial not null
         constraint doc_dacha_addr_pk
@@ -204,9 +204,24 @@ create table if not exists doc_dacha_addr
         constraint doc_dacha_addr_doc_dacha_id_fk
             references doc_dacha
             on delete cascade,
-    district varchar(255),
-    address text
+    lastname varchar(100),
+    firstname varchar(100),
+    patronymic varchar(100),
+    age integer
 );
+
+-- create table if not exists doc_dacha_addr
+-- (
+--     id serial not null
+--         constraint doc_dacha_addr_pk
+--             primary key,
+--     id_doc_dacha integer not null
+--         constraint doc_dacha_addr_doc_dacha_id_fk
+--             references doc_dacha
+--             on delete cascade,
+--     district varchar(255),
+--     address text
+-- );
 
 alter table doc_dacha_addr owner to postgres;
 
