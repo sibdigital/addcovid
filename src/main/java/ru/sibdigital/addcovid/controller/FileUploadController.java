@@ -175,7 +175,7 @@ public class FileUploadController {
                 uploadFolder.mkdirs();
             }
 
-            file = new File(String.format("%s\\%s_%s",uploadingAttacchmentDir, String.valueOf(System.currentTimeMillis()), pdfFile.getOriginalFilename()));
+            file = new File(String.format("%s/%s_%s",uploadFolder.getAbsolutePath(), String.valueOf(System.currentTimeMillis()), pdfFile.getOriginalFilename()));
             pdfFile.transferTo(file);
 
         } catch (IOException ex) {

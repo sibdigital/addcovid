@@ -79,14 +79,14 @@ webix.ready(function() {
                             {
                                 view: 'label',
                                 width: 300,
-                                label: '<span style="font-size: 1.3rem">ЕИС "Работающая Бурятия". </span>',
+                                label: '<span style="font-size: 1.3rem">Работающая Бурятия. </span>',
                                 tooltip: 'Зявка для дачников'
                             },
                             {
                                 view: 'label',
                                 minWidth: 400,
                                 autoheight: true,
-                                label: '<span style="font-size: 1.3rem">Зявка для дачников.</span>',
+                                label: '<span style="font-size: 1.3rem">Заявка для дачников.</span>',
                             }
                         ]
                     }
@@ -400,6 +400,35 @@ webix.ready(function() {
 
                     view_section('Подача заявки'),
                     {
+                        view: 'textarea',
+                        height: 60,
+                        readonly: true,
+                        value: 'Ознакомлен о необходимости иметь при себе по пути к месту следования паспорт и документы, ' +
+                            'подтверждающий право собственности или иное законное основание для владения загородными жилыми строениями, ' +
+                            'дачными (жилыми), садовыми домами, к земельным участкам, предоставленным в целях ведения садоводства, ' +
+                            'огородничества, личного подсобного хозяйства, индивидуального жилищного строительства.'
+                    },
+                    {
+                        view: 'checkbox',
+                        name: 'isAgree',
+                        id: 'isAgree',
+                        labelPosition: 'top',
+                        invalidMessage: 'Поле не может быть пустым',
+                        required: true,
+                        css: 'boldLabel',
+                        label: 'Подтверждаю ознакомление',
+                        on: {
+                            onChange (newv, oldv) {
+                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 ){
+                                    $$('send_btn').enable();
+                                }else{
+                                    $$('send_btn').disable();
+                                }
+                                //$$('send_btn').disabled = !($$('isAgree').getValue() && $$('isProtect').getValue() )
+                            }
+                        }
+                    },
+                    {
                         view: 'template',
                         height: 550,
                         readonly: true,
@@ -436,6 +465,7 @@ webix.ready(function() {
                     },
                     {
                         view: 'checkbox',
+                        id: 'isProtect',
                         name: 'isProtect',
                         labelPosition: 'top',
                         invalidMessage: 'Поле не может быть пустым',
@@ -448,9 +478,9 @@ webix.ready(function() {
                         label: 'Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия',
                         on: {
                             onChange(newv, oldv) {
-                                if (newv == 1) {
+                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 ){
                                     $$('send_btn').enable();
-                                } else {
+                                }else{
                                     $$('send_btn').disable();
                                 }
                             }
@@ -519,9 +549,9 @@ webix.ready(function() {
                                                 JSON.stringify(params),
                                                 function (data) {
                                                     webix.confirm({
-                                                        title:"Заявка внесена",
+                                                        title:"Ваше уведомление принято.",
                                                         ok:"Закрыть",
-                                                        cancel:"Внести еще заявку",
+                                                        cancel:"Внести еще уведомление",
                                                         text:data
                                                     }).then(function(result){
                                                         window.location.replace('http://работающаябурятия.рф');
