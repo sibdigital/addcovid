@@ -3,6 +3,7 @@ package ru.sibdigital.addcovid.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -107,13 +108,12 @@ public class MainController {
     }
 
     @PostMapping("/dacha")
-    public @ResponseBody
-    String dachaPostForm(@RequestBody DachaDto dachaDto) {
+    public ResponseEntity<String> dachaPostForm(@RequestBody DachaDto dachaDto) {
         try {
             DocDacha docDacha = dachaService.addNewRequest(dachaDto);
-            return "Ваша заявка внесена в базу данных дачников";
+            return ResponseEntity.ok().body("Ваша заявка внесена в базу данных дачников");
         } catch(Exception e){
-            return "Невозможно сохранить заявку";
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Невозможно сохранить заявку");
         }
     }
 }

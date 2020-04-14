@@ -10,7 +10,9 @@ import ru.sibdigital.addcovid.repository.DocDachaPersonRepo;
 import ru.sibdigital.addcovid.repository.DocDachaRepo;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,13 +36,15 @@ public class DachaService {
             docDachaPersons = dachaDto.getPersonList()
                     .stream()
                     .map(docDachaDto -> docDachaDto.convertToDocDachaPerson())
+                    //.map(docDachaDto -> docDachaDto.setId(null))
                     .collect(Collectors.toList());
         }
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         docDacha = DocDacha.builder()
                 .isAgree(dachaDto.getIsAgree())
                 .isProtect(dachaDto.getIsProtect())
-                .validDate(dachaDto.getValidDate())
+                .validDate(LocalDate.parse(dachaDto.getValidDate(), formatter))
                 .link(dachaDto.getLink())
                 .raion(dachaDto.getRaion())
                 .naspunkt(dachaDto.getNaspunkt())
