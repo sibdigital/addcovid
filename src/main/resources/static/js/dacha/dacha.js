@@ -78,7 +78,7 @@ webix.ready(function() {
                                 view: 'label',
                                 width: 300,
                                 label: '<span style="font-size: 1.3rem">ЕИС "Работающая Бурятия". </span>',
-                                tooltip: 'Форма подача заявки для дачников'
+                                tooltip: 'Зявка для дачников'
                             },
                             {
                                 view: 'label',
@@ -178,7 +178,7 @@ webix.ready(function() {
                         ]
                     },
 
-                    view_section('Срок действия разрешения'),
+                    view_section('День действия разрешения'),
                     {
                         view: 'datepicker',
                         id: 'validDate',
