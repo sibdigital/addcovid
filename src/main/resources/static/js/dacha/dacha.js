@@ -401,7 +401,7 @@ webix.ready(function() {
                     view_section('Подача заявки'),
                     {
                         view: 'textarea',
-                        height: 60,
+                        height: 100,
                         readonly: true,
                         value: 'Ознакомлен о необходимости иметь при себе по пути к месту следования паспорт и документы, ' +
                             'подтверждающий право собственности или иное законное основание для владения загородными жилыми строениями, ' +
@@ -548,10 +548,10 @@ webix.ready(function() {
                                             .post('/dacha',
                                                 JSON.stringify(params),
                                                 function (data) {
-                                                    webix.confirm({
+                                                    webix.alert({
                                                         title:"Ваше уведомление принято.",
                                                         ok:"Закрыть",
-                                                        cancel:"Внести еще уведомление",
+                                                        //cancel:"Внести еще уведомление",
                                                         text:data
                                                     }).then(function(result){
                                                         window.location.replace('http://работающаябурятия.рф');
