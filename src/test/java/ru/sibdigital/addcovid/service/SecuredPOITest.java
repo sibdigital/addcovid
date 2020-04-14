@@ -16,7 +16,8 @@ import java.net.URISyntaxException;
 @SpringBootTest
 public class SecuredPOITest {
 
-    @Test
+
+    //@Test
     public void readSecuredCells() throws IOException, URISyntaxException {
         ExcelParser excelParser = new ExcelParser();
         File file = new File(this.getClass().getClassLoader().getResource("all_ok.xlsx").toURI());

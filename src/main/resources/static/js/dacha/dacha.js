@@ -183,6 +183,8 @@ webix.ready(function() {
                         view: 'datepicker',
                         id: 'validDate',
                         name: 'validDate',
+                        startOnMonday:true,
+                        minDate: new Date(),
                         value: new Date(),
                         format: webix.i18n.dateFormatStr,
                         required: true
