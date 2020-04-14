@@ -1,6 +1,6 @@
 package ru.sibdigital.addcovid.controller;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
@@ -31,7 +31,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
-@Log4j
+@Log4j2
 @Controller
 public class FileUploadController {
 
@@ -140,13 +140,13 @@ public class FileUploadController {
 
         } catch (IOException ex){
             rm.addFlashAttribute("errorMessage", ex.getMessage());
-            log.error("ERROR", ex);
+            log.error("uploadFiles()", ex);
             excelRecord.setStatus(1);
             excelRecord.setDescription(ex.getMessage());
             excelRepo.save(excelRecord);
 
         }  catch (Exception ex) {
-            rm.addFlashAttribute("errorMessage", ex.getMessage());
+            rm.addFlashAttribute("uploadFiles()", ex.getMessage());
             log.error("ERROR", ex);
             if(ex instanceof SQLException){
 
@@ -179,10 +179,10 @@ public class FileUploadController {
 
         } catch (IOException ex) {
             //importStatus = ImportStatuses.FILE_ERROR.getValue();
-            log.error(String.format("xls file was not saved cause: %s", ex.getMessage()));
+            log.error("saveFile() " + String.format("xls file was not saved cause: %s", ex));
         } catch (Exception ex) {
             //importStatus = ImportStatuses.FILE_ERROR.getValue();
-            log.error(String.format("xls file was not saved cause: %s", ex.getMessage()));
+            log.error("saveFile() " + String.format("xls file was not saved cause: %s", ex));
         }
         return f;
     }
