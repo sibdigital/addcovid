@@ -112,7 +112,7 @@ public class MainController {
         try {
             DocDacha docDacha = dachaService.addNewRequest(dachaDto);
             return ResponseEntity.ok().body("<b>Желаем Вам счастливого пути!</b><br/>" +
-                    "Напоминаем о необходимости иметь при себе паспорт и документы, подтверждающий право собственности или владения недвижимостью!");
+                    "Напоминаем о необходимости иметь при себе паспорт и документы, подтверждающие право собственности или владения недвижимостью!");
         } catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Невозможно сохранить заявку");
         }
