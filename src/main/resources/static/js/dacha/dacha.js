@@ -59,6 +59,8 @@ webix.ready(function() {
 
     webix.i18n.setLocale("ru-RU");
 
+    webix.Date.startOnMonday = true;
+
     webix.ui({
         container: 'app',
         autowidth: true,
@@ -84,7 +86,7 @@ webix.ready(function() {
                                 view: 'label',
                                 minWidth: 400,
                                 autoheight: true,
-                                label: '<span style="font-size: 1.3rem">Форма подача заявки для дачников.</span>',
+                                label: '<span style="font-size: 1.3rem">Зявка для дачников.</span>',
                             }
                         ]
                     }
@@ -431,23 +433,24 @@ webix.ready(function() {
                             '<p style="text-align: left;">- пользуйтесь при кашле или чихании одноразовой салфеткой или платком, прикрывая рот. При их отсутствии чихайте в локтевой сгиб,</p>\n' +
                             '<p style="text-align: left;">- пользуйтесь индивидуальными предметами личной гигиены и одноразовой посудой,</p>\n' +
                             '<p style="text-align: left;">- обеспечьте в помещении влажную уборку с помощью дезинфицирующих средств и частое проветривание.</p>'
-                        },
-                        {
+                    },
+                    {
                         view: 'checkbox',
                         name: 'isProtect',
                         labelPosition: 'top',
                         invalidMessage: 'Поле не может быть пустым',
-                        validate: function(val){
-                            if(val) return true
+                        validate: function (val) {
+                            if (val) return true
                             else return false
                         },
                         required: true,
-                        label:  'Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия',
+                        css: 'boldLabel',
+                        label: 'Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия',
                         on: {
                             onChange(newv, oldv) {
-                                if (newv == 1){
+                                if (newv == 1) {
                                     $$('send_btn').enable();
-                                }else{
+                                } else {
                                     $$('send_btn').disable();
                                 }
                             }
@@ -456,6 +459,7 @@ webix.ready(function() {
                     {
                         id: 'label_sogl',
                         view: 'label',
+                        css: 'boldLabel',
                         label: 'Информация мною прочитана и я согласен с ней при подаче заявки',
                         align: 'center'
                     },
@@ -555,7 +559,8 @@ webix.ready(function() {
         ]
     })
 
-    $$('addform').hide()
-    $$('close_btn').hide()
+    $$('addform').hide();
+    $$('close_btn').hide();
+    $$('validDate').getPopup().getBody().define('minDate', new Date());
     webix.extend($$('label_sogl'), webix.ProgressBar);
 })
