@@ -29,7 +29,9 @@ public class ExcelParser {
     @Autowired
     ClsDepartmentRepo clsDepartmentRepo;
 
-
+    final int MAX_FIRSTNAME_LENGHTH = 100;
+    final int MAX_LASTNAME_LENGHTH  = 100;
+    final int MAX_PATRONYMIC_LENGHTH  = 100;
 
     final String[] SHEET_NAMES = {"ДАННЫЕ О ВАШЕЙ ОРГАНИЗАЦИИ", "АДРЕСНАЯ ИНФОРМАЦИЯ", "РАБОТНИКИ ВЫХОДЯЩИЕ НА РАБОТУ", "КУРИРУЮЩЕЕ МИНИСТЕРСТВО"};
 
@@ -584,19 +586,76 @@ public class ExcelParser {
                 emptyRows.add(i+1);
                 emptyRowCounter++;
             } else{
-
+                String[] firstname = personInfo.getFirstname().split(" ");
                 if(StringUtils.isBlank(personInfo.getFirstname())) {
                     log.info("parseSheetWithPeople: personInfo.getFirstname setted success as false, row: ", row.getRowNum()+1);
-                    errorString.append(String.format("Поле \"%s\" не может быть пустым",PEOPLE_COLUMNS_NAMES[0]));
-                    checkProtocol.setSuccess(false);
-                    skip=true;
-                }
-                if(StringUtils.isBlank(personInfo.getLastname())) {
-                    log.info("parseSheetWithPeople: personInfo.getLastname setted success as false, row: ", row.getRowNum()+1);
                     errorString.append(String.format("Поле \"%s\" не может быть пустым",PEOPLE_COLUMNS_NAMES[1]));
                     checkProtocol.setSuccess(false);
                     skip=true;
+                } else if (firstname.length != 1){
+                    for (int j = 0; j < firstname.length; j++) {
+                        if(firstname[j].equals(personInfo.getLastname()) || firstname[j].equals(personInfo.getPatronymic())){
+                            errorString.append(String.format("Поле \"%s\" не должно содержать ФИО!",PEOPLE_COLUMNS_NAMES[1]));
+                            checkProtocol.setSuccess(false);
+                            skip = true;
+                            break;
+                        }
+                    }
                 }
+                if(personInfo.getFirstname().length() > 100) {
+                    log.info("parseSheetWithPeople: personInfo.getFirstname setted success as false, row: ", row.getRowNum()+1);
+                    errorString.append(String.format("Поле \"%s\" не может быть длинее %d символов",PEOPLE_COLUMNS_NAMES[1], MAX_FIRSTNAME_LENGHTH));
+                    checkProtocol.setSuccess(false);
+                    skip=true;
+                }
+
+
+
+                String[] lastname = personInfo.getLastname().split(" ");
+                if(StringUtils.isBlank(personInfo.getLastname())) {
+                    log.info("parseSheetWithPeople: personInfo.getLastname setted success as false, row: ", row.getRowNum()+1);
+                    errorString.append(String.format("Поле \"%s\" не может быть пустым",PEOPLE_COLUMNS_NAMES[0]));
+                    checkProtocol.setSuccess(false);
+                    skip=true;
+                } else if (lastname.length != 1){
+                    for (int j = 0; j < lastname.length; j++) {
+                        if(lastname[j].equals(personInfo.getFirstname()) || lastname[j].equals(personInfo.getPatronymic())){
+                            errorString.append(String.format("Поле \"%s\" не должно содержать ФИО!",PEOPLE_COLUMNS_NAMES[0]));
+                            checkProtocol.setSuccess(false);
+                            skip = true;
+                            break;
+                        }
+                    }
+                }
+                if(personInfo.getLastname().length() > 100) {
+                    log.info("parseSheetWithPeople: personInfo.getFirstname setted success as false, row: ", row.getRowNum()+1);
+                    errorString.append(String.format("Поле \"%s\" не может быть длинее %d символов",PEOPLE_COLUMNS_NAMES[0], MAX_LASTNAME_LENGHTH));
+                    checkProtocol.setSuccess(false);
+                    skip=true;
+                }
+
+
+
+                String[] patronymic = personInfo.getPatronymic().split(" ");
+                if (patronymic.length != 1){
+                    for (int j = 0; j < patronymic.length; j++) {
+                        if(patronymic[j].equals(personInfo.getLastname()) || patronymic[j].equals(personInfo.getFirstname())){
+                            errorString.append(String.format("Поле \"%s\" не должно содержать ФИО!",PEOPLE_COLUMNS_NAMES[2]));
+                            checkProtocol.setSuccess(false);
+                            skip = true;
+                            break;
+                        }
+                    }
+                }
+                if(personInfo.getPatronymic().length() > 100) {
+                    log.info("parseSheetWithPeople: personInfo.getFirstname setted success as false, row: ", row.getRowNum()+1);
+                    errorString.append(String.format("Поле \"%s\" не может быть длинее %d символов",PEOPLE_COLUMNS_NAMES[0], MAX_PATRONYMIC_LENGHTH));
+                    checkProtocol.setSuccess(false);
+                    skip=true;
+                }
+
+
+
 
                 persons.add(personInfo);
                 emptyRowCounter = 0;
