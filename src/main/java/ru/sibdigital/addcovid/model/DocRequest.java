@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "doc_request", schema = "public")
@@ -47,7 +47,7 @@ public class DocRequest {
 
     @JsonIgnore
     @OneToMany(targetEntity = DocPerson.class, mappedBy="docRequest", fetch = FetchType.LAZY)
-    private Set<DocPerson> docPersonSet;
+    private List<DocPerson> docPersonList;
 
     @OneToOne
     @JoinColumn(name = "id_department", referencedColumnName = "id")
@@ -58,7 +58,7 @@ public class DocRequest {
     private ClsOrganization organization;
 
     @OneToMany(targetEntity = DocAddressFact.class, mappedBy="docRequestAddressFact", fetch = FetchType.EAGER)
-    private Set<DocAddressFact> docAddressFact;
+    private List<DocAddressFact> docAddressFact;
 
 /*    @SequenceGenerator(name = "REQUEST_SEQ", sequenceName = "doc_request_id_seq")*/
     public Long getId() {
@@ -211,12 +211,12 @@ public class DocRequest {
         this.timeReview = timeReview;
     }
 
-    public Set<DocPerson> getDocPersonSet() {
-        return docPersonSet;
+    public List<DocPerson> getDocPersonList() {
+        return docPersonList;
     }
 
-    public void setDocPersonSet(Set<DocPerson> docPersonSet) {
-        this.docPersonSet = docPersonSet;
+    public void setDocPersonList(List<DocPerson> docPersonList) {
+        this.docPersonList = docPersonList;
     }
 
     public ClsDepartment getDepartment() {
@@ -235,11 +235,11 @@ public class DocRequest {
         this.organization = organization;
     }
 
-    public Set<DocAddressFact> getDocAddressFact() {
+    public List<DocAddressFact> getDocAddressFact() {
         return docAddressFact;
     }
 
-    public void setDocAddressFact(Set<DocAddressFact> docAddressFact) {
+    public void setDocAddressFact(List<DocAddressFact> docAddressFact) {
         this.docAddressFact = docAddressFact;
     }
 
@@ -282,7 +282,7 @@ public class DocRequest {
                 Objects.equals(isProtect, that.isProtect) &&
                 Objects.equals(reqBasis, that.reqBasis) &&
                 Objects.equals(orgHashCode, that.orgHashCode) &&
-                Objects.equals(docPersonSet, that.docPersonSet) &&
+                Objects.equals(docPersonList, that.docPersonList) &&
                 Objects.equals(department, that.department) &&
                 Objects.equals(organization, that.organization) &&
                 Objects.equals(docAddressFact, that.docAddressFact);
@@ -290,6 +290,6 @@ public class DocRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview, isAgree, isProtect, reqBasis, orgHashCode, docPersonSet, department, organization, docAddressFact);
+        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview, isAgree, isProtect, reqBasis, orgHashCode, docPersonList, department, organization, docAddressFact);
     }
 }
