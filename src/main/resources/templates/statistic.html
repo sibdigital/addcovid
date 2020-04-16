@@ -19,6 +19,19 @@
     <link type="text/css" rel="stylesheet" href="/libs/webix.min.css">
     <script src="/libs/webix.min.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        /*.test .webix_canvas_text {*/
+        /*   font-size: 15px !important;-->*/
+        /*    offset: 1.5em !important;-->*/
+        /*}*/
+
+    tr {
+        line-height: 10px;
+        min-height: 10px;
+        height: 10px;
+    }
+    </style>
 </head>
 <body>
 <div th:insert="navbar-boots"></div>
@@ -26,10 +39,10 @@
 
 </div>
 <div class="container">
-    <div class="row my-2">
-        <div class="col">
+    <div class="row my-2 justify-content-center">
+        <div class="col-8">
             <div class="table-responsive-sm">
-                <table class="table" id="totalTable">
+                <table class=" table" id="totalTable">
                     <thead class="thead-dark">
                     <tr>
                         <th scope="col" class="text-center" style="width: 70%"></th>
@@ -50,8 +63,8 @@
     <div class="dropdown-divider"></div>
 
 
-    <div class="row my-2">
-        <div class="col">
+    <div class="row my-2 justify-content-center">
+        <div class="col-8">
             <div class="table-responsive-sm">
                 <table class="table" id="depTable">
                     <thead class="thead-dark">
@@ -166,9 +179,8 @@
             container: 'chart-dep',
             width: document.body.clientWidth,
             type:'clean',
-            height:250,
-            rows: [{
-                cols: [
+            // height:250,
+            rows: [
                     {
                         rows:[
                             {
@@ -176,7 +188,9 @@
                                 height:30
                             },
                             {
+                                height:250,
                                 view: "chart",
+                                // css: "test",
                                 type:"pie",
                                 value:"#value#",
                                 color:"#color#",
@@ -198,6 +212,7 @@
                                 height:30
                             },
                             {
+                                height: 250,
                                 view: "chart",
                                 type:"pie",
                                 value:"#value#",
@@ -212,10 +227,8 @@
                                 height:30
                             },
                         ]
-                    }
 
-                ]
-            }
+                    }
             ]
         })
     });
