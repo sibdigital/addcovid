@@ -53,30 +53,77 @@
 <!--    <div class="row my-2">-->
 <!--        <div class="col">-->
 <!--            <div class="table-responsive-sm">-->
-<!--                <table class="table" id="depTable">-->
+<!--                <table class="table" id="timeCreateTable">-->
 <!--                    <thead class="thead-dark">-->
 <!--                    <tr>-->
-<!--                        <th scope="col" class="text-center" style="width: 60%">ИОГВ</th>-->
-<!--                        <th scope="col" class="text-center" style="width: 20%">Тип</th>-->
-<!--                        <th scope="col" class="text-center" style="width: 20%">Кол-во</th>-->
+<!--                        <th scope="col" class="text-center" style="width: 50%">Дата подачи заявки</th>-->
+<!--                        <th scope="col" class="text-center" style="width: 50%">Заявки</th>-->
 <!--                    </tr>-->
 <!--                    </thead>-->
 
-<!--                    <tbody id="depBody">-->
+<!--                    <tbody id="timeCreateBody">-->
 
 <!--                    </tbody>-->
-<!--                    <span class="text-center" style="display:none" id="noResults1">Нет результатов</span>-->
+<!--                    <span class="text-center" style="display:none" id="noResultsTimeCreate">Нет результатов</span>-->
 <!--                </table>-->
 <!--            </div>-->
 <!--        </div>-->
 <!--    </div>-->
+
+    <div class="row my-2">
+        <div class="col">
+            <div class="table-responsive-sm">
+                <table class="table" id="valiDateTable">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col" class="text-center" style="width: 33%">Дата поездки</th>
+                        <th scope="col" class="text-center" style="width: 33%">Заявки</th>
+                        <th scope="col" class="text-center" style="width: 33%">Люди</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="validDateBody">
+
+                    </tbody>
+                    <span class="text-center" style="display:none" id="noResultsValidDate">Нет результатов</span>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="row my-2">
+        <div class="col">
+            <div class="table-responsive-sm">
+                <table class="table" id="depTable">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th scope="col" class="text-center" style="width: 33%">День подачи</th>
+                        <th scope="col" class="text-center" style="width: 33%">День поездки</th>
+                        <th scope="col" class="text-center" style="width: 33%">Кол-во заявок</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="depBody">
+
+                    </tbody>
+                    <span class="text-center" style="display:none" id="noResults1">Нет результатов</span>
+                </table>
+            </div>
+        </div>
+    </div>
 
 </div>
 
 <script th:inline="javascript">
 
     const totalStatistic = [[${totalStatistic}]]
-    //const departmentStatistic = [[${departmentStatistic}]]
+    const nearestDaysStatistic = [[${nearestDaysStatistic}]]
+
+   // const timeCreateStatistic = totalStatistic.timeCreateStatistic;
+    const validDateStatistic = totalStatistic.validDateStatistic;
 
     let total = 0
 
@@ -87,7 +134,7 @@
         return `${mo}.${da}.${ye}`
     }
 
-    function insertRow(firstCol, secondCol, cssClass=""){
+    function insertRowIntoTotalTable(firstCol, secondCol, cssClass=""){
         const html = `<tr>
             <td class="${cssClass}"> ${ firstCol } </td>
             <td class="${cssClass}"> ${ secondCol } </td>
@@ -96,12 +143,9 @@
         $("#totalBody").append(html);
     }
 
-
-
-
     totalStatistic.peopleStatistic.total = totalStatistic.peopleStatistic.accepted + totalStatistic.peopleStatistic.declined + totalStatistic.peopleStatistic.awaiting;
-    insertRow("Всего людей в утвержденных заявках", totalStatistic.peopleStatistic.accepted, "text-center font-weight-bold");
-    insertRow("Всего людей в заявках", totalStatistic.peopleStatistic.total, "text-center font-weight-bold");
+    insertRowIntoTotalTable("Всего людей в утвержденных заявках", totalStatistic.peopleStatistic.accepted, "text-center font-weight-bold");
+    insertRowIntoTotalTable("Всего людей в заявках", totalStatistic.peopleStatistic.total, "text-center font-weight-bold");
 
 
     for (let i = 0; i < totalStatistic.forEachDayStatistic.length; i++) {
@@ -111,48 +155,69 @@
         if(totalStatistic.forEachDayStatistic[i].date ){
 
         }
-        insertRow("За " + formatDate(totalStatistic.forEachDayStatistic[i].date), totalStatistic.forEachDayStatistic[i].total, "text-center")
+        insertRowIntoTotalTable("За " + formatDate(totalStatistic.forEachDayStatistic[i].date), totalStatistic.forEachDayStatistic[i].total, "text-center")
     }
 
-    insertRow('ВСЕГО ЗАЯВОК', total, "text-center font-weight-bold")
-    let totalAwaiting = 0, totalAccepted = 0, totalDeclined = 0;
-    function insertSecondRow(name, awaiting, accepted, declined, cssClass=""){
-        const totalInARow = awaiting + accepted + declined;
-        totalAwaiting += awaiting;
-        totalAccepted += accepted;
-        totalDeclined += declined;
+    insertRowIntoTotalTable('ВСЕГО ЗАЯВОК', total, "text-center font-weight-bold")
+
+
+
+    // function insertRowIntoTimeCreateTable(time_create, count, cssClass=""){
+    //     const html = `<tr>
+    //         <td class="${cssClass}"> ${ time_create } </td>
+    //         <td class="${cssClass}"> ${ count } </td>
+    //     </tr>
+    //     `
+    //
+    //     $("#timeCreateBody").append(html);
+    // }
+    //
+    // for (let i = 0; i < timeCreateStatistic.length; i++) {
+    //     insertRowIntoTimeCreateTable(formatDate(new Date(timeCreateStatistic[i].time_create)) , timeCreateStatistic[i].count, "text-center")
+    // }
+
+    function insertRowIntoValidDateTable(valid_date, request, people,cssClass=""){
+
 
         const html = `<tr>
-            <td class="${cssClass}" rowspan="4"> ${ name } </td>
-            <td class="${cssClass}"> Необработано </td>
-            <td class="${cssClass}"> ${ awaiting } </td>
+            <td class="${cssClass}"> ${ valid_date } </td>
+            <td class="${cssClass}"> ${ request} </td>
+            <td class="${cssClass}"> ${ people } </td>
+        </tr>
+        `
 
+        $("#validDateBody").append(html);
+    }
+
+    for (let i = 0; i < validDateStatistic.length; i++) {
+        insertRowIntoValidDateTable(formatDate(new Date(validDateStatistic[i].valid_date)) , validDateStatistic[i].request, validDateStatistic[i].people, "text-center")
+    }
+
+    let totalAwaiting = 0, totalAccepted = 0, totalDeclined = 0;
+    function insertRowIntoTimeCreateValidDateTable(time_create, valid_date, count, cssClass=""){
+
+
+        const html = `<tr>
+            <td class="${cssClass}"> ${ time_create } </td>
+            <td class="${cssClass}"> ${ valid_date} </td>
+            <td class="${cssClass}"> ${ count } </td>
         </tr>
-        <tr>
-            <td class="${cssClass}"> Утверждено </td>
-            <td class="${cssClass}"> ${ accepted } </td>
-        </tr>
-        <tr>
-            <td class="${cssClass}"> Отклонено </td>
-            <td class="${cssClass}"> ${ declined } </td>
-        </tr>
-        <tr>
-            <td class="text-center font-weight-bold"> Всего </td>
-            <td class="text-center font-weight-bold"> ${ totalInARow } </td>
-        </tr>`;
+        `
 
         $("#depBody").append(html);
     }
+    let prev_date;
+    for (let i = 0; i < nearestDaysStatistic.length; i++) {
+        insertRowIntoTimeCreateValidDateTable(nearestDaysStatistic[i].time_create == prev_date ? '' : formatDate(new Date(nearestDaysStatistic[i].time_create)), formatDate(new Date(nearestDaysStatistic[i].valid_date)) , nearestDaysStatistic[i].count, "text-center")
+        prev_date = nearestDaysStatistic[i].time_create;
+    }
 
-    // for (let i = 0; i < departmentStatistic.length; i++) {
-    //     insertSecondRow(departmentStatistic[i].name, departmentStatistic[i].awaiting, departmentStatistic[i].accepted, departmentStatistic[i].declined, "text-center")
-    // }
 
     chartData = {
         depStatistic: [
-            { value:totalDeclined, legend:"Отказано", color: "#ee3639" },
-            { value:totalAwaiting, legend:"Ожидают", color: "#ee9e36" },
-            { value:totalAccepted, legend:"Утвердили", color: "#a9ee36" },
+            { value:totalStatistic.requestStatistic[2] ? totalStatistic.requestStatistic[2].count : 0, legend:"Отказано", color: "#ee3639" },
+            { value:totalStatistic.requestStatistic[0] ? totalStatistic.requestStatistic[0].count : 0, legend:"Ожидают", color: "#ee9e36" },
+            { value:totalStatistic.requestStatistic[1] ? totalStatistic.requestStatistic[1].count : 0, legend:"Утвердили", color: "#a9ee36" },
         ],
         personStatistic: [
             { value:totalStatistic.peopleStatistic.declined, legend:"Отказано", color: "#ee3639" },

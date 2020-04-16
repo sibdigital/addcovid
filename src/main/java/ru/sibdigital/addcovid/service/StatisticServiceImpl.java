@@ -54,7 +54,8 @@ public class StatisticServiceImpl implements StatisticService {
     @Override
     public Map getTotalDachaStatistic() {
 
-        Map<String, Object> statistic = new HashMap(5);
+        Map<String, Object> statistic = new HashMap(8);
+
 
         Map<String, Object> peopleStatistic = new HashMap<>(3);
         peopleStatistic.put("accepted",docDachaPersonRepo.getTotalApprovedPeopleByReviewStatus(1));
@@ -62,9 +63,19 @@ public class StatisticServiceImpl implements StatisticService {
         peopleStatistic.put("awaiting",docDachaPersonRepo.getTotalApprovedPeopleByReviewStatus(0));
 
 
+
+
         statistic.put("peopleStatistic", peopleStatistic);
+        statistic.put("requestStatistic", docDachaRepo.getCountByReviewStatus());
         statistic.put("forEachDayStatistic", docDachaRepo.getStatisticForEachDay());
+       // statistic.put("timeCreateStatistic", docDachaRepo.getTotalStatisticByTimeCreate());
+        statistic.put("validDateStatistic", docDachaRepo.getTotalStatisticByValidDate());
         return statistic;
+    }
+
+    @Override
+    public List<Map<String, Object>> getNearestDaysDachaRequestStatistic() {
+        return docDachaRepo.getStatisticForNearestDays();
     }
 
 

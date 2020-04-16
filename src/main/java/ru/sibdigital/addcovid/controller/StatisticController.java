@@ -27,7 +27,7 @@ public class StatisticController {
     public String getDachaStatisticPage(Model model){
 
         model.addAttribute("totalStatistic", statisticService.getTotalDachaStatistic());
-        //model.addAttribute("departmentStatistic", statisticService.getDepartmentRequestStatistic());
+        model.addAttribute("nearestDaysStatistic", statisticService.getNearestDaysDachaRequestStatistic());
 
         return "dacha_statistic";
     }
