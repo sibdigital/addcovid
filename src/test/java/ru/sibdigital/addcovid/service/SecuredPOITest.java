@@ -644,8 +644,8 @@ public class SecuredPOITest {
         CheckProtocol checkProtocol = excelParser.parseFile(file);
         Assertions.assertEquals(false, checkProtocol.isSuccess());
     }
-    
-    
+
+
     @Test
     public void testPeopleEmptyError() throws IOException, URISyntaxException {
         File file = new File(this.getClass().getClassLoader().getResource("people_empty_error.xlsx").toURI());

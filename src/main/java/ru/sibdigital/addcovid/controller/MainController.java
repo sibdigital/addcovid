@@ -111,7 +111,8 @@ public class MainController {
     public ResponseEntity<String> dachaPostForm(@RequestBody DachaDto dachaDto) {
         try {
             DocDacha docDacha = dachaService.addNewRequest(dachaDto);
-            return ResponseEntity.ok().body("Ваша заявка внесена в базу данных дачников");
+            return ResponseEntity.ok().body("<b>Желаем Вам счастливого пути!</b><br/>" +
+                    "Напоминаем о необходимости иметь при себе паспорт и документы, подтверждающие право собственности или владения недвижимостью!");
         } catch(Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Невозможно сохранить заявку");
         }

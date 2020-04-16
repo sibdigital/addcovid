@@ -59,6 +59,8 @@ webix.ready(function() {
 
     webix.i18n.setLocale("ru-RU");
 
+    webix.Date.startOnMonday = true;
+
     webix.ui({
         container: 'app',
         autowidth: true,
@@ -77,14 +79,14 @@ webix.ready(function() {
                             {
                                 view: 'label',
                                 width: 300,
-                                label: '<span style="font-size: 1.3rem">ЕИС "Работающая Бурятия". </span>',
-                                tooltip: 'Форма подача заявки для дачников'
+                                label: '<span style="font-size: 1.3rem">Работающая Бурятия. </span>',
+                                tooltip: 'Зявка для дачников'
                             },
                             {
                                 view: 'label',
                                 minWidth: 400,
                                 autoheight: true,
-                                label: '<span style="font-size: 1.3rem">Форма подача заявки для дачников.</span>',
+                                label: '<span style="font-size: 1.3rem">Заявка для дачников.</span>',
                             }
                         ]
                     }
@@ -95,7 +97,7 @@ webix.ready(function() {
                 view: 'form',
                 complexData: true,
                 elements: [
-                    view_section('Адрес (откуда вы выезжаете на дачу)'),
+                    view_section('Откуда вы выезжаете'),
                     {
                         type: 'space',
                         //margin: 5,
@@ -127,7 +129,7 @@ webix.ready(function() {
                                         view: 'text',
                                         name: 'naspunkt',
                                         minwidth: 250,
-                                        label: 'Населенный пункт',
+                                        label: 'Населенный пункт/ДНТ/СНТ',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
                                         required: true
@@ -137,7 +139,7 @@ webix.ready(function() {
                         ]
                     },
 
-                    view_section('Место вашего следования (где находится ваша дача или дом)'),
+                    view_section('Куда вы следуете'),
                     {
                         type: 'space',
                         //margin: 5,
@@ -168,7 +170,7 @@ webix.ready(function() {
                                         minWidth: 250,
                                         view: 'text',
                                         name: 'address',
-                                        label: 'ДНТ/Адрес',
+                                        label: 'Населенный пункт/ДНТ/СНТ',
                                         labelPosition: 'top',
                                         required: true,
                                         invalidMessage: 'Поле не может быть пустым',
@@ -178,11 +180,13 @@ webix.ready(function() {
                         ]
                     },
 
-                    view_section('Срок действия разрешения'),
+                    view_section('День действия разрешения'),
                     {
                         view: 'datepicker',
                         id: 'validDate',
                         name: 'validDate',
+                        startOnMonday:true,
+                        minDate: new Date(),
                         value: new Date(),
                         format: webix.i18n.dateFormatStr,
                         required: true
@@ -328,7 +332,7 @@ webix.ready(function() {
                                 height: 200,
                                 select: 'row',
                                 autowidth: true,
-                                editable: true,
+                                editable: false,
                                 columns: [
                                     // { id: 'id', header: '', css: 'rank', autowidth: true },
                                     {
@@ -396,6 +400,35 @@ webix.ready(function() {
 
                     view_section('Подача заявки'),
                     {
+                        view: 'textarea',
+                        height: 100,
+                        readonly: true,
+                        value: 'Ознакомлен о необходимости иметь при себе по пути к месту следования паспорт и документы, ' +
+                            'подтверждающий право собственности или иное законное основание для владения загородными жилыми строениями, ' +
+                            'дачными (жилыми), садовыми домами, к земельным участкам, предоставленным в целях ведения садоводства, ' +
+                            'огородничества, личного подсобного хозяйства, индивидуального жилищного строительства.'
+                    },
+                    {
+                        view: 'checkbox',
+                        name: 'isAgree',
+                        id: 'isAgree',
+                        labelPosition: 'top',
+                        invalidMessage: 'Поле не может быть пустым',
+                        required: true,
+                        css: 'boldLabel',
+                        label: 'Подтверждаю ознакомление',
+                        on: {
+                            onChange (newv, oldv) {
+                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 ){
+                                    $$('send_btn').enable();
+                                }else{
+                                    $$('send_btn').disable();
+                                }
+                                //$$('send_btn').disabled = !($$('isAgree').getValue() && $$('isProtect').getValue() )
+                            }
+                        }
+                    },
+                    {
                         view: 'template',
                         height: 550,
                         readonly: true,
@@ -429,21 +462,23 @@ webix.ready(function() {
                             '<p style="text-align: left;">- пользуйтесь при кашле или чихании одноразовой салфеткой или платком, прикрывая рот. При их отсутствии чихайте в локтевой сгиб,</p>\n' +
                             '<p style="text-align: left;">- пользуйтесь индивидуальными предметами личной гигиены и одноразовой посудой,</p>\n' +
                             '<p style="text-align: left;">- обеспечьте в помещении влажную уборку с помощью дезинфицирующих средств и частое проветривание.</p>'
-                        },
-                        {
+                    },
+                    {
                         view: 'checkbox',
+                        id: 'isProtect',
                         name: 'isProtect',
                         labelPosition: 'top',
                         invalidMessage: 'Поле не может быть пустым',
-                        validate: function(val){
-                            if(val) return true
+                        validate: function (val) {
+                            if (val) return true
                             else return false
                         },
                         required: true,
-                        labelRight:  'Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия',
+                        css: 'boldLabel',
+                        label: 'Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия',
                         on: {
                             onChange(newv, oldv) {
-                                if (newv == 1){
+                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 ){
                                     $$('send_btn').enable();
                                 }else{
                                     $$('send_btn').disable();
@@ -454,6 +489,7 @@ webix.ready(function() {
                     {
                         id: 'label_sogl',
                         view: 'label',
+                        css: 'boldLabel',
                         label: 'Информация мною прочитана и я согласен с ней при подаче заявки',
                         align: 'center'
                     },
@@ -477,7 +513,11 @@ webix.ready(function() {
                                                 equalsRow(obj)
                                             }).length == 0)
                                             {
-                                                $$('age').callEvent('onEnter')
+                                                if($$('age').getValue() > 65){
+                                                    webix.alert("Данные не могут быть введены. Людям старше 65 лет предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
+                                                    return false;
+                                                }
+                                                //$$('age').callEvent('onEnter')
                                             }
                                         }
                                         else if($$('person_table').data.pull.length == 0) {
@@ -508,10 +548,10 @@ webix.ready(function() {
                                             .post('/dacha',
                                                 JSON.stringify(params),
                                                 function (data) {
-                                                    webix.confirm({
-                                                        title:"Заявка внесена",
+                                                    webix.alert({
+                                                        title:"Ваше уведомление принято.",
                                                         ok:"Закрыть",
-                                                        cancel:"Внести еще заявку",
+                                                        //cancel:"Внести еще уведомление",
                                                         text:data
                                                     }).then(function(result){
                                                         window.location.replace('http://работающаябурятия.рф');
@@ -549,7 +589,8 @@ webix.ready(function() {
         ]
     })
 
-    $$('addform').hide()
-    $$('close_btn').hide()
+    $$('addform').hide();
+    $$('close_btn').hide();
+    $$('validDate').getPopup().getBody().define('minDate', new Date());
     webix.extend($$('label_sogl'), webix.ProgressBar);
 })
