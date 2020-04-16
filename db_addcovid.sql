@@ -223,7 +223,7 @@ create table if not exists doc_dacha_person
 --     address text
 -- );
 
-alter table doc_dacha_addr owner to postgres;
+-- alter table doc_dacha_addr owner to postgres;
 
 create or replace view v_doc_person_and_org_info as (
     select pers.*,  org.inn, org.short_name from (

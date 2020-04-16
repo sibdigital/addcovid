@@ -3,6 +3,8 @@ package ru.sibdigital.addcovid.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.sibdigital.addcovid.repository.DocDachaPersonRepo;
+import ru.sibdigital.addcovid.repository.DocDachaRepo;
 import ru.sibdigital.addcovid.repository.DocPersonRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 
@@ -18,7 +20,13 @@ public class StatisticServiceImpl implements StatisticService {
     DocPersonRepo docPersonRepo;
 
     @Autowired
+    DocDachaPersonRepo docDachaPersonRepo;
+
+    @Autowired
     DocRequestRepo docRequestRepo;
+
+    @Autowired
+    DocDachaRepo docDachaRepo;
 
     @Override
     public Map<String, Object> getTotalStatistic(){
@@ -43,8 +51,21 @@ public class StatisticServiceImpl implements StatisticService {
         return rawStatistic;
     }
 
+    @Override
+    public Map getTotalDachaStatistic() {
+
+        Map<String, Object> statistic = new HashMap(5);
+
+        Map<String, Object> peopleStatistic = new HashMap<>(3);
+        peopleStatistic.put("accepted",docDachaPersonRepo.getTotalApprovedPeopleByReviewStatus(1));
+        peopleStatistic.put("declined",docDachaPersonRepo.getTotalApprovedPeopleByReviewStatus(2));
+        peopleStatistic.put("awaiting",docDachaPersonRepo.getTotalApprovedPeopleByReviewStatus(0));
 
 
+        statistic.put("peopleStatistic", peopleStatistic);
+        statistic.put("forEachDayStatistic", docDachaRepo.getStatisticForEachDay());
+        return statistic;
+    }
 
 
 }
