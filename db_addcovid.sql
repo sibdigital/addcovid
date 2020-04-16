@@ -269,3 +269,20 @@ alter table cls_excel owner to postgres
 ;
 
 alter table  doc_request alter column attachment_path type text;
+
+create unique index fki_dep_user_login
+    on dep_user (login);
+
+alter table dep_user owner to postgres;
+
+alter table doc_request add column id_reassigned_user integer;
+
+alter table doc_request
+    add constraint doc_request_reassigned_user_id_fk
+        foreign key (id_reassigned_user) references dep_user;
+
+alter table doc_request add column id_processed_user integer;
+
+alter table doc_request
+    add constraint doc_request_processed_user_id_fk
+        foreign key (id_processed_user) references dep_user;
