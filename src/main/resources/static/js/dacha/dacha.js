@@ -517,7 +517,7 @@ webix.ready(function() {
                                                     webix.alert("Данные не могут быть введены. Людям старше 65 лет предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
                                                     return false;
                                                 }
-                                                //$$('age').callEvent('onEnter')
+                                                $$('age').callEvent('onEnter')
                                             }
                                         }
                                         else if($$('person_table').data.pull.length == 0) {

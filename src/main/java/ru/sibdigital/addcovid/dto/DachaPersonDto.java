@@ -19,9 +19,9 @@ public class DachaPersonDto {
 
     public DocDachaPerson convertToDocDachaPerson(){
         return DocDachaPerson.builder()
-                .lastname(this.lastname)
-                .firstname(this.firstname)
-                .patronymic(this.patronymic)
+                .lastname(this.lastname != null ? this.lastname.trim() : this.lastname)
+                .firstname(this.firstname != null ? this.firstname.trim() : this.firstname)
+                .patronymic(this.patronymic != null ? this.patronymic.trim() : this.patronymic)
                 .age(this.age)
                 .build();
     }
