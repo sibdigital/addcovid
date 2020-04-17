@@ -107,6 +107,11 @@ public class MainController {
         return "dacha";
     }
 
+    @GetMapping("/barber")
+    public String barber(Map<String, Object> model) throws JsonProcessingException {
+        return "barber";
+    }
+
     @PostMapping("/dacha")
     public ResponseEntity<String> dachaPostForm(@RequestBody DachaDto dachaDto) {
         try {

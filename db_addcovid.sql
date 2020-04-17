@@ -286,3 +286,5 @@ alter table doc_request add column id_processed_user integer;
 alter table doc_request
     add constraint doc_request_processed_user_id_fk
         foreign key (id_processed_user) references dep_user;
+
+alter table  doc_request add  column id_type_request integer;
