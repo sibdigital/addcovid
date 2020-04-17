@@ -12,10 +12,16 @@ import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,15 +83,15 @@ public class RequestService {
             organization = clsOrganizationRepo.save(organization);
         }
 
-            Set<DocPerson> personSet = postForm.getPersons()
+            List<DocPerson> personList = postForm.getPersons()
                     .stream()
                     .map(personDto -> personDto.convertToPersonEntity())
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
 
-            Set<DocAddressFact> docAddressFactSet = postForm.getAddressFact()
+            List<DocAddressFact> docAddressFactList = postForm.getAddressFact()
                     .stream()
                     .map(personDto -> personDto.convertToDocAddressFact())
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
 
 
         //int importStatus = ImportStatuses.SUCCESS.getValue();
@@ -134,8 +140,8 @@ public class RequestService {
                     .personRemoteCnt(postForm.getPersonRemoteCnt())
                     .personSlrySaveCnt(postForm.getPersonSlrySaveCnt())
                     .attachmentPath(files)
-                    .docPersonSet(personSet)
-                    .docAddressFact(docAddressFactSet)
+                    .docPersonList(personList)
+                    .docAddressFact(docAddressFactList)
                     .statusReview(0)
                     .timeReview(Timestamp.valueOf(LocalDateTime.now()))
                     .statusImport(0)
@@ -154,12 +160,12 @@ public class RequestService {
                 docAddressFact.setDocRequest(finalDocRequest);
             });
 
-            docRequest.getDocPersonSet().forEach(docPerson -> {
+            docRequest.getDocPersonList().forEach(docPerson -> {
                 docPerson.setDocRequest(finalDocRequest);
             });
 
             docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
-            docPersonRepo.saveAll(docRequest.getDocPersonSet());
+            docPersonRepo.saveAll(docRequest.getDocPersonList());
 
             return docRequest;
         }

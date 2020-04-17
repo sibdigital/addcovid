@@ -5,18 +5,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import ru.sibdigital.addcovid.service.StatisticService;
 
 @Log4j2
 @Controller
-@RequestMapping(value = "statistic")
 public class StatisticController {
 
     @Autowired
     StatisticService statisticService;
 
-    @GetMapping()
+    @GetMapping(value = "/statistic")
     public String getStatisticPage(Model model){
 
         model.addAttribute("totalStatistic", statisticService.getTotalStatistic());
@@ -25,6 +23,14 @@ public class StatisticController {
         return "statistic";
     }
 
+    @GetMapping(value = "/dacha/statistic")
+    public String getDachaStatisticPage(Model model){
+
+        model.addAttribute("totalStatistic", statisticService.getTotalDachaStatistic());
+        model.addAttribute("nearestDaysStatistic", statisticService.getNearestDaysDachaRequestStatistic());
+
+        return "dacha_statistic";
+    }
 
 
 

@@ -104,4 +104,5 @@ public class DocDachaPerson {
     public void setDocDachaByIdDocDacha(DocDacha docDachaByIdDocDacha) {
         this.docDachaByIdDocDacha = docDachaByIdDocDacha;
     }
+
 }

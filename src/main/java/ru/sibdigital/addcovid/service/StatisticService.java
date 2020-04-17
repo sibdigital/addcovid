@@ -11,4 +11,7 @@ public interface StatisticService {
 
     List<Map<String, Object>> getDepartmentRequestStatistic();
 
+    Map getTotalDachaStatistic();
+
+    List<Map<String, Object>> getNearestDaysDachaRequestStatistic();
 }
