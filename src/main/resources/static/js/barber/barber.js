@@ -797,13 +797,15 @@ webix.ready(function() {
                                                         })
                                                         .fail(function(){
                                                             $$('label_sogl').hideProgress()
-                                                            $$('form').clear()
-                                                            $$('upload').setValue()
-                                                            $$('form_person').clear()
-                                                            $$('form_addr').clear()
-                                                            $$('addr_table').clearAll()
-                                                            $$('person_table').clearAll()
-                                                            $$('organizationName').focus()
+                                                            $$('form').clear();
+                                                            $$('upload').setValue();
+                                                            $$('form_person').clear();
+                                                            $$('form_addr').clear();
+                                                            $$('addr_table').clearAll();
+                                                            $$('person_table').clearAll();
+                                                            $$('organizationName').focus();
+                                                            $$("departmentId").setValue("4"); // name: '',
+                                                            $$("organizationOkved").setValue("93.02 - Предоставление услуг парикмахерскими и салонами красоты");
                                                         });
                                                     })
                                         })
