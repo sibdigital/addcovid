@@ -80,7 +80,7 @@ webix.ready(function() {
                                 view: 'label',
                                 width: 300,
                                 label: '<span style="font-size: 1.3rem">Работающая Бурятия. </span>',
-                                tooltip: 'Зявка для дачников'
+                                tooltip: 'Заявка для дачников.'
                             },
                             {
                                 view: 'label',

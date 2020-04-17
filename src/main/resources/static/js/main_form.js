@@ -181,7 +181,7 @@ var link_form = webix.ui({
             // },
             {
                 view: 'label',
-                label: '<a style="font-size: 1.0rem; text-align: center;" href="http://172.18.16.51:8090/barber" >Подать заявку для парикмахерской</a>',
+                label: '<a style="font-size: 1.0rem; text-align: center;" href="http://172.18.16.51:8090/barber" >Заявка на оказание парикмахерских услуг</a>',
                 width:0,
             },
         ],
