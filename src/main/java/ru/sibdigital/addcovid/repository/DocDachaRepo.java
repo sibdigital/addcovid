@@ -51,4 +51,5 @@ public interface DocDachaRepo extends JpaRepository<DocDacha, Long> {
             "group by date_trunc('day',dd.valid_date)" +
             "order by date_trunc('day',dd.valid_date)")
     List<Map<String, Object>> getTotalStatisticByValidDate();
+
 }

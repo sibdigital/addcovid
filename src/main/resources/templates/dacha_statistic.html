@@ -21,7 +21,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-<div th:insert="navbar-boots"></div>
+<div th:insert="~{navbar-bootstrap::frag ('Дачиники. Статистика.')}"></div>
 <div id="chart-dep">
 
 </div>
@@ -33,7 +33,7 @@
                     <thead class="thead-dark">
                     <tr>
                         <th scope="col" class="text-center" style="width: 70%"></th>
-                        <th scope="col" class="text-center" style="width: 30%">Заявки</th>
+                        <th scope="col" class="text-center" style="width: 30%">Уведомления</th>
                     </tr>
                     </thead>
 
@@ -56,8 +56,8 @@
 <!--                <table class="table" id="timeCreateTable">-->
 <!--                    <thead class="thead-dark">-->
 <!--                    <tr>-->
-<!--                        <th scope="col" class="text-center" style="width: 50%">Дата подачи заявки</th>-->
-<!--                        <th scope="col" class="text-center" style="width: 50%">Заявки</th>-->
+<!--                        <th scope="col" class="text-center" style="width: 50%">Дата подачи уведомлениях</th>-->
+<!--                        <th scope="col" class="text-center" style="width: 50%">Уведомления</th>-->
 <!--                    </tr>-->
 <!--                    </thead>-->
 
@@ -77,7 +77,7 @@
                     <thead class="thead-dark">
                     <tr>
                         <th scope="col" class="text-center" style="width: 33%">Дата поездки</th>
-                        <th scope="col" class="text-center" style="width: 33%">Заявки</th>
+                        <th scope="col" class="text-center" style="width: 33%">Уведомления</th>
                         <th scope="col" class="text-center" style="width: 33%">Люди</th>
                     </tr>
                     </thead>
@@ -133,6 +133,11 @@
         const [{ value: mo },,{ value: da },,{ value: ye }] = dtf.formatToParts(date)
         return `${mo}.${da}.${ye}`
     }
+    function formatDateWithoutYear(date) {
+        const [{ value: mo },,{ value: da },,{ value: ye }] = dtf.formatToParts(date)
+        return `${mo}.${da}`
+    }
+
 
     function insertRowIntoTotalTable(firstCol, secondCol, cssClass=""){
         const html = `<tr>
@@ -143,22 +148,35 @@
         $("#totalBody").append(html);
     }
 
-    totalStatistic.peopleStatistic.total = totalStatistic.peopleStatistic.accepted + totalStatistic.peopleStatistic.declined + totalStatistic.peopleStatistic.awaiting;
-    insertRowIntoTotalTable("Всего людей в утвержденных заявках", totalStatistic.peopleStatistic.accepted, "text-center font-weight-bold");
-    insertRowIntoTotalTable("Всего людей в заявках", totalStatistic.peopleStatistic.total, "text-center font-weight-bold");
-
+    //totalStatistic.peopleStatistic.total = totalStatistic.peopleStatistic.accepted + totalStatistic.peopleStatistic.declined + totalStatistic.peopleStatistic.awaiting;
+    totalStatistic.peopleStatistic.total = totalStatistic.peopleStatistic.awaiting;
+    //insertRowIntoTotalTable("Всего людей в утвержденных уведомлениях", totalStatistic.peopleStatistic.accepted, "text-center font-weight-bold");
+    insertRowIntoTotalTable("Всего людей в уведомлениях", totalStatistic.peopleStatistic.total, "text-center font-weight-bold");
+    chartData = {
+        requesrStatistic: [
+            //{  valid_date:[], time_create:[], legend:"Подано", color: "#ee9e36" },
+        ],
+        personStatistic: [
+            // { value:totalStatistic.peopleStatistic.declined, legend:"Отказано", color: "#ee3639" },
+            //{ valid_date:[], time_create:[], legend:"Подано", color: "#ee9e36" },
+            // { value:totalStatistic.peopleStatistic.accepted, legend:"Утвердили", color: "#a9ee36" },
+        ]
+    }
 
     for (let i = 0; i < totalStatistic.forEachDayStatistic.length; i++) {
 
         total += totalStatistic.forEachDayStatistic[i].total
         totalStatistic.forEachDayStatistic[i].date = new Date(totalStatistic.forEachDayStatistic[i].date.replace('T', ' '))
-        if(totalStatistic.forEachDayStatistic[i].date ){
 
-        }
+        chartData.requesrStatistic[i] = chartData.requesrStatistic[i] ? chartData.requesrStatistic[i] : {date: formatDate(new Date()), valid_date_count: 0, time_create_count: 0}
+        chartData.requesrStatistic[i].date = formatDateWithoutYear(totalStatistic.forEachDayStatistic[i].date)
+        chartData.requesrStatistic[i].time_create_count = totalStatistic.forEachDayStatistic[i].total
+
+
         insertRowIntoTotalTable("За " + formatDate(totalStatistic.forEachDayStatistic[i].date), totalStatistic.forEachDayStatistic[i].total, "text-center")
     }
 
-    insertRowIntoTotalTable('ВСЕГО ЗАЯВОК', total, "text-center font-weight-bold")
+    insertRowIntoTotalTable('ВСЕГО УВЕДОМЛЕНИЙ', total, "text-center font-weight-bold")
 
 
 
@@ -176,11 +194,13 @@
     //     insertRowIntoTimeCreateTable(formatDate(new Date(timeCreateStatistic[i].time_create)) , timeCreateStatistic[i].count, "text-center")
     // }
 
+
+
+
     function insertRowIntoValidDateTable(valid_date, request, people,cssClass=""){
 
-
         const html = `<tr>
-            <td class="${cssClass}"> ${ valid_date } </td>
+            <td class="${cssClass}"> ${ formatDate(valid_date) } </td>
             <td class="${cssClass}"> ${ request} </td>
             <td class="${cssClass}"> ${ people } </td>
         </tr>
@@ -189,9 +209,20 @@
         $("#validDateBody").append(html);
     }
 
+
+
     for (let i = 0; i < validDateStatistic.length; i++) {
-        insertRowIntoValidDateTable(formatDate(new Date(validDateStatistic[i].valid_date)) , validDateStatistic[i].request, validDateStatistic[i].people, "text-center")
+        validDateStatistic[i].valid_date = new Date(validDateStatistic[i].valid_date)
+
+        chartData.requesrStatistic[i] = chartData.requesrStatistic[i] ? chartData.requesrStatistic[i] : {date: formatDate(new Date()), valid_date_count: 0, time_create_count: 0}
+        chartData.requesrStatistic[i].date = formatDateWithoutYear(validDateStatistic[i].valid_date)
+        chartData.requesrStatistic[i].valid_date_count = validDateStatistic[i].request
+
+
+        insertRowIntoValidDateTable(validDateStatistic[i].valid_date , validDateStatistic[i].request, validDateStatistic[i].people, "text-center")
     }
+
+    console.log(chartData.requesrStatistic)
 
     let totalAwaiting = 0, totalAccepted = 0, totalDeclined = 0;
     function insertRowIntoTimeCreateValidDateTable(time_create, valid_date, count, cssClass=""){
@@ -213,42 +244,82 @@
     }
 
 
-    chartData = {
-        depStatistic: [
-            { value:totalStatistic.requestStatistic[2] ? totalStatistic.requestStatistic[2].count : 0, legend:"Отказано", color: "#ee3639" },
-            { value:totalStatistic.requestStatistic[0] ? totalStatistic.requestStatistic[0].count : 0, legend:"Ожидают", color: "#ee9e36" },
-            { value:totalStatistic.requestStatistic[1] ? totalStatistic.requestStatistic[1].count : 0, legend:"Утвердили", color: "#a9ee36" },
-        ],
-        personStatistic: [
-            { value:totalStatistic.peopleStatistic.declined, legend:"Отказано", color: "#ee3639" },
-            { value:totalStatistic.peopleStatistic.awaiting, legend:"Ожидают", color: "#ee9e36" },
-            { value:totalStatistic.peopleStatistic.accepted, legend:"Утвердили", color: "#a9ee36" },
-        ]
-    }
+    // chartData = {
+    //     depStatistic: [
+    //         // { value:totalStatistic.requestStatistic[2] ? totalStatistic.requestStatistic[2].count : 0, legend:"Отказано", color: "#ee3639" },
+    //         { value:totalStatistic.requestStatistic[0] ? totalStatistic.requestStatistic[0].count : 0, legend:"Подано", color: "#ee9e36" },
+    //         // { value:totalStatistic.requestStatistic[1] ? totalStatistic.requestStatistic[1].count : 0, legend:"Утвердили", color: "#a9ee36" },
+    //     ],
+    //     personStatistic: [
+    //         // { value:totalStatistic.peopleStatistic.declined, legend:"Отказано", color: "#ee3639" },
+    //         { value:totalStatistic.peopleStatistic.awaiting, legend:"Подано", color: "#ee9e36" },
+    //         // { value:totalStatistic.peopleStatistic.accepted, legend:"Утвердили", color: "#a9ee36" },
+    //     ]
+    // }
 
     webix.ready(function() {
         webix.ui({
             container: 'chart-dep',
             width: document.body.clientWidth,
             type:'clean',
-            height:250,
+            height:400,
             rows: [{
-                cols: [
-                    {
                         rows:[
                             {
-                                template:"<div style='width:100%;text-align:center'>Заявки</div>",
+                                template:"<div style='width:100%;text-align:center'>Уведомления</div>",
                                 height:30
                             },
+                            // {
+                            //     view: "chart",
+                            //     type:"pie",
+                            //     value:"#value#",
+                            //     color:"#color#",
+                            //     label:"#legend#",
+                            //     pieInnerText:"#value#",
+                            //     shadow:0,
+                            //     data:chartData.depStatistic
+                            // }, c
                             {
-                                view: "chart",
-                                type:"pie",
-                                value:"#value#",
-                                color:"#color#",
-                                label:"#legend#",
-                                pieInnerText:"#value#",
-                                shadow:0,
-                                data:chartData.depStatistic
+                                view:"chart",
+                                width:750,
+                                height:250,
+                                type:"area",
+                                barWidth:20,
+                                radius:2,
+                                alpha: 0.7,
+                                gradient:"rising",
+                                xAxis:{
+                                    template: "#date#",
+                                },
+                                yAxis:{
+                                    start:0,
+                                    step:5,
+                                },
+                                legend:{
+                                    values:[{text:"По дате поездки",color:"#4aa397"},{text:"По дате подачи",color:"#69ba00"}],
+                                    valign:"middle",
+                                    align:"right",
+                                    width:150,
+                                    height: 200,
+                                    layout:"y"
+                                },
+                                series:[
+                                    {
+                                        value:"#valid_date_count#",
+                                        color: "#4aa397",
+                                        tooltip:{
+                                            template:"#valid_date_count#"
+                                        }
+                                    },
+                                    {
+                                        value:"#time_create_count#",
+                                        color:"#69ba00",
+                                        tooltip:{
+                                            template:"#time_create_count#"
+                                        }
+                                    },
+                                ],
+                                data:chartData.requesrStatistic
                             },
                             {
                                 template:`<div style='width:100%;text-align:center'>Всего: ${total}</div>`,
@@ -256,32 +327,30 @@
                             },
                         ]
                     },
-                    {
-                        rows:[
-                            {
-                                template:"<div style='width:100%;text-align:center'>Люди</div>",
-                                height:30
-                            },
-                            {
-                                view: "chart",
-                                type:"pie",
-                                value:"#value#",
-                                color:"#color#",
-                                label:"#legend#",
-                                pieInnerText:"#value#",
-                                shadow:0,
-                                data:chartData.personStatistic
-                            },
-                            {
-                                template:`<div style='width:100%;text-align:center'>Всего: ${totalStatistic.peopleStatistic.total}</div>`,
-                                height:30
-                            },
-                        ]
-                    }
+                    // {
+                    //     rows:[
+                    //         {
+                    //             template:"<div style='width:100%;text-align:center'>Люди</div>",
+                    //             height:30
+                    //         },
+                    //         {
+                    //             view: "chart",
+                    //             type:"pie",
+                    //             value:"#value#",
+                    //             color:"#color#",
+                    //             label:"#legend#",
+                    //             pieInnerText:"#value#",
+                    //             shadow:0,
+                    //             data:chartData.personStatistic
+                    //         },
+                    //         {
+                    //             template:`<div style='width:100%;text-align:center'>Всего: ${totalStatistic.peopleStatistic.total}</div>`,
+                    //             height:30
+                    //         },
+                    //     ]
+                    // }
 
                 ]
-            }
-            ]
         })
     });
 
