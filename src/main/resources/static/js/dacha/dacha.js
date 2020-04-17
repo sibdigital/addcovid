@@ -93,6 +93,11 @@ webix.ready(function() {
                 ]
             },
             {
+                view: 'label',
+                label: '<span  style="text-align: center;">Телефон: 46-24-34; колл-центр: 573-900; 571-600 </span>',
+                //css: 'main_label'
+            },
+            {
                 id: 'form',
                 view: 'form',
                 complexData: true,

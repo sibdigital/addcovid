@@ -162,23 +162,27 @@ webix.ready(function() {
         rows: [
             {
                 view: 'toolbar',
-                //borderless: true,
-                height: 40,
-                //align: 'center',
-                cols: [
+                autoheight: true,
+                id: 't1',
+                rows: [
                     {
-                        /*
-                                                view: 'template',
-                                                width: 20,
-                                                borderless: true
-                        */
-                    },
-                    {
-                        view: 'label',
-                        label: '<span style="font-size: 1.5rem">Работающая Бурятия. Подача заявки для парикмахерской.</span>',
-                        //css: 'main_label'
-                    },
-                    {}
+                        responsive: 't1',
+                        css: 'webix_dark',
+                        cols: [
+                            {
+                                view: 'label',
+                                width: 300,
+                                label: '<span style="font-size: 1.0rem">Работающая Бурятия. </span>',
+                                tooltip: 'Зявка для дачников'
+                            },
+                            {
+                                view: 'label',
+                                minWidth: 400,
+                                autoheight: true,
+                                label: '<span style="font-size: 1.0rem">Подача&nbspзаявки&nbspдля&nbspпарикмахерской.</span>',
+                            }
+                        ]
+                    }
                 ]
             },
             {
@@ -287,8 +291,8 @@ webix.ready(function() {
                                         required: true,
                                         disabled: true,
                                         options: [
-                                            { id: 4, value: 'Минпром РБ '},
-                                            // { id: 2, value: 'Мин.экон РБ (В сфере финансовой, страховой деятельности)'},
+                                            //{ id: 4, value: 'Минпром РБ '},
+                                             { id: 2, value: 'Мин.экон РБ (В сфере финансовой, страховой деятельности)'},
                                             // { id: 3, value: 'Мин.имущества РБ ("оценочная деятельность, деятельность кадастровых инженеров")'},
                                             // { id: 5, value: 'Мин.природных ресурсов РБ (Предприятия добывающей промышленности, имеющие непрерывный )'},
                                             // { id: 6, value: 'Мин.сельхоз РБ'},
@@ -804,8 +808,7 @@ webix.ready(function() {
                                                             $$('addr_table').clearAll();
                                                             $$('person_table').clearAll();
                                                             $$('organizationName').focus();
-                                                            $$("departmentId").setValue("4"); // name: '',
-                                                            $$("organizationOkved").setValue("93.02 - Предоставление услуг парикмахерскими и салонами красоты");
+                                                            $$("departmentId").setValue("2"); // name: '',
                                                         });
                                                     })
                                         })
@@ -840,8 +843,7 @@ webix.ready(function() {
 
     $$('form_person').bind('person_table');
     $$('form_addr').bind('addr_table');
-    $$("departmentId").setValue("4"); // name: '',
-    $$("organizationOkved").setValue("93.02 - Предоставление услуг парикмахерскими и салонами красоты");
+    $$("departmentId").setValue("2"); // name: '',
     //93.02 - Предоставление услуг парикмахерскими и салонами красоты
 
     webix.extend($$('label_sogl'), webix.ProgressBar);
