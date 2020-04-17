@@ -44,6 +44,7 @@ public class DocRequest {
     private String orgHashCode;
     private String rejectComment;
     private Long old_department_id;
+    private Integer idTypeRequest;
 
     @JsonIgnore
     @OneToMany(targetEntity = DocPerson.class, mappedBy="docRequest", fetch = FetchType.LAZY)
@@ -263,6 +264,16 @@ public class DocRequest {
         this.old_department_id = old_department_id;
     }
 
+    @Basic
+    @Column(name = "id_type_request")
+    public Integer getIdTypeRequest() {
+        return idTypeRequest;
+    }
+
+    public void setIdTypeRequest(Integer idTypeRequest) {
+        this.idTypeRequest = idTypeRequest;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -282,6 +293,9 @@ public class DocRequest {
                 Objects.equals(isProtect, that.isProtect) &&
                 Objects.equals(reqBasis, that.reqBasis) &&
                 Objects.equals(orgHashCode, that.orgHashCode) &&
+                Objects.equals(rejectComment, that.rejectComment) &&
+                Objects.equals(old_department_id, that.old_department_id) &&
+                Objects.equals(idTypeRequest, that.idTypeRequest) &&
                 Objects.equals(docPersonList, that.docPersonList) &&
                 Objects.equals(department, that.department) &&
                 Objects.equals(organization, that.organization) &&
@@ -290,6 +304,6 @@ public class DocRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview, isAgree, isProtect, reqBasis, orgHashCode, docPersonList, department, organization, docAddressFact);
+        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview, isAgree, isProtect, reqBasis, orgHashCode, rejectComment, old_department_id, idTypeRequest, docPersonList, department, organization, docAddressFact);
     }
 }

@@ -14,6 +14,7 @@ import ru.sibdigital.addcovid.dto.ListItemDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.DocDacha;
 import ru.sibdigital.addcovid.model.DocRequest;
+import ru.sibdigital.addcovid.model.RequestTypes;
 import ru.sibdigital.addcovid.repository.ClsDepartmentRepo;
 import ru.sibdigital.addcovid.service.DachaService;
 import ru.sibdigital.addcovid.service.RequestService;
@@ -57,7 +58,7 @@ public class MainController {
             //валидация
             String errors = validate(postFormDto);
             if(errors.isEmpty()){
-                DocRequest docRequest = requestService.addNewRequest(postFormDto);
+                DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION);
 
 //            return hash;
                 return "Заявка принята. Ожидайте ответ на электронную почту.";
@@ -107,11 +108,6 @@ public class MainController {
         return "dacha";
     }
 
-    @GetMapping("/barber")
-    public String barber(Map<String, Object> model) throws JsonProcessingException {
-        return "barber";
-    }
-
     @PostMapping("/dacha")
     public ResponseEntity<String> dachaPostForm(@RequestBody DachaDto dachaDto) {
         try {
@@ -122,4 +118,32 @@ public class MainController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Невозможно сохранить заявку");
         }
     }
+
+    @GetMapping("/barber")
+    public String barber(Map<String, Object> model) throws JsonProcessingException {
+        return "barber";
+    }
+
+    @PostMapping("/barber")
+    public @ResponseBody
+    String postBarbershopForm(@RequestBody PostFormDto postFormDto) {
+
+        try {
+            //валидация
+            String errors = validate(postFormDto);
+            if(errors.isEmpty()){
+                DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.BARBERSHOP);
+
+                return "Заявка принята. Ожидайте ответ на электронную почту.";
+            }
+            else {
+                return "[" + errors + "]";
+            }
+
+        } catch(Exception e){
+            return "Невозможно сохранить заявку";
+        }
+    }
+
+
 }

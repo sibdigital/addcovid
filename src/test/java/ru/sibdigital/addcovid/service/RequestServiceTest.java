@@ -2,7 +2,6 @@ package ru.sibdigital.addcovid.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,6 +9,7 @@ import ru.sibdigital.addcovid.dto.FactAddressDto;
 import ru.sibdigital.addcovid.dto.PersonDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.DocRequest;
+import ru.sibdigital.addcovid.model.RequestTypes;
 import ru.sibdigital.addcovid.model.ReviewStatuses;
 import ru.sibdigital.addcovid.repository.ClsDepartmentRepo;
 
@@ -82,7 +82,7 @@ class RequestServiceTest {
     //@Test
     public void testAdd() {
 
-        DocRequest docRequest = requestService.addNewRequest(postForm);
+        DocRequest docRequest = requestService.addNewRequest(postForm, RequestTypes.ORGANIZATION);
         Assertions.assertEquals(docRequest.getAttachmentPath(), "error while upload");
 
     }
@@ -107,7 +107,7 @@ class RequestServiceTest {
         }
         this.postForm.setAttachmentFilename("db_addcovid.sql");
         this.postForm.setAttachment(stringBuilder.toString());
-        DocRequest docRequest = requestService.addNewRequest(postForm);
+        DocRequest docRequest = requestService.addNewRequest(postForm, RequestTypes.ORGANIZATION);
         Assertions.assertNotEquals(docRequest.getAttachmentPath(), "error while upload");
 
 

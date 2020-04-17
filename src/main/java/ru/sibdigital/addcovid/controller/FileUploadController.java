@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.ClsExcel;
+import ru.sibdigital.addcovid.model.RequestTypes;
 import ru.sibdigital.addcovid.parser.CheckProtocol;
 import ru.sibdigital.addcovid.parser.ExcelParser;
 import ru.sibdigital.addcovid.repository.ClsExcelRepo;
@@ -130,7 +131,7 @@ public class FileUploadController {
             postFormDto.setReqBasis(reqBasis);
 
             if(checkProtocol.isSuccess()) {
-                requestService.addNewRequest(postFormDto);
+                requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION);
                 excelRecord.setStatus(0);
             } else {
                 excelRecord.setStatus(1);

@@ -780,7 +780,7 @@ webix.ready(function() {
                                             webix.ajax()
                                                 .headers({'Content-type': 'application/json'})
                                                 //.headers({'Content-type': 'application/x-www-form-urlencoded'})
-                                                .post('/',
+                                                .post('/barber',
                                                     JSON.stringify(params),
                                                     //params,
                                                     function (text, data, xhr) {

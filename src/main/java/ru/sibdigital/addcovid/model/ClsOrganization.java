@@ -32,6 +32,7 @@ public class ClsOrganization {
     private String phone;
     private Integer statusImport;
     private Timestamp timeImport;
+    private Integer idTypeRequest;
 
 
     public Long getId() {
@@ -152,6 +153,16 @@ public class ClsOrganization {
         this.timeImport = timeImport;
     }
 
+    @Basic
+    @Column(name = "id_type_request", nullable = true)
+    public Integer getIdTypeRequest() {
+        return idTypeRequest;
+    }
+
+    public void setIdTypeRequest(Integer idTypeRequest) {
+        this.idTypeRequest = idTypeRequest;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -168,13 +179,16 @@ public class ClsOrganization {
                 Objects.equals(email, that.email) &&
                 Objects.equals(phone, that.phone) &&
                 Objects.equals(statusImport, that.statusImport) &&
-                Objects.equals(timeImport, that.timeImport);
+                Objects.equals(timeImport, that.timeImport) &&
+                Objects.equals(idTypeRequest, that.idTypeRequest);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, shortName, inn, ogrn, addressJur, okvedAdd, okved, email, phone, statusImport, timeImport);
+        return Objects.hash(id, name, shortName, inn, ogrn, addressJur, okvedAdd, okved, email, phone, statusImport, timeImport, idTypeRequest);
     }
+
+
 
 
 }

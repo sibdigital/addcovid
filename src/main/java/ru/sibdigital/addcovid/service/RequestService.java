@@ -51,7 +51,7 @@ public class RequestService {
 
     private static final int BUFFER_SIZE = 4096;
 
-    public DocRequest addNewRequest(PostFormDto postForm) {
+    public DocRequest addNewRequest(PostFormDto postForm, RequestTypes requestType) {
 
         String sha256 = SHA256Generator.generate(postForm.getOrganizationInn(), postForm.getOrganizationOgrn(), postForm.getOrganizationName());
 
@@ -79,6 +79,7 @@ public class RequestService {
                     .phone(postForm.getOrganizationPhone())
                     .statusImport(0)
                     .timeImport(Timestamp.valueOf(LocalDateTime.now()))
+                    .idTypeRequest(requestType.getValue())
                     .build();
             organization = clsOrganizationRepo.save(organization);
         }
@@ -151,6 +152,7 @@ public class RequestService {
                     .isProtect(postForm.getIsProtect())
                     .reqBasis(postForm.getReqBasis())
                     .orgHashCode(sha256)
+                    .idTypeRequest(requestType.getValue())
                     .build();
 
             docRequest = docRequestRepo.save(docRequest);
