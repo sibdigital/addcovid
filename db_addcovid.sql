@@ -288,3 +288,4 @@ alter table doc_request
         foreign key (id_processed_user) references dep_user;
 
 alter table  doc_request add  column id_type_request integer;
+alter table  cls_organization add  column id_type_request integer;
