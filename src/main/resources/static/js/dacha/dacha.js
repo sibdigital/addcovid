@@ -94,7 +94,7 @@ webix.ready(function() {
             },
             {
                 view: 'label',
-                label: '<span  style="text-align: center;">Телефон: 46-24-34; колл-центр: 573-900; 571-600 </span>',
+                label: '<span  style="text-align: center;">Телефон: 8 (3012) 46-24-34; колл-центр: 8 (3012) 573-900; 8 (3012) 571-600 </span>',
                 //css: 'main_label'
             },
             {

@@ -50,28 +50,6 @@ public class MainController {
         return "index";
     }
 
-    @PostMapping("/")
-    public @ResponseBody
-    String postForm(@RequestBody PostFormDto postFormDto) {
-
-        try {
-            //валидация
-            String errors = validate(postFormDto);
-            if(errors.isEmpty()){
-                DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION);
-
-//            return hash;
-                return "Заявка принята. Ожидайте ответ на электронную почту.";
-            }
-            else {
-                return "[" + errors + "]";
-            }
-
-        } catch(Exception e){
-            return "Невозможно сохранить заявку";
-        }
-    }
-
     @PostMapping(value = "/uploadpart", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> uploadFile(@RequestParam(value = "upload") MultipartFile file){
         return ResponseEntity.ok().body(requestService.uploadFile(file));
@@ -122,6 +100,33 @@ public class MainController {
     @GetMapping("/barber")
     public String barber(Map<String, Object> model) throws JsonProcessingException {
         return "barber";
+    }
+
+    @GetMapping("/form")
+    public String form(Map<String, Object> model) throws JsonProcessingException {
+        return "form";
+    }
+
+    @PostMapping("/form")
+    public @ResponseBody
+    String postForm(@RequestBody PostFormDto postFormDto) {
+
+        try {
+            //валидация
+            String errors = validate(postFormDto);
+            if(errors.isEmpty()){
+                DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION);
+
+//            return hash;
+                return "Заявка принята. Ожидайте ответ на электронную почту.";
+            }
+            else {
+                return "[" + errors + "]";
+            }
+
+        } catch(Exception e){
+            return "Невозможно сохранить заявку";
+        }
     }
 
     @PostMapping("/barber")
