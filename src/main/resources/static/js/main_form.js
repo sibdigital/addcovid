@@ -158,7 +158,7 @@ var link_form = webix.ui({
     view: "window",
     modal:true,
     container: 'app',
-    width:550,
+    width:document.body.clientWidth,
     position: 'top',
     head: "&nbsp&nbsp&nbsp&nbspВыберите необходимое действие&nbsp&nbsp&nbsp&nbsp",
     body: {
@@ -166,17 +166,17 @@ var link_form = webix.ui({
         rows: [
             {
                 view: 'label',
-                label: '<a style="font-size: 1.3rem; text-align: center;" href="http://rabota.govrb.ru/form" >Подать заявку</a>',
+                label: '<a style="font-size:calc(0.75em + 1vmin); text-align: center;" href="http://rabota.govrb.ru/form" >Подать заявку</a>',
                 width:0,
             },
             {
                 view: 'label',
-                label: '<a style="font-size: 1.3rem; text-align: center;" href="http://form.govrb.ru/upload/" >Подать заявку (более 100 сотрудников)</a>',
+                label: '<a style="font-size: calc(0.75em + 1vmin); text-align: center;" href="http://form.govrb.ru/upload/" >Подать заявку (более 100 сотрудников)</a>',
                 width:0,
             },
             {
                 view: 'label',
-                label: '<a style="font-size: 1.3rem; text-align: center;" href="http://rabota.govrb.ru/barber" >Заявка на оказание ПАРИКМАХЕРСКИХ УСЛУГ</a>',
+                label: '<a style="font-size: calc(0.75em + 1vmin); text-align: center;" href="http://rabota.govrb.ru/barber" >Заявка на оказание ПАРИКМАХЕРСКИХ УСЛУГ</a>',
                 width:0,
             },
         ],

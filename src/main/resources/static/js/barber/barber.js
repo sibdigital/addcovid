@@ -609,6 +609,7 @@ webix.ready(function() {
                         readonly: true,
                         scroll:true,
                         template:
+                            '<p><a href="http://Работающаябурятия.рф/predpisanie.docx">&nbsp;ДАНЫЕ ПРАВИЛА ДОЛЖНЫ БЫТЬ РАСПЕЧАТАНЫ КРУПНЫМ ШРИФТОМ (РАЗМЕР ШРИФТА НЕ МЕНЕЕ, ЧЕМ 22 Times New Roman) И РАЗМЕЩЕНЫ НА ВИДНОМ ДЛЯ ПОСЕТИТЕЛЯ МЕСТЕ.</a></p>' +
                             '<p style="text-align: center;"><strong>ПРЕДПИСАНИЕ&nbsp;</strong></p>\n' +
                             '<p style="text-align: center;"><strong>Управления Роспотребнадзора по Республике Бурятия</strong></p>\n' +
                             '<p style="text-align: center;"><strong>Методические рекомендации (требования) по профилактике новой коронавирусной инфекции (COVID-19) среди должностных лиц и работников организаций коммунально-бытового назначения,&nbsp;оказывающих парикмахерские услуги</strong></p>\n' +
