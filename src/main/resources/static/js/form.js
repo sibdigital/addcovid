@@ -29,7 +29,7 @@ function addPerson(){
         //isagree: values.isagree
     }, $$('person_table').count() + 1)
 
-    let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!';
+    let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
     if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && !is_no_pdf){
         $$('send_btn').enable();
     }else{
@@ -66,7 +66,7 @@ function removePerson(){
             function () {
                 $$("person_table").remove($$("person_table").getSelectedId());
                 let cnt = $$('person_table').data.count();
-                let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!';
+                let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
 
                 if(cnt>0){
                     $$('clearPersonsBtn').enable();
@@ -152,6 +152,7 @@ function removeAddr(){
 let uploadFile = '';
 let uploadFilename = '';
 let pred_date = new Date();
+let upload_chack_error = 'Загружать можно только PDF-файлы и ZIP-архивы!';
 
 webix.ready(function() {
     webix.ui({
@@ -498,7 +499,7 @@ webix.ready(function() {
                                 on: {
                                     onBeforeFileAdd: function (upload) {
                                         if (upload.type.toUpperCase() !== 'PDF' && upload.type.toUpperCase() !== 'ZIP') {
-                                            $$('no_pdf').setValue('Загружать можно только PDF-файлы и ZIP-архивы!');
+                                            $$('no_pdf').setValue(upload_chack_error);
                                             $$('file').setValue('');
                                             $$('send_btn').disable();
                                             return false;
@@ -526,6 +527,13 @@ webix.ready(function() {
                                         }
                                         else {
                                             $$('file').setValue(upload.name)
+                                        }
+                                        $$('no_pdf').setValue('');
+                                        let cnt = $$('person_table').data.count();
+                                        if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0){
+                                            $$('send_btn').enable();
+                                        }else{
+                                            $$('send_btn').disable();
                                         }
                                         return true
                                     }
@@ -664,7 +672,7 @@ webix.ready(function() {
                         on: {
                             onChange (newv, oldv) {
                                 let cnt = $$('person_table').data.count();
-                                let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!';
+                                let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
                                 if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0 && !is_no_pdf){
                                     $$('send_btn').enable();
                                 }else{
@@ -710,7 +718,7 @@ webix.ready(function() {
                         on: {
                             onChange(newv, oldv) {
                                 let cnt = $$('person_table').data.count();
-                                let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!';
+                                let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
                                 if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0 && !is_no_pdf){
                                     $$('send_btn').enable();
                                 }else{
@@ -732,10 +740,9 @@ webix.ready(function() {
                                 view: 'button',
                                 css: 'webix_primary',
                                 value: 'Подать заявку',
-                                //disabled: true,
-
-                                disabled: false,
-
+                                //НЕ МЕНЯТЬ!
+                                disabled: true, //НЕ МЕНЯТЬ!
+                                //НЕ МЕНЯТЬ!
                                 align: 'center',
                                 click: function () {
 

@@ -115,6 +115,12 @@ public class MainController {
             //валидация
             String errors = validate(postFormDto);
             if(errors.isEmpty()){
+                if (postFormDto.getIsAgree() == false){
+                    return "Необходимо подтвердить согласие работников на обработку персональных данных";
+                }
+                if (postFormDto.getIsProtect() == false){
+                    return "Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия";
+                }
                 DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION);
 
 //            return hash;
