@@ -797,6 +797,15 @@ webix.ready(function() {
                                             return false
                                         }
 
+                                        if (params.isAgree != 1){
+                                            webix.message('Необходимо подтвердить согласие работников на обработку персональных данных', 'error')
+                                            return false
+                                        }
+                                        if (params.isProtect != 1) {
+                                            webix.message('Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия', 'error')
+                                            return false
+                                        }
+
                                         let cur_date = new Date();
                                         let dif  = Math.abs((cur_date.getTime() - pred_date.getTime()) /1000);
                                         pred_date = new Date();

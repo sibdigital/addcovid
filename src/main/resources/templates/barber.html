@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Парикмахерские. Работающая Бурятия</title>
 <!--    <link type="text/css" rel="stylesheet" href="/libs/webix.css">-->
-    <link href="/libs/skins/flat.min.css" rel="stylesheet" type="text/css">
-    <script src="/libs/webix.min.js"></script>
+<!--    <link href="/libs/skins/flat.min.css" rel="stylesheet" type="text/css">-->
+<!--    <script src="/libs/webix.min.js"></script>-->
+    <link type="text/css" rel="stylesheet" th:href="@{/libs/skins/flat.min.css}">
+    <script th:src="@{/libs/webix.min.js}"></script>
+    <script th:src="@{/libs/routie.min.js}"></script>
+    <script th:src="@{/libs/jquery-3.4.1.min.js}"></script>
     <style>body {margin: 0}
         .boldLabel {
             font-weight: bold; border-width: 2px; border-style: solid; border-color: #000000;
@@ -15,6 +19,7 @@
 </head>
 <body>
 <div id="app"></div>
-<script src="/js/barber/barber.js"></script>
+<script th:src="@{/js/barber/barber.js}"></script>
+<!--<script src="/js/barber/barber.js"></script>-->
 </body>
 </html>
