@@ -829,30 +829,39 @@ webix.ready(function() {
                                                     //params,
                                                     function (text, data, xhr) {
                                                         console.log(text);
-
-                                                        webix.confirm({
-                                                            title:"Заявка внесена",
-                                                            ok: "Закрыть",
-                                                            cancel: "Внести еще одну заявку",
-                                                            text: text
-                                                            + '<br/> Обязательно распечатайте предписание Управления Роспотребнадзора по Республике Бурятия и разместите на видном месте'
-                                                            + '<br/><a href="http://Работающаябурятия.рф/predpisanie.docx">Ссылка для скачивания</a>'
-                                                        })
-                                                        .then(function () {
+                                                        let errorText = "ЗАЯВКА НЕ ВНЕСЕНА. ОБНАРУЖЕНЫ ОШИБКИ ЗАПОЛНЕНИЯ: ";
+                                                        if(text.includes(errorText)){
+                                                            webix.alert({
+                                                                title: "ИСПРАВЬТЕ ОШИБКИ",
+                                                                ok:"Вернуться к заполнению заявки",
+                                                                text: text
+                                                            });
                                                             $$('label_sogl').hideProgress();
-                                                            window.location.replace('http://работающаябурятия.рф');
-                                                        })
-                                                        .fail(function(){
-                                                            $$('label_sogl').hideProgress()
-                                                            $$('form').clear();
-                                                            $$('upload').setValue();
-                                                            $$('form_person').clear();
-                                                            $$('form_addr').clear();
-                                                            $$('addr_table').clearAll();
-                                                            $$('person_table').clearAll();
-                                                            $$('organizationName').focus();
-                                                            $$("departmentId").setValue("2"); // name: '',
-                                                        });
+                                                        }else{
+                                                            webix.confirm({
+                                                                title:"Заявка внесена",
+                                                                ok: "Закрыть",
+                                                                cancel: "Внести еще одну заявку",
+                                                                text: text
+                                                                    + '<br/> Обязательно распечатайте предписание Управления Роспотребнадзора по Республике Бурятия и разместите на видном месте'
+                                                                    + '<br/><a href="http://Работающаябурятия.рф/predpisanie.docx">Ссылка для скачивания</a>'
+                                                            })
+                                                                .then(function () {
+                                                                    $$('label_sogl').hideProgress();
+                                                                    window.location.replace('http://работающаябурятия.рф');
+                                                                })
+                                                                .fail(function(){
+                                                                    $$('label_sogl').hideProgress()
+                                                                    $$('form').clear();
+                                                                    $$('upload').setValue();
+                                                                    $$('form_person').clear();
+                                                                    $$('form_addr').clear();
+                                                                    $$('addr_table').clearAll();
+                                                                    $$('person_table').clearAll();
+                                                                    $$('organizationName').focus();
+                                                                    $$("departmentId").setValue("2"); // name: '',
+                                                                });
+                                                        }
                                                     })
                                         })
                                     }

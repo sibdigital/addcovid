@@ -3,6 +3,7 @@ package ru.sibdigital.addcovid.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.*;
@@ -10,6 +11,7 @@ import ru.sibdigital.addcovid.service.EmailService;
 import ru.sibdigital.addcovid.service.RequestService;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -135,5 +137,28 @@ public class DocRequestController {
     @GetMapping("/doc_address_fact/{id_request}")
     public Optional<List<DocAddressFact>> getListAddress(@PathVariable("id_request") Long id_request){
         return docAddressFactRepo.findByDocRequest(id_request);
+    }
+
+    @GetMapping("/cls_departments")
+    public List<ClsDepartment> getListDepartments() {
+        List<ClsDepartment> list =  clsDepartmentRepo.findAll(Sort.by("id"));
+        try {
+            List<ClsDepartment> presult = new ArrayList<>();
+            ClsDepartment first = clsDepartmentRepo.findById(4L).get();
+            ClsDepartment last = clsDepartmentRepo.findById(1L).get();
+            for (ClsDepartment department : list) {
+                if (department.getId() != 1L && department.getId() != 4L) {
+                    presult.add(department);
+                }
+            }
+            List<ClsDepartment> result = new ArrayList<>();
+            result.add(first);
+            result.addAll(presult);
+            result.add(last);
+            return result;
+        }catch (Exception ex){
+
+        }
+        return list;
     }
 }
