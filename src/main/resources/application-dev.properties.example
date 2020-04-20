@@ -27,3 +27,5 @@ link.suffix=
 logging.level.org.springframework=DEBUG
 logging.level.ru.sibdigital.addcovid = DEBUG
 logging.file.path=./addcovid-logs
+
+webdriver.chrome.driver=C:/Program Files/Java/selenium/chromedriver.exe

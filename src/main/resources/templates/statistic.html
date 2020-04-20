@@ -92,6 +92,12 @@
 
     const totalStatistic = [[${totalStatistic}]]
     const departmentStatistic = [[${departmentStatistic}]]
+    const today = new Date();
+
+    today.setHours(0);
+    today.setMinutes(0);
+    today.setSeconds(0);
+    today.setMilliseconds(0);
 
     let total = 0
 
@@ -118,15 +124,15 @@
     insertRow("Всего людей в утвержденных заявках", totalStatistic.peopleStatistic.accepted, "text-center font-weight-bold");
     insertRow("Всего людей в заявках", totalStatistic.peopleStatistic.total, "text-center font-weight-bold");
 
-
+    let prefix = 'За';
     for (let i = 0; i < totalStatistic.forEachDayStatistic.length; i++) {
 
-        total += totalStatistic.forEachDayStatistic[i].total
-        totalStatistic.forEachDayStatistic[i].date = new Date(totalStatistic.forEachDayStatistic[i].date.replace('T', ' '))
-        if(totalStatistic.forEachDayStatistic[i].date ){
-
+        total += totalStatistic.forEachDayStatistic[i].total;
+        totalStatistic.forEachDayStatistic[i].date = new Date(totalStatistic.forEachDayStatistic[i].date.replace('T', ' '));
+        if(i === totalStatistic.forEachDayStatistic.length-1){
+            prefix = 'До';
         }
-        insertRow("За " + formatDate(totalStatistic.forEachDayStatistic[i].date), totalStatistic.forEachDayStatistic[i].total, "text-center")
+        insertRow(`${prefix} ${totalStatistic.forEachDayStatistic[i].date.getTime() === today.getTime() ? 'сегодня' : formatDate(totalStatistic.forEachDayStatistic[i].date)} `, totalStatistic.forEachDayStatistic[i].total, "text-center");
     }
 
     insertRow('ВСЕГО ЗАЯВОК', total, "text-center font-weight-bold")
