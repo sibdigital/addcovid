@@ -791,6 +791,11 @@ webix.ready(function() {
     $$('form_person').bind('person_table')
     $$('form_addr').bind('addr_table')
 
+    webix.event(window, "resize", function(event){
+        link_form.define("width",document.body.clientWidth);
+        link_form.resize();
+    });
+
     webix.extend($$('label_sogl'), webix.ProgressBar);
 
     link_form.show();

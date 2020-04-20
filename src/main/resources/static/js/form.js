@@ -945,9 +945,9 @@ webix.ready(function() {
 
     $$('form_person').bind('person_table');
     $$('form_addr').bind('addr_table');
-    webix.event(window, "resize", function () {
+    webix.event(window, "resize", function (event) {
+        layout.define("width",document.body.clientWidth);
         layout.resize();
-        layout.resizeChildren();
     });
     webix.extend($$('label_sogl'), webix.ProgressBar);
 })
