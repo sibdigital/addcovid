@@ -518,11 +518,11 @@ public class ExcelParser {
             }
             ++i;
         }
-        if(addresses.size() == 0 ) {
-            checkProtocol.setSuccess( false );
-            error++;
-            checkProtocol.getPostFormDto().setAddressFactStatus("Список не может быть пустым!");
-        }
+//        if(addresses.size() == 0 ) {
+//            checkProtocol.setSuccess( false );
+//            error++;
+//            checkProtocol.getPostFormDto().setAddressFactStatus("Список не может быть пустым!");
+//        }
 
         if(!emptyRows.isEmpty()){
             warningStringBuilder.append(String.format("На листе %s имеются пустые строки на позициях: ", SHEET_NAMES[SHEET_ADDRESSES_INDEX]));
