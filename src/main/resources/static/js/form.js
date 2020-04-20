@@ -154,7 +154,7 @@ let uploadFilename = '';
 let pred_date = new Date();
 
 webix.ready(function() {
-    webix.ui({
+    var layout = webix.ui({
         container: 'app',
         autowidth: true,
         height: document.body.clientHeight,
@@ -913,10 +913,13 @@ webix.ready(function() {
                 */
             }
         ]
-    })
+    });
 
-    $$('form_person').bind('person_table')
-    $$('form_addr').bind('addr_table')
-
+    $$('form_person').bind('person_table');
+    $$('form_addr').bind('addr_table');
+    webix.event(window, "resize", function () {
+        layout.resize();
+        layout.resizeChildren();
+    });
     webix.extend($$('label_sogl'), webix.ProgressBar);
 })
