@@ -29,7 +29,7 @@ function addPerson(){
         //isagree: values.isagree
     }, $$('person_table').count() + 1)
 
-    let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!';
+    let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
     if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && !is_no_pdf){
         $$('send_btn').enable();
     }else{
@@ -66,7 +66,7 @@ function removePerson(){
             function () {
                 $$("person_table").remove($$("person_table").getSelectedId());
                 let cnt = $$('person_table').data.count();
-                let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!';
+                let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
 
                 if(cnt>0){
                     $$('clearPersonsBtn').enable();
@@ -152,6 +152,7 @@ function removeAddr(){
 let uploadFile = '';
 let uploadFilename = '';
 let pred_date = new Date();
+let upload_chack_error = 'Загружать можно только PDF-файлы и ZIP-архивы!';
 
 webix.ready(function() {
     var layout = webix.ui({
@@ -184,8 +185,9 @@ webix.ready(function() {
             {
                 view: 'label',
                 label: '<a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/#top" target="_blank">Горячая линия. </a>'
-                + '&nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/doc.pdf" target="_blank">Инструкция по заполнению формы </a>',
-                //css: 'main_label'
+                + '&nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/doc.pdf" target="_blank">Инструкция по заполнению формы </a>'
+                + '&nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/faq.html" target="_blank">Часто задаваемые вопросы</a>'
+
             },
             {
                 view: 'label',
@@ -295,32 +297,33 @@ webix.ready(function() {
                                         labelPosition: 'top'
                                     },
                                     {
-                                        view: 'combo',
+                                        view: 'select',//'combo',
                                         name: 'departmentId',
                                         label: 'Министерство, курирующее вашу деятельность',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
                                         required: true,
-                                        options: [
-                                            { id: 4, value: 'Минпром РБ (1. Машиностроение и металообработка...)'},
-                                            { id: 2, value: 'Мин.экон РБ (В сфере финансовой, страховой деятельности)'},
-                                            { id: 3, value: 'Мин.имущества РБ ("оценочная деятельность, деятельность кадастровых инженеров")'},
-                                            { id: 5, value: 'Мин.природных ресурсов РБ (Предприятия добывающей промышленности, имеющие непрерывный )'},
-                                            { id: 6, value: 'Мин.сельхоз РБ'},
-                                            { id: 7, value: 'Мин.строй РБ (Строительство: Организации (в том числе работающие с ними по договорам подряда и/или оказания услуг юридические лица и индивидуальные предприниматели):)'},
-                                            { id: 8, value: 'Мин.транс РБ (Сфера транспорта, энергетики, связи и дорожного хозяйства, а также в области энергосбережения и повышения энергетической эффективности в сфере транспорта, энергетики, связи и дорожного хозяйства)'},
-                                            { id: 9, value: 'Мин.соцзащиты РБ (Организации социального обслуживания населения)'},
-                                            { id: 10, value: 'Мин.здрав РБ (Организации по техническому обслуживанию медицинского оборудования)'},
-                                            { id: 11, value: 'Мин.культ РБ (Нет курируемых предприятий/организаций)'},
-                                            { id: 12, value: 'Мин.обр РБ (1. учреждения дошкольного образования, где функционируют дежурные группы. 2. Учреждения среднего общего образования, где очно-заочное обучение для 9,11 классов.)'},
-                                            { id: 13, value: 'Мин.спорта РБ (1. Содержание, эксплуатация и обеспечение безопасности на спортивных объектов 2. Строительство спортивных объектов 3. Волонтерская деятельность)'},
-                                            { id: 14, value: 'Мин.туризма РБ (1. Санаторно-курортная сфера 2. Гостиничный комплекс 3. Туроператоры, турагентства, экскурсоводы")'},
-                                            { id: 1, value: 'Мин.фин РБ (Нет курируемых предприятий/организаций)'},
-                                            { id: 15, value: 'РАЛХ (Выполнение мероприятий по использованию, охране, защите, воспроизводству лесов, лесозаготовка, лесопереработка)'},
-                                            { id: 16, value: 'Управление ветеринарии (Ветеринарные клиники, ветеринарные аптеки, ветеринарные кабинеты, зоомагазины, организации, занимающиеся отловом животных без владельцев)'},
-                                            { id: 17, value: 'Управление МЧС по РБ (Организации, осуществляющие деятельность в сфере противопожарной безопасности)'},
-                                            { id: 18, value: 'Росгвардия (Частные охранные предприятия)'},
-                                        ]
+                                        options: 'cls_departments',
+                                        // options: [
+                                        //     { id: 4, value: 'Минпром РБ (1. Машиностроение и металообработка...)'},
+                                        //     { id: 2, value: 'Мин.экон РБ (В сфере финансовой, страховой деятельности)'},
+                                        //     { id: 3, value: 'Мин.имущества РБ ("оценочная деятельность, деятельность кадастровых инженеров")'},
+                                        //     { id: 5, value: 'Мин.природных ресурсов РБ (Предприятия добывающей промышленности, имеющие непрерывный )'},
+                                        //     { id: 6, value: 'Мин.сельхоз РБ'},
+                                        //     { id: 7, value: 'Мин.строй РБ (Строительство: Организации (в том числе работающие с ними по договорам подряда и/или оказания услуг юридические лица и индивидуальные предприниматели):)'},
+                                        //     { id: 8, value: 'Мин.транс РБ (Сфера транспорта, энергетики, связи и дорожного хозяйства, а также в области энергосбережения и повышения энергетической эффективности в сфере транспорта, энергетики, связи и дорожного хозяйства)'},
+                                        //     { id: 9, value: 'Мин.соцзащиты РБ (Организации социального обслуживания населения)'},
+                                        //     { id: 10, value: 'Мин.здрав РБ (Организации по техническому обслуживанию медицинского оборудования)'},
+                                        //     { id: 11, value: 'Мин.культ РБ (Нет курируемых предприятий/организаций)'},
+                                        //     { id: 12, value: 'Мин.обр РБ (1. учреждения дошкольного образования, где функционируют дежурные группы. 2. Учреждения среднего общего образования, где очно-заочное обучение для 9,11 классов.)'},
+                                        //     { id: 13, value: 'Мин.спорта РБ (1. Содержание, эксплуатация и обеспечение безопасности на спортивных объектов 2. Строительство спортивных объектов 3. Волонтерская деятельность)'},
+                                        //     { id: 14, value: 'Мин.туризма РБ (1. Санаторно-курортная сфера 2. Гостиничный комплекс 3. Туроператоры, турагентства, экскурсоводы")'},
+                                        //     { id: 1, value: 'Мин.фин РБ (Нет курируемых предприятий/организаций)'},
+                                        //     { id: 15, value: 'РАЛХ (Выполнение мероприятий по использованию, охране, защите, воспроизводству лесов, лесозаготовка, лесопереработка)'},
+                                        //     { id: 16, value: 'Управление ветеринарии (Ветеринарные клиники, ветеринарные аптеки, ветеринарные кабинеты, зоомагазины, организации, занимающиеся отловом животных без владельцев)'},
+                                        //     { id: 17, value: 'Управление МЧС по РБ (Организации, осуществляющие деятельность в сфере противопожарной безопасности)'},
+                                        //     { id: 18, value: 'Росгвардия (Частные охранные предприятия)'},
+                                        // ]
                                     },
                                     {
                                         view: 'textarea',
@@ -498,7 +501,7 @@ webix.ready(function() {
                                 on: {
                                     onBeforeFileAdd: function (upload) {
                                         if (upload.type.toUpperCase() !== 'PDF' && upload.type.toUpperCase() !== 'ZIP') {
-                                            $$('no_pdf').setValue('Загружать можно только PDF-файлы и ZIP-архивы!');
+                                            $$('no_pdf').setValue(upload_chack_error);
                                             $$('file').setValue('');
                                             $$('send_btn').disable();
                                             return false;
@@ -526,6 +529,13 @@ webix.ready(function() {
                                         }
                                         else {
                                             $$('file').setValue(upload.name)
+                                        }
+                                        $$('no_pdf').setValue('');
+                                        let cnt = $$('person_table').data.count();
+                                        if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0){
+                                            $$('send_btn').enable();
+                                        }else{
+                                            $$('send_btn').disable();
                                         }
                                         return true
                                     }
@@ -664,7 +674,7 @@ webix.ready(function() {
                         on: {
                             onChange (newv, oldv) {
                                 let cnt = $$('person_table').data.count();
-                                let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!';
+                                let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
                                 if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0 && !is_no_pdf){
                                     $$('send_btn').enable();
                                 }else{
@@ -710,7 +720,7 @@ webix.ready(function() {
                         on: {
                             onChange(newv, oldv) {
                                 let cnt = $$('person_table').data.count();
-                                let is_no_pdf = $$('no_pdf').getValue() == 'Загружать можно только PDF-файлы!';
+                                let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
                                 if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1  && cnt > 0 && !is_no_pdf){
                                     $$('send_btn').enable();
                                 }else{
@@ -732,10 +742,9 @@ webix.ready(function() {
                                 view: 'button',
                                 css: 'webix_primary',
                                 value: 'Подать заявку',
-                                //disabled: true,
-
-                                disabled: false,
-
+                                //НЕ МЕНЯТЬ!
+                                disabled: true, //НЕ МЕНЯТЬ!
+                                //НЕ МЕНЯТЬ!
                                 align: 'center',
                                 click: function () {
 
@@ -787,6 +796,15 @@ webix.ready(function() {
 
                                         if(params.organizationAddressJur.length > 255){
                                             webix.message('Превышена длина юридического адреса', 'error')
+                                            return false
+                                        }
+
+                                        if (params.isAgree != 1){
+                                            webix.message('Необходимо подтвердить согласие работников на обработку персональных данных', 'error')
+                                            return false
+                                        }
+                                        if (params.isProtect != 1) {
+                                            webix.message('Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия', 'error')
                                             return false
                                         }
 
@@ -859,31 +877,41 @@ webix.ready(function() {
                                             webix.ajax()
                                                 .headers({'Content-type': 'application/json'})
                                                 //.headers({'Content-type': 'application/x-www-form-urlencoded'})
-                                                .post('/',
+                                                .post('/form',
                                                     JSON.stringify(params),
                                                     //params,
                                                     function (text, data, xhr) {
                                                         console.log(text);
-
-                                                        webix.confirm({                                                        title:"Заявка внесена",
-                                                            ok: "Закрыть",
-                                                            cancel: "Внести еще одну заявку",
-                                                            text: text
-                                                        })
-                                                        .then(function () {
-                                                            $$('label_sogl').hideProgress();
-                                                            window.location.replace('http://работающаябурятия.рф');
-                                                        })
-                                                        .fail(function(){
+                                                        let errorText = "ЗАЯВКА НЕ ВНЕСЕНА. ОБНАРУЖЕНЫ ОШИБКИ ЗАПОЛНЕНИЯ: ";
+                                                        if(text.includes(errorText)){
+                                                            webix.alert({
+                                                                title: "ИСПРАВЬТЕ ОШИБКИ",
+                                                                ok:"Вернуться к заполнению заявки",
+                                                                text: text
+                                                            });
                                                             $$('label_sogl').hideProgress()
-                                                            $$('form').clear()
-                                                            $$('upload').setValue()
-                                                            $$('form_person').clear()
-                                                            $$('form_addr').clear()
-                                                            $$('addr_table').clearAll()
-                                                            $$('person_table').clearAll()
-                                                            $$('organizationName').focus()
-                                                        });
+                                                        }else{
+                                                            webix.confirm({
+                                                                title:"Заявка внесена",
+                                                                ok: "Закрыть",
+                                                                cancel: "Внести еще одну заявку",
+                                                                text: text
+                                                            })
+                                                                .then(function () {
+                                                                    $$('label_sogl').hideProgress();
+                                                                    window.location.replace('http://работающаябурятия.рф');
+                                                                })
+                                                                .fail(function(){
+                                                                    $$('label_sogl').hideProgress()
+                                                                    $$('form').clear()
+                                                                    $$('upload').setValue()
+                                                                    $$('form_person').clear()
+                                                                    $$('form_addr').clear()
+                                                                    $$('addr_table').clearAll()
+                                                                    $$('person_table').clearAll()
+                                                                    $$('organizationName').focus()
+                                                                });
+                                                        }
                                                     })
                                         })
                                     }

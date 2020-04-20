@@ -93,5 +93,15 @@ public class ClsDepartment {
         return Objects.hash(id, name, description, statusImport, timeImport);
     }
 
+    public String getValue() {
+        try {
+            String descr = this.getDescription().length() > 100 ? this.getDescription().substring(0, 100) : this.getDescription();
+            return (this.getName() + " (" + descr + ")");
+        }catch (Exception ex)
+        {
+
+        }
+        return this.getName();
+    }
 
 }

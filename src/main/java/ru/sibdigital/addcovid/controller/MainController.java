@@ -50,28 +50,6 @@ public class MainController {
         return "index";
     }
 
-    @PostMapping("/")
-    public @ResponseBody
-    String postForm(@RequestBody PostFormDto postFormDto) {
-
-        try {
-            //валидация
-            String errors = validate(postFormDto);
-            if(errors.isEmpty()){
-                DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION);
-
-//            return hash;
-                return "Заявка принята. Ожидайте ответ на электронную почту.";
-            }
-            else {
-                return "[" + errors + "]";
-            }
-
-        } catch(Exception e){
-            return "Невозможно сохранить заявку";
-        }
-    }
-
     @PostMapping(value = "/uploadpart", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> uploadFile(@RequestParam(value = "upload") MultipartFile file){
         return ResponseEntity.ok().body(requestService.uploadFile(file));
@@ -87,19 +65,48 @@ public class MainController {
     }
 
     private String validate(PostFormDto postFormDto){
+
         String errors = "";
-/*
-        if(postFormDto.getPersonOfficeCnt() == null || postFormDto.getPersonOfficeCnt() < 0){
-            errors = errors + addError("personOfficeCnt", "д.б.>0");
+        try {
+
+            if (postFormDto.getIsAgree() == false) {
+                errors += "Необходимо подтвердить согласие работников на обработку персональных данных\n";
+            }
+            if (postFormDto.getIsProtect() == false) {
+                errors += "Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия\n";
+            }
+            if (postFormDto.getPersons() == null ||postFormDto.getPersons().isEmpty()) {
+                errors += "Необходимо заполнить список работников\n";
+            }
+            if(postFormDto.getOrganizationInn() == null || postFormDto.getOrganizationInn().isEmpty() ){
+                errors +=  "Заполните ИНН";
+            }else if(postFormDto.getOrganizationInn().length() > 12 ){
+                errors +=  "Превышена длина ИНН";
+            }
+            if(postFormDto.getOrganizationOgrn() == null || postFormDto.getOrganizationOgrn().length() > 15 ){
+                errors +=  "Превышена длина 'Превышена длина ОГРН'";
+            }
+            if(postFormDto.getOrganizationPhone() == null || postFormDto.getOrganizationPhone().length() > 100){
+                errors +=  "Превышена длина номера телефона";
+            }
+            if(postFormDto.getOrganizationEmail() == null || postFormDto.getOrganizationEmail().length() > 100){
+                errors +=  "Превышена длина электронной почты";
+            }
+            if(postFormDto.getOrganizationShortName() == null || postFormDto.getOrganizationShortName().length() > 255){
+                errors +=  "Превышена длина краткого наименования";
+            }
+            if(postFormDto.getOrganizationAddressJur() == null ||postFormDto.getOrganizationAddressJur().length() > 255){
+                errors +=  "Превышена длина юридического адреса";
+            }
+        }catch (Exception ex){
+            log.error(ex.getMessage(), ex);
+            errors += "Неправильно заполнены необходимые поля\n";
         }
-        if(postFormDto.getPersonRemoteCnt() == null || postFormDto.getPersonRemoteCnt() < 0){
-            errors = errors + addError("personRemoteCnt", "д.б.<>0");
+
+        if (!errors.isEmpty()){
+            errors = "ЗАЯВКА НЕ ВНЕСЕНА. ОБНАРУЖЕНЫ ОШИБКИ ЗАПОЛНЕНИЯ: " + errors;
         }
-        if(postFormDto.getPersonSlrySaveCnt() == null || postFormDto.getPersonSlrySaveCnt() < 0){
-            errors = errors + addError("personSlrySaveCnt", "д.б.<>0");
-        }
-*/
-        //if(postFormDto.getOrganizationInn().length() < )
+
         return errors;
     }
 
@@ -115,6 +122,7 @@ public class MainController {
             return ResponseEntity.ok().body("<b>Желаем Вам счастливого пути!</b><br/>" +
                     "Напоминаем о необходимости иметь при себе паспорт и документы, подтверждающие право собственности или владения недвижимостью!");
         } catch(Exception e){
+            log.error(e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Невозможно сохранить заявку");
         }
     }
@@ -122,6 +130,34 @@ public class MainController {
     @GetMapping("/barber")
     public String barber(Map<String, Object> model) throws JsonProcessingException {
         return "barber";
+    }
+
+    @GetMapping("/form")
+    public String form(Map<String, Object> model) throws JsonProcessingException {
+        return "form";
+    }
+
+    @PostMapping("/form")
+    public @ResponseBody
+    String postForm(@RequestBody PostFormDto postFormDto) {
+
+        try {
+            //валидация
+            String errors = validate(postFormDto);
+            if(errors.isEmpty()){
+                DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION);
+
+//            return hash;
+                return "Заявка принята. Ожидайте ответ на электронную почту.";
+            }
+            else {
+                return errors;
+            }
+
+        } catch(Exception e){
+            log.error(e.getMessage(), e);
+            return "Невозможно сохранить заявку";
+        }
     }
 
     @PostMapping("/barber")
@@ -137,10 +173,11 @@ public class MainController {
                 return "Заявка принята. Ожидайте ответ на электронную почту.";
             }
             else {
-                return "[" + errors + "]";
+                return errors;
             }
 
         } catch(Exception e){
+            log.error(e.getMessage(), e);
             return "Невозможно сохранить заявку";
         }
     }

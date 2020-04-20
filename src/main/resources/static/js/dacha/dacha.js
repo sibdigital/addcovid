@@ -80,7 +80,7 @@ webix.ready(function() {
                                 view: 'label',
                                 width: 300,
                                 label: '<span style="font-size: 1.3rem">Работающая Бурятия. </span>',
-                                tooltip: 'Зявка для дачников'
+                                tooltip: 'Заявка для дачников.'
                             },
                             {
                                 view: 'label',
@@ -91,6 +91,11 @@ webix.ready(function() {
                         ]
                     }
                 ]
+            },
+            {
+                view: 'label',
+                label: '<span  style="text-align: center;">Телефон: 8 (3012) 46-24-34; колл-центр: 8 (3012) 573-900; 8 (3012) 571-600 </span>',
+                //css: 'main_label'
             },
             {
                 id: 'form',
@@ -523,6 +528,15 @@ webix.ready(function() {
                                         else if($$('person_table').data.pull.length == 0) {
                                             webix.message('Не заполнен список дачников', 'error')
                                             $$('add_btn').focus()
+                                            return false
+                                        }
+
+                                        if (params.isAgree != 1){
+                                            webix.message('Необходимо подтвердить согласие работников на обработку персональных данных', 'error')
+                                            return false
+                                        }
+                                        if (params.isProtect != 1) {
+                                            webix.message('Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия', 'error')
                                             return false
                                         }
 
