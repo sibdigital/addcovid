@@ -2,6 +2,7 @@ package ru.sibdigital.addcovid.service;
 
 
 import lombok.extern.log4j.Log4j2;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
@@ -579,19 +580,19 @@ public class SecuredPOITest {
         Assertions.assertEquals(false, checkProtocol.isSuccess());
     }
 
-    @Test
-    public void testAddressFactEmptyError() throws IOException, URISyntaxException {
-        File file = new File(this.getClass().getClassLoader().getResource("fact_address_size_0_error.xlsx").toURI());
-        CheckProtocol checkProtocol = excelParser.parseFile(file);
-        Assertions.assertEquals(false, checkProtocol.getPostFormDto().getAddressFactStatus().equals("OK"));
-    }
+//    @Test
+//    public void testAddressFactEmptyError() throws IOException, URISyntaxException {
+//        File file = new File(this.getClass().getClassLoader().getResource("fact_address_size_0_error.xlsx").toURI());
+//        CheckProtocol checkProtocol = excelParser.parseFile(file);
+//        Assertions.assertEquals(false, checkProtocol.getPostFormDto().getAddressFactStatus().equals("OK"));
+//    }
 
-    @Test
-    public void testAddressFactEmptySetSuccessFalse() throws IOException, URISyntaxException {
-        File file = new File(this.getClass().getClassLoader().getResource("fact_address_size_0_error.xlsx").toURI());
-        CheckProtocol checkProtocol = excelParser.parseFile(file);
-        Assertions.assertEquals(false, checkProtocol.isSuccess());
-    }
+//    @Test
+//    public void testAddressFactEmptySetSuccessFalse() throws IOException, URISyntaxException {
+//        File file = new File(this.getClass().getClassLoader().getResource("fact_address_size_0_error.xlsx").toURI());
+//        CheckProtocol checkProtocol = excelParser.parseFile(file);
+//        Assertions.assertEquals(false, checkProtocol.isSuccess());
+//    }
 
     @Test
     public void testAddressFactSize3Ok() throws IOException, URISyntaxException {

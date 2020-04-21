@@ -32,7 +32,7 @@ public class OrganizationPageTest {
 
 
 
-    @Test
+    //@Test
     public void testingScenarion(){
         System.setProperty("webdriver.chrome.driver",chromeDriverLocation);
         WebDriver driver = new ChromeDriver();
