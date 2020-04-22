@@ -1,8 +1,8 @@
 package ru.sibdigital.addcovid.frontend.pages;
 
+import net.lightbody.bmp.BrowserMobProxy;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import ru.sibdigital.addcovid.frontend.components.*;
 
 public class OrganizationAddPage {
@@ -46,8 +46,17 @@ public class OrganizationAddPage {
 
     HTMLComponent errorPane;
 
-    public OrganizationAddPage(WebDriver driver, String baseUrl) {
-        driver.get(baseUrl+"/form");
+
+
+    public OrganizationAddPage(WebDriver driver, BrowserMobProxy proxy, String baseUrl) {
+
+        String url = baseUrl+"/form";
+
+
+
+        // create a new HAR with the label "yahoo.com"
+        proxy.newHar(url);
+        driver.get(url);
         this.organizationName = new HTMLText(driver, By.xpath("//*[@view_id='organizationName']"));
         this.organizationShortName = new HTMLText(driver, By.xpath("//*[@view_id='organizationShortName']"));
         this.organizationInn = new HTMLText(driver, By.xpath("//*[@view_id='organizationInn']"));
@@ -86,7 +95,7 @@ public class OrganizationAddPage {
         this.isProtect = new HTMLCheckBox(driver, By.xpath("//*[@view_id='isProtect']"));
         this.sendBtn = new HTMLButton(driver, By.xpath("//*[@view_id='send_btn']"));
 
-        //this.errorPane = new HTMLText(driver, By.xpath("//*[@view_id='suggest1']")); //Error pane
+        this.errorPane = new HTMLMessagePane(driver, By.xpath("//div[@class='webix_message webix_error']")); //Error pane
     }
 
     public HTMLText getOrganizationName() {
@@ -210,7 +219,7 @@ public class OrganizationAddPage {
         return (HTMLButton) sendBtn;
     }
 
-    public HTMLComponent getErrorPane() {
-        return errorPane;
+    public HTMLMessagePane getErrorPane() {
+        return (HTMLMessagePane) errorPane;
     }
 }

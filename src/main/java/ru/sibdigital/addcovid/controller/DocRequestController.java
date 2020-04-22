@@ -48,6 +48,9 @@ public class DocRequestController {
 
     @GetMapping("/doc_requests")
     public DocRequest requests(@RequestParam String inn,@RequestParam String ogrn, Map<String, Object> model) {
+
+
+
         //if(inn!=null & !inn.isBlank()){
         if(inn!=null & !inn.isEmpty()){
             return requestService.getLasRequestInfoByInn(inn);

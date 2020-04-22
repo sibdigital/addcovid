@@ -245,8 +245,11 @@ webix.ready(function() {
                                         labelPosition: 'top',
                                         validate: function(val){
                                             const trimmedValue = val.trim()
-                                            log.console(trimmedValue.length)
-                                            return /*val &*/ (trimmedValue.length == 10 || trimmedValue.length == 12);
+                                            console.log(trimmedValue.length)
+
+                                            console.log()
+
+                                            return /*val &*/ (trimmedValue.length == 10 || trimmedValue.length == 12) && !isNaN(Number.parseInt(trimmedValue));
                                         },
                                         //attributes:{ type:"number" },
                                         invalidMessage: 'Должен состоять из 10 или 12 цифр',
@@ -259,8 +262,8 @@ webix.ready(function() {
                                         label: 'ОГРН',
                                         validate: function(val){
                                             const trimmedValue = val.trim()
-                                            log.console(trimmedValue.length)
-                                            return (trimmedValue.length == 13 || trimmedValue.length == 15);
+                                            console.log(trimmedValue.length)
+                                            return (trimmedValue.length == 13 || trimmedValue.length == 15) && !isNaN(Number.parseInt(trimmedValue));
                                         },
                                         //attributes:{ type:"number" },
                                         labelPosition: 'top',
