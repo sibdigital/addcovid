@@ -8,12 +8,12 @@ import net.lightbody.bmp.client.ClientUtil;
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.mitm.manager.ImpersonatingMitmManager;
 import net.lightbody.bmp.proxy.CaptureType;
-import org.junit.After;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -37,7 +37,8 @@ import java.util.List;
 @SpringBootTest(properties = "server.port=8091", webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class OrganizationPageTest {
 
-    List<Character> chars = new ArrayList<>(70);
+    List<Character> rusChars = new ArrayList<>(70);
+    List<Character> engChars = new ArrayList<>(70);
 
 
 
@@ -52,13 +53,25 @@ public class OrganizationPageTest {
     BrowserMobProxy proxy;
 
     public OrganizationPageTest() {
-        for (int i = 'А'; i < 'Я'; i++) {
-            chars.add((char) i);
+        for (int i = 'А'; i <= 'Я'; i++) {
+            rusChars.add((char) i);
         }
-        chars.add(' ');
-        for (int i = 'а'; i < 'я'; i++) {
-            chars.add((char) i);
+        rusChars.add(' ');
+        rusChars.add('Ё');
+        rusChars.add('ё');
+        for (int i = 'а'; i <= 'я'; i++) {
+            rusChars.add((char) i);
         }
+
+        for (int i = 'A'; i <= 'Z'; i++) {
+            engChars.add((char) i);
+        }
+        for (int i = 'a'; i <= 'z'; i++) {
+            engChars.add((char) i);
+        }
+
+
+
     }
 
     @PostConstruct
@@ -105,26 +118,46 @@ public class OrganizationPageTest {
 
     private String generateWord(int maximumNumberOfChars){
 
-        int random_number1 = 1 + (int) (Math.random() * maximumNumberOfChars);
+        int sizeOfSequence = this.getRandomNumber(1,maximumNumberOfChars);
 
         StringBuilder word = new StringBuilder();
 
-        for (int i = 0; i < random_number1; i++) {
-            int random_char_index = 0 + (int) (Math.random() * this.chars.size()-1);
-
-            word.append(chars.get(random_char_index));
+        for (int i = 0; i < sizeOfSequence; i++) {
+            word.append(rusChars.get(this.getRandomNumber(0,this.rusChars.size()-1)));
         }
 
         return word.toString();
+    }
+
+    private String generateEmail(int sizeOfSequence){
+
+
+        StringBuilder word = new StringBuilder();
+
+        for (int i = 0; i < sizeOfSequence; i++) {
+            if(i == sizeOfSequence/2) {
+                word.append("@");
+            } else if(i == sizeOfSequence-3){
+                word.append(".");
+            } else {
+                word.append(engChars.get(this.getRandomNumber(0,this.engChars.size()-1)));
+            }
+
+
+        }
+
+        return word.toString();
+    }
+
+    private int getRandomNumber(int min, int max) {
+        return min + (int) (Math.random() * max-1);
     }
 
     private String generateNumberSequence(int sizeOfSequence){
         StringBuilder sequence = new StringBuilder();
 
         for (int i = 0; i < sizeOfSequence; i++) {
-            int random_number = 1 + (int) (Math.random() * 10);
-
-            sequence.append(random_number);
+            sequence.append(this.getRandomNumber(0,9));
         }
         return sequence.toString();
     }
@@ -162,17 +195,19 @@ public class OrganizationPageTest {
         organizationAddPage.getOrganizationShortName().setText(generateWord(99));
         organizationAddPage.getOrganizationInn().setText(generateNumberSequence(12));
         organizationAddPage.getOrganizationOgrn().setText(generateNumberSequence(15));
+        organizationAddPage.getOrganizationPhone().setText(generateNumberSequence(11));
+        organizationAddPage.getOrganizationEmail().setText(generateEmail(30));
         organizationAddPage.getOrganizationOkved().setText(generateWord(99));
         organizationAddPage.getOrganizationOkvedAdd().setText(generateWord(99));
-
-
+        List<WebElement> availableValues = organizationAddPage.getDepartmentId().getAvailableValues();
+        availableValues.get(getRandomNumber(0,availableValues.size())).click();
 
 
         Har har = proxy.getHar();
 
 
 
-       har.getLog().getPages().stream().forEach(harPage ->  log.info(harPage.getTitle()));
+      // har.getLog().getPages().stream().forEach(harPage ->  log.info(harPage.getTitle()));
 
         //this.driver.quit();
         this.proxy.stop();
