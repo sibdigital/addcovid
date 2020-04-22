@@ -95,7 +95,7 @@ public class ClsDepartment {
 
     public String getValue() {
         try {
-            String descr = this.getDescription().length() > 92 ? this.getDescription().substring(0, 92) : this.getDescription();
+            String descr = this.getDescription().length() > 91 ? (this.getDescription().substring(0, 91) + "...") : this.getDescription();
             return (this.getName() + " (" + descr + ")");
         }catch (Exception ex)
         {
