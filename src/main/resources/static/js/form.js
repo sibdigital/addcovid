@@ -300,6 +300,7 @@ webix.ready(function() {
                                         id: 'organizationOkved',
                                         label: 'Основной вид осуществляемой деятельности (отрасль)',
                                         labelPosition: 'top',
+                                        invalidMessage: 'Поле не может быть пустым',
                                         required: true
                                     },
                                     {

@@ -15,7 +15,7 @@ public class HTMLChoiceBox extends HTMLComponent {
     }
 
     public List<WebElement> getAvailableValues(){
-        return this.getElement().findElements(By.xpath("//select/option"));
+        return this.getElement().findElements(By.xpath(".//select/option"));
 
     }
 

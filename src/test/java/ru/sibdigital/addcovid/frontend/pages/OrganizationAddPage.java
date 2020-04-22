@@ -7,7 +7,8 @@ import ru.sibdigital.addcovid.frontend.components.*;
 
 public class OrganizationAddPage {
 
-    HTMLComponent organizationName;
+
+    private final HTMLComponent organizationName;
     HTMLComponent organizationShortName;
     HTMLComponent organizationInn;
     HTMLComponent organizationOgrn;
@@ -17,6 +18,9 @@ public class OrganizationAddPage {
     HTMLComponent organizationOkvedAdd;
     HTMLComponent departmentId;
 
+    HTMLComponent organizationAddressJur;
+
+    private final HTMLComponent addressTable;
     HTMLComponent addressFact;
     HTMLComponent personOfficeFactCnt;
     HTMLComponent buttonAddrAdd;
@@ -67,10 +71,12 @@ public class OrganizationAddPage {
         this.organizationOkvedAdd = new HTMLTextArea(driver, By.xpath("//*[@view_id='organizationOkvedAdd']"));
         this.departmentId = new HTMLChoiceBox(driver, By.xpath("//*[@view_id='departmentId']"));
 
+        this.organizationAddressJur = new HTMLTextArea(driver, By.xpath("//*[@view_id='organizationAddressJur']"));
 
+        this.addressTable = new HTMLTable(driver, By.xpath("//*[@view_id='addr_table']"));
         this.addressFact = new HTMLText(driver, By.xpath("//*[@view_id='addressFactText']"));
         this.personOfficeFactCnt = new HTMLText(driver, By.xpath("//*[@view_id='personOfficeFactCntText']"));
-        this.buttonAddrAdd = new HTMLText(driver, By.xpath("//*[@view_id='buttonAddrAdd']"));
+        this.buttonAddrAdd = new HTMLButton(driver, By.xpath("//*[@view_id='buttonAddrAdd']"));
         this.buttonAddrEdit = new HTMLButton(driver, By.xpath("//*[@view_id='buttonAddrEdit']"));
         this.buttonAddrRemove = new HTMLButton(driver, By.xpath("//*[@view_id='buttonAddrRemove']"));
 
@@ -95,7 +101,7 @@ public class OrganizationAddPage {
         this.isProtect = new HTMLCheckBox(driver, By.xpath("//*[@view_id='isProtect']"));
         this.sendBtn = new HTMLButton(driver, By.xpath("//*[@view_id='send_btn']"));
 
-        this.errorPane = new HTMLMessagePane(driver, By.xpath("//div[@class='webix_message webix_error']")); //Error pane
+        this.errorPane = new HTMLMessagePane(driver, By.xpath("//div[@class='webix_message']")); //Error pane
     }
 
     public HTMLText getOrganizationName() {
@@ -133,6 +139,12 @@ public class OrganizationAddPage {
     public HTMLChoiceBox getDepartmentId() {
         return (HTMLChoiceBox) departmentId;
     }
+
+    public HTMLTable getAddressTable() {
+        return (HTMLTable) addressTable;
+    }
+
+    public HTMLTextArea getOrganizationAddressJur() {return (HTMLTextArea) organizationAddressJur;}
 
     public HTMLText getAddressFact() {
         return (HTMLText) addressFact;

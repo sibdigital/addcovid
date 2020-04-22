@@ -3,7 +3,7 @@ package ru.sibdigital.addcovid.frontend.components;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
-public class HTMLTextArea extends HTMLComponent {
+public class HTMLTextArea extends HTMLComponentWithErrorLabel {
     public HTMLTextArea(WebDriver driver, By selector) {
         super(driver, selector);
     }
