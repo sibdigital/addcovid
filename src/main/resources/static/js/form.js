@@ -231,6 +231,7 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationShortName',
+                                        id: 'organizationShortName',
                                         label: 'Краткое наименование организации',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
@@ -239,31 +240,38 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationInn',
+                                        id: 'organizationInn',
                                         label: 'ИНН',
                                         labelPosition: 'top',
                                         validate: function(val){
-                                            return !isNaN(val*1);
+                                            const trimmedValue = val.trim()
+                                            log.console(trimmedValue.length)
+                                            return /*val &*/ (trimmedValue.length == 10 || trimmedValue.length == 12);
                                         },
                                         //attributes:{ type:"number" },
-                                        invalidMessage: 'Поле не может быть пустым',
+                                        invalidMessage: 'Должен состоять из 10 или 12 цифр',
                                         required: true
                                     },
                                     {
                                         view: 'text',
                                         name: 'organizationOgrn',
+                                        id: 'organizationOgrn',
                                         label: 'ОГРН',
                                         validate: function(val){
-                                            return !isNaN(val*1);
+                                            const trimmedValue = val.trim()
+                                            log.console(trimmedValue.length)
+                                            return (trimmedValue.length == 13 || trimmedValue.length == 15);
                                         },
                                         //attributes:{ type:"number" },
                                         labelPosition: 'top',
                                         //validate:webix.rules.isNumber(),
-                                        invalidMessage: 'Поле не может быть пустым',
+                                        invalidMessage: 'Должен состоять из 13 или 15 цифр',
                                         required: true
                                     },
                                     {
                                         view: 'text',
                                         name: 'organizationEmail',
+                                        id: 'organizationEmail',
                                         label: 'e-mail',
                                         labelPosition: 'top',
                                         validate:webix.rules.isEmail,
@@ -273,6 +281,7 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationPhone',
+                                        id: 'organizationPhone',
                                         label: 'Телефон',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
@@ -285,6 +294,7 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationOkved',
+                                        id: 'organizationOkved',
                                         label: 'Основной вид осуществляемой деятельности (отрасль)',
                                         labelPosition: 'top',
                                         required: true
@@ -292,6 +302,7 @@ webix.ready(function() {
                                     {
                                         view: 'textarea',
                                         name: 'organizationOkvedAdd',
+                                        id: 'organizationOkvedAdd',
                                         label: 'Дополнительные виды осуществляемой деятельности',
                                         height: 100,
                                         labelPosition: 'top'
@@ -299,6 +310,7 @@ webix.ready(function() {
                                     {
                                         view: 'select',//'combo',
                                         name: 'departmentId',
+                                        id: 'departmentId',
                                         label: 'Министерство, курирующее вашу деятельность',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
@@ -397,6 +409,7 @@ webix.ready(function() {
                     {
                         view: 'textarea',
                         name: 'organizationAddressJur',
+                        id: 'organizationAddressJur',
                         label: 'Юридический адрес',
                         labelPosition: 'top',
                         height: 80,
@@ -405,7 +418,11 @@ webix.ready(function() {
                     {
                         rows: [
                             {
-                                view: 'datatable', name: 'addressFact', label: '', labelPosition: 'top',
+                                view: 'datatable',
+                                name: 'addressFact',
+                                id: 'addressFactTable',
+                                label: '',
+                                labelPosition: 'top',
                                 height: 200,
                                 select: 'row',
                                 editable: true,
@@ -443,8 +460,21 @@ webix.ready(function() {
                                     {
                                         type: 'space',
                                         cols: [
-                                            {view: 'text', name: 'addressFact', label: 'Фактический адрес', labelPosition: 'top', required: true },
-                                            {view: 'text', name: 'personOfficeFactCnt', inputWidth: '250', label: 'Численность работников', labelPosition: 'top',
+                                            {
+                                                view: 'text',
+                                                name: 'addressFact',
+                                                id: 'addressFactText',
+                                                label: 'Фактический адрес',
+                                                labelPosition: 'top',
+                                                required: true
+                                            },
+                                            {
+                                                view: 'text',
+                                                name: 'personOfficeFactCnt',
+                                                id: 'personOfficeFactCntText',
+                                                inputWidth: '250',
+                                                label: 'Численность работников',
+                                                labelPosition: 'top',
                                                 invalidMessage: 'Поле не может быть пустым',
                                                 required: true,
                                             },
@@ -455,10 +485,10 @@ webix.ready(function() {
                                         //type: 'space',
                                         margin: 5,
                                         cols: [
-                                            {view: 'button', value: 'Добавить', width: 150, click: addAddr },
-                                            {view: 'button', value: 'Изменить', width: 150, click: editAddr },
-                                            {view: 'button', value: 'Удалить', width: 150, click: removeAddr}
-                                        ]
+                                            {view: 'button', id: "buttonAddrAdd", value: 'Добавить', width: 150, click: addAddr },
+                                            {view: 'button', id: "buttonAddrEdit", value: 'Изменить', width: 150, click: editAddr },
+                                            {view: 'button', id: "buttonAddrRemove", value: 'Удалить', width: 150, click: removeAddr}
+                                            ]
                                     }
                                 ]
                             }
@@ -560,7 +590,9 @@ webix.ready(function() {
                         type: 'space',
                         rows: [
                             {
-                                view: 'text', name: 'personSlrySaveCnt',
+                                view: 'text',
+                                name: 'personSlrySaveCnt',
+                                id: 'personSlrySaveCnt',
                                 label: 'Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы',
                                 labelPosition: 'top',
                                 validate: function(val){
@@ -570,7 +602,9 @@ webix.ready(function() {
                                 required: true
                             },
                             {
-                                view: 'text', name: 'personRemoteCnt',
+                                view: 'text',
+                                name: 'personRemoteCnt',
+                                id: 'personRemoteCnt',
                                 label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
                                 invalidMessage: 'Поле не может быть пустым',
                                 validate: function(val){
@@ -580,7 +614,9 @@ webix.ready(function() {
                                 labelPosition: 'top'
                             },
                             {
-                                view: 'text', name: 'personOfficeCnt',
+                                view: 'text',
+                                name: 'personOfficeCnt',
+                                id: 'personOfficeCnt',
                                 label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
                                 labelPosition: 'top',
                                 validate: function(val){
@@ -631,20 +667,37 @@ webix.ready(function() {
                                             type: 'space',
                                             margin: 0,
                                             cols: [
-                                                {view: 'text', name: 'lastname', inputWidth: '250', label: 'Фамилия', labelPosition: 'top' },
-                                                {view: 'text', name: 'firstname', inputWidth: '250', label: 'Имя', labelPosition: 'top'},
-                                                {view: 'text', name: 'patronymic', inputWidth: '250', label: 'Отчество', labelPosition: 'top'},
-                                                //{view: 'checkbox', label: 'Согласие', name: 'isagree', id: 'agree_checkbox'},
-                                                {},
-                                            ]
+                                                {
+                                                    view: 'text',
+                                                    name: 'lastname',
+                                                    id: 'lastname',
+                                                    inputWidth: '150',
+                                                    label: 'Фамилия',
+                                                    labelPosition: 'top' },
+                                                {
+                                                    view: 'text',
+                                                    name: 'firstname',
+                                                    id: 'firstname',
+                                                    inputWidth: '150',
+                                                    label: 'Имя',
+                                                    labelPosition: 'top'},
+                                                {
+                                                    view: 'text',
+                                                    name: 'patronymic',
+                                                    id: 'patronymic',
+                                                    inputWidth: '150',
+                                                    label: 'Отчество',
+                                                    labelPosition: 'top'
+                                                },
+                                                ]
                                         },
                                         {
                                             //type: 'space',
                                             margin: 5,
                                             cols: [
-                                                {view: 'button', value: 'Добавить', width: 150, click: addPerson },
-                                                {view: 'button', value: 'Изменить', width: 150, click: editPerson },
-                                                {view: 'button', value: 'Удалить', width: 150, click: removePerson},
+                                                {view: 'button', value: 'Добавить', id: 'addPersonsBtn', width: 150, click: addPerson },
+                                                {view: 'button', value: 'Изменить', id: 'editPersonsBtn', width: 150, click: editPerson },
+                                                {view: 'button', value: 'Удалить', id: 'removePersonsBtn', width: 150, click: removePerson},
                                                 {view: 'button', value: 'Очистить', id: 'clearPersonsBtn', width: 150, disabled: true, click: clearPersons}
                                             ]
                                         }
@@ -755,7 +808,7 @@ webix.ready(function() {
                                         params.organizationInn = params.organizationInn.trim();
                                         params.organizationOgrn = params.organizationOgrn.trim();
 
-                                        if(params.organizationInn.length > 12 ){
+                                        if(params.organizationInn.length !== 12 && params.organizationInn.length !== 10  ){
                                             webix.message('Превышена длина ИНН', 'error')
                                             return false
                                         }
@@ -765,7 +818,7 @@ webix.ready(function() {
                                             return false
                                         }
 
-                                        if(params.organizationOgrn.length > 15){
+                                        if(params.organizationOgrn.length !== 15 && params.organizationOgrn.length !== 13 ){
                                             webix.message('Превышена длина ОГРН', 'error')
                                             return false
                                         }
