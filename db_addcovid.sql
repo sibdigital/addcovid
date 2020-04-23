@@ -289,3 +289,57 @@ alter table doc_request
 
 alter table  doc_request add  column id_type_request integer;
 alter table  cls_organization add  column id_type_request integer;
+
+create table reg_history_request
+(
+    id                   serial  not null
+        constraint reg_history_request_pkey
+            primary key,
+    person_office_cnt    integer,
+    person_remote_cnt    integer,
+    person_slry_save_cnt integer,
+    id_organization      integer not null
+        constraint fk_reg_history_request_org
+            references cls_organization,
+    id_department        integer not null
+        constraint reg_history_request_cls_department_id_fk
+            references cls_department,
+    attachment_path      text,
+    status_review        integer default 0,
+    time_create          timestamp,
+    status_import        integer default 0,
+    time_import          timestamp,
+    time_review          timestamp,
+    req_basis            text    default ''::text,
+    is_agree             boolean,
+    is_protect           boolean,
+    org_hash_code        text,
+    reject_comment       text,
+    old_department_id    integer,
+    id_processed_user    integer
+        constraint reg_history_request_processed_user_id_fk
+            references dep_user,
+    id_reassigned_user   integer
+        constraint reg_history_request_reassigned_user_id_fk
+            references dep_user,
+    id_type_request      integer,
+    id_doc_request       integer,
+    id_user              integer
+        constraint reg_history_request_id_user_fk
+            references dep_user,
+    reg_time             timestamp not null default current_timestamp
+);
+
+create table if not exists cls_type_request(
+    id integer not null
+	    constraint cls_type_request_pkey
+			primary key, --соответствует нынешщнему idTypeRequest
+    activity_kind   text, --вид деятельности для вывода в заголовок формы
+    id_department        integer
+        constraint rcls_type_request_department_id_fk
+            references cls_department, --министерство по умолчанию в выпадающий список министерств
+    prescription text, --текст предприсания роспотребнадзора, форматированный в хтмл
+    prescription_link text, --ссылка на файл с предписанием, пока прозапас
+    settings text, --JSON с настройками, пока прозапас на будущее через него можно будет передавать видимость элементов если что.
+    status_registration integer not null default 0-- статус регистрации 0 - закрыта, 1 - используется для регистрации
+);
