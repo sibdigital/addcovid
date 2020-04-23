@@ -74,10 +74,14 @@ public class SeleniumContainer{
         });*/
 
         proxy.addResponseFilter((httpResponse, httpMessageContents, httpMessageInfo) -> {
-            log.info(String.valueOf(httpResponse.status().code()));
+            /*log.info(String.valueOf(httpResponse.status().code()));
             log.info(httpMessageContents.isText() ? httpMessageContents.getTextContents() : httpMessageContents.getContentType());
             log.info(httpMessageInfo.getUrl());
-            log.info("addResponseFilter");
+            log.info("addResponseFilter");*/
+            System.out.println(String.valueOf(httpResponse.status().code()));
+            System.out.println(String.valueOf(httpMessageContents.isText() ? httpMessageContents.getTextContents() : httpMessageContents.getContentType()));
+            System.out.println(String.valueOf(httpMessageInfo.getUrl()));
+            System.out.println(String.valueOf("addResponseFilter"));
         });
 
         proxy.start(0);
