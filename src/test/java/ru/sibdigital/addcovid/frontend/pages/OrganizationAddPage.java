@@ -5,6 +5,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import ru.sibdigital.addcovid.frontend.components.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class OrganizationAddPage {
 
 
@@ -21,11 +24,7 @@ public class OrganizationAddPage {
     HTMLComponent organizationAddressJur;
 
     private final HTMLComponent addressTable;
-    HTMLComponent addressFact;
-    HTMLComponent personOfficeFactCnt;
-    HTMLComponent buttonAddrAdd;
-    HTMLComponent buttonAddrEdit;
-    HTMLComponent buttonAddrRemove;
+
 
 
     HTMLComponent reqBasis;
@@ -35,20 +34,15 @@ public class OrganizationAddPage {
     HTMLComponent personRemoteCnt;
     HTMLComponent personOfficeCnt;
 
-    HTMLComponent persons;
-    HTMLComponent lastname;
-    HTMLComponent firstname;
-    HTMLComponent patronymic;
-    HTMLComponent addPersonsBtn;
-    HTMLComponent editPersonsBtn;
-    HTMLComponent removePersonsBtn;
-    HTMLComponent clearPersonsBtn;
+    HTMLComponent peopleTable;
+
 
     HTMLComponent isAgree;
     HTMLComponent isProtect;
     HTMLComponent sendBtn;
 
     HTMLComponent errorPane;
+    HTMLComponent finalModalWindow;
 
 
 
@@ -73,12 +67,16 @@ public class OrganizationAddPage {
 
         this.organizationAddressJur = new HTMLTextArea(driver, By.xpath("//*[@view_id='organizationAddressJur']"));
 
-        this.addressTable = new HTMLTable(driver, By.xpath("//*[@view_id='addr_table']"));
-        this.addressFact = new HTMLText(driver, By.xpath("//*[@view_id='addressFactText']"));
-        this.personOfficeFactCnt = new HTMLText(driver, By.xpath("//*[@view_id='personOfficeFactCntText']"));
-        this.buttonAddrAdd = new HTMLButton(driver, By.xpath("//*[@view_id='buttonAddrAdd']"));
-        this.buttonAddrEdit = new HTMLButton(driver, By.xpath("//*[@view_id='buttonAddrEdit']"));
-        this.buttonAddrRemove = new HTMLButton(driver, By.xpath("//*[@view_id='buttonAddrRemove']"));
+
+        HTMLComponent addressFact = new HTMLText(driver, By.xpath("//*[@view_id='addressFactText']"));
+        HTMLComponent personOfficeFactCnt = new HTMLText(driver, By.xpath("//*[@view_id='personOfficeFactCntText']"));
+        HTMLButton buttonAddrAdd = new HTMLButton(driver, By.xpath("//*[@view_id='buttonAddrAdd']"));
+        HTMLButton buttonAddrEdit = new HTMLButton(driver, By.xpath("//*[@view_id='buttonAddrEdit']"));
+        HTMLButton buttonAddrRemove = new HTMLButton(driver, By.xpath("//*[@view_id='buttonAddrRemove']"));
+        List<HTMLComponent> addressFields = new ArrayList<>(2);
+        addressFields.add(addressFact);
+        addressFields.add(personOfficeFactCnt);
+        this.addressTable = new HTMLTable(driver, By.xpath("//*[@view_id='addr_table']"), addressFields, buttonAddrAdd, buttonAddrRemove, buttonAddrEdit);
 
 
         this.reqBasis = new HTMLTextArea(driver, By.xpath("//*[@view_id='reqBasis']"));
@@ -88,20 +86,30 @@ public class OrganizationAddPage {
         this.personRemoteCnt = new HTMLText(driver, By.xpath("//*[@view_id='personRemoteCnt']"));
         this.personOfficeCnt = new HTMLText(driver, By.xpath("//*[@view_id='personOfficeCnt']"));
 
-        this.persons = new HTMLText(driver, By.xpath("//*[@view_id='person_table']")); //Table
-        this.lastname = new HTMLText(driver, By.xpath("//*[@view_id='lastname']"));
-        this.firstname = new HTMLText(driver, By.xpath("//*[@view_id='firstname']"));
-        this.patronymic = new HTMLText(driver, By.xpath("//*[@view_id='patronymic']"));
-        this.addPersonsBtn = new HTMLButton(driver, By.xpath("//*[@view_id='addPersonsBtn']"));
-        this.editPersonsBtn = new HTMLButton(driver, By.xpath("//*[@view_id='editPersonsBtn']"));
-        this.removePersonsBtn = new HTMLButton(driver, By.xpath("//*[@view_id='removePersonsBtn']"));
-        this.clearPersonsBtn = new HTMLButton(driver, By.xpath("//*[@view_id='clearPersonsBtn']"));
+        HTMLComponent lastname  = new HTMLText(driver, By.xpath("//*[@view_id='lastname']"));
+        HTMLComponent firstname = new HTMLText(driver, By.xpath("//*[@view_id='firstname']"));
+        HTMLComponent patronymic = new HTMLText(driver, By.xpath("//*[@view_id='patronymic']"));
+
+
+        ArrayList<HTMLComponent> personFields = new ArrayList<>(3);
+        personFields.add(lastname);
+        personFields.add(firstname);
+        personFields.add(patronymic);
+
+        HTMLButton addPersonsBtn = new HTMLButton(driver, By.xpath("//*[@view_id='addPersonsBtn']"));
+        HTMLButton editPersonsBtn = new HTMLButton(driver, By.xpath("//*[@view_id='editPersonsBtn']"));
+        HTMLButton removePersonsBtn  = new HTMLButton(driver, By.xpath("//*[@view_id='removePersonsBtn']"));
+        HTMLButton clearPersonsBtn = new HTMLButton(driver, By.xpath("//*[@view_id='clearPersonsBtn']"));
+
+        this.peopleTable = new HTMLTable(driver, By.xpath("//*[@view_id='person_table']"), personFields, addPersonsBtn, removePersonsBtn, editPersonsBtn, clearPersonsBtn); //Table
 
         this.isAgree = new HTMLCheckBox(driver, By.xpath("//*[@view_id='isAgree']"));
         this.isProtect = new HTMLCheckBox(driver, By.xpath("//*[@view_id='isProtect']"));
         this.sendBtn = new HTMLButton(driver, By.xpath("//*[@view_id='send_btn']"));
 
-        this.errorPane = new HTMLMessagePane(driver, By.xpath("//div[@class='webix_message']")); //Error pane
+        this.errorPane = new HTMLNotificationPane(driver, By.xpath("//div[@class='webix_message']")); //Error pane
+        this.finalModalWindow = new HTMLFinalConfirmationModalWindow(driver, By.xpath("//div[@webixbox='1' and @role='alertdialog']"));
+
     }
 
     public HTMLText getOrganizationName() {
@@ -146,26 +154,6 @@ public class OrganizationAddPage {
 
     public HTMLTextArea getOrganizationAddressJur() {return (HTMLTextArea) organizationAddressJur;}
 
-    public HTMLText getAddressFact() {
-        return (HTMLText) addressFact;
-    }
-
-    public HTMLText getPersonOfficeFactCnt() {
-        return (HTMLText) personOfficeFactCnt;
-    }
-
-    public HTMLButton getButtonAddrAdd() {
-        return (HTMLButton) buttonAddrAdd;
-    }
-
-    public HTMLButton getButtonAddrEdit() {
-        return (HTMLButton) buttonAddrEdit;
-    }
-
-    public HTMLButton getButtonAddrRemove() {
-        return (HTMLButton) buttonAddrRemove;
-    }
-
     public HTMLTextArea getReqBasis() {
         return (HTMLTextArea) reqBasis;
     }
@@ -187,37 +175,10 @@ public class OrganizationAddPage {
         return (HTMLText) personOfficeCnt;
     }
 
-    public HTMLComponent getPersons() {
-        return persons;
+    public HTMLTable getPeopleTable() {
+        return (HTMLTable) peopleTable;
     }
 
-    public HTMLText getLastname() {
-        return (HTMLText) lastname;
-    }
-
-    public HTMLText getFirstname() {
-        return (HTMLText) firstname;
-    }
-
-    public HTMLText getPatronymic() {
-        return (HTMLText) patronymic;
-    }
-
-    public HTMLButton getAddPersonsBtn() {
-        return (HTMLButton) addPersonsBtn;
-    }
-
-    public HTMLButton getEditPersonsBtn() {
-        return (HTMLButton) editPersonsBtn;
-    }
-
-    public HTMLButton getRemovePersonsBtn() {
-        return (HTMLButton) removePersonsBtn;
-    }
-
-    public HTMLButton getClearPersonsBtn() {
-        return (HTMLButton) clearPersonsBtn;
-    }
 
     public HTMLCheckBox getIsAgree() {
         return (HTMLCheckBox) isAgree;
@@ -231,7 +192,11 @@ public class OrganizationAddPage {
         return (HTMLButton) sendBtn;
     }
 
-    public HTMLMessagePane getErrorPane() {
-        return (HTMLMessagePane) errorPane;
+    public HTMLNotificationPane getErrorPane() {
+        return (HTMLNotificationPane) errorPane;
+    }
+
+    public HTMLFinalConfirmationModalWindow getFinalModalWindow() {
+        return (HTMLFinalConfirmationModalWindow) finalModalWindow;
     }
 }

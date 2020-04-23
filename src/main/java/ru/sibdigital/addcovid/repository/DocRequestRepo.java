@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.repository;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -44,6 +45,8 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
     @Query(value = "SELECT dr FROM DocRequest dr WHERE  dr.organization.ogrn = :ogrn ORDER BY dr.timeCreate DESC")
     Optional<List<DocRequest>> getLastRequestByOgrn(@Param("ogrn")String ogrn);
 
+    @Query(nativeQuery = true, value = "SELECT * FROM doc_request WHERE id_organization = :organization_id")
+    Optional<List<DocRequest>> getAllByOrganizationId(@Param("organization_id") Long organizationId);
 
 
 

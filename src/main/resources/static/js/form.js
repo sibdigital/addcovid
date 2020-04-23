@@ -417,6 +417,7 @@ webix.ready(function() {
                         label: 'Юридический адрес',
                         labelPosition: 'top',
                         height: 80,
+                        invalidMessage: 'Поле не может быть пустым',
                         required: true
                     },
                     {
@@ -507,7 +508,12 @@ webix.ready(function() {
                                 label: 'Обоснование заявки',
                                 name: 'reqBasis',
                                 id: 'reqBasis',
-                                invalidMessage: 'Поле не может быть пустым',
+                                validate: function(val){
+                                    const trimmedValue = val.trim()
+                                    console.log(trimmedValue.length)
+                                    return (trimmedValue.length>0 && trimmedValue.length<255);
+                                },
+                                invalidMessage: 'Должен содержать от 1 до 255 сиволов',
                                 required: true,
                                 labelPosition: 'top'
                             },
@@ -944,7 +950,8 @@ webix.ready(function() {
                                                             webix.alert({
                                                                 title: "ИСПРАВЬТЕ ОШИБКИ",
                                                                 ok:"Вернуться к заполнению заявки",
-                                                                text: text
+                                                                text: text,
+                                                                id:"modalEndDialog"
                                                             });
                                                             $$('label_sogl').hideProgress()
                                                         }else{
@@ -952,7 +959,8 @@ webix.ready(function() {
                                                                 title:"Заявка внесена",
                                                                 ok: "Закрыть",
                                                                 cancel: "Внести еще одну заявку",
-                                                                text: text
+                                                                text: text,
+                                                                id:"modalEndDialog"
                                                             })
                                                                 .then(function () {
                                                                     $$('label_sogl').hideProgress();

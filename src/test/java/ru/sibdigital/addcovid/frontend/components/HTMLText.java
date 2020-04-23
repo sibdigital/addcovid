@@ -10,7 +10,7 @@ public class HTMLText extends HTMLComponentWithErrorLabel {
         super(driver, selector);
     }
 
-
+    @Override
     public void setText(String text){
         WebElement input = this.getElement().findElement(By.tagName("input"));
         input.sendKeys(Keys.CONTROL + "a");

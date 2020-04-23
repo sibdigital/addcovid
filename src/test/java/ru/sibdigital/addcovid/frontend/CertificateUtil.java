@@ -60,7 +60,7 @@ public class CertificateUtil {
         }
 
 
-        return builder.build();
+        return builder.trustAllServers(true).build();
         // tell the ImpersonatingMitmManager  use the RootCertificateGenerator we just configured
 
     }

@@ -2,33 +2,22 @@ package ru.sibdigital.addcovid.frontend;
 
 
 import lombok.extern.slf4j.Slf4j;
-import net.lightbody.bmp.BrowserMobProxy;
-import net.lightbody.bmp.BrowserMobProxyServer;
-import net.lightbody.bmp.client.ClientUtil;
 import net.lightbody.bmp.core.har.Har;
-import net.lightbody.bmp.proxy.CaptureType;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.Proxy;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeDriverService;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import ru.sibdigital.addcovid.frontend.pages.OrganizationAddPage;
+import ru.sibdigital.addcovid.frontend.components.HTMLFinalConfirmationModalWindow;
+import ru.sibdigital.addcovid.service.RequestService;
 
-import javax.annotation.PostConstruct;
-import java.io.File;
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,10 +29,15 @@ public class OrganizationPageTest {
     final private String INN_ERROR_TEXT = "Должен состоять из 10 или 12 цифр";
     final private String OGRN_ERROR_TEXT = "Должен состоять из 13 или 15 цифр";
     final private String EMPTY_ERROR_TEXT = "Поле не может быть пустым";
+    final private String JUR_ADDRESS_ERROR_TEXT = "Должен содержать от 1 до 255 сиволов";
+    
+    private static SeleniumContainer seleniumContainer;
 
     @Autowired
     CertificateUtil certificateUtil;
 
+    @Autowired
+    RequestService requestService;
 
     List<Character> rusChars = new ArrayList<>(70);
     List<Character> engChars = new ArrayList<>(70);
@@ -57,8 +51,9 @@ public class OrganizationPageTest {
     String baseUrl;
     @Value("${webdriver.chrome.driver}")
     String chromeDriverLocation; //Берем отсюда https://chromedriver.storage.googleapis.com/index.html?path=81.0.4044.69/
-    WebDriver driver;
+   /* WebDriver driver;
     BrowserMobProxy proxy;
+    private OrganizationAddPage this.seleniumContainer.getOrganizationAddPage();*/
 
     public OrganizationPageTest() {
         for (int i = 'А'; i <= 'Я'; i++) {
@@ -80,59 +75,6 @@ public class OrganizationPageTest {
 
 
 
-    }
-
-    @PostConstruct
-    public void initUrl(){
-        this.baseUrl = String.format("%s://%s:%d", this.protocol, this.host, this.port);
-        //System.setProperty("webdriver.chrome.driver",chromeDriverLocation);
-        // start the proxy
-        proxy = new BrowserMobProxyServer();
-        proxy.setMitmManager(certificateUtil.getCertificate());
-        proxy.setTrustAllServers(true);
-        //proxy.setMitmManager(ImpersonatingMitmManager.builder().trustAllServers(true).build());
-        /*proxy.addRequestFilter((httpRequest, httpMessageContents, httpMessageInfo) -> {
-            log.info(httpRequest.method().name());
-            log.info(httpRequest.uri());
-            log.info("addRequestFilter");
-            return null;
-        });*/
-
-        proxy.addResponseFilter((httpResponse, httpMessageContents, httpMessageInfo) -> {
-            log.info(String.valueOf(httpResponse.status().code()));
-            log.info(httpMessageContents.isText() ? httpMessageContents.getTextContents() : httpMessageContents.getContentType());
-            log.info(httpMessageInfo.getUrl());
-            log.info("addResponseFilter");
-        });
-
-        proxy.start(0);
-
-
-
-        // get the Selenium proxy object
-        Proxy seleniumProxy = ClientUtil.createSeleniumProxy(proxy);
-
-        try {
-            String hostIp = Inet4Address.getLocalHost().getHostAddress();
-            log.info(hostIp);
-            seleniumProxy.setHttpProxy(hostIp + ":" + proxy.getPort());
-            seleniumProxy.setSslProxy(hostIp + ":" + proxy.getPort());
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-
-        // configure it as a desired capability
-        DesiredCapabilities capabilities = new DesiredCapabilities();
-        capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
-
-        ChromeOptions options = new ChromeOptions();
-        options.merge(capabilities);
-
-        ChromeDriverService service = new ChromeDriverService.Builder()
-                .usingDriverExecutable(new File(chromeDriverLocation))
-                .usingAnyFreePort()
-                .build();
-        this.driver = new ChromeDriver(service, options);
     }
 
     private String generateWord(int maximumNumberOfChars){
@@ -179,148 +121,277 @@ public class OrganizationPageTest {
         return sequence.toString();
     }
 
+    @Before
+    public void fillDataToEnableSubmitButton(){
+        this.seleniumContainer = SeleniumContainer.getInstance(port, protocol, host, chromeDriverLocation, certificateUtil);
+        this.seleniumContainer.getOrganizationAddPage().getIsProtect().setChecked(true);
+        this.seleniumContainer.getOrganizationAddPage().getIsAgree().setChecked(true);
+        this.seleniumContainer.getOrganizationAddPage().getPeopleTable().addValue("Hey", "Heyt", "Dddd");
+    }
+
     @Test
-    public void testingScenario(){
+    public void testDisabilitySubmitButton(){
+        for (int i = 0; i < 3; i++) {
+            this.seleniumContainer.getOrganizationAddPage().getIsProtect().setChecked(false);
+            this.seleniumContainer.getOrganizationAddPage().getIsAgree().setChecked(false);
+            this.seleniumContainer.getOrganizationAddPage().getPeopleTable().clearTable();
+            Assertions.assertTrue(this.seleniumContainer.getOrganizationAddPage().getSendBtn().isDisabled());
+            System.out.println(this.seleniumContainer.getOrganizationAddPage().getIsProtect().getChecked()+" "+this.seleniumContainer.getOrganizationAddPage().getIsAgree().getChecked()+" "+this.seleniumContainer.getOrganizationAddPage().getPeopleTable().getRowsSize() );
+            if(i == 0){
+                this.seleniumContainer.getOrganizationAddPage().getIsProtect().setChecked(true);
+            }
+            if( i==1 ){
+                this.seleniumContainer.getOrganizationAddPage().getIsAgree().setChecked(true);
+            }
+            if( i== 3 ){
+                this.seleniumContainer.getOrganizationAddPage().getPeopleTable().addValue("Hey", "Heyt", "Dddd");
+            }
+            System.out.println(this.seleniumContainer.getOrganizationAddPage().getIsProtect().getChecked()+" "+this.seleniumContainer.getOrganizationAddPage().getIsAgree().getChecked()+" "+this.seleniumContainer.getOrganizationAddPage().getPeopleTable().getRowsSize() );
 
-        proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
-        OrganizationAddPage organizationAddPage = new OrganizationAddPage(driver, proxy, baseUrl);
+            for (int j = 0; j < 3; j++) {
+                if(i!=j) {
+                    if(j == 0){
+                        this.seleniumContainer.getOrganizationAddPage().getIsProtect().setChecked(true);
+                    }
+                    if( j==1 ){
+                        this.seleniumContainer.getOrganizationAddPage().getIsAgree().setChecked(true);
+                    }
+                    if( j== 2 ){
+                        this.seleniumContainer.getOrganizationAddPage().getPeopleTable().addValue("Hey", "Heyt", "Dddd");
+                    }
+                    System.out.println(this.seleniumContainer.getOrganizationAddPage().getIsProtect().getChecked()+" "+this.seleniumContainer.getOrganizationAddPage().getIsAgree().getChecked()+" "+this.seleniumContainer.getOrganizationAddPage().getPeopleTable().getRowsSize() );
+                    if(this.seleniumContainer.getOrganizationAddPage().getIsProtect().getChecked() && this.seleniumContainer.getOrganizationAddPage().getIsAgree().getChecked() && this.seleniumContainer.getOrganizationAddPage().getPeopleTable().getRowsSize() > 0){
+                        Assertions.assertFalse(this.seleniumContainer.getOrganizationAddPage().getSendBtn().isDisabled());
+                    } else {
+                        Assertions.assertTrue(this.seleniumContainer.getOrganizationAddPage().getSendBtn().isDisabled());
+                    }
 
-        Assertions.assertTrue(organizationAddPage.getSendBtn().isDisabled());
+                }
+            }
+            for (int j = 0; j < 3; j++) {
+                if(i!=j){
+                    if(j == 0){
+                        this.seleniumContainer.getOrganizationAddPage().getIsProtect().setChecked(false);
+                    }
+                    if( j==1 ){
+                        this.seleniumContainer.getOrganizationAddPage().getIsAgree().setChecked(false);
+                    }
+                    if( j== 2 ){
+                        this.seleniumContainer.getOrganizationAddPage().getPeopleTable().deleteRow(0);
+                    }
+                    System.out.println(this.seleniumContainer.getOrganizationAddPage().getIsProtect().getChecked()+" "+this.seleniumContainer.getOrganizationAddPage().getIsAgree().getChecked()+" "+this.seleniumContainer.getOrganizationAddPage().getPeopleTable().getRowsSize() );
+                    if(this.seleniumContainer.getOrganizationAddPage().getIsProtect().getChecked() && this.seleniumContainer.getOrganizationAddPage().getIsAgree().getChecked() && this.seleniumContainer.getOrganizationAddPage().getPeopleTable().getRowsSize() > 0){
+                        Assertions.assertFalse(this.seleniumContainer.getOrganizationAddPage().getSendBtn().isDisabled());
+                    } else {
+                        Assertions.assertTrue(this.seleniumContainer.getOrganizationAddPage().getSendBtn().isDisabled());
+                    }
 
 
+                }
+            }
+            this.seleniumContainer.getOrganizationAddPage().getIsProtect().setChecked(true);
+            this.seleniumContainer.getOrganizationAddPage().getIsAgree().setChecked(true);
+            this.seleniumContainer.getOrganizationAddPage().getPeopleTable().addValue("Hey", "Heyt", "Dddd");
+            System.out.println(this.seleniumContainer.getOrganizationAddPage().getIsProtect().getChecked()+" "+this.seleniumContainer.getOrganizationAddPage().getIsAgree().getChecked()+" "+this.seleniumContainer.getOrganizationAddPage().getPeopleTable().getRowsSize() );
+            Assertions.assertFalse(this.seleniumContainer.getOrganizationAddPage().getSendBtn().isDisabled());
+            this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        }
+    }
 
+    @Test
+    public void testOrganizationNameError(){
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationName().setText("Тестовая организация");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getOrganizationName().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationName().setText("");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals(EMPTY_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getOrganizationName().getErrorText());
 
+    }
 
-        organizationAddPage.getFirstname().setText(generateWord(99));
-        organizationAddPage.getLastname().setText(generateWord(99));
-        organizationAddPage.getPatronymic().setText(generateWord(99));
-        organizationAddPage.getAddPersonsBtn().submit();
+    @Test
+    public void testOrganizationShortNameError(){
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationShortName().setText("Тестовая организация");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getOrganizationShortName().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationShortName().setText("");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals(EMPTY_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getOrganizationShortName().getErrorText());
 
-        Assertions.assertTrue(organizationAddPage.getSendBtn().isDisabled());
+    }
 
-        organizationAddPage.getIsAgree().setChecked(true);
-
-        Assertions.assertTrue(organizationAddPage.getSendBtn().isDisabled());
-
-        organizationAddPage.getIsProtect().setChecked(true);
-
-        Assertions.assertFalse(organizationAddPage.getSendBtn().isDisabled());
-        organizationAddPage.getSendBtn().submit();
-
-        Assertions.assertEquals(EMPTY_ERROR_TEXT, organizationAddPage.getOrganizationName().getErrorText());
-        Assertions.assertEquals(EMPTY_ERROR_TEXT,organizationAddPage.getOrganizationShortName().getErrorText());
-
+    @Test
+    public void testInnError(){
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < 15; i++) {
-            organizationAddPage.getOrganizationInn().setText(stringBuilder.toString());
-            organizationAddPage.getSendBtn().submit();
+            this.seleniumContainer.getOrganizationAddPage().getOrganizationInn().setText(stringBuilder.toString());
+            this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
             if(stringBuilder.length() == 12 || stringBuilder.length() == 10){
-                Assertions.assertEquals("", organizationAddPage.getOrganizationInn().getErrorText());
+                Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getOrganizationInn().getErrorText());
             } else {
-                Assertions.assertEquals(INN_ERROR_TEXT, organizationAddPage.getOrganizationInn().getErrorText());
+                Assertions.assertEquals(INN_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getOrganizationInn().getErrorText());
             }
             stringBuilder.append(i);
         }
 
+    }
 
-        stringBuilder = new StringBuilder();
+    @Test
+    public void testOgrnError(){
+        StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < 17; i++) {
-            organizationAddPage.getOrganizationOgrn().setText(stringBuilder.toString());
-            organizationAddPage.getSendBtn().submit();
+            this.seleniumContainer.getOrganizationAddPage().getOrganizationOgrn().setText(stringBuilder.toString());
+            this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
             if(stringBuilder.length() == 13 || stringBuilder.length() == 15){
-                Assertions.assertEquals("", organizationAddPage.getOrganizationOgrn().getErrorText());
+                Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getOrganizationOgrn().getErrorText());
             } else {
-                Assertions.assertEquals(OGRN_ERROR_TEXT, organizationAddPage.getOrganizationOgrn().getErrorText());
+                Assertions.assertEquals(OGRN_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getOrganizationOgrn().getErrorText());
             }
             stringBuilder.append(i);
         }
-        Assertions.assertEquals(EMPTY_ERROR_TEXT,organizationAddPage.getOrganizationPhone().getErrorText());
-        Assertions.assertEquals(EMPTY_ERROR_TEXT,organizationAddPage.getOrganizationEmail().getErrorText());
-        Assertions.assertEquals(EMPTY_ERROR_TEXT,organizationAddPage.getOrganizationOkved().getErrorText());
 
-        Assertions.assertEquals(EMPTY_ERROR_TEXT,organizationAddPage.getReqBasis().getErrorText());
+    }
+
+    @Test
+    public void testOrganizationPhoneError(){
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationPhone().setText("Тестовая организация");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getOrganizationPhone().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationPhone().setText("");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals(EMPTY_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getOrganizationPhone().getErrorText());
+
+    }
+
+    @Test
+    public void testOrganizationEmailError(){
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationEmail().setText(generateEmail(50));
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getOrganizationEmail().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationEmail().setText("");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals(EMPTY_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getOrganizationEmail().getErrorText());
+
+    }
+
+    @Test
+    public void testOrganizationOkvedError(){
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationOkved().setText("Тестовая организация");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getOrganizationOkved().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationOkved().setText("");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals(EMPTY_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getOrganizationOkved().getErrorText());
+
+    }
+
+    @Test
+    public void testReqBasisError(){
+        this.seleniumContainer.getOrganizationAddPage().getReqBasis().setText("Тестовая организация");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getReqBasis().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getReqBasis().setText("");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals(JUR_ADDRESS_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getReqBasis().getErrorText());
+
+    }
+
+    @Test
+    public void testPersonOfficeCntError(){
+        this.seleniumContainer.getOrganizationAddPage().getPersonOfficeCnt().setText(String.valueOf(getRandomNumber(1,200)));
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getPersonOfficeCnt().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getPersonOfficeCnt().setText("");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals(EMPTY_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getPersonOfficeCnt().getErrorText());
+
+    }
+
+    @Test
+    public void testPersonRemoteCntError(){
+        this.seleniumContainer.getOrganizationAddPage().getPersonRemoteCnt().setText(String.valueOf(getRandomNumber(1,200)));
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getPersonRemoteCnt().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getPersonRemoteCnt().setText("");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals(EMPTY_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getPersonRemoteCnt().getErrorText());
+
+    }
+
+    @Test
+    public void testPersonSlrySaveCntError(){
+        this.seleniumContainer.getOrganizationAddPage().getPersonSlrySaveCnt().setText(String.valueOf(getRandomNumber(1,200)));
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getPersonSlrySaveCnt().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getPersonSlrySaveCnt().setText("");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals(EMPTY_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getPersonSlrySaveCnt().getErrorText());
+
+    }
+
+    @Test
+    public void testOrganizationAddressJurError(){
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationAddressJur().setText("Тестовая организация");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getOrganizationAddressJur().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationAddressJur().setText("");
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+        Assertions.assertEquals(EMPTY_ERROR_TEXT, this.seleniumContainer.getOrganizationAddPage().getOrganizationAddressJur().getErrorText());
+    }
 
 
-        Assertions.assertEquals(EMPTY_ERROR_TEXT,organizationAddPage.getPersonOfficeCnt().getErrorText());
-        Assertions.assertEquals(EMPTY_ERROR_TEXT,organizationAddPage.getPersonRemoteCnt().getErrorText());
-        Assertions.assertEquals(EMPTY_ERROR_TEXT,organizationAddPage.getPersonSlrySaveCnt().getErrorText());
+    @Test
+    public void testingSendingToServer(){
 
 
 
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationName().setText("Тестовая организация");
 
 
-        //Добавить на проверку на ответ от сервера
-
-        organizationAddPage.getOrganizationName().setText(generateWord(99));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("", organizationAddPage.getOrganizationName().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationShortName().setText(generateWord(99));
 
 
 
-        organizationAddPage.getOrganizationShortName().setText(generateWord(99));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("", organizationAddPage.getOrganizationShortName().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationInn().setText("9999999999");
 
 
-        organizationAddPage.getOrganizationInn().setText(generateNumberSequence(12));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("", organizationAddPage.getOrganizationInn().getErrorText());
+
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationOgrn().setText("999999999999999");
 
 
-        organizationAddPage.getOrganizationOgrn().setText(generateNumberSequence(15));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("", organizationAddPage.getOrganizationOgrn().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationPhone().setText(generateNumberSequence(11));
 
-        organizationAddPage.getOrganizationPhone().setText(generateNumberSequence(11));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("", organizationAddPage.getOrganizationPhone().getErrorText());
 
-        organizationAddPage.getOrganizationEmail().setText(generateEmail(30));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("", organizationAddPage.getOrganizationEmail().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationEmail().setText(generateEmail(30));
 
-        organizationAddPage.getOrganizationOkved().setText(generateWord(99));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("", organizationAddPage.getOrganizationOkved().getErrorText());
 
-        organizationAddPage.getOrganizationOkvedAdd().setText(generateWord(99));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("", organizationAddPage.getOrganizationOkvedAdd().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationOkved().setText(generateWord(99));
 
-        List<WebElement> availableValues = organizationAddPage.getDepartmentId().getAvailableValues();
+
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationOkvedAdd().setText(generateWord(99));
+
+
+        List<WebElement> availableValues = this.seleniumContainer.getOrganizationAddPage().getDepartmentId().getAvailableValues();
         availableValues.get(getRandomNumber(0, availableValues.size())).click();
 
-
-        organizationAddPage.getOrganizationAddressJur().setText(generateWord(200));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("", organizationAddPage.getOrganizationName().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationAddressJur().setText(generateWord(200));
 
 
-        Assertions.assertEquals(0, organizationAddPage.getAddressTable().getRowsSize());
-        organizationAddPage.getAddressFact().setText(generateWord(99));
-        organizationAddPage.getPersonOfficeFactCnt().setText(String.valueOf(getRandomNumber(1,255)));
-        organizationAddPage.getButtonAddrAdd().submit();
+        Assertions.assertEquals(0, this.seleniumContainer.getOrganizationAddPage().getAddressTable().getRowsSize());
+        this.seleniumContainer.getOrganizationAddPage().getAddressTable().addValue(generateWord(99), String.valueOf(getRandomNumber(1,255)));
+        Assertions.assertEquals(1, this.seleniumContainer.getOrganizationAddPage().getAddressTable().getRowsSize());
 
 
-        organizationAddPage.getReqBasis().setText(generateWord(99));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("",organizationAddPage.getReqBasis().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getReqBasis().setText(generateWord(99));
 
 
-        organizationAddPage.getPersonOfficeCnt().setText(String.valueOf(getRandomNumber(1,255)));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("",organizationAddPage.getPersonOfficeCnt().getErrorText());
-
-        organizationAddPage.getPersonRemoteCnt().setText(String.valueOf(getRandomNumber(1,255)));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("",organizationAddPage.getPersonRemoteCnt().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getPersonOfficeCnt().setText(String.valueOf(getRandomNumber(1,255)));
 
 
+        this.seleniumContainer.getOrganizationAddPage().getPersonRemoteCnt().setText(String.valueOf(getRandomNumber(1,255)));
 
 
-        organizationAddPage.getPersonSlrySaveCnt().setText(String.valueOf(getRandomNumber(1,255)));
-        organizationAddPage.getSendBtn().submit();
-        Assertions.assertEquals("",organizationAddPage.getPersonSlrySaveCnt().getErrorText());
+        this.seleniumContainer.getOrganizationAddPage().getPersonSlrySaveCnt().setText(String.valueOf(getRandomNumber(1,255)));
 
 
 
@@ -330,7 +401,10 @@ public class OrganizationPageTest {
 
 
 
-        Har har = proxy.getHar();
+
+
+
+
 
 
 
@@ -341,18 +415,44 @@ public class OrganizationPageTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        this.driver.quit();
-        this.proxy.stop();
+        Har har = this.seleniumContainer.getProxy().getHar();
+        this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
+
+        try {
+            Thread.sleep(5000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+        HTMLFinalConfirmationModalWindow finalModalWindow = this.seleniumContainer.getOrganizationAddPage().getFinalModalWindow();
+        Assertions.assertEquals("Заявка принята. Ожидайте ответ на электронную почту." ,finalModalWindow.getText());
+
+        finalModalWindow.newRequest();
 
 
 
 
-
-
+        requestService.deleteAllByOrganizationName("Тестовая организация");
+        //this.proxy.stop();
 
 
     }
 
+//    @Test
+//    public void test(){}
+
+    @After
+    public void deleteTestValuesFromDb(){
+        /*this.driver.quit();
+        this.proxy.stop();*/
+        requestService.deleteAllByOrganizationName("Тестовая организация");
+    }
+
+    @AfterClass
+    public static void closeDriverAndProxy(){
+        if(seleniumContainer != null) seleniumContainer.closeDriverAndProxy();
+    }
 
 
 

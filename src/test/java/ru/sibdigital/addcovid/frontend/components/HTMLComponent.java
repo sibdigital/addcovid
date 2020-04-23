@@ -34,8 +34,12 @@ public class HTMLComponent {
     }
 
     public boolean isVisible() {
-        WebElement element = this.getElement().findElement(By.tagName("button"));
+        WebElement element = this.getElement();
         return element.isDisplayed() & !"none".equals(element.getCssValue("display"));
+    }
+
+    public void setText(String text){
+        this.getElement().sendKeys(text);
     }
 
 }

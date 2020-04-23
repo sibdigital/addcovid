@@ -12,16 +12,14 @@ import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,15 +82,15 @@ public class RequestService {
             organization = clsOrganizationRepo.save(organization);
         }
 
-            List<DocPerson> personList = postForm.getPersons()
-                    .stream()
-                    .map(personDto -> personDto.convertToPersonEntity())
-                    .collect(Collectors.toList());
+        List<DocPerson> personList = postForm.getPersons()
+                .stream()
+                .map(personDto -> personDto.convertToPersonEntity())
+                .collect(Collectors.toList());
 
-            List<DocAddressFact> docAddressFactList = postForm.getAddressFact()
-                    .stream()
-                    .map(personDto -> personDto.convertToDocAddressFact())
-                    .collect(Collectors.toList());
+        List<DocAddressFact> docAddressFactList = postForm.getAddressFact()
+                .stream()
+                .map(personDto -> personDto.convertToDocAddressFact())
+                .collect(Collectors.toList());
 
 
         //int importStatus = ImportStatuses.SUCCESS.getValue();
@@ -131,46 +129,46 @@ public class RequestService {
         }
 */
 
-            String files = postForm.getAttachment();
+        String files = postForm.getAttachment();
 
-            docRequest = DocRequest.builder()
-                    .organization(organization)
-                    .department(departmentRepo.getOne(postForm.getDepartmentId()))
-                    .personOfficeCnt(postForm.getPersonOfficeCnt())
-                    //.personOfficeFactCnt(postForm.getPersonOfficeFactCnt())
-                    .personRemoteCnt(postForm.getPersonRemoteCnt())
-                    .personSlrySaveCnt(postForm.getPersonSlrySaveCnt())
-                    .attachmentPath(files)
-                    .docPersonList(personList)
-                    .docAddressFact(docAddressFactList)
-                    .statusReview(0)
-                    .timeReview(Timestamp.valueOf(LocalDateTime.now()))
-                    .statusImport(0)
-                    .timeImport(Timestamp.valueOf(LocalDateTime.now()))
-                    .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
-                    .isAgree(postForm.getIsAgree())
-                    .isProtect(postForm.getIsProtect())
-                    .reqBasis(postForm.getReqBasis())
-                    .orgHashCode(sha256)
-                    .idTypeRequest(requestType.getValue())
-                    .build();
+        docRequest = DocRequest.builder()
+                .organization(organization)
+                .department(departmentRepo.getOne(postForm.getDepartmentId()))
+                .personOfficeCnt(postForm.getPersonOfficeCnt())
+                //.personOfficeFactCnt(postForm.getPersonOfficeFactCnt())
+                .personRemoteCnt(postForm.getPersonRemoteCnt())
+                .personSlrySaveCnt(postForm.getPersonSlrySaveCnt())
+                .attachmentPath(files)
+                .docPersonList(personList)
+                .docAddressFact(docAddressFactList)
+                .statusReview(0)
+                .timeReview(Timestamp.valueOf(LocalDateTime.now()))
+                .statusImport(0)
+                .timeImport(Timestamp.valueOf(LocalDateTime.now()))
+                .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
+                .isAgree(postForm.getIsAgree())
+                .isProtect(postForm.getIsProtect())
+                .reqBasis(postForm.getReqBasis())
+                .orgHashCode(sha256)
+                .idTypeRequest(requestType.getValue())
+                .build();
 
-            docRequest = docRequestRepo.save(docRequest);
+        docRequest = docRequestRepo.save(docRequest);
 
-            DocRequest finalDocRequest = docRequest;
-            docRequest.getDocAddressFact().forEach(docAddressFact -> {
-                docAddressFact.setDocRequest(finalDocRequest);
-            });
+        DocRequest finalDocRequest = docRequest;
+        docRequest.getDocAddressFact().forEach(docAddressFact -> {
+            docAddressFact.setDocRequest(finalDocRequest);
+        });
 
-            docRequest.getDocPersonList().forEach(docPerson -> {
-                docPerson.setDocRequest(finalDocRequest);
-            });
+        docRequest.getDocPersonList().forEach(docPerson -> {
+            docPerson.setDocRequest(finalDocRequest);
+        });
 
-            docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
-            docPersonRepo.saveAll(docRequest.getDocPersonList());
+        docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
+        docPersonRepo.saveAll(docRequest.getDocPersonList());
 
-            return docRequest;
-        }
+        return docRequest;
+    }
 
 
     public DocRequest getLastRequestInfoByInnAndOgrnAndOrganizationName(String inn, String ogrn, String organizationName){
@@ -294,4 +292,37 @@ public class RequestService {
         }
         return "{ \"status\": \"error\" }";
     }
+
+
+    @Transactional
+    public void deleteAllByOrganizationName(String organizationName){
+        List<ClsOrganization> testOrganizations = clsOrganizationRepo.findAllByName(organizationName).orElse(new ArrayList<>(0));
+        Set<DocRequest> docRequestsSet = new HashSet<>(20);
+        Set<DocPerson> docPersonSet = new HashSet<>(100);
+        Set<DocAddressFact> docAddressFactsSet = new HashSet<>(20);
+
+        testOrganizations.forEach(clsOrganization -> {
+
+            List<DocRequest> docRequests = docRequestRepo.getAllByOrganizationId(clsOrganization.getId()).orElse(new ArrayList<>());
+
+            docRequests.forEach(docRequest -> {
+                docPersonSet.addAll(docRequest.getDocPersonList());
+                docAddressFactsSet.addAll(docRequest.getDocAddressFact());
+            });
+
+            docRequestsSet.addAll(docRequests);
+
+
+        });
+
+        if(docPersonSet.size() > 0) docPersonRepo.deleteAll(docPersonSet);
+        if(docAddressFactsSet.size() > 0) docAddressFactRepo.deleteAll(docAddressFactsSet);
+        if(docRequestsSet.size() > 0) docRequestRepo.deleteAll(docRequestsSet);
+        if(testOrganizations.size() > 0) clsOrganizationRepo.deleteAll(testOrganizations);
+
+
+
+    }
+
+
 }
