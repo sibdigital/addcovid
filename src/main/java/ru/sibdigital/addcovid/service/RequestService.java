@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @Slf4j
@@ -300,5 +301,10 @@ public class RequestService {
 
     public ClsTypeRequest getClsTypeRequestById(Integer id) {
         return clsTypeRequestRepo.findById(Long.valueOf(id)).orElseGet(() -> null);
+    }
+
+    public List<ClsTypeRequest> getClsTypeRequests() {
+        return StreamSupport.stream(clsTypeRequestRepo.findAll().spliterator(), false)
+                .collect(Collectors.toList());
     }
 }

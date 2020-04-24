@@ -192,6 +192,11 @@ public class MainController {
         return requestService.getClsTypeRequestById(idTypeRequest);
     }
 
+    @GetMapping("/cls_type_requests")
+    public @ResponseBody List<ClsTypeRequest> getClsTypeRequests() {
+        return requestService.getClsTypeRequests();
+    }
+
     @PostMapping("/typed_form")
     public @ResponseBody String postTypedForm(@RequestParam("request_type") Integer idTypeRequest,
                                               @RequestBody PostFormDto postFormDto) {

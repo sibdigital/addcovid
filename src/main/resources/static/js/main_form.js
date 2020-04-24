@@ -163,6 +163,7 @@ var link_form = webix.ui({
     head: "&nbsp&nbsp&nbsp&nbspВыберите необходимое действие&nbsp&nbsp&nbsp&nbsp",
     body: {
         view: "form",
+        id: 'link_form',
         rows: [
             {
                 view: 'label',
@@ -788,8 +789,25 @@ webix.ready(function() {
         ]
     })
 
-    $$('form_person').bind('person_table')
-    $$('form_addr').bind('addr_table')
+    $$('form_person').bind('person_table');
+    $$('form_addr').bind('addr_table');
+
+    webix.ajax('/cls_type_requests').then(function (data) {
+        let typeRequests = data.json();
+        for(var  j = 0; j< typeRequests.length; j++){
+            let labl =  typeRequests[j].activityKind;
+            let vdid = typeRequests[j].id;
+            let reqv = 'typed_form?request_type=' + vdid;
+            v = {
+                view: 'label',
+                label: '<a style="font-size: calc(0.75em + 1vmin); text-align: center;" href="http://form.govrb.ru/'+reqv+'" >' +
+                    'Подать заявку ('+ labl +')</a>',
+                width:0,
+            };
+            $$('link_form').addView(v);
+        }
+
+    });
 
     webix.event(window, "resize", function(event){
         link_form.define("width",document.body.clientWidth);
