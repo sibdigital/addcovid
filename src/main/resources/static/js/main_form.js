@@ -795,16 +795,18 @@ webix.ready(function() {
     webix.ajax('/cls_type_requests').then(function (data) {
         let typeRequests = data.json();
         for(var  j = 0; j< typeRequests.length; j++){
-            let labl =  typeRequests[j].activityKind;
-            let vdid = typeRequests[j].id;
-            let reqv = 'typed_form?request_type=' + vdid;
-            v = {
-                view: 'label',
-                label: '<a style="font-size: calc(0.75em + 1vmin); text-align: center;" href="http://form.govrb.ru/'+reqv+'" >' +
-                    'Подать заявку ('+ labl +')</a>',
-                width:0,
-            };
-            $$('link_form').addView(v);
+            if (typeRequests[j].status_registration == 1) {
+                let labl = typeRequests[j].activityKind;
+                let vdid = typeRequests[j].id;
+                let reqv = 'typed_form?request_type=' + vdid;
+                v = {
+                    view: 'label',
+                    label: '<a style="font-size: calc(0.75em + 1vmin); text-align: center;" href="http://form.govrb.ru/' + reqv + '" >' +
+                        'Подать заявку (' + labl + ')</a>',
+                    width: 0,
+                };
+                $$('link_form').addView(v);
+            }
         }
 
     });
