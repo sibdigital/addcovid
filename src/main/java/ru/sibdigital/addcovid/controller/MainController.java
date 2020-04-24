@@ -7,14 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.dto.DachaDto;
 import ru.sibdigital.addcovid.dto.ListItemDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
-import ru.sibdigital.addcovid.model.DocDacha;
-import ru.sibdigital.addcovid.model.DocRequest;
-import ru.sibdigital.addcovid.model.RequestTypes;
+import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.ClsDepartmentRepo;
 import ru.sibdigital.addcovid.service.DachaService;
 import ru.sibdigital.addcovid.service.RequestService;
@@ -145,7 +144,7 @@ public class MainController {
             //валидация
             String errors = validate(postFormDto);
             if(errors.isEmpty()){
-                DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION);
+                DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION.getValue());
 
 //            return hash;
                 return "Заявка принята. Ожидайте ответ на электронную почту.";
@@ -168,7 +167,7 @@ public class MainController {
             //валидация
             String errors = validate(postFormDto);
             if(errors.isEmpty()){
-                DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.BARBERSHOP);
+                DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.BARBERSHOP.getValue());
 
                 return "Заявка принята. Ожидайте ответ на электронную почту.";
             }
@@ -182,5 +181,42 @@ public class MainController {
         }
     }
 
+    @GetMapping("/typed_form")
+    public String typedForm(@RequestParam(name = "request_type") Long idTypeRequest, Model model) {
+        model.addAttribute("idTypeRequest", idTypeRequest);
+        return "typed_form";
+    }
+
+    @GetMapping("/cls_type_request/{request_type}")
+    public @ResponseBody ClsTypeRequest getClsTypeRequest(@PathVariable(name = "request_type") Integer idTypeRequest) {
+        return requestService.getClsTypeRequestById(idTypeRequest);
+    }
+
+    @PostMapping("/typed_form")
+    public @ResponseBody String postTypedForm(@RequestParam("request_type") Integer idTypeRequest,
+                                              @RequestBody PostFormDto postFormDto) {
+
+        try {
+            ClsTypeRequest clsTypeRequest = requestService.getClsTypeRequestById(idTypeRequest);
+            if (clsTypeRequest == null) {
+                return "Данный тип заявки не существует!";
+            } else if (clsTypeRequest.getStatusRegistration() != StatusRegistration.OPENED.getValue()) {
+                return "Подача заявок с данным типом закрыта!";
+            }
+            //валидация
+            String errors = validate(postFormDto);
+            if(errors.isEmpty()){
+                DocRequest docRequest = requestService.addNewRequest(postFormDto, idTypeRequest);
+
+                return "Заявка принята. Ожидайте ответ на электронную почту.";
+            }
+            else {
+                return errors;
+            }
+        } catch(Exception e){
+            log.error(e.getMessage(), e);
+            return "Невозможно сохранить заявку";
+        }
+    }
 
 }

@@ -46,12 +46,15 @@ public class RequestService {
     @Autowired
     private DepUserRepo depUserRepo;
 
+    @Autowired
+    private ClsTypeRequestRepo clsTypeRequestRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
     private static final int BUFFER_SIZE = 4096;
 
-    public DocRequest addNewRequest(PostFormDto postForm, RequestTypes requestType) {
+    public DocRequest addNewRequest(PostFormDto postForm, int requestType) {
 
         String sha256 = SHA256Generator.generate(postForm.getOrganizationInn(), postForm.getOrganizationOgrn(), postForm.getOrganizationName());
 
@@ -79,7 +82,7 @@ public class RequestService {
                     .phone(postForm.getOrganizationPhone())
                     .statusImport(0)
                     .timeImport(Timestamp.valueOf(LocalDateTime.now()))
-                    .idTypeRequest(requestType.getValue())
+                    .idTypeRequest(requestType)
                     .build();
             organization = clsOrganizationRepo.save(organization);
         }
@@ -152,7 +155,7 @@ public class RequestService {
                     .isProtect(postForm.getIsProtect())
                     .reqBasis(postForm.getReqBasis())
                     .orgHashCode(sha256)
-                    .idTypeRequest(requestType.getValue())
+                    .idTypeRequest(requestType)
                     .build();
 
             docRequest = docRequestRepo.save(docRequest);
@@ -293,5 +296,9 @@ public class RequestService {
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         }
         return "{ \"status\": \"error\" }";
+    }
+
+    public ClsTypeRequest getClsTypeRequestById(Integer id) {
+        return clsTypeRequestRepo.findById(Long.valueOf(id)).orElseGet(() -> null);
     }
 }

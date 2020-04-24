@@ -131,7 +131,7 @@ public class FileUploadController {
             postFormDto.setReqBasis(reqBasis);
 
             if(checkProtocol.isSuccess()) {
-                requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION);
+                requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION.getValue());
                 excelRecord.setStatus(0);
             } else {
                 excelRecord.setStatus(1);
