@@ -795,7 +795,10 @@ webix.ready(function() {
     webix.ajax('/cls_type_requests').then(function (data) {
         let typeRequests = data.json();
         for(var  j = 0; j< typeRequests.length; j++){
-            if (typeRequests[j].status_registration == 1) {
+            if (typeRequests[j].id == 1 || typeRequests[j].id == 2) {
+                continue;
+            }
+            if (typeRequests[j].statusRegistration == 1) {
                 let labl = typeRequests[j].activityKind;
                 let vdid = typeRequests[j].id;
                 let reqv = 'typed_form?request_type=' + vdid;
