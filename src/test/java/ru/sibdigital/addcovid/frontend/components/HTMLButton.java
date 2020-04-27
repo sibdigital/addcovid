@@ -10,6 +10,7 @@ public class HTMLButton extends HTMLComponent {
     }
 
     public void submit(){
+
         this.getElement().findElement(By.tagName("button")).click();
     }
 

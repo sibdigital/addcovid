@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrganizationAddPage {
-
+    private String pageUrl;
 
     private final HTMLComponent organizationName;
     HTMLComponent organizationShortName;
@@ -48,13 +48,12 @@ public class OrganizationAddPage {
 
     public OrganizationAddPage(WebDriver driver, BrowserMobProxy proxy, String baseUrl) {
 
-        String url = baseUrl+"/form";
+        this.pageUrl = baseUrl+"/form";
 
 
 
-        // create a new HAR with the label "yahoo.com"
-        proxy.newHar(url);
-        driver.get(url);
+
+        driver.get(pageUrl);
         this.organizationName = new HTMLText(driver, By.xpath("//*[@view_id='organizationName']"));
         this.organizationShortName = new HTMLText(driver, By.xpath("//*[@view_id='organizationShortName']"));
         this.organizationInn = new HTMLText(driver, By.xpath("//*[@view_id='organizationInn']"));
@@ -198,5 +197,9 @@ public class OrganizationAddPage {
 
     public HTMLFinalConfirmationModalWindow getFinalModalWindow() {
         return (HTMLFinalConfirmationModalWindow) finalModalWindow;
+    }
+
+    public String getPageUrl() {
+        return pageUrl;
     }
 }

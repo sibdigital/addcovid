@@ -8,18 +8,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 
 @Component
 public class CertificateUtil {
 
-    @Value("${ssl.certifficate.path:./cer}")
+    @Value("${test.ssl.certifficate.path:./cer}")
     private String certDirectoryPath;
-    @Value("${ssl.certifficate.open.name:certificate.cer}")
+    @Value("${test.ssl.certifficate.open.name:certificate.cer}")
     private String openCertName;
-    @Value("${ssl.certificate.private.name:private-key.pem}")
+    @Value("${test.ssl.certificate.private.name:private-key.pem}")
     private String privateCertName;
-    @Value("${ssl.certificate.store.name:keystore.p12}")
+    @Value("${test.ssl.certificate.store.name:keystore.p12}")
     private String storeName;
+    @Value("${test.ssl.certificate.store.password:password}")
+    private String storePassword;
 
 
     private RootCertificateGenerator generateSertificate(){
@@ -30,11 +33,11 @@ public class CertificateUtil {
         // save the newly-generated Root Certificate and Private Key -- the .cer file can be imported
         // directly into a browser
         rootCertificateGenerator.saveRootCertificateAsPemFile(new File(certDirectoryPath+"/"+openCertName));
-        rootCertificateGenerator.savePrivateKeyAsPemFile(new File(certDirectoryPath+"/"+privateCertName), "password");
+        rootCertificateGenerator.savePrivateKeyAsPemFile(new File(certDirectoryPath+"/"+privateCertName), storePassword);
 
         // or save the certificate and private key as a PKCS12 keystore, for later use
         rootCertificateGenerator.saveRootCertificateAndKey("PKCS12", new File(certDirectoryPath+"/"+storeName),
-                "privateKeyAlias", "password");
+                "privateKeyAlias", storePassword);
 
 
         return rootCertificateGenerator;
@@ -43,24 +46,20 @@ public class CertificateUtil {
 
     public ImpersonatingMitmManager getCertificate(){
         ImpersonatingMitmManager.Builder builder = ImpersonatingMitmManager.builder();
-        File cerDirectory = new File(certDirectoryPath);
-        if(cerDirectory.exists()) {
+        File keyStoredCertificate = new File(certDirectoryPath + "/" + storeName);
+        if(keyStoredCertificate.exists()) {
             CertificateAndKeySource existingCertificateSource =
-                    new KeyStoreFileCertificateSource("PKCS12",
-                            new File(certDirectoryPath+"/"+storeName),
-                            "privateKeyAlias",
-                            "password");
-            builder.rootCertificateSource(existingCertificateSource)
-            ;
-
-
+                        new KeyStoreFileCertificateSource("PKCS12", keyStoredCertificate,
+                                "privateKeyAlias",
+                                storePassword);
+                builder.rootCertificateSource(existingCertificateSource);
         } else {
             RootCertificateGenerator rootCertificateGenerator = generateSertificate();
             builder.rootCertificateSource(rootCertificateGenerator);
         }
 
 
-        return builder.trustAllServers(true).build();
+        return builder/*.trustAllServers(true)*/.build();
         // tell the ImpersonatingMitmManager  use the RootCertificateGenerator we just configured
 
     }

@@ -28,4 +28,16 @@ logging.level.org.springframework=DEBUG
 logging.level.ru.sibdigital.addcovid = DEBUG
 logging.file.path=./addcovid-logs
 
-webdriver.chrome.driver=C:/Program Files/Java/selenium/chromedriver.exe
+
+#Секция для тестирования фронта
+#Смотрим версию своего браузера и качаем драйвер для своей версии отсюда https://chromedriver.chromium.org/downloads
+test.webdriver.chrome.driver=C:/Program Files/Java/selenium/chromedriver.exe
+test.webdriver.browser.show=false
+
+#После первого запуска теста на селениуме, сгенерированный сертификат .p12 необходимо установить в Доверенные корневые центры сертификации.
+#На windows 10 - двойной щелчок по .p12 файлу -> Для текущего пользователя (далее) -> (далее) -> Вводим пароль соответствующий test.ssl.certificate.store.password ; по умолчанию password (далее) -> Поместить все сертификаты в следущее хранилище: Доверенные корневые центры сертификации (Далее) -> (Готово)
+test.ssl.certifficate.path=./cer
+test.ssl.certifficate.open.name=certificate.cer
+test.ssl.certificate.private.name=private-key.pem
+test.ssl.certificate.store.name=keystore.p12
+test.ssl.certificate.store.password=password

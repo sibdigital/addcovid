@@ -38,73 +38,63 @@ public class SeleniumContainer{
     private OrganizationAddPage organizationAddPage;
 
 
-    public void closeDriverAndProxy() {
-        if(this.proxy.isStarted()) this.proxy.stop();
-        this.driver.close();
-    }
 
-    public static SeleniumContainer getInstance(final int port, final String protocol, final String host, String chromeDriverLocation , CertificateUtil certificateUtil){
+
+    public static SeleniumContainer getInstance(final boolean showBrowser,final int port, final String protocol, final String host, String chromeDriverLocation , CertificateUtil certificateUtil){
         String baseUrl = String.format("%s://%s:%d", protocol, host, port);
 
         if(instance == null){
-            instance = new SeleniumContainer(port, protocol, host, chromeDriverLocation, certificateUtil);
+            instance = new SeleniumContainer(showBrowser,port, protocol, host, chromeDriverLocation, certificateUtil);
         } else {
             if(!baseUrl.equals(instance.getBaseUrl())){
                 instance.closeDriverAndProxy();
-                instance = new SeleniumContainer(port, protocol, host, chromeDriverLocation, certificateUtil);
+                instance = new SeleniumContainer(showBrowser,port, protocol, host, chromeDriverLocation, certificateUtil);
             }
         }
         return instance;
     }
 
-    private SeleniumContainer(final int port, final String protocol, final String host,String chromeDriverLocation ,CertificateUtil certificateUtil){
+    public void closeDriverAndProxy() {
+        if(this.proxy.isStarted()) this.proxy.stop();
+        this.driver.close();
+        this.driver.quit();
+    }
+
+    private SeleniumContainer(boolean showBrowser, final int port, final String protocol, final String host,String chromeDriverLocation ,CertificateUtil certificateUtil){
 
         this.baseUrl = String.format("%s://%s:%d", protocol, host, port);
-        //System.setProperty("webdriver.chrome.driver",chromeDriverLocation);
         // start the proxy
         proxy = new BrowserMobProxyServer();
+        proxy.setTrustAllServers(true);
         proxy.setMitmManager(certificateUtil.getCertificate());
         proxy.setTrustAllServers(true);
-        //proxy.setMitmManager(ImpersonatingMitmManager.builder().trustAllServers(true).build());
-        /*proxy.addRequestFilter((httpRequest, httpMessageContents, httpMessageInfo) -> {
-            log.info(httpRequest.method().name());
-            log.info(httpRequest.uri());
-            log.info("addRequestFilter");
-            return null;
-        });*/
-
-        proxy.addResponseFilter((httpResponse, httpMessageContents, httpMessageInfo) -> {
-            /*log.info(String.valueOf(httpResponse.status().code()));
-            log.info(httpMessageContents.isText() ? httpMessageContents.getTextContents() : httpMessageContents.getContentType());
-            log.info(httpMessageInfo.getUrl());
-            log.info("addResponseFilter");*/
-            System.out.println(String.valueOf(httpResponse.status().code()));
-            System.out.println(String.valueOf(httpMessageContents.isText() ? httpMessageContents.getTextContents() : httpMessageContents.getContentType()));
-            System.out.println(String.valueOf(httpMessageInfo.getUrl()));
-            System.out.println(String.valueOf("addResponseFilter"));
-        });
-
-        proxy.start(0);
-
-
+        proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT,
+                CaptureType.RESPONSE_CONTENT);
+        proxy.start(8068);
 
         // get the Selenium proxy object
         Proxy seleniumProxy = ClientUtil.createSeleniumProxy(proxy);
-
         try {
+            //String hostIp = host;
             String hostIp = Inet4Address.getLocalHost().getHostAddress();
-            log.info(hostIp);
+            log.info("proxyUrl = "+hostIp + ":" + proxy.getPort());
             seleniumProxy.setHttpProxy(hostIp + ":" + proxy.getPort());
             seleniumProxy.setSslProxy(hostIp + ":" + proxy.getPort());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
+
+
         // configure it as a desired capability
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
 
         ChromeOptions options = new ChromeOptions();
+        options.addArguments( "--proxy-bypass-list=<-loopback>", "--disable-extensions");
+        if(!showBrowser){
+            options.addArguments( "--disable-gpu", "--headless", "--no-sandbox");
+        }
         options.merge(capabilities);
 
         ChromeDriverService service = new ChromeDriverService.Builder()
@@ -112,10 +102,13 @@ public class SeleniumContainer{
                 .usingAnyFreePort()
                 .build();
         this.driver = new ChromeDriver(service, options);
-        proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
-        this.organizationAddPage = new OrganizationAddPage(driver, proxy, baseUrl);
     }
 
-
-
+    public OrganizationAddPage getOrganizationAddPage() {
+        if(this.organizationAddPage == null) {
+            this.organizationAddPage = new OrganizationAddPage(driver, proxy, baseUrl);
+            this.proxy.newHar(baseUrl);
+        }
+        return this.organizationAddPage;
+    }
 }

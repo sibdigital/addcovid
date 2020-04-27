@@ -151,7 +151,8 @@ function removeAddr(){
 
 let uploadFile = '';
 let uploadFilename = '';
-let pred_date = new Date();
+const sendButtonDelay = 5 // в секундах
+let pred_date =  new Date(new Date().getTime() - sendButtonDelay * 1000);
 let upload_chack_error = 'Загружать можно только PDF-файлы и ZIP-архивы!';
 
 webix.ready(function() {
@@ -872,9 +873,11 @@ webix.ready(function() {
                                         }
 
                                         let cur_date = new Date();
+
                                         let dif  = Math.abs((cur_date.getTime() - pred_date.getTime()) /1000);
+                                        console.log(cur_date.getTime(), pred_date.getTime(), dif)
                                         pred_date = new Date();
-                                        if (dif < 5){
+                                        if (dif < sendButtonDelay){
                                             webix.message('Слишком частое нажатие на кнопку', 'error')
                                             return false
                                         }
