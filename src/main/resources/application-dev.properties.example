@@ -32,7 +32,7 @@ logging.file.path=./addcovid-logs
 #Секция для тестирования фронта
 #Смотрим версию своего браузера и качаем драйвер для своей версии отсюда https://chromedriver.chromium.org/downloads
 test.webdriver.chrome.driver=C:/Program Files/Java/selenium/chromedriver.exe
-test.webdriver.browser.show=false
+test.webdriver.browser.show=true #false - не всегда корректно отрабатывают тесты
 
 #После первого запуска теста на селениуме, сгенерированный сертификат .p12 необходимо установить в Доверенные корневые центры сертификации.
 #На windows 10 - двойной щелчок по .p12 файлу -> Для текущего пользователя (далее) -> (далее) -> Вводим пароль соответствующий test.ssl.certificate.store.password ; по умолчанию password (далее) -> Поместить все сертификаты в следущее хранилище: Доверенные корневые центры сертификации (Далее) -> (Готово)

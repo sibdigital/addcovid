@@ -54,7 +54,7 @@ public class OrganizationPageTest {
     final String host = "127.0.0.1";
     @Value("${test.webdriver.chrome.driver}") //#Смотрим версию своего браузера и качаем драйвер для своей версии отсюда https://chromedriver.chromium.org/downloads
     String chromeDriverLocation;
-    @Value("${test.webdriver.browser.show:false}")
+    @Value("${test.webdriver.browser.show:true}")
     boolean showBrowserWindow;
    /* WebDriver driver;
     BrowserMobProxy proxy;
