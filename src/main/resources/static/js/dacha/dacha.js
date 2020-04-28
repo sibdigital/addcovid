@@ -33,7 +33,6 @@ let district_options = [
     { id: 21, value: 'Тарбагатайский'},
     { id: 22, value: 'Тункинский'},
     { id: 23, value: 'Хоринский'},
-
 ]
 
 function getOptionsValue(index){
@@ -120,7 +119,10 @@ webix.ready(function() {
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
                                         required: true,
-                                        options: district_options,
+                                        suggest: {
+                                            data:district_options,
+                                            id:'district_options'
+                                        },
                                         on: {
                                             onChange: function (newv, oldv) {
                                                 if (newv == 18 || newv == 20 || newv == 24) {
@@ -161,7 +163,10 @@ webix.ready(function() {
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
                                         required: true,
-                                        options: district_options,
+                                        suggest: {
+                                            data:district_options,
+                                            id:'district_options'
+                                        },
                                         on: {
                                             onChange: function (newv, oldv) {
                                                 if (newv == 18 || newv == 20 || newv == 24) {
@@ -302,6 +307,12 @@ webix.ready(function() {
                                                                 webix.message('Повтор записи', 'error')
                                                                 $$('lastname').focus()
                                                             }
+                                                            let cnt = $$('person_table').data.count();
+                                                            if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0){
+                                                                $$('send_btn').enable();
+                                                            }else{
+                                                                $$('send_btn').disable();
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -318,6 +329,12 @@ webix.ready(function() {
                                                         align: 'center',
                                                         click: function () {
                                                             $$('age').callEvent('onEnter')
+                                                            let cnt = $$('person_table').data.count();
+                                                            if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0){
+                                                                $$('send_btn').enable();
+                                                            }else{
+                                                                $$('send_btn').disable();
+                                                            }
                                                         }
                                                     }
                                                 ]
@@ -396,7 +413,15 @@ webix.ready(function() {
 */
                                 onClick:{
                                     delete_btn: function(ev, id){
+
                                         this.remove(id);
+                                        let cnt = $$('person_table').data.count();
+                                        if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0){
+                                            $$('send_btn').enable();
+                                        }else{
+                                            $$('send_btn').disable();
+                                        }
+
                                     }
                                 }
                             },
@@ -424,7 +449,8 @@ webix.ready(function() {
                         label: 'Подтверждаю ознакомление',
                         on: {
                             onChange (newv, oldv) {
-                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 ){
+                                let cnt = $$('person_table').data.count();
+                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0){
                                     $$('send_btn').enable();
                                 }else{
                                     $$('send_btn').disable();
@@ -483,7 +509,8 @@ webix.ready(function() {
                         label: 'Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия',
                         on: {
                             onChange(newv, oldv) {
-                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 ){
+                                let cnt = $$('person_table').data.count();
+                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0){
                                     $$('send_btn').enable();
                                 }else{
                                     $$('send_btn').disable();

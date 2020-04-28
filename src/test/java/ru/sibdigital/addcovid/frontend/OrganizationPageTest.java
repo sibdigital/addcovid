@@ -18,9 +18,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import ru.sibdigital.addcovid.frontend.components.HTMLFinalConfirmationModalWindow;
+import ru.sibdigital.addcovid.frontend.util.CertificateUtil;
+import ru.sibdigital.addcovid.frontend.util.CharsAndSymbolsGenerator;
+import ru.sibdigital.addcovid.frontend.util.SeleniumContainer;
 import ru.sibdigital.addcovid.service.RequestService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -43,10 +45,7 @@ public class OrganizationPageTest {
     @Autowired
     RequestService requestService;
 
-    List<Character> rusChars = new ArrayList<>(70);
-    List<Character> engChars = new ArrayList<>(70);
-
-
+  
 
     @LocalServerPort
     private int port;
@@ -60,77 +59,13 @@ public class OrganizationPageTest {
     BrowserMobProxy proxy;
     private OrganizationAddPage this.seleniumContainer.getOrganizationAddPage();*/
 
-    public OrganizationPageTest() {
-        for (int i = 'А'; i <= 'Я'; i++) {
-            rusChars.add((char) i);
-        }
-        rusChars.add(' ');
-        rusChars.add('Ё');
-        rusChars.add('ё');
-        for (int i = 'а'; i <= 'я'; i++) {
-            rusChars.add((char) i);
-        }
-
-        for (int i = 'A'; i <= 'Z'; i++) {
-            engChars.add((char) i);
-        }
-        for (int i = 'a'; i <= 'z'; i++) {
-            engChars.add((char) i);
-        }
-
-
-
-    }
-
-    private String generateWord(int maximumNumberOfChars){
-
-        int sizeOfSequence = this.getRandomNumber(1,maximumNumberOfChars);
-
-        StringBuilder word = new StringBuilder();
-
-        for (int i = 0; i < sizeOfSequence; i++) {
-            word.append(rusChars.get(this.getRandomNumber(0,this.rusChars.size()-1)));
-        }
-
-        return word.toString();
-    }
-
-    private String generateEmail(int sizeOfSequence){
-
-
-        StringBuilder word = new StringBuilder();
-
-        for (int i = 0; i < sizeOfSequence; i++) {
-            if(i == sizeOfSequence/2) {
-                word.append("@");
-            } else if(i == sizeOfSequence-3){
-                word.append(".");
-            } else {
-                word.append(engChars.get(this.getRandomNumber(0,this.engChars.size()-1)));
-            }
-        }
-
-        return word.toString();
-    }
-
-    private int getRandomNumber(int min, int max) {
-        return min + (int) (Math.random() * max-1);
-    }
-
-    private String generateNumberSequence(int sizeOfSequence){
-        StringBuilder sequence = new StringBuilder();
-
-        for (int i = 0; i < sizeOfSequence; i++) {
-            sequence.append(this.getRandomNumber(0,9));
-        }
-        return sequence.toString();
-    }
-
+   
     @Before
     public void fillDataToEnableSubmitButton(){
         this.seleniumContainer = SeleniumContainer.getInstance(showBrowserWindow, port, protocol, host, chromeDriverLocation, certificateUtil);
         this.seleniumContainer.getOrganizationAddPage().getIsProtect().setChecked(true);
         this.seleniumContainer.getOrganizationAddPage().getIsAgree().setChecked(true);
+        this.seleniumContainer.getOrganizationAddPage().getPeopleTable().clearTable();
         this.seleniumContainer.getOrganizationAddPage().getPeopleTable().addValue("Hey", "Heyt", "Dddd");
     }
 
@@ -295,7 +230,7 @@ public class OrganizationPageTest {
 
     @Test
     public void testOrganizationEmailError(){
-        this.seleniumContainer.getOrganizationAddPage().getOrganizationEmail().setText(generateEmail(50));
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationEmail().setText(CharsAndSymbolsGenerator.generateEmail(50));
         this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
         assertResponseWasNull();
         Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getOrganizationEmail().getErrorText());
@@ -334,7 +269,7 @@ public class OrganizationPageTest {
 
     @Test
     public void testPersonOfficeCntError(){
-        this.seleniumContainer.getOrganizationAddPage().getPersonOfficeCnt().setText(String.valueOf(getRandomNumber(1,200)));
+        this.seleniumContainer.getOrganizationAddPage().getPersonOfficeCnt().setText(String.valueOf(CharsAndSymbolsGenerator.getRandomNumber(1,200)));
         this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
         assertResponseWasNull();
         Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getPersonOfficeCnt().getErrorText());
@@ -347,7 +282,7 @@ public class OrganizationPageTest {
 
     @Test
     public void testPersonRemoteCntError(){
-        this.seleniumContainer.getOrganizationAddPage().getPersonRemoteCnt().setText(String.valueOf(getRandomNumber(1,200)));
+        this.seleniumContainer.getOrganizationAddPage().getPersonRemoteCnt().setText(String.valueOf(CharsAndSymbolsGenerator.getRandomNumber(1,200)));
         this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
         assertResponseWasNull();
         Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getPersonRemoteCnt().getErrorText());
@@ -360,7 +295,7 @@ public class OrganizationPageTest {
 
     @Test
     public void testPersonSlrySaveCntError(){
-        this.seleniumContainer.getOrganizationAddPage().getPersonSlrySaveCnt().setText(String.valueOf(getRandomNumber(1,200)));
+        this.seleniumContainer.getOrganizationAddPage().getPersonSlrySaveCnt().setText(String.valueOf(CharsAndSymbolsGenerator.getRandomNumber(1,200)));
         this.seleniumContainer.getOrganizationAddPage().getSendBtn().submit();
         assertResponseWasNull();
         Assertions.assertEquals("", this.seleniumContainer.getOrganizationAddPage().getPersonSlrySaveCnt().getErrorText());
@@ -392,7 +327,7 @@ public class OrganizationPageTest {
         this.seleniumContainer.getOrganizationAddPage().getOrganizationName().setText(TEST_ORGANIZATION_NAME);
 
 
-        this.seleniumContainer.getOrganizationAddPage().getOrganizationShortName().setText(generateWord(99));
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationShortName().setText(CharsAndSymbolsGenerator.generateWord(99));
 
 
 
@@ -403,39 +338,39 @@ public class OrganizationPageTest {
         this.seleniumContainer.getOrganizationAddPage().getOrganizationOgrn().setText("999999999999999");
 
 
-        this.seleniumContainer.getOrganizationAddPage().getOrganizationPhone().setText(generateNumberSequence(11));
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationPhone().setText(CharsAndSymbolsGenerator.generateNumberSequence(11));
 
 
-        this.seleniumContainer.getOrganizationAddPage().getOrganizationEmail().setText(generateEmail(30));
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationEmail().setText(CharsAndSymbolsGenerator.generateEmail(30));
 
 
-        this.seleniumContainer.getOrganizationAddPage().getOrganizationOkved().setText(generateWord(99));
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationOkved().setText(CharsAndSymbolsGenerator.generateWord(99));
 
 
-        this.seleniumContainer.getOrganizationAddPage().getOrganizationOkvedAdd().setText(generateWord(99));
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationOkvedAdd().setText(CharsAndSymbolsGenerator.generateWord(99));
 
 
         List<WebElement> availableValues = this.seleniumContainer.getOrganizationAddPage().getDepartmentId().getAvailableValues();
-        availableValues.get(getRandomNumber(0, availableValues.size())).click();
+        availableValues.get(CharsAndSymbolsGenerator.getRandomNumber(0, availableValues.size())).click();
 
-        this.seleniumContainer.getOrganizationAddPage().getOrganizationAddressJur().setText(generateWord(200));
+        this.seleniumContainer.getOrganizationAddPage().getOrganizationAddressJur().setText(CharsAndSymbolsGenerator.generateWord(200));
 
 
         Assertions.assertEquals(0, this.seleniumContainer.getOrganizationAddPage().getAddressTable().getRowsSize());
-        this.seleniumContainer.getOrganizationAddPage().getAddressTable().addValue(generateWord(99), String.valueOf(getRandomNumber(1,255)));
+        this.seleniumContainer.getOrganizationAddPage().getAddressTable().addValue(CharsAndSymbolsGenerator.generateWord(99), String.valueOf(CharsAndSymbolsGenerator.getRandomNumber(1,255)));
         Assertions.assertEquals(1, this.seleniumContainer.getOrganizationAddPage().getAddressTable().getRowsSize());
 
 
-        this.seleniumContainer.getOrganizationAddPage().getReqBasis().setText(generateWord(99));
+        this.seleniumContainer.getOrganizationAddPage().getReqBasis().setText(CharsAndSymbolsGenerator.generateWord(99));
 
 
-        this.seleniumContainer.getOrganizationAddPage().getPersonOfficeCnt().setText(String.valueOf(getRandomNumber(1,255)));
+        this.seleniumContainer.getOrganizationAddPage().getPersonOfficeCnt().setText(String.valueOf(CharsAndSymbolsGenerator.getRandomNumber(1,255)));
 
 
-        this.seleniumContainer.getOrganizationAddPage().getPersonRemoteCnt().setText(String.valueOf(getRandomNumber(1,255)));
+        this.seleniumContainer.getOrganizationAddPage().getPersonRemoteCnt().setText(String.valueOf(CharsAndSymbolsGenerator.getRandomNumber(1,255)));
 
 
-        this.seleniumContainer.getOrganizationAddPage().getPersonSlrySaveCnt().setText(String.valueOf(getRandomNumber(1,255)));
+        this.seleniumContainer.getOrganizationAddPage().getPersonSlrySaveCnt().setText(String.valueOf(CharsAndSymbolsGenerator.getRandomNumber(1,255)));
 
 
 
@@ -482,7 +417,7 @@ public class OrganizationPageTest {
         HTMLFinalConfirmationModalWindow finalModalWindow = this.seleniumContainer.getOrganizationAddPage().getFinalModalWindow();
         Assertions.assertEquals(REQUEST_ACCEPTED_MESSAGE ,finalModalWindow.getText());
         Assertions.assertEquals(REQUEST_ACCEPTED_MESSAGE, response.getContent().getText());
-        finalModalWindow.newRequest();
+        finalModalWindow.stayOnPage();
 
 
 

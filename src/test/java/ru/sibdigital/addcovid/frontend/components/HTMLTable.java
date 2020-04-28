@@ -6,6 +6,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
 import java.util.List;
 @Data
 public class HTMLTable extends HTMLComponent {
@@ -45,9 +46,17 @@ public class HTMLTable extends HTMLComponent {
         this.editButton = editButton;
     }
 
+    public HTMLTable(WebDriver driver, By selector, ArrayList<HTMLComponent> textFields, HTMLButton addButton) {
+        this(driver,selector,textFields,addButton,null,null);
+    }
+
 
     public WebElement getCell(int rowIndex ,int columnIndex){
         return this.getElement().findElement(By.xpath(String.format(".//div[@aria-colindex='%d' and @aria-rowindex='%d']", columnIndex+1,rowIndex+1)));
+    }
+
+    public WebElement getDeleteButtonInCell(int rowIndex){
+        return getCell(rowIndex, 4).findElement(By.tagName("button"));
     }
 
     public int getColumnSize(){
@@ -70,9 +79,16 @@ public class HTMLTable extends HTMLComponent {
 
     public void deleteRow(int rowIndex){
         if(rowIndex+1 <= this.getRowsSize()) {
-            this.getCell(rowIndex, 0).click();
-            this.deleteButton.submit();
-            this.confirmDeletion();
+
+            if(deleteButton != null){
+                this.getCell(rowIndex, 0).click();
+                this.deleteButton.submit();
+                this.confirmDeletion();
+            } else {
+                getDeleteButtonInCell(rowIndex).submit();
+            }
+
+
         }
     }
 
@@ -81,11 +97,15 @@ public class HTMLTable extends HTMLComponent {
             if(this.clearButton != null) {
                 this.clearButton.submit();
                 this.confirmDeletion();
-            } else {
+            } else if(deleteButton != null) {
                 for (int i = 0; i < getRowsSize(); i++) {
                     getCell(i,0).click();
                     deleteButton.submit();
                     this.confirmDeletion();
+                }
+            } else {
+                for (int i = 0; i < getRowsSize(); i++) {
+                    getDeleteButtonInCell(i).click();
                 }
             }
         }

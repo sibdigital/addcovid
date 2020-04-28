@@ -1,4 +1,4 @@
-package ru.sibdigital.addcovid.frontend;
+package ru.sibdigital.addcovid.frontend.util;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,13 +14,10 @@ import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import ru.sibdigital.addcovid.frontend.pages.BarberAddPage;
+import ru.sibdigital.addcovid.frontend.pages.DachaAddPage;
 import ru.sibdigital.addcovid.frontend.pages.OrganizationAddPage;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.File;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
@@ -36,6 +33,8 @@ public class SeleniumContainer{
     private WebDriver driver;
     private BrowserMobProxy proxy;
     private OrganizationAddPage organizationAddPage;
+    private BarberAddPage barberAddPage;
+    private DachaAddPage dachaAddPage;
 
 
 
@@ -110,5 +109,21 @@ public class SeleniumContainer{
             this.proxy.newHar(baseUrl);
         }
         return this.organizationAddPage;
+    }
+
+    public BarberAddPage getBarberAddPage() {
+        if(this.barberAddPage == null) {
+            this.barberAddPage = new BarberAddPage(driver, proxy, baseUrl);
+            this.proxy.newHar(baseUrl);
+        }
+        return this.barberAddPage;
+    }
+
+    public DachaAddPage getDachaAddPage() {
+        if(this.dachaAddPage == null) {
+            this.dachaAddPage = new DachaAddPage(driver, proxy, baseUrl);
+            this.proxy.newHar(baseUrl);
+        }
+        return this.dachaAddPage;
     }
 }

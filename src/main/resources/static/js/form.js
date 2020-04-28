@@ -873,7 +873,6 @@ webix.ready(function() {
                                         }
 
                                         let cur_date = new Date();
-
                                         let dif  = Math.abs((cur_date.getTime() - pred_date.getTime()) /1000);
                                         console.log(cur_date.getTime(), pred_date.getTime(), dif)
                                         pred_date = new Date();

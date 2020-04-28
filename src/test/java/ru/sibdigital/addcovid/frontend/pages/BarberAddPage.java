@@ -8,7 +8,7 @@ import ru.sibdigital.addcovid.frontend.components.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrganizationAddPage {
+public class BarberAddPage {
     private String pageUrl;
 
     private final HTMLComponent organizationName;
@@ -19,7 +19,6 @@ public class OrganizationAddPage {
     private final HTMLComponent organizationPhone;
     private final HTMLComponent organizationOkved;
     private final HTMLComponent organizationOkvedAdd;
-    private final HTMLComponent departmentId;
 
     private final HTMLComponent organizationAddressJur;
 
@@ -46,9 +45,9 @@ public class OrganizationAddPage {
 
 
 
-    public OrganizationAddPage(WebDriver driver, BrowserMobProxy proxy, String baseUrl) {
+    public BarberAddPage(WebDriver driver, BrowserMobProxy proxy, String baseUrl) {
 
-        this.pageUrl = baseUrl+"/form";
+        this.pageUrl = baseUrl+"/barber";
 
 
 
@@ -62,7 +61,6 @@ public class OrganizationAddPage {
         this.organizationPhone = new HTMLText(driver, By.xpath("//*[@view_id='organizationPhone']"));
         this.organizationOkved = new HTMLText(driver, By.xpath("//*[@view_id='organizationOkved']"));
         this.organizationOkvedAdd = new HTMLTextArea(driver, By.xpath("//*[@view_id='organizationOkvedAdd']"));
-        this.departmentId = new HTMLChoiceBox(driver, By.xpath("//*[@view_id='departmentId']"));
 
         this.organizationAddressJur = new HTMLTextArea(driver, By.xpath("//*[@view_id='organizationAddressJur']"));
 
@@ -143,9 +141,6 @@ public class OrganizationAddPage {
         return (HTMLTextArea) organizationOkvedAdd;
     }
 
-    public HTMLChoiceBox getDepartmentId() {
-        return (HTMLChoiceBox) departmentId;
-    }
 
     public HTMLTable getAddressTable() {
         return (HTMLTable) addressTable;

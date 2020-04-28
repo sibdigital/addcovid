@@ -1,4 +1,4 @@
-package ru.sibdigital.addcovid.frontend;
+package ru.sibdigital.addcovid.frontend.util;
 
 import net.lightbody.bmp.mitm.CertificateAndKeySource;
 import net.lightbody.bmp.mitm.KeyStoreFileCertificateSource;
@@ -49,18 +49,20 @@ public class CertificateUtil {
         File keyStoredCertificate = new File(certDirectoryPath + "/" + storeName);
         if(keyStoredCertificate.exists()) {
             CertificateAndKeySource existingCertificateSource =
-                        new KeyStoreFileCertificateSource("PKCS12", keyStoredCertificate,
+                        new KeyStoreFileCertificateSource("PKCS12",
+                                keyStoredCertificate,
                                 "privateKeyAlias",
                                 storePassword);
                 builder.rootCertificateSource(existingCertificateSource);
         } else {
             RootCertificateGenerator rootCertificateGenerator = generateSertificate();
+            // tell the ImpersonatingMitmManager  use the RootCertificateGenerator we just configured
             builder.rootCertificateSource(rootCertificateGenerator);
         }
 
 
         return builder/*.trustAllServers(true)*/.build();
-        // tell the ImpersonatingMitmManager  use the RootCertificateGenerator we just configured
+
 
     }
 

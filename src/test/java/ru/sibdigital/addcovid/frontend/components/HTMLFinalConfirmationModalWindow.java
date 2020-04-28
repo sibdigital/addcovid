@@ -27,7 +27,7 @@ public class HTMLFinalConfirmationModalWindow extends HTMLComponent {
         this.getElement().findElement(By.xpath(".//div[@role='button' and @class='webix_popup_button confirm' and @result='true']")).click();
     }
 
-    public void newRequest(){
+    public void stayOnPage(){
         this.getElement().findElement(By.xpath(".//div[@role='button' and @class='webix_popup_button' and @result='false']")).click();
     }
 
