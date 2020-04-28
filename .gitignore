@@ -30,3 +30,6 @@ build/
 ### VS Code ###
 .vscode/
 /addcovid-logs/
+
+### Dev properties ###
+./src/main/resources/application-dev.properties
