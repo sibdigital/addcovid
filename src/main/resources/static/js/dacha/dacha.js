@@ -284,9 +284,11 @@ webix.ready(function() {
                                                 on: {
                                                     onEnter: function () {
                                                         if($$('addform').validate()) {
-                                                            if($$('age').getValue() > 65){
-                                                                webix.alert("Данные не могут быть введены. Людям старше 65 лет предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
-                                                                return false;
+                                                            if (validateAge != 'false') {
+                                                                if ($$('age').getValue() > 65) {
+                                                                    webix.alert("Данные не могут быть введены. Людям старше 65 лет предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
+                                                                    return false;
+                                                                }
                                                             }
 
                                                             let find = $$('person_table').find(function(obj){
@@ -518,9 +520,11 @@ webix.ready(function() {
                                                 equalsRow(obj)
                                             }).length == 0)
                                             {
-                                                if($$('age').getValue() > 65){
-                                                    webix.alert("Данные не могут быть введены. Людям старше 65 лет предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
-                                                    return false;
+                                                if (validateAge != 'false') {
+                                                    if ($$('age').getValue() > 65) {
+                                                        webix.alert("Данные не могут быть введены. Людям старше 65 лет предписана обязательная самоизоляция. Оставайтесь дома и будьте здоровы!")
+                                                        return false;
+                                                    }
                                                 }
                                                 $$('age').callEvent('onEnter')
                                             }
