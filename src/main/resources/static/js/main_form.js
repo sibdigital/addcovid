@@ -153,33 +153,21 @@ let uploadFile = '';
 let uploadFilename = '';
 let pred_date = new Date();
 
-
+let h = window.screen.height * 0.45;
 var link_form = webix.ui({
     view: "window",
     modal:true,
     container: 'app',
     width:document.body.clientWidth,
+    minHeight: h,
     position: 'top',
     head: "&nbsp&nbsp&nbsp&nbspВыберите необходимое действие&nbsp&nbsp&nbsp&nbsp",
     body: {
         view: "form",
         id: 'link_form',
+        scroll:true,
         rows: [
-            {
-                view: 'label',
-                label: '<a style="font-size:calc(0.75em + 1vmin); text-align: center;" href="/form" >Подать заявку</a>',
-                width:0,
-            },
-            {
-                view: 'label',
-                label: '<a style="font-size: calc(0.75em + 1vmin); text-align: center;" href="/upload/" >Подать заявку (более 100 сотрудников)</a>',
-                width:0,
-            },
-            {
-                view: 'label',
-                label: '<a style="font-size: calc(0.75em + 1vmin); text-align: center;" href="/barber" >Заявка на оказание ПАРИКМАХЕРСКИХ УСЛУГ</a>',
-                width:0,
-            },
+
         ],
         elementsConfig: {
             labelPosition: "top",
@@ -794,23 +782,31 @@ webix.ready(function() {
 
     webix.ajax('/cls_type_requests').then(function (data) {
         let typeRequests = data.json();
+        let vtxt = '<a style="font-size:calc(0.8em + 1vmin); text-align: center;" href="http://rabota.govrb.ru/form" >Подать заявку</a><br/><br/>'
+        + '<a style="font-size: calc(0.8em + 1vmin); text-align: center;" href="http://form.govrb.ru/upload/" >Подать заявку (более 100 сотрудников)</a><br/><br/>'
+        + '<a style="font-size: calc(0.8em + 1vmin); text-align: center;" href="http://rabota.govrb.ru/barber" >Заявка на оказание ПАРИКМАХЕРСКИХ УСЛУГ</a><br/><br/>';
+
         for(var  j = 0; j< typeRequests.length; j++){
             if (typeRequests[j].id == 1 || typeRequests[j].id == 2) {
                 continue;
             }
-            if (typeRequests[j].statusRegistration == 1) {
-                let labl = typeRequests[j].activityKind;
+
+            if (typeRequests[j].statusRegistration == 1 && typeRequests[j].statusVisible == 1 ) {
+                let labl = typeRequests[j].activityKind.replace(new RegExp(' ', 'g'), '&nbsp');
                 let vdid = typeRequests[j].id;
                 let reqv = 'typed_form?request_type=' + vdid;
-                v = {
-                    view: 'label',
-                    label: '<a style="font-size: calc(0.75em + 1vmin); text-align: center;" href="http://form.govrb.ru/' + reqv + '" >' +
-                        'Подать заявку (' + labl + ')</a>',
-                    width: 0,
-                };
-                $$('link_form').addView(v);
+                vtxt += '<a style="font-size: calc(0.8em + 1vmin); text-align: center; word-break: break-all; overflow-wrap: break-word; line-height: 1.05;" href="http://form.govrb.ru/' + reqv + '" >' +
+                    'Подать заявку (' + labl + ')</a><br/><br/>'
             }
         }
+        v = {
+            view: 'template',
+            template: vtxt,
+            width: 0,
+            autoheight:true,
+            //height:300
+        };
+        $$('link_form').addView(v);
 
     });
 

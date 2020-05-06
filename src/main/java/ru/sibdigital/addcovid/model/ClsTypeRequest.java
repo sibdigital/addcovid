@@ -22,6 +22,7 @@ public class ClsTypeRequest {
     private String prescriptionLink;
     private String settings;
     private int statusRegistration;
+    private int statusVisible;
 
     @OneToOne
     @JoinColumn(name = "id_department", referencedColumnName = "id")
@@ -83,6 +84,16 @@ public class ClsTypeRequest {
 
     public void setStatusRegistration(int statusRegistration) {
         this.statusRegistration = statusRegistration;
+    }
+
+    @Basic
+    @Column(name = "status_visible")
+    public int getStatusVisible() {
+        return statusVisible;
+    }
+
+    public void setStatusVisible(int statusVisible) {
+        this.statusVisible = statusVisible;
     }
 
     public ClsDepartment getDepartment() {

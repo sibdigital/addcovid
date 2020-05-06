@@ -343,3 +343,9 @@ create table if not exists cls_type_request(
     settings text, --JSON с настройками, пока прозапас на будущее через него можно будет передавать видимость элементов если что.
     status_registration integer not null default 0-- статус регистрации 0 - закрыта, 1 - используется для регистрации
 );
+
+alter table cls_type_request add column status_visible int default 0; -- отображение в списк
+alter table cls_type_request add column begin_registration timestamp; -- начало возможности проверки
+alter table cls_type_request add column end_registration timestamp; -- завершение возможности проверки
+alter table cls_type_request add column begin_visible timestamp; --  начало возможности видимости
+alter table cls_type_request add column end_visible timestamp;  -- завершение возможности видимости

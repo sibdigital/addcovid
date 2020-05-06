@@ -48,7 +48,7 @@ public class FileUploadController {
     @Value("${upload_xls.path:/upload_xls}")
     String uploadingDir;
 
-    @Value("${upload.path:/upload}")
+    @Value("${upload.path:/uploads}")
     String uploadingAttacchmentDir;
 
     private Base64.Encoder enc = Base64.getEncoder();
