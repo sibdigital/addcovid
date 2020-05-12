@@ -17,6 +17,26 @@ webix.ready(function() {
         height: document.body.clientHeight,
         width: document.body.clientWidth - 8,
         rows: [
+            {
+                view: 'toolbar',
+                autoheight: true,
+                id: 't1',
+                css: 'header-dark',
+                rows: [
+                    {
+                        responsive: 't1',
+                        css: 'webix_dark',
+                        cols: [
+                            {
+                                view: 'label',
+                                width: 300,
+                                label: '<span style="font-size: 1.3rem; color: #fff">Работающая Бурятия. </span>',
+                                tooltip: 'Работающая Бурятия.',
+                            }
+                        ]
+                    }
+                ]
+            }
             // {
             //     view: "form",
             //     id: 'link_form',
@@ -32,8 +52,7 @@ webix.ready(function() {
 
     webix.ajax('/cls_type_requests').then(function (data) {
         let typeRequests = data.json();
-        let vtxt = '<span style="font-size::calc(1.5em + 1vmin); text-align: center;">Работающая Бурятия. </span><br/>'
-        + '<span style="font-size::calc(1.0em + 1vmin);text-align: center;">Подайте заявку в соответствии с вашим видом деятельности. </span><br/><br/>'
+        let vtxt = '<span style="font-size::calc(1.0em + 1vmin);text-align: center;">Подайте заявку в соответствии с вашим видом деятельности. </span><br/><br/>'
         + '<a style="font-size:calc(0.8em + 1vmin); text-align: center;" href="http://rabota.govrb.ru/form" >Общие основания</a><br/><br/>'
         + '<a style="font-size: calc(0.8em + 1vmin); text-align: center;" href="http://form.govrb.ru/upload/" >Общие основания (более 100 сотрудников)</a><br/><br/>'
         + '<a style="font-size: calc(0.8em + 1vmin); text-align: center;" href="http://rabota.govrb.ru/barber" >Парикмахерские услуги</a><br/><br/>';
