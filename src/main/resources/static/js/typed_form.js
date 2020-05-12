@@ -499,7 +499,8 @@ webix.ready(function() {
                                     return !isNaN(val*1) && (val.trim() !== '')
                                 },
                                 invalidMessage: 'Поле не может быть пустым',
-                                required: true
+                                required: false,
+                                hidden:true
                             },
                             {
                                 view: 'text', name: 'personRemoteCnt',
