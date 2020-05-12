@@ -23,6 +23,7 @@ public class ClsTypeRequest {
     private String settings;
     private int statusRegistration;
     private int statusVisible;
+    private int sortWeight;
 
     @OneToOne
     @JoinColumn(name = "id_department", referencedColumnName = "id")
@@ -120,5 +121,15 @@ public class ClsTypeRequest {
     @Override
     public int hashCode() {
         return Objects.hash(id, activityKind, prescription, prescriptionLink, settings, statusRegistration);
+    }
+
+    @Basic
+    @Column(name = "sort_weight")
+    public int getSortWeight() {
+        return sortWeight;
+    }
+
+    public void setSortWeight(int sortWeight) {
+        this.sortWeight = sortWeight;
     }
 }

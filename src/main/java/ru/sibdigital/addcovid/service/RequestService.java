@@ -304,7 +304,7 @@ public class RequestService {
     }
 
     public List<ClsTypeRequest> getClsTypeRequests() {
-        return StreamSupport.stream(clsTypeRequestRepo.findAll().spliterator(), false)
+        return StreamSupport.stream(clsTypeRequestRepo.findAllByOrderBySortWeight().spliterator(), false)
                 .collect(Collectors.toList());
     }
 }
