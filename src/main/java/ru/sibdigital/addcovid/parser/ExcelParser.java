@@ -378,7 +378,7 @@ public class ExcelParser {
             success++;
         }
 
-        cell = sheet.getRow(11).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // * Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы
+/*        cell = sheet.getRow(11).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // * Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы
         text = fmt.formatCellValue(cell).trim();
         if(StringUtils.isBlank(text)){
             log.info("setPersonSlrySaveCntStatus setted success as false");
@@ -396,7 +396,8 @@ public class ExcelParser {
                 postFormDto.setPersonSlrySaveCntStatus(String.format("Значение \"%s\" не может быть преобразовано в число", text));
                 postFormDto.setPersonSlrySaveCnt(null);
             }
-        }
+        }*/
+        postFormDto.setPersonSlrySaveCnt(null);
 
         cell = sheet.getRow(12).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // * Суммарная численность работников, подлежащих переводу на дистанционный режим работы
         text = fmt.formatCellValue(cell).trim();

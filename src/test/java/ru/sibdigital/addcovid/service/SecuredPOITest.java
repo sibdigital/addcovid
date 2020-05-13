@@ -55,12 +55,7 @@ public class SecuredPOITest {
         Assertions.assertNotNull(postFormDto.getPersonOfficeCnt());
     }
 
-    @Test
-    public void testPersonSlrySaveCntNotNull() throws IOException {
-        CheckProtocol checkProtocol = excelParser.parseFile(allOkFile);
-        PostFormDto postFormDto = checkProtocol.getPostFormDto();
-        Assertions.assertNotNull(postFormDto.getPersonSlrySaveCnt());
-    }
+
 
     @Test
     public void testOrganizationNameNotEmpty() throws IOException {
@@ -198,7 +193,7 @@ public class SecuredPOITest {
 
 
 
-    @Test
+    /*@Test
     public void testCntSaveBlank() throws IOException, URISyntaxException {
         File file = new File(this.getClass().getClassLoader().getResource("cnt_save_blank_error.xlsx").toURI());
         CheckProtocol checkProtocol = excelParser.parseFile(file);
@@ -239,6 +234,57 @@ public class SecuredPOITest {
         CheckProtocol checkProtocol = excelParser.parseFile(file);
         Assertions.assertEquals(false, checkProtocol.isSuccess());
     }
+
+    @Test
+    public void testPersonSlrySaveCntNotNull() throws IOException {
+        CheckProtocol checkProtocol = excelParser.parseFile(allOkFile);
+        PostFormDto postFormDto = checkProtocol.getPostFormDto();
+        Assertions.assertNotNull(postFormDto.getPersonSlrySaveCnt());
+    }
+    */
+
+    @Test
+    public void testCntSaveBlank() throws IOException, URISyntaxException {
+        File file = new File(this.getClass().getClassLoader().getResource("cnt_save_blank_error.xlsx").toURI());
+        CheckProtocol checkProtocol = excelParser.parseFile(file);
+        Assertions.assertEquals(true, checkProtocol.getPostFormDto().getPersonSlrySaveCntStatus().equals("OK"));
+    }
+
+    @Test
+    public void testCntSaveBlankIsNullable() throws IOException, URISyntaxException {
+        File file = new File(this.getClass().getClassLoader().getResource("cnt_save_blank_error.xlsx").toURI());
+        CheckProtocol checkProtocol = excelParser.parseFile(file);
+        Assertions.assertNull(checkProtocol.getPostFormDto().getPersonSlrySaveCnt());
+    }
+
+    @Test
+    public void testCntSaveBlankSetSuccessFalse() throws IOException, URISyntaxException {
+        File file = new File(this.getClass().getClassLoader().getResource("cnt_save_blank_error.xlsx").toURI());
+        CheckProtocol checkProtocol = excelParser.parseFile(file);
+        Assertions.assertEquals(true, checkProtocol.isSuccess());
+    }
+
+    @Test
+    public void testCntSaveText() throws IOException, URISyntaxException {
+        File file = new File(this.getClass().getClassLoader().getResource("cnt_save_text_error.xlsx").toURI());
+        CheckProtocol checkProtocol = excelParser.parseFile(file);
+        Assertions.assertEquals(true, checkProtocol.getPostFormDto().getPersonSlrySaveCntStatus().equals("OK"));
+    }
+
+    @Test
+    public void testCntSaveTextIsNullable() throws IOException, URISyntaxException {
+        File file = new File(this.getClass().getClassLoader().getResource("cnt_save_text_error.xlsx").toURI());
+        CheckProtocol checkProtocol = excelParser.parseFile(file);
+        Assertions.assertNull(checkProtocol.getPostFormDto().getPersonSlrySaveCnt());
+    }
+
+    @Test
+    public void testCntSaveTextSetSuccessFalse() throws IOException, URISyntaxException {
+        File file = new File(this.getClass().getClassLoader().getResource("cnt_save_text_error.xlsx").toURI());
+        CheckProtocol checkProtocol = excelParser.parseFile(file);
+        Assertions.assertEquals(true, checkProtocol.isSuccess());
+    }
+
 
     @Test
     public void testIdDepartmentBlankError() throws IOException, URISyntaxException {
