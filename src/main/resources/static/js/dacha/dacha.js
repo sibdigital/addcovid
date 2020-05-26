@@ -33,7 +33,7 @@ let district_options = [
     { id: 21, value: 'Тарбагатайский'},
     { id: 22, value: 'Тункинский'},
     { id: 23, value: 'Хоринский'},
-
+    { id: 25, value: 'Иное'},
 ]
 
 function getOptionsValue(index){
