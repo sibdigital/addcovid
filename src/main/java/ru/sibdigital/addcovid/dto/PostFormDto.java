@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.sibdigital.addcovid.model.AdditionalAttributes;
 
 import java.util.List;
 
@@ -69,6 +70,6 @@ public class PostFormDto {
     private String addressFactStatus = "OK";
     private String personsStatus = "OK";
 
-
+    private AdditionalAttributes additionalAttributes;
 
 }

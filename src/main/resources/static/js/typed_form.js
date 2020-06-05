@@ -941,6 +941,21 @@ webix.ready(function() {
                 $$("departmentId").disable();
             }
             $$('prescription').setHTML(typeRequest.prescription);
+
+            if (typeRequest.settings) {
+                console.log(typeRequest.settings);
+                const settings = JSON.parse(typeRequest.settings, function (key, value) {
+                    if (value === 'webix.rules.isChecked') {
+                        return webix.rules.isChecked;
+                    }
+                    return value;
+                });
+                if (settings.fields) {
+                    settings.fields.forEach(field => {
+                        $$('form').addView(field.ui, field.pos);
+                    })
+                }
+            }
         }
     });
 
