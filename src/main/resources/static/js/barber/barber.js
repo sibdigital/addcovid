@@ -619,7 +619,7 @@ webix.ready(function() {
                         readonly: true,
                         scroll:true,
                         template:
-                            '<p><a href="http://Работающаябурятия.рф/predpisanie.docx">&nbsp;ДАНЫЕ ПРАВИЛА ДОЛЖНЫ БЫТЬ РАСПЕЧАТАНЫ КРУПНЫМ ШРИФТОМ (РАЗМЕР ШРИФТА НЕ МЕНЕЕ, ЧЕМ 22 Times New Roman) И РАЗМЕЩЕНЫ НА ВИДНОМ ДЛЯ ПОСЕТИТЕЛЯ МЕСТЕ.</a></p>' +
+                            '<p><a href="http://Работающаябурятия.рф/predpisanie.docx">&nbsp;ДАННЫЕ ПРАВИЛА ДОЛЖНЫ БЫТЬ РАСПЕЧАТАНЫ КРУПНЫМ ШРИФТОМ (РАЗМЕР ШРИФТА НЕ МЕНЕЕ, ЧЕМ 22 Times New Roman) И РАЗМЕЩЕНЫ НА ВИДНОМ ДЛЯ ПОСЕТИТЕЛЯ МЕСТЕ.</a></p>' +
                             '<p style="text-align: center;"><strong>ПРЕДПИСАНИЕ </strong></p>\n' +
                             '<p style="text-align: center;"><strong>о проведении дополнительных санитарно-противоэпидемических (профилактических) мероприятий</strong></p>\n' +
                             '<p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n' +
@@ -665,7 +665,7 @@ webix.ready(function() {
                             '<p>санитарный врач</p>\n' +
                             '<p>по Республике Бурятия&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;______________&nbsp; С.С. Ханхареев&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</p>\n' +
                             '<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>' +
-                            '<p><a href="http://Работающаябурятия.рф/predpisanie.docx">&nbsp;ДАНЫЕ ПРАВИЛА ДОЛЖНЫ БЫТЬ РАСПЕЧАТАНЫ КРУПНЫМ ШРИФТОМ (РАЗМЕР ШРИФТА НЕ МЕНЕЕ, ЧЕМ 22 Times New Roman) И РАЗМЕЩЕНЫ НА ВИДНОМ ДЛЯ ПОСЕТИТЕЛЯ МЕСТЕ.</a></p>'
+                            '<p><a href="http://Работающаябурятия.рф/predpisanie.docx">&nbsp;ДАННЫЕ ПРАВИЛА ДОЛЖНЫ БЫТЬ РАСПЕЧАТАНЫ КРУПНЫМ ШРИФТОМ (РАЗМЕР ШРИФТА НЕ МЕНЕЕ, ЧЕМ 22 Times New Roman) И РАЗМЕЩЕНЫ НА ВИДНОМ ДЛЯ ПОСЕТИТЕЛЯ МЕСТЕ.</a></p>'
                     },
                     { //http://Работающаябурятия.рф/predpisanie.docx
                         view: 'checkbox',
