@@ -18,10 +18,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -157,6 +154,7 @@ public class RequestService {
                     .reqBasis(postForm.getReqBasis())
                     .orgHashCode(sha256)
                     .idTypeRequest(requestType)
+                    .additionalAttributes(postForm.getAdditionalAttributes())
                     .build();
 
             docRequest = docRequestRepo.save(docRequest);

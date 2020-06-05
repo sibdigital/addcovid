@@ -350,3 +350,5 @@ alter table cls_type_request add column end_registration timestamp; -- заве�
 alter table cls_type_request add column begin_visible timestamp; --  начало возможности видимости
 alter table cls_type_request add column end_visible timestamp;  -- завершение возможности видимости
 alter table cls_type_request add column sort_weight integer default 0;  --для сортировки
+
+alter table doc_request add additional_attributes jsonb; -- дополнительные аттрибуты
