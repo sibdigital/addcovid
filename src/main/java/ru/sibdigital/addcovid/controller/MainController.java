@@ -283,6 +283,9 @@ public class MainController {
             if (postFormDto.getOrganizationEmail() == null || postFormDto.getOrganizationEmail().length() > 100) {
                 errors += "Превышена длина электронной почты";
             }
+            if (postFormDto.getTypeTaxReporting() == null) {
+                errors += "Выберите способ сдачи налоговой отчетности";
+            }
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
             errors += "Неправильно заполнены необходимые поля\n";
