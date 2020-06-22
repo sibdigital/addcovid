@@ -327,12 +327,14 @@ public class RequestService {
             organization = docRequest.getOrganization();
         } else {
             organization = ClsOrganization.builder()
+                    .name(postForm.getPerson().getFIO())
                     .inn(postForm.getOrganizationInn())
                     .email(postForm.getOrganizationEmail())
                     .phone(postForm.getOrganizationPhone())
                     .typeTaxReporting(Integer.valueOf(postForm.getTypeTaxReporting()))
                     .statusImport(0)
                     .idTypeRequest(requestType)
+                    .idTypeOrganization(OrganizationTypes.PHYSICAL.getValue())
                     .build();
             organization = clsOrganizationRepo.save(organization);
         }

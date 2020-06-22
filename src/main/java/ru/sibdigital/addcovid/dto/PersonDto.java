@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.sibdigital.addcovid.model.DocPerson;
 
+import java.util.Objects;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,6 +25,20 @@ public class PersonDto {
                //.isAgree(this.isAgree)
                .patronymic(this.patronymic)
                .build();
+   }
+
+   public String getFIO() {
+       String fio = "";
+       if (Objects.nonNull(this.lastname)) {
+           fio += this.lastname;
+       }
+       if (Objects.nonNull(this.firstname) && !this.lastname.isEmpty()) {
+           fio += ' ' + this.firstname;
+       }
+       if (this.patronymic != null && !this.patronymic.isEmpty()) {
+           fio += ' ' + this.patronymic;
+       }
+       return fio;
    }
 
 }

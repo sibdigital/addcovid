@@ -353,6 +353,8 @@ alter table cls_type_request add column sort_weight integer default 0;  --для
 
 alter table doc_request add additional_attributes jsonb; -- дополнительные аттрибуты
 
+insert into cls_type_request(id, activity_kind) values (100, 'Форма уведомления физическими лицами об оказании услуг по сдаче в аренду жилья туристам');
+
 ---- cls_district ----
 
 create table cls_district
