@@ -30,6 +30,8 @@ public class PostFormDto {
     private String  organizationEmail;
     private String  organizationPhone;
 
+    private String  typeTaxReporting;
+
     private List<FactAddressDto> addressFact;
 
     private List<PersonDto> persons;

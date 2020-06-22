@@ -33,6 +33,7 @@ public class ClsOrganization {
     private Integer statusImport;
     private Timestamp timeImport;
     private Integer idTypeRequest;
+    private Integer typeTaxReporting;
 
 
     public Long getId() {
@@ -161,6 +162,16 @@ public class ClsOrganization {
 
     public void setIdTypeRequest(Integer idTypeRequest) {
         this.idTypeRequest = idTypeRequest;
+    }
+
+    @Basic
+    @Column(name = "type_tax_reporting")
+    public Integer getTypeTaxReporting() {
+        return typeTaxReporting;
+    }
+
+    public void setTypeTaxReporting(Integer typeTaxReporting) {
+        this.typeTaxReporting = typeTaxReporting;
     }
 
     @Override

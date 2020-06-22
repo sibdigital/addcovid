@@ -373,6 +373,7 @@ alter table doc_request
 
 ---- cls_type_organization ----
 
+alter table cls_organization add column type_tax_reporting integer;
 alter table cls_organization add column id_type_organization integer;
 
 -- create table cls_type_organization

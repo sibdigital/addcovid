@@ -330,6 +330,7 @@ public class RequestService {
                     .inn(postForm.getOrganizationInn())
                     .email(postForm.getOrganizationEmail())
                     .phone(postForm.getOrganizationPhone())
+                    .typeTaxReporting(Integer.valueOf(postForm.getTypeTaxReporting()))
                     .statusImport(0)
                     .idTypeRequest(requestType)
                     .build();
