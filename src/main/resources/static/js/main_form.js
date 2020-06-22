@@ -58,7 +58,7 @@ webix.ready(function() {
         + '<a style="font-size: calc(0.8em + 1vmin); text-align: center;" href="http://rabota.govrb.ru/barber" >Парикмахерские услуги</a><br/><br/>';
 
         for(var  j = 0; j< typeRequests.length; j++){
-            if (typeRequests[j].id == 1 || typeRequests[j].id == 2) {
+            if (typeRequests[j].id == 1 || typeRequests[j].id == 2 || typeRequests[j].id == 100) {
                 continue;
             }
 
@@ -70,6 +70,7 @@ webix.ready(function() {
                     '' + labl + '</a><br/><br/>'
             }
         }
+        vtxt += '<a style="font-size:calc(0.8em + 1vmin); text-align: center;" href="http://rabota.govrb.ru/personal_form" >Физические лица, оказывающие услуги по сдаче в аренду жилья туристам</a><br/><br/>'
         v = {
             view: 'template',
             template: vtxt,
