@@ -516,6 +516,7 @@ webix.ready(function() {
                                                                     $$('upload').setValue();
                                                                     $$('form_addr').clear();
                                                                     $$('addr_table').clearAll();
+                                                                    $$('form').setValues({ departmentId: 14 });
                                                                 });
                                                         }
                                                     })
