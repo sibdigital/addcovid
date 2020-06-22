@@ -91,8 +91,16 @@ webix.ready(function() {
                         cols: [
                             {
                                 view: 'label',
-                                label: '<span style="font-size: 1.0rem">Работающая Бурятия. Форма уведомления физическими лицами об оказании услуг по сдаче в аренду жилья туристам</span>',
+                                width: 300,
+                                label: '<span style="font-size: 1.0rem">Работающая Бурятия. </span>',
+                                // tooltip: ''
                             },
+                            {
+                                view: 'label',
+                                id: 'activityKind',
+                                minWidth: 400,
+                                autoheight: true,
+                            }
                         ]
                     }
                 ]
@@ -240,8 +248,9 @@ webix.ready(function() {
                             }
                         ]
                     },
-                    view_section('Обоснование'),
+                    // view_section('Обоснование'),
                     {
+                        hidden: true,
                         rows: [
                             // {
                             //     view: 'textarea',
@@ -344,14 +353,14 @@ webix.ready(function() {
                             }
                         }
                     },
-                    // {
-                    //     view: 'template',
-                    //     id: 'prescription',
-                    //     height: 450,
-                    //     readonly: true,
-                    //     scroll:true,
-                    //     template: ''
-                    // },
+                    {
+                        view: 'template',
+                        id: 'prescription',
+                        height: 450,
+                        readonly: true,
+                        scroll:true,
+                        template: ''
+                    },
                     {
                         view: 'checkbox',
                         name: 'isProtect',
@@ -532,6 +541,59 @@ webix.ready(function() {
 
     $$('form').setValues({ departmentId: 14 });
     $$('form_addr').bind('addr_table');
+
+    let win = webix.ui({
+        view: 'window',
+        modal: true,
+        container: 'app',
+        width: 400,
+        position: 'center',
+        head: 'ВНИМАНИЕ!',
+        body: {
+            view: 'form',
+            rows: [
+                {
+                    view: 'label',
+                    id: 'win_id_label',
+                    label: '',
+                    align: 'center'
+                },
+            ],
+            elementsConfig: {
+                labelPosition: 'top',
+            }
+        }
+    })
+
+    webix.ajax('cls_type_request/100').then(function (data) {
+        let typeRequest = data.json();
+
+        if (!typeRequest) {
+            $$('win_id_label').setValue('Данный тип заявки не существует!');
+            win.show();
+        } else if (typeRequest.statusRegistration == 0) {
+            $$('win_id_label').setValue('Подача заявок с данным типом закрыта!')
+            win.show();
+        } else {
+            $$('activityKind').setHTML('<span style="font-size: 1.0rem">' + typeRequest.activityKind + '</span>');
+            $$('prescription').setHTML(typeRequest.prescription);
+
+            if (typeRequest.settings) {
+                console.log(typeRequest.settings);
+                const settings = JSON.parse(typeRequest.settings, function (key, value) {
+                    if (value === 'webix.rules.isChecked') {
+                        return webix.rules.isChecked;
+                    }
+                    return value;
+                });
+                if (settings.fields) {
+                    settings.fields.forEach(field => {
+                        $$('form').addView(field.ui, field.pos);
+                    })
+                }
+            }
+        }
+    });
 
     webix.event(window, "resize", function (event) {
         layout.define("width",document.body.clientWidth);
