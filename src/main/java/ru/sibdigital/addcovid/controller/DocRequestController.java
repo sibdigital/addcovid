@@ -45,6 +45,9 @@ public class DocRequestController {
     @Autowired
     private ClsDepartmentRepo clsDepartmentRepo;
 
+    @Autowired
+    private ClsDistrictRepo clsDistrictRepo;
+
     private static final Logger log = LoggerFactory.getLogger(DocRequestController.class);
 
     @GetMapping("/doc_requests")
@@ -180,6 +183,12 @@ public class DocRequestController {
         }catch (Exception ex){
 
         }
+        return list;
+    }
+
+    @GetMapping("/cls_districts")
+    public List<ClsDistrict> getListDistricts() {
+        List<ClsDistrict> list =  clsDistrictRepo.findAll(Sort.by("id"));
         return list;
     }
 }

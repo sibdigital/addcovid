@@ -46,6 +46,11 @@ public class DocPerson {
     @JsonIgnore
     private DocRequest docRequest;
 
+    @ManyToOne
+    @JoinColumn(name="id_organization", nullable=false)
+    @JsonIgnore
+    private ClsOrganization organization;
+
 
 /*    @SequenceGenerator(name = "PERSON_SEQ", sequenceName = "doc_person_id_seq")*/
     public Long getId() {
@@ -96,6 +101,14 @@ public class DocPerson {
 
     public void setDocRequest(DocRequest docRequest) {
         this.docRequest = docRequest;
+    }
+
+    public ClsOrganization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(ClsOrganization organization) {
+        this.organization = organization;
     }
 
     @Override

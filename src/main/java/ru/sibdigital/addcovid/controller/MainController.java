@@ -16,6 +16,7 @@ import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.ClsDepartmentRepo;
 import ru.sibdigital.addcovid.service.DachaService;
+import ru.sibdigital.addcovid.service.EmailService;
 import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +36,9 @@ public class MainController {
 
     @Autowired
     private DachaService dachaService;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping
     public String greeting(Map<String, Object> model) throws JsonProcessingException {
@@ -224,4 +228,70 @@ public class MainController {
         }
     }
 
+    @GetMapping("/personal_form")
+    public String personalForm(Model model) {
+        return "personal_form";
+    }
+
+    @PostMapping("/personal_form")
+    public @ResponseBody String postPersonalForm(@RequestBody PostFormDto postFormDto) {
+        try {
+            String errors = validatePersonalForm(postFormDto);
+            if (errors.isEmpty()) {
+                DocRequest docRequest = requestService.addPersonalRequest(postFormDto, RequestTypes.PERSONAL.getValue());
+                emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), "Работающая Бурятия", "Ваша заявка получена.");
+                return "На указанный e-mail отправлено письмо!";
+            } else {
+                return errors;
+            }
+        } catch(Exception e) {
+            log.error(e.getMessage(), e);
+            return "Невозможно сохранить уведомление!";
+        }
+    }
+
+    private String validatePersonalForm(PostFormDto postFormDto) {
+        String errors = "";
+        try {
+            if (postFormDto.getPerson() == null) {
+                errors += "Заполните ФИО";
+            } else {
+                if (postFormDto.getPerson().getLastname() == null || postFormDto.getPerson().getLastname().isEmpty()) {
+                    errors += "Заполните Фамилию";
+                }
+                if (postFormDto.getPerson().getFirstname() == null || postFormDto.getPerson().getFirstname().isEmpty()) {
+                    errors += "Заполните Имя";
+                }
+            }
+            if (postFormDto.getIsAgree() == false) {
+                errors += "Необходимо подтвердить согласие на обработку персональных данных\n";
+            }
+            if (postFormDto.getIsProtect() == false) {
+                errors += "Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия\n";
+            }
+            if (postFormDto.getAddressFact() == null || postFormDto.getAddressFact().isEmpty()) {
+                errors += "Необходимо заполнить список адресов\n";
+            }
+            if (postFormDto.getOrganizationInn() == null || postFormDto.getOrganizationInn().isEmpty()) {
+                errors += "Заполните ИНН";
+            } else if (postFormDto.getOrganizationInn().length() > 12) {
+                errors += "Превышена длина ИНН";
+            }
+            if (postFormDto.getOrganizationPhone() == null || postFormDto.getOrganizationPhone().length() > 100) {
+                errors += "Превышена длина номера телефона";
+            }
+            if (postFormDto.getOrganizationEmail() == null || postFormDto.getOrganizationEmail().length() > 100) {
+                errors += "Превышена длина электронной почты";
+            }
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            errors += "Неправильно заполнены необходимые поля\n";
+        }
+
+        if (!errors.isEmpty()) {
+            errors = "УВЕДОМЛЕНИЕ НЕ ПРИНЯТО. ОБНАРУЖЕНЫ ОШИБКИ ЗАПОЛНЕНИЯ: " + errors;
+        }
+
+        return errors;
+    }
 }

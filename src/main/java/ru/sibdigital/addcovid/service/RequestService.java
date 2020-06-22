@@ -5,6 +5,7 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.*;
@@ -46,6 +47,9 @@ public class RequestService {
 
     @Autowired
     private ClsTypeRequestRepo clsTypeRequestRepo;
+
+    @Autowired
+    private ClsDistrictRepo districtRepo;
 
     @Value("${upload.path:/uploads}")
     String uploadingDir;
@@ -304,5 +308,73 @@ public class RequestService {
     public List<ClsTypeRequest> getClsTypeRequests() {
         return StreamSupport.stream(clsTypeRequestRepo.findAllByOrderBySortWeight().spliterator(), false)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public DocRequest addPersonalRequest(PostFormDto postForm, int requestType) {
+
+        String sha256 = SHA256Generator.generate(postForm.getOrganizationInn()); // TODO
+
+        DocRequest docRequest = null;
+        try {
+            docRequest = docRequestRepo.getTopByOrgHashCode(sha256).orElseGet(() -> null);
+        } catch (Exception e) {
+            docRequest = null;
+        }
+
+        ClsOrganization organization;
+        if (docRequest != null) {
+            organization = docRequest.getOrganization();
+        } else {
+            organization = ClsOrganization.builder()
+                    .inn(postForm.getOrganizationInn())
+                    .email(postForm.getOrganizationEmail())
+                    .phone(postForm.getOrganizationPhone())
+                    .statusImport(0)
+                    .idTypeRequest(requestType)
+                    .build();
+            organization = clsOrganizationRepo.save(organization);
+        }
+
+        DocPerson docPerson = postForm.getPerson().convertToPersonEntity();
+        docPerson.setOrganization(organization);
+
+        List<DocAddressFact> docAddressFactList = postForm.getAddressFact()
+                .stream()
+                .map(personDto -> personDto.convertToDocAddressFact())
+                .collect(Collectors.toList());
+
+        String files = postForm.getAttachment();
+
+        docRequest = DocRequest.builder()
+                .organization(organization)
+                .department(departmentRepo.getOne(postForm.getDepartmentId()))
+                .district(districtRepo.getOne(postForm.getDistrictId()))
+                .attachmentPath(files)
+                .docAddressFact(docAddressFactList)
+                .statusReview(ReviewStatuses.ACCEPTED.getValue())
+                .timeReview(Timestamp.valueOf(LocalDateTime.now()))
+                .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
+                .isAgree(postForm.getIsAgree())
+                .isProtect(postForm.getIsProtect())
+                .reqBasis(postForm.getReqBasis())
+                .orgHashCode(sha256)
+                .idTypeRequest(requestType)
+                .additionalAttributes(postForm.getAdditionalAttributes())
+                .build();
+
+        docRequest = docRequestRepo.save(docRequest);
+
+        DocRequest finalDocRequest = docRequest;
+        docRequest.getDocAddressFact().forEach(docAddressFact -> {
+            docAddressFact.setDocRequest(finalDocRequest);
+        });
+
+        docPerson.setDocRequest(finalDocRequest);
+
+        docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
+        docPersonRepo.save(docPerson);
+
+        return docRequest;
     }
 }

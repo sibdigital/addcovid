@@ -352,3 +352,45 @@ alter table cls_type_request add column end_visible timestamp;  -- заверш�
 alter table cls_type_request add column sort_weight integer default 0;  --для сортировки
 
 alter table doc_request add additional_attributes jsonb; -- дополнительные аттрибуты
+
+---- cls_district ----
+
+create table cls_district
+(
+	id integer not null
+		constraint cls_district_pkey
+			primary key,
+	name varchar(255)
+);
+
+alter table cls_district owner to postgres;
+
+alter table doc_request add column id_district integer;
+
+alter table doc_request
+    add constraint doc_request_cls_district_id_fk
+        foreign key (id_district) references cls_district;
+
+---- cls_type_organization ----
+
+alter table cls_organization add column id_type_organization integer;
+
+-- create table cls_type_organization
+-- (
+-- 	id integer not null
+-- 		constraint cls_type_organization_pkey
+-- 			primary key,
+-- 	name varchar(255)
+-- );
+--
+-- alter table cls_type_organization owner to postgres;
+--
+-- alter table cls_organization
+--     add constraint cls_organization_cls_type_organization_id_fk
+--         foreign key (id_type_organization) references cls_type_organization;
+
+alter table doc_person add column id_organization integer;
+
+alter table doc_person
+    add constraint doc_person_cls_organization_id_fk
+        foreign key (id_organization) references cls_organization;

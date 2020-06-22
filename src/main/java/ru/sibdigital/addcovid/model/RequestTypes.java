@@ -2,7 +2,8 @@ package ru.sibdigital.addcovid.model;
 
 public enum RequestTypes {
     ORGANIZATION(1),
-    BARBERSHOP(2);
+    BARBERSHOP(2),
+    PERSONAL(100);
 
     private final int value;
     private RequestTypes(int value) {

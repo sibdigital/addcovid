@@ -69,6 +69,10 @@ public class DocRequest {
     @JoinColumn(name = "id_organization", referencedColumnName = "id")
     private ClsOrganization organization;
 
+    @OneToOne
+    @JoinColumn(name = "id_district", referencedColumnName = "id")
+    private ClsDistrict district;
+
     @OneToMany(targetEntity = DocAddressFact.class, mappedBy="docRequestAddressFact", fetch = FetchType.EAGER)
     private List<DocAddressFact> docAddressFact;
 
@@ -245,6 +249,14 @@ public class DocRequest {
 
     public void setOrganization(ClsOrganization organization) {
         this.organization = organization;
+    }
+
+    public ClsDistrict getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(ClsDistrict district) {
+        this.district = district;
     }
 
     public List<DocAddressFact> getDocAddressFact() {

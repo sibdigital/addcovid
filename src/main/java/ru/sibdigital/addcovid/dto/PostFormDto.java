@@ -16,6 +16,9 @@ public class PostFormDto {
     private Long organizationId;
     
     private Long departmentId;
+    private Long districtId;
+
+    private PersonDto person;
 
     private String organizationName;
     private String  organizationShortName;
