@@ -540,7 +540,6 @@ webix.ready(function() {
         ]
     });
 
-    $$('form').setValues({ departmentId: 14 });
     $$('form_addr').bind('addr_table');
 
     let win = webix.ui({
@@ -577,6 +576,10 @@ webix.ready(function() {
             win.show();
         } else {
             $$('activityKind').setHTML('<span style="font-size: 1.0rem">' + typeRequest.activityKind + '</span>');
+            let department = typeRequest.department;
+            if (department) {
+                $$('form').setValues({ departmentId: department.id });
+            }
             $$('prescription').setHTML(typeRequest.prescription);
 
             if (typeRequest.settings) {
