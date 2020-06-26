@@ -328,6 +328,7 @@ public class RequestService {
         } else {
             organization = ClsOrganization.builder()
                     .name(postForm.getPerson().getFIO())
+                    .shortName(postForm.getPerson().getFIO())
                     .inn(postForm.getOrganizationInn())
                     .email(postForm.getOrganizationEmail())
                     .phone(postForm.getOrganizationPhone())
