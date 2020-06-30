@@ -243,19 +243,39 @@ webix.ready(function() {
                                         required: true
                                     },
                                     {
-                                        view: 'text',
-                                        name: 'organizationInn',
-                                        label: 'ИНН',
-                                        labelPosition: 'top',
-                                        validate: function(val){
-                                            return !isNaN(val*1);
-                                        },
-                                        //attributes:{ type:"number" },
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true
+                                        cols: [
+                                            {
+                                                view: 'text',
+                                                name: 'organizationInn',
+                                                label: 'ИНН',
+                                                labelPosition: 'top',
+                                                validate: function (val) {
+                                                    return !isNaN(val * 1);
+                                                },
+                                                //attributes:{ type:"number" },
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true
+                                            },
+                                            {
+                                                view: 'checkbox',
+                                                name: 'isSelfEmployed',
+                                                labelPosition: 'top',
+                                                label: 'Самозанятый',
+                                                on: {
+                                                    onChange(newv, oldv) {
+                                                        if (newv === 1) {
+                                                            $$('organizationOgrn').disable();
+                                                        } else {
+                                                            $$('organizationOgrn').enable();
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
                                     },
                                     {
                                         view: 'text',
+                                        id: 'organizationOgrn',
                                         name: 'organizationOgrn',
                                         label: 'ОГРН',
                                         validate: function(val){

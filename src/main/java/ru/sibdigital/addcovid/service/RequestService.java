@@ -72,6 +72,11 @@ public class RequestService {
         if (docRequest != null) {
             organization = docRequest.getOrganization();
         } else {
+            int typeOrganization = OrganizationTypes.JURIDICAL.getValue();
+            if (postForm.getIsSelfEmployed()) {
+                typeOrganization = OrganizationTypes.SELF_EMPLOYED.getValue();
+            }
+
             organization = ClsOrganization.builder()
                     .name(postForm.getOrganizationName())
                     .shortName(postForm.getOrganizationShortName())
@@ -85,6 +90,7 @@ public class RequestService {
                     .statusImport(0)
                     .timeImport(Timestamp.valueOf(LocalDateTime.now()))
                     .idTypeRequest(requestType)
+                    .idTypeOrganization(typeOrganization)
                     .build();
             organization = clsOrganizationRepo.save(organization);
         }

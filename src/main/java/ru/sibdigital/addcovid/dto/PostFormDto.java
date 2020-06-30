@@ -75,6 +75,8 @@ public class PostFormDto {
     private String addressFactStatus = "OK";
     private String personsStatus = "OK";
 
+    private Boolean isSelfEmployed;
+
     private AdditionalAttributes additionalAttributes;
 
 }
