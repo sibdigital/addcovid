@@ -403,10 +403,10 @@ create table cls_principal
     id            serial not null
         constraint cls_principal_pkey
             primary key,
-    password varchar(100) not null
+    password varchar(255) not null
 )
-
-alter table cls_principal owner to postgres;
+;
+--alter table cls_principal owner to postgres;
 
 alter table cls_organization add column id_principal integer;
 
