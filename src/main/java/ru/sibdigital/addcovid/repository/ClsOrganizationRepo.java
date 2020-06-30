@@ -7,4 +7,5 @@ import ru.sibdigital.addcovid.model.ClsOrganization;
 @Repository
 public interface ClsOrganizationRepo extends JpaRepository<ClsOrganization, Long> {
 
+    ClsOrganization findByInnAndPrincipalIsNotNull(String inn);
 }

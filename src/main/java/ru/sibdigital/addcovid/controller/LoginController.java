@@ -8,9 +8,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import ru.sibdigital.addcovid.dto.PrincipalDto;
+import ru.sibdigital.addcovid.model.ClsOrganization;
 import ru.sibdigital.addcovid.model.DepUser;
 import ru.sibdigital.addcovid.repository.DepUserRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
+import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpSession;
 import java.util.Map;
@@ -23,6 +26,9 @@ public class LoginController {
 
     @Autowired
     private DocRequestRepo docRequestRepo;
+
+    @Autowired
+    private RequestService requestService;
 
     @Value("${link.prefix:http://fs.govrb.ru}")
     private String linkPrefix;
@@ -39,7 +45,7 @@ public class LoginController {
 
     @GetMapping("/logout")
     public String login(HttpSession session) {
-        session.removeAttribute("user");
+        session.removeAttribute("id_organization");
         return "redirect:/login";
     }
 
@@ -69,16 +75,15 @@ public class LoginController {
     }
 
     @PostMapping("/authenticate")
-    //public String login(Model model, String error, String logout) {
-    public String authenticate(@ModelAttribute("log_form") DepUser inputDepUser, Map<String, Object> model, HttpSession session) {
+    public String authenticate(@ModelAttribute("log_form") PrincipalDto principal, Map<String, Object> model, HttpSession session) {
 
-        if(inputDepUser == null){
+        if (principal == null) {
             return "login";
         }
 
-        DepUser depUser = depUserRepo.findByLogin(inputDepUser.getLogin().toLowerCase());
+        ClsOrganization organization = requestService.findOrganizationByInn(principal.getLogin());
 
-        if ((depUser == null) || (!depUser.getPassword().equals(inputDepUser.getPassword()) ) ){
+        if ((organization == null) || (!organization.getPrincipal().getPassword().equals(principal.getPassword()))) {
             //не прошли аутентификацию
             log.debug("LoginController. Аутентификация не пройдена.");
 
@@ -87,9 +92,9 @@ public class LoginController {
         }
         log.debug("LoginController. Аутентификация пройдена.");
 
-        session.setAttribute("user", depUser);
-        session.setAttribute("token", depUser.hashCode());
+        session.setAttribute("id_organization", organization.getId());
+        session.setAttribute("token", organization.hashCode());
 
-        return "redirect:/requests";
+        return "redirect:/cabinet";
     }
 }

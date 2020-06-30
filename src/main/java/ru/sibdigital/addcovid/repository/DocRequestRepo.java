@@ -93,7 +93,6 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
             "ORDER BY date desc, total")
     public List<Map<String, Object>> getStatisticForEachDay();
 
-
-
-
+    @Query("SELECT dr FROM DocRequest dr WHERE dr.organization.inn = :inn ORDER BY dr.timeCreate DESC")
+    Optional<List<DocRequest>> getAllByInn(@Param("inn")String inn);
 }

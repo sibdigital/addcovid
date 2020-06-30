@@ -51,7 +51,6 @@ public class DocRequest {
     private String orgHashCode;
     private String rejectComment;
     private Long old_department_id;
-    private Integer idTypeRequest;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
@@ -68,6 +67,10 @@ public class DocRequest {
     @OneToOne
     @JoinColumn(name = "id_organization", referencedColumnName = "id")
     private ClsOrganization organization;
+
+    @OneToOne
+    @JoinColumn(name = "id_type_request", referencedColumnName = "id")
+    private ClsTypeRequest typeRequest;
 
     @OneToOne
     @JoinColumn(name = "id_district", referencedColumnName = "id")
@@ -251,6 +254,14 @@ public class DocRequest {
         this.organization = organization;
     }
 
+    public ClsTypeRequest getTypeRequest() {
+        return typeRequest;
+    }
+
+    public void setTypeRequest(ClsTypeRequest typeRequest) {
+        this.typeRequest = typeRequest;
+    }
+
     public ClsDistrict getDistrict() {
         return district;
     }
@@ -287,14 +298,18 @@ public class DocRequest {
         this.old_department_id = old_department_id;
     }
 
-    @Basic
-    @Column(name = "id_type_request")
-    public Integer getIdTypeRequest() {
-        return idTypeRequest;
-    }
-
-    public void setIdTypeRequest(Integer idTypeRequest) {
-        this.idTypeRequest = idTypeRequest;
+    public String getStatusReviewName(){
+        String result  = "";
+        if (getStatusReview() != null) {
+            if (getStatusReview() == ReviewStatuses.OPENED.getValue()) {
+                result = "На рассмотрении";
+            } else if (getStatusReview() == ReviewStatuses.CONFIRMED.getValue()) {
+                result = "Одобрена";
+            } else if (getStatusReview() == ReviewStatuses.REJECTED.getValue()) {
+                result = "Отклонена";
+            }
+        }
+        return result;
     }
 
     public AdditionalAttributes getAdditionalAttributes() {
@@ -326,7 +341,7 @@ public class DocRequest {
                 Objects.equals(orgHashCode, that.orgHashCode) &&
                 Objects.equals(rejectComment, that.rejectComment) &&
                 Objects.equals(old_department_id, that.old_department_id) &&
-                Objects.equals(idTypeRequest, that.idTypeRequest) &&
+                Objects.equals(typeRequest, that.typeRequest) &&
                 Objects.equals(docPersonList, that.docPersonList) &&
                 Objects.equals(department, that.department) &&
                 Objects.equals(organization, that.organization) &&
@@ -335,6 +350,6 @@ public class DocRequest {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview, isAgree, isProtect, reqBasis, orgHashCode, rejectComment, old_department_id, idTypeRequest, docPersonList, department, organization, docAddressFact);
+        return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview, isAgree, isProtect, reqBasis, orgHashCode, rejectComment, old_department_id, typeRequest, docPersonList, department, organization, docAddressFact);
     }
 }

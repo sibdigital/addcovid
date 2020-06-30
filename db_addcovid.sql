@@ -397,3 +397,19 @@ alter table doc_person add column id_organization integer;
 alter table doc_person
     add constraint doc_person_cls_organization_id_fk
         foreign key (id_organization) references cls_organization;
+
+create table cls_principal
+(
+    id            serial not null
+        constraint cls_principal_pkey
+            primary key,
+    password varchar(100) not null
+)
+
+alter table cls_principal owner to postgres;
+
+alter table cls_organization add column id_principal integer;
+
+alter table cls_organization
+    add constraint cls_organization_cls_principal_id_fk
+        foreign key (id_principal) references cls_principal;

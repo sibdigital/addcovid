@@ -163,7 +163,7 @@ public class RequestService {
                     .isProtect(postForm.getIsProtect())
                     .reqBasis(postForm.getReqBasis())
                     .orgHashCode(sha256)
-                    .idTypeRequest(requestType)
+                    .typeRequest(clsTypeRequestRepo.findById((long) requestType).orElse(null))
                     .additionalAttributes(postForm.getAdditionalAttributes())
                     .build();
 
@@ -369,7 +369,7 @@ public class RequestService {
                 .isProtect(postForm.getIsProtect())
                 .reqBasis(postForm.getReqBasis())
                 .orgHashCode(sha256)
-                .idTypeRequest(requestType)
+                .typeRequest(clsTypeRequestRepo.findById((long) requestType).orElse(null))
                 .additionalAttributes(postForm.getAdditionalAttributes())
                 .build();
 
@@ -386,5 +386,9 @@ public class RequestService {
         docPersonRepo.save(docPerson);
 
         return docRequest;
+    }
+
+    public ClsOrganization findOrganizationByInn(String inn) {
+        return clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
     }
 }
