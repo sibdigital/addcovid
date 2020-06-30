@@ -88,8 +88,9 @@ public class MainController {
                 errors +=  "Превышена длина ИНН";
             }
             if (!postFormDto.getIsSelfEmployed()) {
-                if(postFormDto.getOrganizationOgrn() == null || postFormDto.getOrganizationOgrn().length() > 15 ){
-                    errors +=  "Превышена длина 'Превышена длина ОГРН'";
+                if(postFormDto.getOrganizationOgrn() == null || postFormDto.getOrganizationOgrn().isBlank()
+                        || postFormDto.getOrganizationOgrn().length() > 15 ){
+                    errors +=  "Превышена длина ОГРН либо ОГРН не заполнен";
                 }
             }
             if(postFormDto.getOrganizationPhone() == null || postFormDto.getOrganizationPhone().length() > 100){
