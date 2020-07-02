@@ -258,6 +258,7 @@ webix.ready(function() {
                                                 on: {
                                                     onChange(newv, oldv) {
                                                         if (newv === 1) {
+                                                            $$('organizationOgrn').setValue('');
                                                             $$('organizationOgrn').disable();
                                                         } else {
                                                             $$('organizationOgrn').enable();

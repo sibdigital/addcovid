@@ -87,11 +87,15 @@ public class MainController {
             }else if(postFormDto.getOrganizationInn().length() > 12 ){
                 errors +=  "Превышена длина ИНН";
             }
-            if (!postFormDto.getIsSelfEmployed()) {
+            boolean validateOgrn = false;
+            if (postFormDto.getIsSelfEmployed() == null || postFormDto.getIsSelfEmployed().booleanValue() == false) {
+                 validateOgrn = true;
+            }
+            if (validateOgrn) {
                 if (postFormDto.getOrganizationOgrn() == null || postFormDto.getOrganizationOgrn().isEmpty()) {
-                    errors +=  "Заполните ОГРН";
-                } else if (postFormDto.getOrganizationInn().length() > 15 ) {
-                    errors +=  "Превышена длина ОГРН";
+                    errors += "Заполните ОГРН";
+                } else if (postFormDto.getOrganizationInn().length() > 15) {
+                    errors += "Превышена длина ОГРН";
                 }
             }
             if(postFormDto.getOrganizationPhone() == null || postFormDto.getOrganizationPhone().length() > 100){
