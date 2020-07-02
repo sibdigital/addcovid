@@ -73,7 +73,7 @@ public class RequestService {
             organization = docRequest.getOrganization();
         } else {
             int typeOrganization = OrganizationTypes.JURIDICAL.getValue();
-            if (postForm.getIsSelfEmployed()) {
+            if (postForm.getIsSelfEmployed() != null && postForm.getIsSelfEmployed()) {
                 typeOrganization = OrganizationTypes.SELF_EMPLOYED.getValue();
             }
 
