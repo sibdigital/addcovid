@@ -20,7 +20,6 @@ import ru.sibdigital.addcovid.service.EmailService;
 import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -307,15 +306,4 @@ public class MainController {
         return errors;
     }
 
-    @GetMapping("/cabinet")
-    public String cabinet(HttpSession session, Model model) {
-        Long id = (Long) session.getAttribute("id_organization");
-        if (id == null) {
-            return "404";
-        } else {
-            model.addAttribute("id_organization", id);
-            model.addAttribute("token", session.getAttribute("token"));
-            return "cabinet/main";
-        }
-    }
 }
