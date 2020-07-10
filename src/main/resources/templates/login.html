@@ -46,7 +46,7 @@
                             height: 200,
                             margintop: 50,
                             elements: [
-                                {view: "text", label: "ИНН", name: "login", labelWidth: 150},
+                                {view: "text", label: "ИНН", name: "username", labelWidth: 150},
                                 {view: "text", type: "password", label: "Пароль", name: "password", labelWidth: 150},
                                 {
                                     margin: 5, cols: [
@@ -68,7 +68,7 @@
     });
     function submit(){
         //webix.message(JSON.stringify($$("log_form").getValues(), null, 2));
-        webix.send("authenticate", $$("log_form").getValues());
+        webix.send("perform_login", $$("log_form").getValues());
     }
 </script>
 </body>

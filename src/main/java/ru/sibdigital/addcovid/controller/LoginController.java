@@ -6,10 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import ru.sibdigital.addcovid.dto.PrincipalDto;
-import ru.sibdigital.addcovid.model.ClsOrganization;
 import ru.sibdigital.addcovid.model.DepUser;
 import ru.sibdigital.addcovid.repository.DepUserRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
@@ -43,12 +39,6 @@ public class LoginController {
         return "login";
     }
 
-    @GetMapping("/logout")
-    public String login(HttpSession session) {
-        session.removeAttribute("id_organization");
-        return "redirect:/login";
-    }
-
     @GetMapping("/requests")
     public String requests(Map<String, Object> model, HttpSession session) {
         //model.put();
@@ -69,32 +59,4 @@ public class LoginController {
         }
     }
 
-    @GetMapping("/authenticate")
-    public String authenticateGet(){
-        return "404";
-    }
-
-    @PostMapping("/authenticate")
-    public String authenticate(@ModelAttribute("log_form") PrincipalDto principal, Map<String, Object> model, HttpSession session) {
-
-        if (principal == null) {
-            return "login";
-        }
-
-        ClsOrganization organization = requestService.findOrganizationByInn(principal.getLogin());
-
-        if ((organization == null) || (!organization.getPrincipal().getPassword().equals(principal.getPassword()))) {
-            //не прошли аутентификацию
-            log.debug("LoginController. Аутентификация не пройдена.");
-
-            model.put("message", "Аутентификация не пройдена.");
-            return "login";
-        }
-        log.debug("LoginController. Аутентификация пройдена.");
-
-        session.setAttribute("id_organization", organization.getId());
-        session.setAttribute("token", organization.hashCode());
-
-        return "redirect:/cabinet";
-    }
 }
