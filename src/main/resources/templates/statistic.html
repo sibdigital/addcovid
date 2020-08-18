@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Комитет информационных технологий</title>
+    <title th:utext="${application_name}"></title>
 
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -34,7 +34,7 @@
     </style>
 </head>
 <body>
-<div th:insert="~{navbar-bootstrap::frag ('Статистика.')}"></div>
+<div th:insert="~{navbar-bootstrap::frag ('Статистика.', ${application_name})}"></div>
 <div id="chart-dep">
 
 </div>

@@ -27,13 +27,13 @@ require(
                         cols: [
                             {
                                 view: 'label',
-                                label: '<span style="font-size: 1.5rem">Работающая Бурятия. Список заявок.</span>',
+                                label: `<span style="font-size: 1.5rem">${APPLICATION_NAME}. Список заявок.</span>`,
                             },
                             {
                             },
                             {
                                 view: 'label',
-                                label: DEPARTMENT + ' ( <a href="/logout" title="Выйти">' + USER_NAME + '</a>)',
+                                label: `${DEPARTMENT} ( <a href="/logout" title="Выйти">' + ${USER_NAME} + </a>)`,
                                 align: 'right'
                             }
                         ]

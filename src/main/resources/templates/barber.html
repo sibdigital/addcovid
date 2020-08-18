@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Парикмахерские. Работающая Бурятия</title>
+    <title th:utext="${application_name}">. Парикмахерские.</title>
 <!--    <link type="text/css" rel="stylesheet" href="/libs/webix.css">-->
 <!--    <link href="/libs/skins/flat.min.css" rel="stylesheet" type="text/css">-->
 <!--    <script src="/libs/webix.min.js"></script>-->
@@ -11,6 +11,7 @@
     <script th:src="@{/libs/webix.min.js}"></script>
     <script th:src="@{/libs/routie.min.js}"></script>
     <script th:src="@{/libs/jquery-3.4.1.min.js}"></script>
+
     <style>body {margin: 0}
         .boldLabel {
             font-weight: bold; border-width: 2px; border-style: solid; border-color: #000000;
@@ -19,7 +20,16 @@
 </head>
 <body>
 <div id="app"></div>
-<script th:src="@{/js/barber/barber.js}"></script>
+<script th:inline="javascript">
+    const APPLICATION_NAME = [[${application_name}]]
+    const HOT_LINE = [[${ref_hot_line}]]
+    const FORM_FILL_INSTRUCTION = [[${ref_form_fill_instruction}]]
+    const FAQ = [[${ref_faq}]]
+    const REF_PRESCRIPTION_ROSPOTREBNADZOR_ADMINISTRATION = [[${ref_prescription_rospotrebnadzor_administration}]]
+    const REF_WORKING_PORTAL = [[${ref_working_portal}]]
+</script>
+<script th:src="@{/js/barber/barber.js}" ></script>
+
 <!--<script src="/js/barber/barber.js"></script>-->
 </body>
 </html>

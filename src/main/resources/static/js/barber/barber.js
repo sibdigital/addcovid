@@ -173,7 +173,7 @@ webix.ready(function() {
                             {
                                 view: 'label',
                                 width: 300,
-                                label: '<span style="font-size: 1.0rem">Работающая Бурятия. </span>',
+                                label: `<span style="font-size: 1.0rem">${APPLICATION_NAME}</span>`,
                                 tooltip: 'Заявка на оказание парикмахерских услуг'
                             },
                             {
@@ -188,14 +188,14 @@ webix.ready(function() {
             },
             {
                 view: 'label',
-                label: '<a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/#top" target="_blank">Горячая линия. </a>'
-                + '&nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/doc.pdf" target="_blank">Инструкция по заполнению формы </a>'
-                + '&nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/faq.html" target="_blank">Часто задаваемые вопросы</a>'
+                label: `<a style="font-size: 1.5rem; text-align: center;" href="${HOT_LINE}" target="_blank">Горячая линия. </a>
+                &nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="${FORM_FILL_INSTRUCTION}" target="_blank">Инструкция по заполнению формы </a>
+                &nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="${FAQ}" target="_blank">Часто задаваемые вопросы</a>`
                 //css: 'main_label'
             },
             {
                 view: 'label',
-                label: '<a href="http://Работающаябурятия.рф/predpisanie.docx">&nbsp;ПРЕДПИСАНИЕ Управления Роспотребнадзора по Республике Бурятия (Обязательно распечатать и разместить)</a>',
+                label: `<a href="${REF_PRESCRIPTION_ROSPOTREBNADZOR_ADMINISTRATION}">&nbsp;ПРЕДПИСАНИЕ Управления Роспотребнадзора по Республике Бурятия (Обязательно распечатать и разместить)</a>`,
             },
             {
                 id: 'form',
@@ -640,7 +640,7 @@ webix.ready(function() {
                         readonly: true,
                         scroll:true,
                         template:
-                            '<p><a href="http://Работающаябурятия.рф/predpisanie.docx">&nbsp;ДАННЫЕ ПРАВИЛА ДОЛЖНЫ БЫТЬ РАСПЕЧАТАНЫ КРУПНЫМ ШРИФТОМ (РАЗМЕР ШРИФТА НЕ МЕНЕЕ, ЧЕМ 22 Times New Roman) И РАЗМЕЩЕНЫ НА ВИДНОМ ДЛЯ ПОСЕТИТЕЛЯ МЕСТЕ.</a></p>' +
+                            `<p><a href="${REF_PRESCRIPTION_ROSPOTREBNADZOR_ADMINISTRATION}">&nbsp;ДАННЫЕ ПРАВИЛА ДОЛЖНЫ БЫТЬ РАСПЕЧАТАНЫ КРУПНЫМ ШРИФТОМ (РАЗМЕР ШРИФТА НЕ МЕНЕЕ, ЧЕМ 22 Times New Roman) И РАЗМЕЩЕНЫ НА ВИДНОМ ДЛЯ ПОСЕТИТЕЛЯ МЕСТЕ.</a></p>` +
                             '<p style="text-align: center;"><strong>ПРЕДПИСАНИЕ </strong></p>\n' +
                             '<p style="text-align: center;"><strong>о проведении дополнительных санитарно-противоэпидемических (профилактических) мероприятий</strong></p>\n' +
                             '<p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>\n' +
@@ -874,13 +874,13 @@ webix.ready(function() {
                                                                 title:"Заявка внесена",
                                                                 ok: "Закрыть",
                                                                 cancel: "Внести еще одну заявку",
-                                                                text: text
-                                                                    + '<br/> Обязательно распечатайте предписание Управления Роспотребнадзора по Республике Бурятия и разместите на видном месте'
-                                                                    + '<br/><a href="http://Работающаябурятия.рф/predpisanie.docx">Ссылка для скачивания</a>'
+                                                                text: `${text}
+                                                                     <br/> Обязательно распечатайте предписание Управления Роспотребнадзора по Республике Бурятия и разместите на видном месте
+                                                                     <br/><a href="${REF_PRESCRIPTION_ROSPOTREBNADZOR_ADMINISTRATION}">Ссылка для скачивания</a>`
                                                             })
                                                                 .then(function () {
                                                                     $$('label_sogl').hideProgress();
-                                                                    window.location.replace('http://работающаябурятия.рф');
+                                                                    window.location.replace(`${REF_WORKING_PORTAL}`);
                                                                 })
                                                                 .fail(function(){
                                                                     $$('label_sogl').hideProgress()

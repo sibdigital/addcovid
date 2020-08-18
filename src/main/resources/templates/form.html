@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Работающая Бурятия</title>
+    <title th:utext="${application_name}"></title>
     <!--<link type="text/css" rel="stylesheet" href="/libs/webix.min.css">
     <script src="/libs/webix.min.js"></script> -->
     <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.min.css}">
@@ -17,6 +17,15 @@
 </head>
 <body>
 <div id="app" ></div>
+<script th:inline="javascript">
+    const APPLICATION_NAME = [[${application_name}]]
+    const HOT_LINE = [[${ref_hot_line}]]
+    const FORM_FILL_INSTRUCTION = [[${ref_form_fill_instruction}]]
+    const FAQ = [[${ref_faq}]]
+    const DOWNLOAD_XLSX_TEMPLATE = [[${ref_download_xlsx_template}]]
+    const XLSX_FILL_INSTRUCTION = [[${ref_xlsx_fill_instruction}]]
+    const SUBDOMAIN_FORM = [[${subdomain_form}]]
+</script>
 <script th:src="@{/js/form.js}"></script>
 <!--<script src="/js/form.js"></script> -->
 </body>

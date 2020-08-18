@@ -6,7 +6,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.dto.PrincipalDto;
 import ru.sibdigital.addcovid.model.ClsOrganization;
 import ru.sibdigital.addcovid.model.ClsPrincipal;
@@ -37,12 +39,16 @@ public class CabinetController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ApplicationConstants applicationConstants;
+
     @GetMapping("/cabinet")
-    public String cabinet(HttpSession session) {
+    public String cabinet(HttpSession session, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) auth.getPrincipal();
         ClsOrganization organization = requestService.findOrganizationByInn(principal.getUsername());
         session.setAttribute("id_organization", organization.getId());
+        model.addAttribute("application_name", applicationConstants.getApplicationName());
         return "cabinet/main";
     }
 

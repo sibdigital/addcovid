@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Работающая Бурятия</title>
+    <title th:utext="${application_name}"></title>
 
 
     <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css">
@@ -18,7 +18,7 @@
 
 </head>
 <body onload="checkFields();">
-<div th:insert="~{navbar-bootstrap::frag ('Импорт Excel')}"></div>
+<div th:insert="~{navbar-bootstrap::frag ('Импорт Excel', ${application_name})}"></div>
 
 <div th:if="${errorMessage != null}">
     <div  class="alert alert-danger" role="alert">
@@ -33,9 +33,9 @@
 <div class="container" onload="refreshFields(); checkFields()">
     <form name="upload" enctype="multipart/form-data" action="/upload" method="POST">
         <ul class="list-group">
-            <li class="list-group-item"><a download style="text-align: center;" href="http://работающаябурятия.рф/zayvka.xlsx" target="_blank">Скачать шаблон</a></li>
-            <li class="list-group-item"><a  style="text-align: center;" href="http://работающаябурятия.рф/doc_excel.pdf" target="_blank">Инструкция по заполнению шаблона Excel </a></li>
-            <li class="list-group-item"><a  style="text-align: center;" href="http://работающаябурятия.рф/faq.html" target="_blank">Часто задаваемые вопросы </a></li>
+            <li class="list-group-item"><a download style="text-align: center;" href="${DOWNLOAD_XLSX_TEMPLATE}" target="_blank">Скачать шаблон</a></li>
+            <li class="list-group-item"><a  style="text-align: center;" href="${XLSX_FILL_INSTRUCTION}" target="_blank">Инструкция по заполнению шаблона Excel </a></li>
+            <li class="list-group-item"><a  style="text-align: center;" href="${FAQ}" target="_blank">Часто задаваемые вопросы </a></li>
             <li class="list-group-item"><span>Заполните его</span></li>
             <li class="list-group-item">
                 <div><span>Прикрепите заполненный шаблон<span class="text-danger">*</span> : </span>

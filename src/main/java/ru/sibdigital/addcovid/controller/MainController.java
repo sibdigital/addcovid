@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.dto.DachaDto;
 import ru.sibdigital.addcovid.dto.ListItemDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
@@ -40,6 +41,9 @@ public class MainController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private ApplicationConstants applicationConstants;
+
     @GetMapping
     public String greeting(Map<String, Object> model) throws JsonProcessingException {
 
@@ -49,7 +53,10 @@ public class MainController {
                 .collect(Collectors.toList());
 
         model.put("listDepartment", listDepartment);
-        
+        model.put("application_name", applicationConstants.getApplicationName());
+        model.put("subdomain_form", applicationConstants.getSubdomainForm());
+        model.put("subdomain_work", applicationConstants.getSubdomainWork());
+
         return "index";
     }
 
@@ -123,6 +130,9 @@ public class MainController {
 
     @GetMapping("/dacha")
     public String dacha(Map<String, Object> model) throws JsonProcessingException {
+        model.put("application_name", applicationConstants.getApplicationName());
+        model.put("contacts", applicationConstants.getContacts());
+        model.put("ref_working_portal", applicationConstants.getWorkingPortal());
         return "dacha";
     }
 
@@ -140,11 +150,27 @@ public class MainController {
 
     @GetMapping("/barber")
     public String barber(Map<String, Object> model) throws JsonProcessingException {
+        model.put("application_name", applicationConstants.getApplicationName());
+        model.put("ref_hot_line", applicationConstants.getRefHotLine());
+        model.put("ref_form_fill_instruction", applicationConstants.getRefFormFillInstruction());
+        model.put("ref_faq", applicationConstants.getRefFaq());
+        model.put("ref_prescription_rospotrebnadzor_administration", applicationConstants.getPrescriptionOfRospotrepnadzorAdministration());
+        model.put("ref_working_portal", applicationConstants.getWorkingPortal());
+
+
         return "barber";
     }
 
     @GetMapping("/form")
     public String form(Map<String, Object> model) throws JsonProcessingException {
+        model.put("application_name", applicationConstants.getApplicationName());
+        model.put("ref_hot_line", applicationConstants.getRefHotLine());
+        model.put("ref_form_fill_instruction", applicationConstants.getRefFormFillInstruction());
+        model.put("ref_faq", applicationConstants.getRefFaq());
+        model.put("ref_download_xlsx_template", applicationConstants.getRefDownloadXlsxTemplate());
+        model.put("ref_xlsx_fill_instruction", applicationConstants.getRefXlsxFillInstruction());
+        model.put("subdomain_form", applicationConstants.getSubdomainForm());
+        model.put("ref_working_portal", applicationConstants.getWorkingPortal());
         return "form";
     }
 
@@ -196,6 +222,14 @@ public class MainController {
     @GetMapping("/typed_form")
     public String typedForm(@RequestParam(name = "request_type") Long idTypeRequest, Model model) {
         model.addAttribute("idTypeRequest", idTypeRequest);
+        model.addAttribute("application_name", applicationConstants.getApplicationName());
+        model.addAttribute("ref_hot_line", applicationConstants.getRefHotLine());
+        model.addAttribute("ref_form_fill_instruction", applicationConstants.getRefFormFillInstruction());
+        model.addAttribute("ref_faq", applicationConstants.getRefFaq());
+        model.addAttribute("ref_download_xlsx_template", applicationConstants.getRefDownloadXlsxTemplate());
+        model.addAttribute("ref_xlsx_fill_instruction", applicationConstants.getRefXlsxFillInstruction());
+        model.addAttribute("subdomain_form", applicationConstants.getSubdomainForm());
+        model.addAttribute("ref_working_portal", applicationConstants.getWorkingPortal());
         return "typed_form";
     }
 
@@ -238,6 +272,9 @@ public class MainController {
 
     @GetMapping("/personal_form")
     public String personalForm(Model model) {
+        model.addAttribute("application_name", applicationConstants.getApplicationName());
+        model.addAttribute("ref_agreement", applicationConstants.getRefAgreement());
+        model.addAttribute("ref_working_portal", applicationConstants.getWorkingPortal());
         return "personal_form";
     }
 
@@ -247,7 +284,7 @@ public class MainController {
             String errors = validatePersonalForm(postFormDto);
             if (errors.isEmpty()) {
                 DocRequest docRequest = requestService.addPersonalRequest(postFormDto, RequestTypes.PERSONAL.getValue());
-                emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), "Работающая Бурятия", "Ваша заявка получена.");
+                emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), applicationConstants.getApplicationName(), "Ваша заявка получена.");
                 return "На указанный e-mail отправлено письмо!";
             } else {
                 return errors;

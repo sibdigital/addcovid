@@ -285,7 +285,7 @@ webix.ready(function() {
                             {
                                 view: 'label',
                                 width: 300,
-                                label: '<span style="font-size: 1.0rem">Работающая Бурятия</span>',
+                                label: `<span style="font-size: 1.0rem">${APPLICATION_NAME}. </span>`,
                             },
                             {
                                 view: 'label',

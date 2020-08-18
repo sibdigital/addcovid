@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.EmailService;
@@ -47,6 +48,10 @@ public class DocRequestController {
 
     @Autowired
     private ClsDistrictRepo clsDistrictRepo;
+
+
+    @Autowired
+    private ApplicationConstants applicationConstants;
 
     private static final Logger log = LoggerFactory.getLogger(DocRequestController.class);
 
@@ -131,7 +136,7 @@ public class DocRequestController {
             else if (docRequest.getStatusReview() == 2) {
                 text = "Ваша заявка отклонена по причине: " + docRequest.getRejectComment();
             }
-            emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), "Работающая Бурятия", text);
+            emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), applicationConstants.getApplicationName(), text);
         }
 
         Long oldDepartmentId = docRequest.getDepartment().getId();
