@@ -16,6 +16,9 @@
     </style>
 </head>
 <body>
+<script th:inline="javascript">
+    const APPLICATION_NAME = [[${application_name}]]
+</script>
 <script th:src="@{/js/cabinet/main.js}"></script>
 </body>
 </html>

@@ -23,7 +23,7 @@ import java.util.Optional;
 public class DocRequestController {
 
     @Autowired
-    private DepUserRepo depUserRepo;
+    private ClsUserRepo clsUserRepo;
 
     @Autowired
     private DocRequestRepo docRequestRepo;
@@ -58,8 +58,8 @@ public class DocRequestController {
     @GetMapping("/doc_requests")
     public DocRequest requests(@RequestParam String inn,@RequestParam String ogrn, Map<String, Object> model, HttpSession session) {
         //if(inn!=null & !inn.isBlank()){
-        DepUser depUser = (DepUser) session.getAttribute("user");
-        if(depUser == null){
+        ClsUser clsUser = (ClsUser) session.getAttribute("user");
+        if(clsUser == null){
             return null;
         }
 
@@ -79,8 +79,8 @@ public class DocRequestController {
                                                      //public List<DocRequest> listRequest(@PathVariable("id_department") ClsDepartment department,
                                                      @PathVariable("status") Integer status, HttpSession session) {
 
-        DepUser depUser = (DepUser) session.getAttribute("user");
-        if(depUser == null){
+        ClsUser clsUser = (ClsUser) session.getAttribute("user");
+        if(clsUser == null){
             return null;
         }
         Optional<List<DocRequestPrs>> docRequests = docRequestPrsRepo.findFirst100ByDepartmentAndStatusReviewOrderByTimeCreate(department, status);
@@ -91,8 +91,8 @@ public class DocRequestController {
     @GetMapping("/list_request/{id_department}/{status}/{innOrName}")
     public Optional<List<DocRequestPrs>> listRequestByInnAndName(@PathVariable("id_department") Long id_department,
                                                   @PathVariable("status") Integer status, @PathVariable("innOrName") String innOrName, HttpSession session) {
-        DepUser depUser = (DepUser) session.getAttribute("user");
-        if(depUser == null){
+        ClsUser clsUser = (ClsUser) session.getAttribute("user");
+        if(clsUser == null){
             return null;
         }
         Optional<List<DocRequestPrs>> docRequests =  docRequestPrsRepo.getFirst100RequestByDepartmentIdAndStatusAndInnOrName(id_department, status, innOrName);
@@ -152,8 +152,8 @@ public class DocRequestController {
 
     @GetMapping("/doc_persons/{id_request}")
     public Optional<List<DocPerson>> getListPerson(@PathVariable("id_request") Long id_request, HttpSession session){
-        DepUser depUser = (DepUser) session.getAttribute("user");
-        if(depUser == null){
+        ClsUser clsUser = (ClsUser) session.getAttribute("user");
+        if(clsUser == null){
             return null;
         }
         return docPersonRepo.findByDocRequest(id_request);
@@ -161,8 +161,8 @@ public class DocRequestController {
 
     @GetMapping("/doc_address_fact/{id_request}")
     public Optional<List<DocAddressFact>> getListAddress(@PathVariable("id_request") Long id_request, HttpSession session){
-        DepUser depUser = (DepUser) session.getAttribute("user");
-        if(depUser == null){
+        ClsUser clsUser = (ClsUser) session.getAttribute("user");
+        if(clsUser == null){
             return null;
         }
         return docAddressFactRepo.findByDocRequest(id_request);

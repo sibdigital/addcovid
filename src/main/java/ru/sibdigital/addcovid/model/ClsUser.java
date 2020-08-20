@@ -9,10 +9,10 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "dep_user", schema = "public")
+@Table(name = "cls_user", schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
-public class DepUser implements Serializable {
+public class ClsUser implements Serializable {
 
     @Id
     @Column(name = "id", nullable = false)
@@ -101,13 +101,13 @@ public class DepUser implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DepUser depUser = (DepUser) o;
-        return Objects.equals(id, depUser.id) &&
-                Objects.equals(lastname, depUser.lastname) &&
-                Objects.equals(firstname, depUser.firstname) &&
-                Objects.equals(patronymic, depUser.patronymic) &&
-                Objects.equals(login, depUser.login) &&
-                Objects.equals(password, depUser.password);
+        ClsUser clsUser = (ClsUser) o;
+        return Objects.equals(id, clsUser.id) &&
+                Objects.equals(lastname, clsUser.lastname) &&
+                Objects.equals(firstname, clsUser.firstname) &&
+                Objects.equals(patronymic, clsUser.patronymic) &&
+                Objects.equals(login, clsUser.login) &&
+                Objects.equals(password, clsUser.password);
     }
 
     @Override

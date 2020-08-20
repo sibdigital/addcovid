@@ -7,8 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
-import ru.sibdigital.addcovid.model.DepUser;
-import ru.sibdigital.addcovid.repository.DepUserRepo;
+import ru.sibdigital.addcovid.model.ClsUser;
+import ru.sibdigital.addcovid.repository.ClsUserRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.service.RequestService;
 
@@ -19,7 +19,7 @@ import java.util.Map;
 public class LoginController {
 
     @Autowired
-    private DepUserRepo depUserRepo;
+    private ClsUserRepo clsUserRepo;
 
     @Autowired
     private DocRequestRepo docRequestRepo;
@@ -42,16 +42,16 @@ public class LoginController {
     @GetMapping("/requests")
     public String requests(Map<String, Object> model, HttpSession session) {
         //model.put();
-        DepUser depUser = (DepUser) session.getAttribute("user");
-        if(depUser == null){
+        ClsUser clsUser = (ClsUser) session.getAttribute("user");
+        if(clsUser == null){
             return "404";
         }
         else {
-            //model.put("user", depUser);
-            model.put("id_department", depUser.getIdDepartment().getId());
-            model.put("department_name", depUser.getIdDepartment().getName());
-            model.put("user_lastname", depUser.getLastname());
-            model.put("user_firstname", depUser.getFirstname());
+            //model.put("user", clsUser);
+            model.put("id_department", clsUser.getIdDepartment().getId());
+            model.put("department_name", clsUser.getIdDepartment().getName());
+            model.put("user_lastname", clsUser.getLastname());
+            model.put("user_firstname", clsUser.getFirstname());
             model.put("link_prefix", applicationConstants.getLinkPrefix());
             model.put("link_suffix", applicationConstants.getLinkSuffix());
             model.put("token", session.getAttribute("token"));
