@@ -170,7 +170,7 @@ public class DocRequestController {
 
     @GetMapping("/cls_departments")
     public List<ClsDepartment> getListDepartments(HttpSession session) {
-        List<ClsDepartment> list =  clsDepartmentRepo.findAll(Sort.by("id"));
+        List<ClsDepartment> list =  clsDepartmentRepo.findByIsDeletedFalseOrderByIdAsc();
         try {
             List<ClsDepartment> presult = new ArrayList<>();
             ClsDepartment first = clsDepartmentRepo.findById(4L).get();
