@@ -24,6 +24,7 @@ public class ClsTypeRequest {
     private int statusRegistration;
     private int statusVisible;
     private int sortWeight;
+    private String consent;
 
     @OneToOne
     @JoinColumn(name = "id_department", referencedColumnName = "id")
@@ -105,6 +106,26 @@ public class ClsTypeRequest {
         this.department = department;
     }
 
+    @Basic
+    @Column(name = "sort_weight")
+    public int getSortWeight() {
+        return sortWeight;
+    }
+
+    public void setSortWeight(int sortWeight) {
+        this.sortWeight = sortWeight;
+    }
+
+    @Basic
+    @Column(name = "consent")
+    public String getConsent() {
+        return consent;
+    }
+
+    public void setConsent(String consent) {
+        this.consent = consent;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -121,15 +142,5 @@ public class ClsTypeRequest {
     @Override
     public int hashCode() {
         return Objects.hash(id, activityKind, prescription, prescriptionLink, settings, statusRegistration);
-    }
-
-    @Basic
-    @Column(name = "sort_weight")
-    public int getSortWeight() {
-        return sortWeight;
-    }
-
-    public void setSortWeight(int sortWeight) {
-        this.sortWeight = sortWeight;
     }
 }
