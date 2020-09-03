@@ -4,12 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.dto.OrganizationDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.*;
+import ru.sibdigital.addcovid.utils.PasswordGenerator;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
 import javax.servlet.http.HttpServletResponse;
@@ -50,6 +53,18 @@ public class RequestService {
 
     @Autowired
     private ClsDistrictRepo districtRepo;
+
+    @Autowired
+    private ClsPrincipalRepo clsPrincipalRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private OkvedRepo okvedRepo;
+
+    @Autowired
+    private RegOrganizationOkvedRepo regOrganizationOkvedRepo;
 
     @Value("${upload.path:/uploads}")
     String uploadingDir;
@@ -390,5 +405,82 @@ public class RequestService {
 
     public ClsOrganization findOrganizationByInn(String inn) {
         return clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
+    }
+
+    @Transactional
+    public ClsOrganization saveClsOrganization(OrganizationDto organizationDto) {
+
+        ClsPrincipal clsPrincipal = ClsPrincipal.builder()
+                .password(passwordEncoder.encode(organizationDto.getPassword()))
+                .build();
+
+        clsPrincipalRepo.save(clsPrincipal);
+
+        int typeOrganization = OrganizationTypes.JURIDICAL.getValue();
+        if (organizationDto.getIsSelfEmployed() != null && organizationDto.getIsSelfEmployed()) {
+            typeOrganization = OrganizationTypes.SELF_EMPLOYED.getValue();
+        }
+
+        ClsOrganization clsOrganization = ClsOrganization.builder()
+                .name(organizationDto.getOrganizationName())
+                .shortName(organizationDto.getOrganizationShortName())
+                .inn(organizationDto.getOrganizationInn())
+                .ogrn(organizationDto.getOrganizationOgrn())
+                .addressJur(organizationDto.getOrganizationAddressJur())
+                .okvedAdd(organizationDto.getOrganizationOkvedAdd())
+                .okved(organizationDto.getOrganizationOkved())
+                .email(organizationDto.getOrganizationEmail())
+                .phone(organizationDto.getOrganizationPhone())
+                .statusImport(0)
+                .idTypeOrganization(typeOrganization)
+                .principal(clsPrincipal)
+                .build();
+
+        clsOrganizationRepo.save(clsOrganization);
+
+        if (organizationDto.getEgrulOkved() != null && !organizationDto.getEgrulOkved().isBlank()) {
+            Set<RegOrganizationOkved> regOrganizationOkveds = new HashSet<>();
+            Okved okved = okvedRepo.findByKindCode(organizationDto.getEgrulOkved());
+            if (okved != null) {
+                RegOrganizationOkvedId regOrganizationOkvedId = new RegOrganizationOkvedId(clsOrganization, okved);
+                regOrganizationOkveds.add(new RegOrganizationOkved(regOrganizationOkvedId, true));
+            }
+            if (organizationDto.getEgrulOkvedAdd() != null && organizationDto.getEgrulOkvedAdd().length > 0) {
+                for (int i = 0; i < organizationDto.getEgrulOkvedAdd().length; i++) {
+                    okved = okvedRepo.findByKindCode(organizationDto.getEgrulOkvedAdd()[i]);
+                    if (okved != null) {
+                        RegOrganizationOkvedId regOrganizationOkvedId = new RegOrganizationOkvedId(clsOrganization, okved);
+                        regOrganizationOkveds.add(new RegOrganizationOkved(regOrganizationOkvedId, false));
+                    }
+                }
+            }
+            regOrganizationOkvedRepo.saveAll(regOrganizationOkveds);
+        }
+
+        return clsOrganization;
+    }
+
+    @Transactional
+    public String changeOrganizationPassword(String inn) {
+
+        ClsOrganization clsOrganization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
+        if (clsOrganization != null) {
+            ClsPrincipal clsPrincipal = clsOrganization.getPrincipal();
+            if (clsPrincipal == null) {
+                clsPrincipal = new ClsPrincipal();
+            }
+
+            String newPassword = PasswordGenerator.generatePassword(8);
+
+            clsPrincipal.setPassword(passwordEncoder.encode(newPassword));
+            clsPrincipalRepo.save(clsPrincipal);
+
+            clsOrganization.setPrincipal(clsPrincipal);
+            clsOrganizationRepo.save(clsOrganization);
+
+            return newPassword;
+        }
+
+        return null;
     }
 }

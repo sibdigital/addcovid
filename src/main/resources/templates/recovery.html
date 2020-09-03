@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:utext="${application_name}"></title>
+    <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.min.css}">
+    <script th:src="@{/libs/webix.min.js}"></script>
+    <script th:src="@{/libs/routie.min.js}"></script>
+    <script th:src="@{/libs/jquery-3.4.1.min.js}"></script>
+    <style>
+        body {margin: 0}
+        .boldLabel {
+            font-weight: bold; border-width: 2px; border-style: solid; border-color: #000000;
+        }
+    </style>
+</head>
+<body>
+<div id="app"></div>
+<script th:inline="javascript">
+    const APPLICATION_NAME = [[${application_name}]]
+
+    webix.i18n.setLocale("ru-RU");
+
+    webix.ui({
+        container: 'app',
+        height: document.body.clientHeight,
+        width: 360,
+        css: {margin: 'auto', marginTop: 'auto'},
+        rows: [
+            {
+                view: 'toolbar',
+                autoheight: true,
+                id: 't1',
+                rows: [
+                    {
+                        responsive: 't1',
+                        css: 'webix_dark',
+                        cols: [
+                            {
+                                view: 'label',
+                                align: 'center',
+                                label: `<span style="font-size: 1.3rem">Восстановление доступа</span>`,
+                            },
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'form',
+                view: 'form',
+                complexData: true,
+                elements: [
+                    {
+                        type: 'space',
+                        margin: 5,
+                        rows: [
+                            {
+                                view: 'text',
+                                id: 'inn',
+                                name: 'inn',
+                                label: 'ИНН',
+                                labelPosition: 'top',
+                                required: true,
+                                validate: webix.rules.isNumber,
+                                invalidMessage: 'Неправильный формат ИНН'
+                            }
+                        ]
+                    },
+                    {
+                        id: 'send_btn',
+                        view: 'button',
+                        css: 'webix_primary',
+                        value: 'Отправить новый пароль',
+                        align: 'center',
+                        click: function () {
+
+                            if ($$('form').validate()) {
+
+                                let params = $$('form').getValues();
+
+                                params.inn = params.inn.trim();
+
+                                if (params.inn.length > 12) {
+                                    webix.message('Превышена длина ИНН', 'error');
+                                    return false;
+                                }
+
+                                webix.ajax()
+                                    .headers({'Content-type': 'application/json'})
+                                    .post('/recovery?inn=' + params.inn)
+                                    .then(function (data) {
+                                        const text = data.text();
+                                        if (text === 'Ок') {
+                                            window.location='/login';
+                                        } else {
+                                            webix.message(text, 'error')
+                                        }
+                                    })
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    })
+</script>
+</body>
+</html>

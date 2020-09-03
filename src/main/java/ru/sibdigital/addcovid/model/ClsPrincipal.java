@@ -16,6 +16,8 @@ public class ClsPrincipal {
 
     @Id
     @Column(name = "id", nullable = false)
+    @SequenceGenerator(name = "CLS_PRINCIPAL", sequenceName = "cls_principal_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CLS_PRINCIPAL")
     private Integer id;
     private String password;
 

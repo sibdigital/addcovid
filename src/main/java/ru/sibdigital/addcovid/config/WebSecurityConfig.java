@@ -36,7 +36,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/libs/**", "/css/**").permitAll()
                 .antMatchers("/js/**").permitAll() // TODO удалить, когда доступ нужно будет закрыть
-                .antMatchers("/", "/form", "/barber", "/typed_form", "/personal_form", "/dacha").permitAll() // TODO удалить, когда доступ нужно будет закрыть
+                .antMatchers("/", "/registration", "/recovery").permitAll()
+                .antMatchers("/form", "/barber", "/typed_form", "/personal_form", "/dacha").permitAll() // TODO удалить, когда доступ нужно будет закрыть
                 .antMatchers("/cls_type_requests", "/cls_type_request/*", "/cls_departments", "/cls_districts" ).permitAll() // TODO удалить, когда доступ нужно будет закрыть
                 .antMatchers("/upload", "/uploadpart", "/upload/protocol", "/download/*").permitAll() // TODO удалить, когда доступ нужно будет закрыть
                 .antMatchers("/login").permitAll()

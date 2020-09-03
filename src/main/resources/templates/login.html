@@ -31,7 +31,7 @@
                             view: 'label',
                             align: 'center',
                             autoheight: true,
-                            label: `<span style="font-size: 1.3rem">${appName}. Личный кабинет.</span>`,
+                            label: `<span style="font-size: 1.3rem">${appName}. Личный кабинет</span>`,
                         },
                     ]
                 },
@@ -57,9 +57,22 @@
                                         //{ view:"button", value:"Cancel"}
                                     ]
                                 },
+                                // {
+                                //     view: 'label',
+                                //     label: message //'<span style="color: red;"' + message + '</span>'
+                                // },
                                 {
-                                    view: 'label',
-                                    label: message //'<span style="color: red;"' + message + '</span>'
+                                    cols: [
+                                        {
+                                            view: 'label',
+                                            label: '<a href="/registration">Регистрация</a>'
+                                        },
+                                        {
+                                            view: 'label',
+                                            align: 'right',
+                                            label: '<a href="/recovery">Не могу войти</a>'
+                                        }
+                                    ]
                                 }
                             ]
                         },
