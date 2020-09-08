@@ -73,41 +73,48 @@ public class RequestService {
 
     public DocRequest addNewRequest(PostFormDto postForm, int requestType) {
 
-        String sha256 = SHA256Generator.generate(postForm.getOrganizationInn(), postForm.getOrganizationOgrn(), postForm.getOrganizationName());
-
-        DocRequest docRequest = null;
-        try {
-            docRequest = docRequestRepo.getTopByOrgHashCode(sha256).orElseGet(() -> null);
-
-        } catch (Exception e) {
-            docRequest = null;
-        }
+        String sha256 = null;
+        DocRequest docRequest;
         ClsOrganization organization;
 
-        if (docRequest != null) {
-            organization = docRequest.getOrganization();
-        } else {
-            int typeOrganization = OrganizationTypes.JURIDICAL.getValue();
-            if (postForm.getIsSelfEmployed() != null && postForm.getIsSelfEmployed()) {
-                typeOrganization = OrganizationTypes.SELF_EMPLOYED.getValue();
+        if (postForm.getOrganizationId() == null) {
+
+            sha256 = SHA256Generator.generate(postForm.getOrganizationInn(), postForm.getOrganizationOgrn(), postForm.getOrganizationName());
+
+            try {
+                docRequest = docRequestRepo.getTopByOrgHashCode(sha256).orElseGet(() -> null);
+            } catch (Exception e) {
+                docRequest = null;
             }
 
-            organization = ClsOrganization.builder()
-                    .name(postForm.getOrganizationName())
-                    .shortName(postForm.getOrganizationShortName())
-                    .inn(postForm.getOrganizationInn())
-                    .ogrn(postForm.getOrganizationOgrn())
-                    .addressJur(postForm.getOrganizationAddressJur())
-                    .okvedAdd(postForm.getOrganizationOkvedAdd())
-                    .okved(postForm.getOrganizationOkved())
-                    .email(postForm.getOrganizationEmail())
-                    .phone(postForm.getOrganizationPhone())
-                    .statusImport(0)
-                    .timeImport(Timestamp.valueOf(LocalDateTime.now()))
-                    .idTypeRequest(requestType)
-                    .idTypeOrganization(typeOrganization)
-                    .build();
-            organization = clsOrganizationRepo.save(organization);
+            if (docRequest != null) {
+                organization = docRequest.getOrganization();
+            } else {
+                int typeOrganization = OrganizationTypes.JURIDICAL.getValue();
+                if (postForm.getIsSelfEmployed() != null && postForm.getIsSelfEmployed()) {
+                    typeOrganization = OrganizationTypes.SELF_EMPLOYED.getValue();
+                }
+
+                organization = ClsOrganization.builder()
+                        .name(postForm.getOrganizationName())
+                        .shortName(postForm.getOrganizationShortName())
+                        .inn(postForm.getOrganizationInn())
+                        .ogrn(postForm.getOrganizationOgrn())
+                        .addressJur(postForm.getOrganizationAddressJur())
+                        .okvedAdd(postForm.getOrganizationOkvedAdd())
+                        .okved(postForm.getOrganizationOkved())
+                        .email(postForm.getOrganizationEmail())
+                        .phone(postForm.getOrganizationPhone())
+                        .statusImport(0)
+                        .timeImport(Timestamp.valueOf(LocalDateTime.now()))
+                        .idTypeRequest(requestType)
+                        .idTypeOrganization(typeOrganization)
+                        .build();
+                organization = clsOrganizationRepo.save(organization);
+            }
+
+        } else {
+            organization = clsOrganizationRepo.findById(postForm.getOrganizationId()).orElse(null);
         }
 
             List<DocPerson> personList = postForm.getPersons()
