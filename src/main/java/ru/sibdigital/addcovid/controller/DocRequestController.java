@@ -152,19 +152,11 @@ public class DocRequestController {
 
     @GetMapping("/doc_persons/{id_request}")
     public Optional<List<DocPerson>> getListPerson(@PathVariable("id_request") Long id_request, HttpSession session){
-        ClsUser clsUser = (ClsUser) session.getAttribute("user");
-        if(clsUser == null){
-            return null;
-        }
         return docPersonRepo.findByDocRequest(id_request);
     }
 
     @GetMapping("/doc_address_fact/{id_request}")
     public Optional<List<DocAddressFact>> getListAddress(@PathVariable("id_request") Long id_request, HttpSession session){
-        ClsUser clsUser = (ClsUser) session.getAttribute("user");
-        if(clsUser == null){
-            return null;
-        }
         return docAddressFactRepo.findByDocRequest(id_request);
     }
 

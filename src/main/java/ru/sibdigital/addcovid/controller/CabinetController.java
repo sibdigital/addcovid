@@ -51,6 +51,8 @@ public class CabinetController {
         session.setAttribute("id_organization", organization.getId());
         model.addAttribute("application_name", applicationConstants.getApplicationName());
         model.addAttribute("id_organization", organization.getId());
+        model.addAttribute("link_prefix", applicationConstants.getLinkPrefix());
+        model.addAttribute("link_suffix", applicationConstants.getLinkSuffix());
         return "cabinet/main";
     }
 
