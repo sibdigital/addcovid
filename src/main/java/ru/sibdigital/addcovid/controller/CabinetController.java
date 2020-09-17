@@ -10,11 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
+import ru.sibdigital.addcovid.dto.EmployeeDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.dto.PrincipalDto;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
 import ru.sibdigital.addcovid.repository.ClsPrincipalRepo;
+import ru.sibdigital.addcovid.repository.DocEmployeeRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.service.RequestService;
 
@@ -42,6 +44,9 @@ public class CabinetController {
 
     @Autowired
     private ApplicationConstants applicationConstants;
+
+    @Autowired
+    private DocEmployeeRepo docEmployeeRepo;
 
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
@@ -189,4 +194,27 @@ public class CabinetController {
         return errors;
     }
 
+    @GetMapping("/employees")
+    public @ResponseBody List<DocEmployee> getEmployees(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        List<DocEmployee> employees = requestService.getEmployeesByOrganizationId(organization.getId());
+        return employees;
+    }
+
+    @PostMapping("/employee")
+    public @ResponseBody String saveEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        employeeDto.setOrganizationId(id);
+        try {
+            requestService.saveEmployee(employeeDto);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "Не удалось добавить сотрудника";
+        }
+        return "Сотрудник добавлен";
+    }
 }

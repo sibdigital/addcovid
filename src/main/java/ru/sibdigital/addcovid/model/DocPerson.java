@@ -46,7 +46,7 @@ public class DocPerson {
     @JsonIgnore
     private DocRequest docRequest;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="id_organization", nullable=false)
     @JsonIgnore
     private ClsOrganization organization;

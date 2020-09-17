@@ -95,4 +95,7 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
 
     @Query("SELECT dr FROM DocRequest dr WHERE dr.organization.inn = :inn ORDER BY dr.timeCreate DESC")
     Optional<List<DocRequest>> getAllByInn(@Param("inn")String inn);
+
+    @Query("SELECT dr FROM DocRequest dr WHERE dr.organization.id = :id ORDER BY dr.timeCreate")
+    Optional<List<DocRequest>> findOneByOrganizationId(Long id);
 }

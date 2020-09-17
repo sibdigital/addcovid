@@ -1310,6 +1310,177 @@ const settings = {
     }
 }
 
+// ***** ВАКЦИНАЦИЯ *****
+
+const employees = {
+    view: 'scrollview',
+    scroll: 'xy',
+    body: {
+        type: 'space',
+        rows: [
+            {
+                view: 'datatable',
+                id: 'employees_table',
+                minHeight: 570,
+                select: 'row',
+                navigation: true,
+                resizeColumn: true,
+                pager: 'Pager',
+                datafetch: 25,
+                columns: [
+                    {
+                        header: "Фамилия",
+                        template: "#person.lastname#",
+                        fillspace: true
+                    },
+                    {
+                        header: "Имя",
+                        template: "#person.firstname#",
+                        fillspace: true
+                    },
+                    {
+                        header: "Отчество",
+                        template: "#person.patronymic#",
+                        fillspace: true
+                    },
+                    {
+                        header: "Привит от гриппа",
+                        template: function (obj) {
+                            if (obj.isVaccinatedFlu) {
+                                return 'Да';
+                            } else {
+                                return 'Нет';
+                            }
+                        },
+                        fillspace: true,
+                        adjust: true
+                    },
+                    {
+                        header: "Привит от COVID-19",
+                        template: function (obj) {
+                            if (obj.isVaccinatedCovid) {
+                                return 'Да';
+                            } else {
+                                return 'Нет';
+                            }
+                        },
+                        fillspace: true,
+                        adjust: true
+                    }
+                ],
+                on: {
+                    onBeforeLoad: function () {
+                        this.showOverlay("Загружаю...");
+                    },
+                    onAfterLoad: function () {
+                        this.hideOverlay();
+                        if (!this.count()) {
+                            this.showOverlay("Отсутствуют данные")
+                        }
+                    },
+                    onLoadError: function () {
+                        this.hideOverlay();
+                    },
+                    onItemDblClick: function (id) {
+                        let item = this.getItem(id);
+                        $$('form_employee').parse(item);
+                    }
+                },
+                url: 'employees'
+            },
+            {
+                cols: [
+                    {
+                        view: 'pager',
+                        id: 'Pager',
+                        height: 38,
+                        size: 25,
+                        group: 5,
+                        template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
+                    },
+                    // {
+                    //     view: 'button',
+                    //     align: 'right',
+                    //     maxWidth: 200,
+                    //     css: 'webix_primary',
+                    //     value: 'Добавить сотрудника',
+                    //     click: function () {
+                    //         showEmployeeCreateForm();
+                    //     }
+                    // }
+                ]
+            },
+            {
+                view: 'form',
+                id: 'form_employee',
+                complexData: true,
+                elements: [
+                    {
+                        view: 'text',
+                        name: 'person.lastname',
+                        label: 'Фамилия',
+                        labelPosition: 'top'
+                    },
+                    {
+                        view: 'text',
+                        name: 'person.firstname',
+                        label: 'Имя',
+                        labelPosition: 'top'
+                    },
+                    {
+                        view: 'text',
+                        name: 'person.patronymic',
+                        label: 'Отчество',
+                        labelPosition: 'top'
+                    },
+                    {
+                        view: 'checkbox',
+                        id: 'isVaccinatedFlu',
+                        name: 'isVaccinatedFlu',
+                        label: 'Привит от гриппа',
+                        labelPosition: 'top'
+                    },
+                    {
+                        view: 'checkbox',
+                        id: 'isVaccinatedCovid',
+                        name: 'isVaccinatedCovid',
+                        label: 'Привит от COVID-19',
+                        labelPosition: 'top'
+                    },
+                    {
+                        view: 'button',
+                        align: 'right',
+                        maxWidth: 200,
+                        css: 'webix_primary',
+                        value: 'Добавить',
+                        click: function () {
+
+                            let params = $$('form_employee').getValues()
+
+                            webix.ajax()
+                                .headers({'Content-type': 'application/json'})
+                                .post('/employee', JSON.stringify(params))
+                                .then(function (data) {
+                                    if (data.text() === 'Сотрудник добавлен') {
+                                        $$('form_employee').clear()
+                                        if (params.id) {
+                                            webix.message('Сотрудник обновлен', 'success');
+                                        } else {
+                                            webix.message(data.text(), 'success');
+                                        }
+                                        $$('employees_table').load('employees');
+                                    } else {
+                                        webix.message(data.text(), 'error');
+                                    }
+                                });
+                        }
+                    },
+                ]
+            }
+        ]
+    }
+}
+
 webix.ready(function() {
     let layout = webix.ui({
         rows: [
@@ -1347,6 +1518,7 @@ webix.ready(function() {
                         css: 'webix_dark',
                         data: [
                             { id: "CommonInfo", value: 'Общая информация' },
+                            { id: "Employees", value: 'Сотрудники' },
                             { id: "Requests", value: 'Заявки' },
                             { id: "Settings", value: 'Настройки' },
                         ],
@@ -1360,6 +1532,10 @@ webix.ready(function() {
                                     }
                                     case 'Requests': {
                                         view = requests;
+                                        break;
+                                    }
+                                    case 'Employees': {
+                                        view = employees;
                                         break;
                                     }
                                     case 'Settings': {
