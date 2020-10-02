@@ -160,6 +160,11 @@ public class DocRequestController {
         return docAddressFactRepo.findByDocRequest(id_request);
     }
 
+    @GetMapping("/doc_requests/{id_request}")
+    public Optional<DocRequest> getDocRequest(@PathVariable("id_request") Long id_request) {
+        return docRequestRepo.findById(id_request);
+    }
+
     @GetMapping("/cls_departments")
     public List<ClsDepartment> getListDepartments(HttpSession session) {
         List<ClsDepartment> list =  clsDepartmentRepo.findByIsDeletedFalseOrderByIdAsc();
@@ -187,5 +192,10 @@ public class DocRequestController {
     public List<ClsDistrict> getListDistricts() {
         List<ClsDistrict> list =  clsDistrictRepo.findAll(Sort.by("id"));
         return list;
+    }
+
+    @GetMapping("/actualized_doc_requests")
+    public List<DocRequestPrs> getActualizedRequests(@RequestParam(name = "inn") String inn) {
+        return docRequestPrsRepo.getActualizedRequests(inn);
     }
 }

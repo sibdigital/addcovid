@@ -220,8 +220,11 @@ public class MainController {
     }
 
     @GetMapping("/typed_form")
-    public String typedForm(@RequestParam(name = "request_type") Long idTypeRequest, Model model) {
+    public String typedForm(@RequestParam(name = "request_type") Long idTypeRequest,
+                            @RequestParam(name = "id", required = false) Long idRequest,
+                            Model model) {
         model.addAttribute("idTypeRequest", idTypeRequest);
+        model.addAttribute("idRequest", idRequest);
         model.addAttribute("application_name", applicationConstants.getApplicationName());
         model.addAttribute("ref_hot_line", applicationConstants.getRefHotLine());
         model.addAttribute("ref_form_fill_instruction", applicationConstants.getRefFormFillInstruction());
@@ -341,6 +344,12 @@ public class MainController {
         }
 
         return errors;
+    }
+
+    @GetMapping("/actualize_form")
+    public String actualizeForm(Model model) {
+        model.addAttribute("application_name", applicationConstants.getApplicationName());
+        return "actualize_form";
     }
 
 }

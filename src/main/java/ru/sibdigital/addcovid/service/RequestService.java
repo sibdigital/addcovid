@@ -187,6 +187,8 @@ public class RequestService {
                     .orgHashCode(sha256)
                     .typeRequest(clsTypeRequestRepo.findById((long) requestType).orElse(null))
                     .additionalAttributes(postForm.getAdditionalAttributes())
+                    .isActualization(postForm.getIsActualization())
+                    .actualizedRequest(docRequestRepo.getOne(postForm.getRequestId()))
                     .build();
 
             docRequest = docRequestRepo.save(docRequest);

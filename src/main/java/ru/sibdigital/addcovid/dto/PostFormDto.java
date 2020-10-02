@@ -48,7 +48,9 @@ public class PostFormDto {
     private Boolean isAgree;
     private Boolean isProtect;
     private String reqBasis;
-    
+
+    private Boolean isActualization;
+    private Long requestId;
     
     
     //Checker section

@@ -237,6 +237,7 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationShortName',
+                                        id: 'organizationShortName',
                                         label: 'Краткое наименование организации',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
@@ -247,6 +248,7 @@ webix.ready(function() {
                                             {
                                                 view: 'text',
                                                 name: 'organizationInn',
+                                                id: 'organizationInn',
                                                 label: 'ИНН',
                                                 labelPosition: 'top',
                                                 validate: function (val) {
@@ -259,6 +261,7 @@ webix.ready(function() {
                                             {
                                                 view: 'checkbox',
                                                 name: 'isSelfEmployed',
+                                                id: 'isSelfEmployed',
                                                 labelPosition: 'top',
                                                 label: 'Самозанятый',
                                                 on: {
@@ -291,6 +294,7 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationEmail',
+                                        id: 'organizationEmail',
                                         label: 'e-mail',
                                         labelPosition: 'top',
                                         validate:webix.rules.isEmail,
@@ -300,6 +304,7 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationPhone',
+                                        id: 'organizationPhone',
                                         label: 'Телефон',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
@@ -320,6 +325,7 @@ webix.ready(function() {
                                     {
                                         view: 'textarea',
                                         name: 'organizationOkvedAdd',
+                                        id: 'organizationOkvedAdd',
                                         label: 'Дополнительные виды осуществляемой деятельности',
                                         height: 100,
                                         labelPosition: 'top'
@@ -350,6 +356,7 @@ webix.ready(function() {
                     {
                         view: 'textarea',
                         name: 'organizationAddressJur',
+                        id: 'organizationAddressJur',
                         label: 'Юридический адрес',
                         labelPosition: 'top',
                         height: 80,
@@ -688,6 +695,8 @@ webix.ready(function() {
 
                                         let params = $$('form').getValues();
 
+                                        params.requestId = ID_REQUEST;
+
                                         params.organizationInn = params.organizationInn.trim();
                                         params.organizationOgrn = params.organizationOgrn.trim();
 
@@ -806,9 +815,9 @@ webix.ready(function() {
                                                 $$('upload').focus()
                                                 return false
                                             }
-                                            console.log(uploadedFiles)
+                                            // console.log(uploadedFiles)
                                             params.attachment = uploadedFiles.join(',')
-                                            console.log(params)
+                                            // console.log(params)
 
                                             webix.ajax()
                                                 .headers({'Content-type': 'application/json'})
@@ -848,27 +857,37 @@ webix.ready(function() {
                                                             });
                                                             $$('label_sogl').hideProgress();
                                                         }else{
-                                                            webix.confirm({
-                                                                title:"Заявка внесена",
-                                                                ok: "Закрыть",
-                                                                cancel: "Внести еще одну заявку",
-                                                                text: text
-                                                            })
-                                                                .then(function () {
+                                                            if (ID_REQUEST) {
+                                                                webix.alert({
+                                                                    title: "Данные формы заявки актуализированы",
+                                                                    text: 'Благодарим за сотрудничество!'
+                                                                }).then(function () {
                                                                     $$('label_sogl').hideProgress();
                                                                     window.location.replace('http://работающаябурятия.рф');
-                                                                })
-                                                                .fail(function(){
-                                                                    $$('label_sogl').hideProgress()
-                                                                    $$('form').clear();
-                                                                    $$('upload').setValue();
-                                                                    $$('form_person').clear();
-                                                                    $$('form_addr').clear();
-                                                                    $$('addr_table').clearAll();
-                                                                    $$('person_table').clearAll();
-                                                                    $$('organizationName').focus();
-                                                                    $$("departmentId").setValue(departmentId);
                                                                 });
+                                                            } else {
+                                                                webix.confirm({
+                                                                    title: "Заявка внесена",
+                                                                    ok: "Закрыть",
+                                                                    cancel: "Внести еще одну заявку",
+                                                                    text: text
+                                                                })
+                                                                    .then(function () {
+                                                                        $$('label_sogl').hideProgress();
+                                                                        window.location.replace('http://работающаябурятия.рф');
+                                                                    })
+                                                                    .fail(function () {
+                                                                        $$('label_sogl').hideProgress()
+                                                                        $$('form').clear();
+                                                                        $$('upload').setValue();
+                                                                        $$('form_person').clear();
+                                                                        $$('form_addr').clear();
+                                                                        $$('addr_table').clearAll();
+                                                                        $$('person_table').clearAll();
+                                                                        $$('organizationName').focus();
+                                                                        $$("departmentId").setValue(departmentId);
+                                                                    });
+                                                            }
                                                         }
                                                     })
                                         })
@@ -979,6 +998,35 @@ webix.ready(function() {
             }
         }
     });
+
+    if (ID_REQUEST) {
+        $$('form').load('doc_requests/' + ID_REQUEST).then(function (data) {
+            data = data.json();
+
+            $$('organizationName').setValue(data.organization.name);
+            $$('organizationShortName').setValue(data.organization.shortName);
+            $$('organizationInn').setValue(data.organization.inn);
+            $$('organizationOgrn').setValue(data.organization.ogrn);
+            $$('organizationEmail').setValue(data.organization.email);
+            $$('organizationEmail').setValue(data.organization.email);
+            $$('organizationPhone').setValue(data.organization.phone);
+            $$('organizationOkved').setValue(data.organization.okved);
+            $$('organizationOkvedAdd').setValue(data.organization.okvedAdd);
+            $$('organizationAddressJur').setValue(data.organization.addressJur);
+
+            let person_table_data = new webix.DataCollection({
+                url: 'doc_persons/' + data.id
+            })
+            $$('person_table').sync(person_table_data);
+
+            let addr_table_data = new webix.DataCollection({
+                url: 'doc_address_fact/' + data.id
+            })
+            $$('addr_table').sync(addr_table_data);
+
+            $$('send_btn').setValue('Актуализировать')
+        });
+    }
 
     webix.event(window, "resize", function (event) {
         layout.define("width",document.body.clientWidth);
