@@ -4,12 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.dto.OrganizationDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.*;
+import ru.sibdigital.addcovid.utils.PasswordGenerator;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
 import javax.servlet.http.HttpServletResponse;
@@ -43,7 +46,7 @@ public class RequestService {
     ClsDepartmentRepo departmentRepo;
 
     @Autowired
-    private DepUserRepo depUserRepo;
+    private ClsUserRepo clsUserRepo;
 
     @Autowired
     private ClsTypeRequestRepo clsTypeRequestRepo;
@@ -51,48 +54,71 @@ public class RequestService {
     @Autowired
     private ClsDistrictRepo districtRepo;
 
+    @Autowired
+    private ClsPrincipalRepo clsPrincipalRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private OkvedRepo okvedRepo;
+
+    @Autowired
+    private RegOrganizationOkvedRepo regOrganizationOkvedRepo;
+
+    @Autowired
+    private RegActualizationHistoryRepo regActualizationHistoryRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
     private static final int BUFFER_SIZE = 4096;
 
+    @Transactional
     public DocRequest addNewRequest(PostFormDto postForm, int requestType) {
 
-        String sha256 = SHA256Generator.generate(postForm.getOrganizationInn(), postForm.getOrganizationOgrn(), postForm.getOrganizationName());
-
-        DocRequest docRequest = null;
-        try {
-            docRequest = docRequestRepo.getTopByOrgHashCode(sha256).orElseGet(() -> null);
-
-        } catch (Exception e) {
-            docRequest = null;
-        }
+        String sha256 = null;
+        DocRequest docRequest;
         ClsOrganization organization;
 
-        if (docRequest != null) {
-            organization = docRequest.getOrganization();
-        } else {
-            int typeOrganization = OrganizationTypes.JURIDICAL.getValue();
-            if (postForm.getIsSelfEmployed() != null && postForm.getIsSelfEmployed()) {
-                typeOrganization = OrganizationTypes.SELF_EMPLOYED.getValue();
+        if (postForm.getOrganizationId() == null) {
+
+            sha256 = SHA256Generator.generate(postForm.getOrganizationInn(), postForm.getOrganizationOgrn(), postForm.getOrganizationName());
+
+            try {
+                docRequest = docRequestRepo.getTopByOrgHashCode(sha256).orElseGet(() -> null);
+            } catch (Exception e) {
+                docRequest = null;
             }
 
-            organization = ClsOrganization.builder()
-                    .name(postForm.getOrganizationName())
-                    .shortName(postForm.getOrganizationShortName())
-                    .inn(postForm.getOrganizationInn())
-                    .ogrn(postForm.getOrganizationOgrn())
-                    .addressJur(postForm.getOrganizationAddressJur())
-                    .okvedAdd(postForm.getOrganizationOkvedAdd())
-                    .okved(postForm.getOrganizationOkved())
-                    .email(postForm.getOrganizationEmail())
-                    .phone(postForm.getOrganizationPhone())
-                    .statusImport(0)
-                    .timeImport(Timestamp.valueOf(LocalDateTime.now()))
-                    .idTypeRequest(requestType)
-                    .idTypeOrganization(typeOrganization)
-                    .build();
-            organization = clsOrganizationRepo.save(organization);
+            if (docRequest != null) {
+                organization = docRequest.getOrganization();
+            } else {
+                int typeOrganization = OrganizationTypes.JURIDICAL.getValue();
+                if (postForm.getIsSelfEmployed() != null && postForm.getIsSelfEmployed()) {
+                    typeOrganization = OrganizationTypes.SELF_EMPLOYED.getValue();
+                }
+
+                organization = ClsOrganization.builder()
+                        .name(postForm.getOrganizationName())
+                        .shortName(postForm.getOrganizationShortName())
+                        .inn(postForm.getOrganizationInn())
+                        .ogrn(postForm.getOrganizationOgrn())
+                        .addressJur(postForm.getOrganizationAddressJur())
+                        .okvedAdd(postForm.getOrganizationOkvedAdd())
+                        .okved(postForm.getOrganizationOkved())
+                        .email(postForm.getOrganizationEmail())
+                        .phone(postForm.getOrganizationPhone())
+                        .statusImport(0)
+                        .timeImport(Timestamp.valueOf(LocalDateTime.now()))
+                        .idTypeRequest(requestType)
+                        .idTypeOrganization(typeOrganization)
+                        .build();
+                organization = clsOrganizationRepo.save(organization);
+            }
+
+        } else {
+            organization = clsOrganizationRepo.findById(postForm.getOrganizationId()).orElse(null);
         }
 
             List<DocPerson> personList = postForm.getPersons()
@@ -144,7 +170,20 @@ public class RequestService {
 
             String files = postForm.getAttachment();
 
-            docRequest = DocRequest.builder()
+        DocRequest actualizedRequest = null;
+        if (postForm.getActualizedRequestId() != null) {
+            actualizedRequest = docRequestRepo.getOne(postForm.getActualizedRequestId());
+        } else {
+            List<DocRequest> requests = docRequestRepo.getRequestsByInnAndStatusReviewOrderByTimeReviewDesc(
+                    postForm.getOrganizationInn(), ReviewStatuses.CONFIRMED.getValue()).orElse(null);
+            if (requests != null && requests.size() > 0) {
+                actualizedRequest = requests.get(0);
+            }
+        }
+
+        int statusReview = actualizedRequest != null ? ReviewStatuses.ACTUALIZED.getValue() : ReviewStatuses.OPENED.getValue();
+
+        docRequest = DocRequest.builder()
                     .organization(organization)
                     .department(departmentRepo.getOne(postForm.getDepartmentId()))
                     .personOfficeCnt(postForm.getPersonOfficeCnt())
@@ -154,7 +193,7 @@ public class RequestService {
                     .attachmentPath(files)
                     .docPersonList(personList)
                     .docAddressFact(docAddressFactList)
-                    .statusReview(0)
+                    .statusReview(statusReview)
                     .timeReview(Timestamp.valueOf(LocalDateTime.now()))
                     .statusImport(0)
                     .timeImport(Timestamp.valueOf(LocalDateTime.now()))
@@ -165,6 +204,8 @@ public class RequestService {
                     .orgHashCode(sha256)
                     .typeRequest(clsTypeRequestRepo.findById((long) requestType).orElse(null))
                     .additionalAttributes(postForm.getAdditionalAttributes())
+                    .isActualization(postForm.getIsActualization())
+                    .actualizedRequest(actualizedRequest)
                     .build();
 
             docRequest = docRequestRepo.save(docRequest);
@@ -180,6 +221,15 @@ public class RequestService {
 
             docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
             docPersonRepo.saveAll(docRequest.getDocPersonList());
+
+            if (actualizedRequest != null) {
+                RegActualizationHistory history = new RegActualizationHistory();
+                history.setDocRequest(docRequest);
+                history.setActualizedDocRequest(actualizedRequest);
+                history.setInn(organization.getInn());
+                history.setTimeActualization(Timestamp.valueOf(LocalDateTime.now()));
+                regActualizationHistoryRepo.save(history);
+            }
 
             return docRequest;
         }
@@ -278,7 +328,7 @@ public class RequestService {
     }
 
     public boolean isTokenValid(Integer hash_code){
-        Iterator<DepUser> iter = depUserRepo.findAll().iterator();
+        Iterator<ClsUser> iter = clsUserRepo.findAll().iterator();
         while(iter.hasNext()) {
             if(hash_code == iter.next().hashCode()) return true;
         }
@@ -390,5 +440,82 @@ public class RequestService {
 
     public ClsOrganization findOrganizationByInn(String inn) {
         return clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
+    }
+
+    @Transactional
+    public ClsOrganization saveClsOrganization(OrganizationDto organizationDto) {
+
+        ClsPrincipal clsPrincipal = ClsPrincipal.builder()
+                .password(passwordEncoder.encode(organizationDto.getPassword()))
+                .build();
+
+        clsPrincipalRepo.save(clsPrincipal);
+
+        int typeOrganization = OrganizationTypes.JURIDICAL.getValue();
+        if (organizationDto.getIsSelfEmployed() != null && organizationDto.getIsSelfEmployed()) {
+            typeOrganization = OrganizationTypes.SELF_EMPLOYED.getValue();
+        }
+
+        ClsOrganization clsOrganization = ClsOrganization.builder()
+                .name(organizationDto.getOrganizationName())
+                .shortName(organizationDto.getOrganizationShortName())
+                .inn(organizationDto.getOrganizationInn())
+                .ogrn(organizationDto.getOrganizationOgrn())
+                .addressJur(organizationDto.getOrganizationAddressJur())
+                .okvedAdd(organizationDto.getOrganizationOkvedAdd())
+                .okved(organizationDto.getOrganizationOkved())
+                .email(organizationDto.getOrganizationEmail())
+                .phone(organizationDto.getOrganizationPhone())
+                .statusImport(0)
+                .idTypeOrganization(typeOrganization)
+                .principal(clsPrincipal)
+                .build();
+
+        clsOrganizationRepo.save(clsOrganization);
+
+        if (organizationDto.getEgrulOkved() != null && !organizationDto.getEgrulOkved().isBlank()) {
+            Set<RegOrganizationOkved> regOrganizationOkveds = new HashSet<>();
+            Okved okved = okvedRepo.findByKindCode(organizationDto.getEgrulOkved());
+            if (okved != null) {
+                RegOrganizationOkvedId regOrganizationOkvedId = new RegOrganizationOkvedId(clsOrganization, okved);
+                regOrganizationOkveds.add(new RegOrganizationOkved(regOrganizationOkvedId, true));
+            }
+            if (organizationDto.getEgrulOkvedAdd() != null && organizationDto.getEgrulOkvedAdd().length > 0) {
+                for (int i = 0; i < organizationDto.getEgrulOkvedAdd().length; i++) {
+                    okved = okvedRepo.findByKindCode(organizationDto.getEgrulOkvedAdd()[i]);
+                    if (okved != null) {
+                        RegOrganizationOkvedId regOrganizationOkvedId = new RegOrganizationOkvedId(clsOrganization, okved);
+                        regOrganizationOkveds.add(new RegOrganizationOkved(regOrganizationOkvedId, false));
+                    }
+                }
+            }
+            regOrganizationOkvedRepo.saveAll(regOrganizationOkveds);
+        }
+
+        return clsOrganization;
+    }
+
+    @Transactional
+    public String changeOrganizationPassword(String inn) {
+
+        ClsOrganization clsOrganization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
+        if (clsOrganization != null) {
+            ClsPrincipal clsPrincipal = clsOrganization.getPrincipal();
+            if (clsPrincipal == null) {
+                clsPrincipal = new ClsPrincipal();
+            }
+
+            String newPassword = PasswordGenerator.generatePassword(8);
+
+            clsPrincipal.setPassword(passwordEncoder.encode(newPassword));
+            clsPrincipalRepo.save(clsPrincipal);
+
+            clsOrganization.setPrincipal(clsPrincipal);
+            clsOrganizationRepo.save(clsOrganization);
+
+            return newPassword;
+        }
+
+        return null;
     }
 }

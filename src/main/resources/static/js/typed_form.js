@@ -175,7 +175,7 @@ webix.ready(function() {
                             {
                                 view: 'label',
                                 width: 300,
-                                label: '<span style="font-size: 1.0rem">Работающая Бурятия. </span>',
+                                label: `<span style="font-size: 1.0rem">${APPLICATION_NAME}. </span>`,
                                 // tooltip: ''
                             },
                             {
@@ -190,9 +190,9 @@ webix.ready(function() {
             },
             {
                 view: 'label',
-                label: '<a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/#top" target="_blank">Горячая линия. </a>'
-                    + '&nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/doc.pdf" target="_blank">Инструкция по заполнению формы </a>'
-                    + '&nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/faq.html" target="_blank">Часто задаваемые вопросы</a>'
+                label: `<a style="font-size: 1.5rem; text-align: center;" href="${HOT_LINE}" target="_blank">Горячая линия. </a>
+                     &nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="${FORM_FILL_INSTRUCTION}" target="_blank">Инструкция по заполнению формы </a>
+                     &nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="${FAQ}" target="_blank">Часто задаваемые вопросы</a>`
 
             },
             {
@@ -202,15 +202,15 @@ webix.ready(function() {
             },
             {
                 view: 'label',
-                label: '<span  style="text-align: center;">При подаче заявки на 100 и более человек обязательно используйте шаблон для заполнения! ' +
-                    '<a  style="text-align: center;" href="http://работающаябурятия.рф/zayvka.xlsx" target="_blank">Скачать шаблон </a>&nbsp&nbsp&nbsp' +
-                    '<a  style="text-align: center;" href="http://работающаябурятия.рф/doc_excel.pdf" target="_blank">Инструкция по заполнению шаблона Excel </a></span>'
+                label: `<span  style="text-align: center;">При подаче заявки на 100 и более человек обязательно используйте шаблон для заполнения!  
+                    <a  style="text-align: center;" href="${FAQ}" target="_blank">Скачать шаблон </a>&nbsp&nbsp&nbsp 
+                    <a  style="text-align: center;" href="${XLSX_FILL_INSTRUCTION}" target="_blank">Инструкция по заполнению шаблона Excel </a></span>`
                 //css: 'main_label'
             },
             {
                 view: 'label',
-                label: '<span  style="text-align: center;">' +
-                    '<a  style="text-align: center;" href="http://form.govrb.ru/upload" target="_blank">Форма ввода с шаблоном Excel</a>  </span>'
+                label: `<span  style="text-align: center;">
+                    <a  style="text-align: center;" href="${SUBDOMAIN_FORM}/upload" target="_blank">Форма ввода с шаблоном Excel</a>  </span>`
                 //css: 'main_label'
             },
             {
@@ -237,6 +237,7 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationShortName',
+                                        id: 'organizationShortName',
                                         label: 'Краткое наименование организации',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
@@ -247,6 +248,7 @@ webix.ready(function() {
                                             {
                                                 view: 'text',
                                                 name: 'organizationInn',
+                                                id: 'organizationInn',
                                                 label: 'ИНН',
                                                 labelPosition: 'top',
                                                 validate: function (val) {
@@ -259,6 +261,7 @@ webix.ready(function() {
                                             {
                                                 view: 'checkbox',
                                                 name: 'isSelfEmployed',
+                                                id: 'isSelfEmployed',
                                                 labelPosition: 'top',
                                                 label: 'Самозанятый',
                                                 on: {
@@ -291,6 +294,7 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationEmail',
+                                        id: 'organizationEmail',
                                         label: 'e-mail',
                                         labelPosition: 'top',
                                         validate:webix.rules.isEmail,
@@ -300,6 +304,7 @@ webix.ready(function() {
                                     {
                                         view: 'text',
                                         name: 'organizationPhone',
+                                        id: 'organizationPhone',
                                         label: 'Телефон',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
@@ -320,6 +325,7 @@ webix.ready(function() {
                                     {
                                         view: 'textarea',
                                         name: 'organizationOkvedAdd',
+                                        id: 'organizationOkvedAdd',
                                         label: 'Дополнительные виды осуществляемой деятельности',
                                         height: 100,
                                         labelPosition: 'top'
@@ -350,6 +356,7 @@ webix.ready(function() {
                     {
                         view: 'textarea',
                         name: 'organizationAddressJur',
+                        id: 'organizationAddressJur',
                         label: 'Юридический адрес',
                         labelPosition: 'top',
                         height: 80,
@@ -513,7 +520,9 @@ webix.ready(function() {
                         type: 'space',
                         rows: [
                             {
-                                view: 'text', name: 'personSlrySaveCnt',
+                                view: 'text',
+                                name: 'personSlrySaveCnt',
+                                id: 'personSlrySaveCnt',
                                 label: 'Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы',
                                 labelPosition: 'top',
                                 validate: function(val){
@@ -524,7 +533,9 @@ webix.ready(function() {
                                 hidden:true
                             },
                             {
-                                view: 'text', name: 'personRemoteCnt',
+                                view: 'text',
+                                name: 'personRemoteCnt',
+                                id: 'personRemoteCnt',
                                 label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
                                 invalidMessage: 'Поле не может быть пустым',
                                 validate: function(val){
@@ -534,7 +545,9 @@ webix.ready(function() {
                                 labelPosition: 'top'
                             },
                             {
-                                view: 'text', name: 'personOfficeCnt',
+                                view: 'text',
+                                name: 'personOfficeCnt',
+                                id: 'personOfficeCnt',
                                 label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
                                 labelPosition: 'top',
                                 validate: function(val){
@@ -609,13 +622,21 @@ webix.ready(function() {
                     },
                     view_section('Подача заявки'),
                     {
-                        view: 'textarea',
+                        view: 'checkbox',
+                        name: 'isActualization',
+                        id: 'isActualization',
+                        labelPosition: 'top',
+                        label: 'Актуален',
+                        value: 1,
+                        disabled: true
+                    },
+                    {
+                        view: 'template',
+                        id: 'consent',
                         height: 200,
                         readonly: true,
-                        value: 'СОГЛАСИЕ на обработку персональных данных (далее – «Согласие»)\n' +
-                            'Настоящим я, во исполнение требований Федерального закона от 27.07.2006 г. № 152-ФЗ «О персональных данных» (с изменениями и дополнениями) свободно, своей волей и в своем интересе даю свое согласие: Администрации Главы РБ и Правительства Республики Бурятия, юридический адрес: 670001, г. Улан-Удэ, ул. Ленина, д.54, ИНН 0323082280 (далее - Администрация), на обработку, с использованием средств автоматизации или без использования таких средств, персональных данных (фамилия, имя отчество сотрудников организации), включая сбор, запись, систематизацию, удаление и уничтожение персональных данных при подаче заявки с предоставлением сведений о численности работников организаций и индивидуальных предпринимателей.\n' +
-                            'Настоящим я уведомлен Администрацией о том, что предполагаемыми пользователями персональных данных сотрудников моей организации являются работники Администрации.\n' +
-                            'Я ознакомлен(а), что: настоящее согласие на обработку персональных данных моей организации являются бессрочным и может быть отозвано посредством направления в адрес Администрации письменного заявления.\n'
+                        scroll: true,
+                        template: ''
                     },
                     {
                         view: 'checkbox',
@@ -688,6 +709,8 @@ webix.ready(function() {
                                     if($$('form').validate()) {
 
                                         let params = $$('form').getValues();
+
+                                        params.actualizedRequestId = ID_REQUEST;
 
                                         params.organizationInn = params.organizationInn.trim();
                                         params.organizationOgrn = params.organizationOgrn.trim();
@@ -807,9 +830,9 @@ webix.ready(function() {
                                                 $$('upload').focus()
                                                 return false
                                             }
-                                            console.log(uploadedFiles)
+                                            // console.log(uploadedFiles)
                                             params.attachment = uploadedFiles.join(',')
-                                            console.log(params)
+                                            // console.log(params)
 
                                             webix.ajax()
                                                 .headers({'Content-type': 'application/json'})
@@ -849,27 +872,38 @@ webix.ready(function() {
                                                             });
                                                             $$('label_sogl').hideProgress();
                                                         }else{
-                                                            webix.confirm({
-                                                                title:"Заявка внесена",
-                                                                ok: "Закрыть",
-                                                                cancel: "Внести еще одну заявку",
-                                                                text: text
-                                                            })
-                                                                .then(function () {
+                                                            // Заявка принята. Ожидайте ответ на электронную почту.
+                                                            if (ID_REQUEST) {
+                                                                webix.alert({
+                                                                    title: "Данные формы заявки актуализированы",
+                                                                    text: 'Благодарим за сотрудничество!'
+                                                                }).then(function () {
                                                                     $$('label_sogl').hideProgress();
                                                                     window.location.replace('http://работающаябурятия.рф');
-                                                                })
-                                                                .fail(function(){
-                                                                    $$('label_sogl').hideProgress()
-                                                                    $$('form').clear();
-                                                                    $$('upload').setValue();
-                                                                    $$('form_person').clear();
-                                                                    $$('form_addr').clear();
-                                                                    $$('addr_table').clearAll();
-                                                                    $$('person_table').clearAll();
-                                                                    $$('organizationName').focus();
-                                                                    $$("departmentId").setValue(departmentId);
                                                                 });
+                                                            } else {
+                                                                webix.confirm({
+                                                                    title: "Заявка внесена",
+                                                                    ok: "Закрыть",
+                                                                    cancel: "Внести еще одну заявку",
+                                                                    text: text
+                                                                })
+                                                                    .then(function () {
+                                                                        $$('label_sogl').hideProgress();
+                                                                        window.location.replace('http://работающаябурятия.рф');
+                                                                    })
+                                                                    .fail(function () {
+                                                                        $$('label_sogl').hideProgress()
+                                                                        $$('form').clear();
+                                                                        $$('upload').setValue();
+                                                                        $$('form_person').clear();
+                                                                        $$('form_addr').clear();
+                                                                        $$('addr_table').clearAll();
+                                                                        $$('person_table').clearAll();
+                                                                        $$('organizationName').focus();
+                                                                        $$("departmentId").setValue(departmentId);
+                                                                    });
+                                                            }
                                                         }
                                                     })
                                         })
@@ -962,6 +996,7 @@ webix.ready(function() {
                 $$("departmentId").disable();
             }
             $$('prescription').setHTML(typeRequest.prescription);
+            $$('consent').setHTML(typeRequest.consent);
 
             if (typeRequest.settings) {
                 console.log(typeRequest.settings);
@@ -979,6 +1014,37 @@ webix.ready(function() {
             }
         }
     });
+
+    if (ID_REQUEST) {
+        webix.ajax('doc_requests/' + ID_REQUEST).then(function (data) {
+            data = data.json();
+            $$('organizationName').setValue(data.organization.name);
+            $$('organizationShortName').setValue(data.organization.shortName);
+            $$('organizationInn').setValue(data.organization.inn);
+            $$('organizationOgrn').setValue(data.organization.ogrn);
+            $$('organizationEmail').setValue(data.organization.email);
+            $$('organizationEmail').setValue(data.organization.email);
+            $$('organizationPhone').setValue(data.organization.phone);
+            $$('organizationOkved').setValue(data.organization.okved);
+            $$('organizationOkvedAdd').setValue(data.organization.okvedAdd);
+            $$('organizationAddressJur').setValue(data.organization.addressJur);
+            $$('reqBasis').setValue(data.reqBasis);
+            $$('personSlrySaveCnt').setValue(data.personSlrySaveCnt);
+            $$('personRemoteCnt').setValue(data.personRemoteCnt);
+            $$('personOfficeCnt').setValue(data.personOfficeCnt);
+        });
+
+        let person_table_data = new webix.DataCollection({
+            url: 'doc_persons/' + ID_REQUEST
+        })
+        $$('person_table').sync(person_table_data);
+        let addr_table_data = new webix.DataCollection({
+            url: 'doc_address_fact/' + ID_REQUEST
+        })
+        $$('addr_table').sync(addr_table_data);
+
+        $$('send_btn').setValue('Актуализировать')
+    }
 
     webix.event(window, "resize", function (event) {
         layout.define("width",document.body.clientWidth);

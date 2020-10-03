@@ -56,6 +56,10 @@ public class DocRequestPrs implements Serializable {
     @JoinColumn(name = "id_organization", referencedColumnName = "id")
     private ClsOrganization organization;
 
+    @OneToOne
+    @JoinColumn(name = "id_type_request", referencedColumnName = "id")
+    private ClsTypeRequest typeRequest;
+
 //    @OneToMany(targetEntity = DocAddressFact.class, mappedBy="docRequestAddressFact", fetch = FetchType.EAGER)
 //    private Set<DocAddressFact> docAddressFact;
 
@@ -234,6 +238,13 @@ public class DocRequestPrs implements Serializable {
         this.organization = organization;
     }
 
+    public ClsTypeRequest getTypeRequest() {
+        return typeRequest;
+    }
+
+    public void setTypeRequest(ClsTypeRequest typeRequest) {
+        this.typeRequest = typeRequest;
+    }
 //    public Set<DocAddressFact> getDocAddressFact() {
 //        return docAddressFact;
 //    }

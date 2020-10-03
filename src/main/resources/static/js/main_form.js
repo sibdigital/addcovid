@@ -30,8 +30,8 @@ webix.ready(function() {
                             {
                                 view: 'label',
                                 width: 300,
-                                label: '<span style="font-size: 1.3rem; color: #fff">Работающая Бурятия. </span>',
-                                tooltip: 'Работающая Бурятия.',
+                                label: `<span style="font-size: 1.3rem; color: #fff">${APPLICATION_NAME}. </span>`,
+                                tooltip: `${APPLICATION_NAME}`,
                             }
                         ]
                     }
@@ -52,10 +52,10 @@ webix.ready(function() {
 
     webix.ajax('/cls_type_requests').then(function (data) {
         let typeRequests = data.json();
-        let vtxt = '<span style="font-size:calc(1.1em + 1vmin);text-align: center;">Подайте заявку в соответствии с вашим видом деятельности. </span><br/><br/>'
-        + '<a style="font-size:calc(0.8em + 1vmin); text-align: center;" href="http://rabota.govrb.ru/form" >Общие основания</a><br/><br/>'
-        + '<a style="font-size: calc(0.8em + 1vmin); text-align: center;" href="http://form.govrb.ru/upload/" >Общие основания (более 100 сотрудников)</a><br/><br/>'
-        + '<a style="font-size: calc(0.8em + 1vmin); text-align: center;" href="http://rabota.govrb.ru/barber" >Парикмахерские услуги</a><br/><br/>';
+        let vtxt = `<span style="font-size:calc(1.1em  1vmin);text-align: center;">Подайте заявку в соответствии с вашим видом деятельности. </span><br/><br/>
+         <a style="font-size:calc(0.8em  1vmin); text-align: center;" href="${SUBDOMAIN_WORK}" >Общие основания</a><br/><br/>
+         <a style="font-size: calc(0.8em  1vmin); text-align: center;" href="${SUBDOMAIN_FORM}/upload/" >Общие основания (более 100 сотрудников)</a><br/><br/>
+         <a style="font-size: calc(0.8em  1vmin); text-align: center;" href="${SUBDOMAIN_WORK}/barber" >Парикмахерские услуги</a><br/><br/>`;
 
         for(var  j = 0; j< typeRequests.length; j++){
             if (typeRequests[j].id == 1 || typeRequests[j].id == 2 || typeRequests[j].id == 100) {
@@ -66,11 +66,11 @@ webix.ready(function() {
                 let labl = typeRequests[j].activityKind.replace(new RegExp(' ', 'g'), '&nbsp');
                 let vdid = typeRequests[j].id;
                 let reqv = 'typed_form?request_type=' + vdid;
-                vtxt += '<a style="font-size: calc(0.8em + 1vmin); text-align: center; word-break: break-all; overflow-wrap: break-word; line-height: 1.05;" href="http://form.govrb.ru/' + reqv + '" >' +
+                vtxt += `<a style="font-size: calc(0.8em + 1vmin); text-align: center; word-break: break-all; overflow-wrap: break-word; line-height: 1.05;" href="${SUBDOMAIN_FORM}/${reqv}" >` +
                     '' + labl + '</a><br/><br/>'
             }
         }
-        vtxt += '<a style="font-size:calc(0.8em + 1vmin); text-align: center;" href="http://rabota.govrb.ru/personal_form" >Физические лица, оказывающие услуги по сдаче в аренду жилья туристам</a><br/><br/>'
+        vtxt += `<a style="font-size:calc(0.8em + 1vmin); text-align: center;" href="${SUBDOMAIN_WORK}/personal_form" >Физические лица, оказывающие услуги по сдаче в аренду жилья туристам</a><br/><br/>`
         v = {
             view: 'template',
             template: vtxt,

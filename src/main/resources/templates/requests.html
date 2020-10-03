@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Работающая Бурятия</title>
+    <title th:utext="${application_name}"></title>
     <link type="text/css" rel="stylesheet" href="/libs/webix.min.css">
     <script src="/libs/webix.min.js"></script>
     <script src="/libs/routie.min.js"></script>
@@ -13,6 +13,8 @@
 <body>
 <div id="app"></div>
 <script th:inline="javascript">
+    const APPLICATION_NAME = [[${application_name}]]
+    const CONTACTS = [[${contacts}]]
     const ID_DEPARTMENT = [[${id_department}]]
     const DEPARTMENT = [[${department_name}]]
     const USER_NAME = [[${user_lastname + " " + user_firstname}]]

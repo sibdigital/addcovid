@@ -176,7 +176,7 @@ webix.ready(function() {
                     },
                     {
                         view: 'label',
-                        label: '<span style="font-size: 1.5rem">Работающая Бурятия. Подача заявки.</span>',
+                        label: `<span style="font-size: 1.5rem">${APPLICATION_NAME}. Подача заявки.</span>`,
                         //css: 'main_label'
                     },
                     {}
@@ -184,9 +184,9 @@ webix.ready(function() {
             },
             {
                 view: 'label',
-                label: '<a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/#top" target="_blank">Горячая линия. </a>'
-                + '&nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/doc.pdf" target="_blank">Инструкция по заполнению формы </a>'
-                + '&nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="http://работающаябурятия.рф/faq.html" target="_blank">Часто задаваемые вопросы</a>'
+                label: `<a style="font-size: 1.5rem; text-align: center;" href="${HOT_LINE}" target="_blank">Горячая линия. </a>
+                &nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="${FORM_FILL_INSTRUCTION}" target="_blank">Инструкция по заполнению формы </a>
+                &nbsp&nbsp&nbsp <a style="font-size: 1.5rem; text-align: center;" href="${FAQ}" target="_blank">Часто задаваемые вопросы</a>`
 
             },
             {
@@ -196,15 +196,15 @@ webix.ready(function() {
             },
             {
                 view: 'label',
-                label: '<span  style="text-align: center;">При подаче заявки на 100 и более человек обязательно используйте шаблон для заполнения! ' +
-                    '<a  style="text-align: center;" href="http://работающаябурятия.рф/zayvka.xlsx" target="_blank">Скачать шаблон </a>&nbsp&nbsp&nbsp' +
-                    '<a  style="text-align: center;" href="http://работающаябурятия.рф/doc_excel.pdf" target="_blank">Инструкция по заполнению шаблона Excel </a></span>'
+                label: `<span  style="text-align: center;">При подаче заявки на 100 и более человек обязательно используйте шаблон для заполнения!
+                    <a  style="text-align: center;" href="${DOWNLOAD_XLSX_TEMPLATE}" target="_blank">Скачать шаблон </a>&nbsp&nbsp&nbsp
+                    <a  style="text-align: center;" href="${XLSX_FILL_INSTRUCTION}" target="_blank">Инструкция по заполнению шаблона Excel </a></span>`
                 //css: 'main_label'
             },
             {
                 view: 'label',
-                label: '<span  style="text-align: center;">' +
-                    '<a  style="text-align: center;" href="http://form.govrb.ru/upload" target="_blank">Форма ввода с шаблоном Excel</a>  </span>'
+                label: `<span  style="text-align: center;">
+                    <a  style="text-align: center;" href="${SUBDOMAIN_FORM}/upload" target="_blank">Форма ввода с шаблоном Excel</a>  </span>`
                 //css: 'main_label'
             },
             {
@@ -682,6 +682,15 @@ webix.ready(function() {
                     },
                     view_section('Подача заявки'),
                     {
+                        view: 'checkbox',
+                        name: 'isActualization',
+                        id: 'isActualization',
+                        labelPosition: 'top',
+                        label: 'Актуален',
+                        value: 1,
+                        disabled: true
+                    },
+                    {
                         view: 'textarea',
                         height: 200,
                         readonly: true,
@@ -926,7 +935,7 @@ webix.ready(function() {
                                                             })
                                                                 .then(function () {
                                                                     $$('label_sogl').hideProgress();
-                                                                    window.location.replace('http://работающаябурятия.рф');
+                                                                    window.location.replace(`${REF_WORKING_PORTAL}`);
                                                                 })
                                                                 .fail(function(){
                                                                     $$('label_sogl').hideProgress()

@@ -92,7 +92,7 @@ webix.ready(function() {
                             {
                                 view: 'label',
                                 width: 300,
-                                label: '<span style="font-size: 1.0rem">Работающая Бурятия. </span>',
+                                label: `<span style="font-size: 1.0rem">${APPLICATION_NAME}</span>`,
                                 // tooltip: ''
                             },
                             {
@@ -331,7 +331,7 @@ webix.ready(function() {
                     // },
                     {
                         view: 'label',
-                        label: '<span style=\"text-align: center;\"><a  style=\"text-align: center;\" href=\"http://xn--80aaacc6bzbngqek9e7crdc.xn--p1ai/soglasie_na_obrabotky_pd.docx\" target=\"_blank\">Согласие на получение и обработку, проверку персональных данных</a></span>'
+                        label: `<span style="text-align: center;"><a  style="text-align: center;" href="${REF_AGREEMENT}" target="_blank">Согласие на получение и обработку, проверку персональных данных</a></span>`
                     },
                     {
                         view: 'checkbox',
@@ -508,7 +508,7 @@ webix.ready(function() {
                                                             })
                                                                 .then(function () {
                                                                     $$('label_sogl').hideProgress();
-                                                                    window.location.replace('http://работающаябурятия.рф');
+                                                                    window.location.replace(`${REF_WORKING_PORTAL}`);
                                                                 })
                                                                 .fail(function(){
                                                                     $$('label_sogl').hideProgress()

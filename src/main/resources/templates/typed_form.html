@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Работающая Бурятия</title>
+    <title th:utext="${application_name}"></title>
     <link type="text/css" rel="stylesheet" th:href="@{/libs/skins/flat.min.css}">
     <script th:src="@{/libs/webix.min.js}"></script>
     <script th:src="@{/libs/routie.min.js}"></script>
@@ -13,12 +13,20 @@
             font-weight: bold; border-width: 2px; border-style: solid; border-color: #000000;
         }
     </style>
-    <script th:inline="javascript">
-        const ID_TYPE_REQUEST = [[${idTypeRequest}]]
-    </script>
 </head>
 <body>
 <div id="app"></div>
+<script th:inline="javascript">
+    const ID_TYPE_REQUEST = [[${idTypeRequest}]]
+    const ID_REQUEST = [[${idRequest}]]
+    const APPLICATION_NAME = [[${application_name}]]
+    const HOT_LINE = [[${ref_hot_line}]]
+    const FORM_FILL_INSTRUCTION = [[${ref_form_fill_instruction}]]
+    const FAQ = [[${ref_faq}]]
+    const DOWNLOAD_XLSX_TEMPLATE = [[${ref_download_xlsx_template}]]
+    const XLSX_FILL_INSTRUCTION = [[${ref_xlsx_fill_instruction}]]
+    const SUBDOMAIN_FORM = [[${subdomain_form}]]
+</script>
 <script th:src="@{/js/typed_form.js}"></script>
 </body>
 </html>

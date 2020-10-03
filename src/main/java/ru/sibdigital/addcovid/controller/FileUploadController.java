@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.ClsExcel;
 import ru.sibdigital.addcovid.model.RequestTypes;
@@ -51,6 +52,9 @@ public class FileUploadController {
     @Value("${upload.path:/uploads}")
     String uploadingAttacchmentDir;
 
+    @Autowired
+    private ApplicationConstants applicationConstants;
+
     private Base64.Encoder enc = Base64.getEncoder();
 
     @RequestMapping("/upload")
@@ -59,7 +63,7 @@ public class FileUploadController {
         //model.addAttribute("errorMessage", null);
 
         model.addAttribute("errorMessage", model.getAttribute("errorMessage")); //hack to inject value inside html
-
+        model.addAttribute("application_name", applicationConstants.getApplicationName());
         return "upload";
     }
 
@@ -78,7 +82,7 @@ public class FileUploadController {
 
         model.addAttribute("checkProtocol", checkProtocol);
         model.addAttribute("postFormDto", checkProtocol.getPostFormDto()); //hack to inject value inside html
-
+        model.addAttribute("application_name", applicationConstants.getApplicationName());
 
         return "upload_protocol";
 
@@ -88,6 +92,7 @@ public class FileUploadController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String  uploadFiles(@RequestParam("excelFile") MultipartFile excelFile,
                                     @RequestParam("pdfFile") MultipartFile pdfFile,
+                                    @RequestParam("isActualization") boolean isActualization,
                                     @RequestParam("isAgreed") boolean isAgreed,
                                     @RequestParam("isProtected") boolean isProtected,
                                     @RequestParam("reqBasis") String reqBasis,
@@ -126,6 +131,7 @@ public class FileUploadController {
 
             postFormDto.setAttachmentFilename(pdfFile.getOriginalFilename());
             postFormDto.setAttachment(f.getName());
+            postFormDto.setIsActualization(isActualization);
             postFormDto.setIsAgree(isAgreed);
             postFormDto.setIsProtect(isProtected);
             postFormDto.setReqBasis(reqBasis);
@@ -181,10 +187,10 @@ public class FileUploadController {
 
         } catch (IOException ex) {
             //importStatus = ImportStatuses.FILE_ERROR.getValue();
-            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
+            log.error("saveFile(): xls file was not saved cause:", ex);
         } catch (Exception ex) {
             //importStatus = ImportStatuses.FILE_ERROR.getValue();
-            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
+            log.error("saveFile(): xls file was not saved cause:", ex);
         }
         return file;
     }
@@ -207,10 +213,10 @@ public class FileUploadController {
 
         } catch (IOException ex) {
             //importStatus = ImportStatuses.FILE_ERROR.getValue();
-            log.error("saveFile() " + String.format("xls file was not saved cause: %s", ex));
+            log.error("saveFile(): xls file was not saved cause:", ex);
         } catch (Exception ex) {
             //importStatus = ImportStatuses.FILE_ERROR.getValue();
-            log.error("saveFile() " + String.format("xls file was not saved cause: %s", ex));
+            log.error("saveFile(): xls file was not saved cause:", ex);
         }
         return f;
     }

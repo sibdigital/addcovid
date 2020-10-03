@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
+import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.EmailService;
@@ -22,7 +23,7 @@ import java.util.Optional;
 public class DocRequestController {
 
     @Autowired
-    private DepUserRepo depUserRepo;
+    private ClsUserRepo clsUserRepo;
 
     @Autowired
     private DocRequestRepo docRequestRepo;
@@ -48,13 +49,17 @@ public class DocRequestController {
     @Autowired
     private ClsDistrictRepo clsDistrictRepo;
 
+
+    @Autowired
+    private ApplicationConstants applicationConstants;
+
     private static final Logger log = LoggerFactory.getLogger(DocRequestController.class);
 
     @GetMapping("/doc_requests")
     public DocRequest requests(@RequestParam String inn,@RequestParam String ogrn, Map<String, Object> model, HttpSession session) {
         //if(inn!=null & !inn.isBlank()){
-        DepUser depUser = (DepUser) session.getAttribute("user");
-        if(depUser == null){
+        ClsUser clsUser = (ClsUser) session.getAttribute("user");
+        if(clsUser == null){
             return null;
         }
 
@@ -74,8 +79,8 @@ public class DocRequestController {
                                                      //public List<DocRequest> listRequest(@PathVariable("id_department") ClsDepartment department,
                                                      @PathVariable("status") Integer status, HttpSession session) {
 
-        DepUser depUser = (DepUser) session.getAttribute("user");
-        if(depUser == null){
+        ClsUser clsUser = (ClsUser) session.getAttribute("user");
+        if(clsUser == null){
             return null;
         }
         Optional<List<DocRequestPrs>> docRequests = docRequestPrsRepo.findFirst100ByDepartmentAndStatusReviewOrderByTimeCreate(department, status);
@@ -86,8 +91,8 @@ public class DocRequestController {
     @GetMapping("/list_request/{id_department}/{status}/{innOrName}")
     public Optional<List<DocRequestPrs>> listRequestByInnAndName(@PathVariable("id_department") Long id_department,
                                                   @PathVariable("status") Integer status, @PathVariable("innOrName") String innOrName, HttpSession session) {
-        DepUser depUser = (DepUser) session.getAttribute("user");
-        if(depUser == null){
+        ClsUser clsUser = (ClsUser) session.getAttribute("user");
+        if(clsUser == null){
             return null;
         }
         Optional<List<DocRequestPrs>> docRequests =  docRequestPrsRepo.getFirst100RequestByDepartmentIdAndStatusAndInnOrName(id_department, status, innOrName);
@@ -131,7 +136,7 @@ public class DocRequestController {
             else if (docRequest.getStatusReview() == 2) {
                 text = "Ваша заявка отклонена по причине: " + docRequest.getRejectComment();
             }
-            emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), "Работающая Бурятия", text);
+            emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), applicationConstants.getApplicationName(), text);
         }
 
         Long oldDepartmentId = docRequest.getDepartment().getId();
@@ -147,25 +152,22 @@ public class DocRequestController {
 
     @GetMapping("/doc_persons/{id_request}")
     public Optional<List<DocPerson>> getListPerson(@PathVariable("id_request") Long id_request, HttpSession session){
-        DepUser depUser = (DepUser) session.getAttribute("user");
-        if(depUser == null){
-            return null;
-        }
         return docPersonRepo.findByDocRequest(id_request);
     }
 
     @GetMapping("/doc_address_fact/{id_request}")
     public Optional<List<DocAddressFact>> getListAddress(@PathVariable("id_request") Long id_request, HttpSession session){
-        DepUser depUser = (DepUser) session.getAttribute("user");
-        if(depUser == null){
-            return null;
-        }
         return docAddressFactRepo.findByDocRequest(id_request);
+    }
+
+    @GetMapping("/doc_requests/{id_request}")
+    public Optional<DocRequest> getDocRequest(@PathVariable("id_request") Long id_request) {
+        return docRequestRepo.findById(id_request);
     }
 
     @GetMapping("/cls_departments")
     public List<ClsDepartment> getListDepartments(HttpSession session) {
-        List<ClsDepartment> list =  clsDepartmentRepo.findAll(Sort.by("id"));
+        List<ClsDepartment> list =  clsDepartmentRepo.findByIsDeletedFalseOrderByIdAsc();
         try {
             List<ClsDepartment> presult = new ArrayList<>();
             ClsDepartment first = clsDepartmentRepo.findById(4L).get();
@@ -190,5 +192,10 @@ public class DocRequestController {
     public List<ClsDistrict> getListDistricts() {
         List<ClsDistrict> list =  clsDistrictRepo.findAll(Sort.by("id"));
         return list;
+    }
+
+    @GetMapping("/actualized_doc_requests")
+    public List<DocRequestPrs> getActualizedRequests(@RequestParam(name = "inn") String inn) {
+        return docRequestPrsRepo.getActualizedRequests(inn);
     }
 }

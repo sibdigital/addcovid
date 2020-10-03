@@ -79,7 +79,7 @@ webix.ready(function() {
                             {
                                 view: 'label',
                                 width: 300,
-                                label: '<span style="font-size: 1.3rem">Работающая Бурятия. </span>',
+                                label: `<span style="font-size: 1.3rem">${APPLICATION_NAME}. </span>`,
                                 tooltip: 'Заявка для дачников.'
                             },
                             {
@@ -94,7 +94,7 @@ webix.ready(function() {
             },
             {
                 view: 'label',
-                label: '<span  style="text-align: center;">Телефон: 8 (3012) 46-24-34; колл-центр: 8 (3012) 573-900; 8 (3012) 571-600 </span>',
+                label: `<span  style="text-align: center;">${CONTACTS}</span>`,
                 //css: 'main_label'
             },
             {
@@ -572,7 +572,7 @@ webix.ready(function() {
                                                         //cancel:"Внести еще уведомление",
                                                         text:data
                                                     }).then(function(result){
-                                                        window.location.replace('http://работающаябурятия.рф');
+                                                        window.location.replace(`${REF_WORKING_PORTAL}`);
                                                     }).fail(function(){
                                                         $$('label_sogl').hideProgress()
                                                         $$('form').clear()

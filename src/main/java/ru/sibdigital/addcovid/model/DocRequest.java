@@ -51,6 +51,7 @@ public class DocRequest {
     private String orgHashCode;
     private String rejectComment;
     private Long old_department_id;
+    private Boolean isActualization;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
@@ -75,6 +76,11 @@ public class DocRequest {
     @OneToOne
     @JoinColumn(name = "id_district", referencedColumnName = "id")
     private ClsDistrict district;
+
+    @OneToOne
+    @JoinColumn(name = "id_actualized_request", referencedColumnName = "id")
+    @JsonIgnore
+    private DocRequest actualizedRequest;
 
     @OneToMany(targetEntity = DocAddressFact.class, mappedBy="docRequestAddressFact", fetch = FetchType.EAGER)
     private List<DocAddressFact> docAddressFact;
@@ -270,12 +276,28 @@ public class DocRequest {
         this.district = district;
     }
 
+    public Boolean getActualization() {
+        return isActualization;
+    }
+
+    public void setActualization(Boolean actualization) {
+        isActualization = actualization;
+    }
+
     public List<DocAddressFact> getDocAddressFact() {
         return docAddressFact;
     }
 
     public void setDocAddressFact(List<DocAddressFact> docAddressFact) {
         this.docAddressFact = docAddressFact;
+    }
+
+    public DocRequest getActualizedRequest() {
+        return actualizedRequest;
+    }
+
+    public void setActualizedRequest(DocRequest actualizedRequest) {
+        this.actualizedRequest = actualizedRequest;
     }
 
     @Basic

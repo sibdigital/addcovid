@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.sibdigital.addcovid.model.ClsDepartment;
+import ru.sibdigital.addcovid.model.DocRequest;
 import ru.sibdigital.addcovid.model.DocRequestPrs;
 
 import java.util.List;
@@ -25,4 +26,6 @@ public interface DocRequestPrsRepo extends JpaRepository<DocRequestPrs, Long> {
     Optional<List<DocRequestPrs>> getFirst100RequestByDepartmentIdAndStatusAndInnOrName(@Param("dep_id") Long departmentId, @Param("status")
             Integer status, @Param("innOrName") String innOrName);
 
+    @Query("SELECT dr FROM DocRequestPrs dr WHERE dr.organization.inn = :inn and dr.statusReview = 1 ORDER BY dr.timeCreate DESC")
+    List<DocRequestPrs> getActualizedRequests(String inn);
 }
