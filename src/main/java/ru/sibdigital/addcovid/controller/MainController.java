@@ -352,8 +352,9 @@ public class MainController {
     }
 
     @GetMapping("/actualize_form")
-    public String actualizeForm(Model model) {
+    public String actualizeForm(@RequestParam(name = "inn", required = false) String inn, Model model) {
         model.addAttribute("application_name", applicationConstants.getApplicationName());
+        model.addAttribute("inn", inn);
         return "actualize_form";
     }
 
