@@ -26,6 +26,24 @@ public interface DocRequestPrsRepo extends JpaRepository<DocRequestPrs, Long> {
     Optional<List<DocRequestPrs>> getFirst100RequestByDepartmentIdAndStatusAndInnOrName(@Param("dep_id") Long departmentId, @Param("status")
             Integer status, @Param("innOrName") String innOrName);
 
-    @Query("SELECT dr FROM DocRequestPrs dr WHERE dr.organization.inn = :inn and dr.statusReview = 1 ORDER BY dr.timeCreate DESC")
+    @Query(value = "with org_requests as(\n" +
+            "    select dr.* from doc_request as dr\n" +
+            "                      inner join (select *\n" +
+            "                                  from cls_organization as co\n" +
+            "                                  where co.inn = :inn\n" +
+            "    ) as co on dr.id_organization = co.id\n" +
+            "    where dr.status_review = 1\n" +
+            "),\n" +
+            "slice_doc_request as(\n" +
+            "    select ore.id_organization, ore.id_type_request,  max(ore.time_create) as time_create\n" +
+            "    from org_requests as ore\n" +
+            "    group by ore.id_organization, ore.id_type_request\n" +
+            ")\n" +
+            "select dr.*\n" +
+            "from slice_doc_request as sdr\n" +
+            "         inner join doc_request as dr\n" +
+            "                    on (sdr.id_organization, sdr.id_type_request, sdr.time_create) = (dr.id_organization, dr.id_type_request, dr.time_create)\n" +
+            "order by time_review desc",
+            nativeQuery = true)
     List<DocRequestPrs> getActualizedRequests(String inn);
 }

@@ -60,7 +60,7 @@ webix.ui({
                                             return;
                                         }
                                         let type = '';
-                                        if (inn.length === 9) {
+                                        if (inn.length === 10) {
                                             type = 'egrul';
                                         } else if (inn.length === 12) {
                                             type = 'egrip';
