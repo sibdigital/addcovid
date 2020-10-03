@@ -50,7 +50,7 @@ public class PostFormDto {
     private String reqBasis;
 
     private Boolean isActualization;
-    private Long requestId;
+    private Long actualizedRequestId;
     
     
     //Checker section

@@ -520,7 +520,9 @@ webix.ready(function() {
                         type: 'space',
                         rows: [
                             {
-                                view: 'text', name: 'personSlrySaveCnt',
+                                view: 'text',
+                                name: 'personSlrySaveCnt',
+                                id: 'personSlrySaveCnt',
                                 label: 'Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы',
                                 labelPosition: 'top',
                                 validate: function(val){
@@ -531,7 +533,9 @@ webix.ready(function() {
                                 hidden:true
                             },
                             {
-                                view: 'text', name: 'personRemoteCnt',
+                                view: 'text',
+                                name: 'personRemoteCnt',
+                                id: 'personRemoteCnt',
                                 label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
                                 invalidMessage: 'Поле не может быть пустым',
                                 validate: function(val){
@@ -541,7 +545,9 @@ webix.ready(function() {
                                 labelPosition: 'top'
                             },
                             {
-                                view: 'text', name: 'personOfficeCnt',
+                                view: 'text',
+                                name: 'personOfficeCnt',
+                                id: 'personOfficeCnt',
                                 label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
                                 labelPosition: 'top',
                                 validate: function(val){
@@ -615,6 +621,15 @@ webix.ready(function() {
                         }
                     },
                     view_section('Подача заявки'),
+                    {
+                        view: 'checkbox',
+                        name: 'isActualization',
+                        id: 'isActualization',
+                        labelPosition: 'top',
+                        label: 'Актуален',
+                        value: 1,
+                        disabled: true
+                    },
                     {
                         view: 'template',
                         id: 'consent',
@@ -695,7 +710,7 @@ webix.ready(function() {
 
                                         let params = $$('form').getValues();
 
-                                        params.requestId = ID_REQUEST;
+                                        params.actualizedRequestId = ID_REQUEST;
 
                                         params.organizationInn = params.organizationInn.trim();
                                         params.organizationOgrn = params.organizationOgrn.trim();
@@ -857,6 +872,7 @@ webix.ready(function() {
                                                             });
                                                             $$('label_sogl').hideProgress();
                                                         }else{
+                                                            // Заявка принята. Ожидайте ответ на электронную почту.
                                                             if (ID_REQUEST) {
                                                                 webix.alert({
                                                                     title: "Данные формы заявки актуализированы",
@@ -1000,9 +1016,8 @@ webix.ready(function() {
     });
 
     if (ID_REQUEST) {
-        $$('form').load('doc_requests/' + ID_REQUEST).then(function (data) {
+        webix.ajax('doc_requests/' + ID_REQUEST).then(function (data) {
             data = data.json();
-
             $$('organizationName').setValue(data.organization.name);
             $$('organizationShortName').setValue(data.organization.shortName);
             $$('organizationInn').setValue(data.organization.inn);
@@ -1013,19 +1028,22 @@ webix.ready(function() {
             $$('organizationOkved').setValue(data.organization.okved);
             $$('organizationOkvedAdd').setValue(data.organization.okvedAdd);
             $$('organizationAddressJur').setValue(data.organization.addressJur);
-
-            let person_table_data = new webix.DataCollection({
-                url: 'doc_persons/' + data.id
-            })
-            $$('person_table').sync(person_table_data);
-
-            let addr_table_data = new webix.DataCollection({
-                url: 'doc_address_fact/' + data.id
-            })
-            $$('addr_table').sync(addr_table_data);
-
-            $$('send_btn').setValue('Актуализировать')
+            $$('reqBasis').setValue(data.reqBasis);
+            $$('personSlrySaveCnt').setValue(data.personSlrySaveCnt);
+            $$('personRemoteCnt').setValue(data.personRemoteCnt);
+            $$('personOfficeCnt').setValue(data.personOfficeCnt);
         });
+
+        let person_table_data = new webix.DataCollection({
+            url: 'doc_persons/' + ID_REQUEST
+        })
+        $$('person_table').sync(person_table_data);
+        let addr_table_data = new webix.DataCollection({
+            url: 'doc_address_fact/' + ID_REQUEST
+        })
+        $$('addr_table').sync(addr_table_data);
+
+        $$('send_btn').setValue('Актуализировать')
     }
 
     webix.event(window, "resize", function (event) {

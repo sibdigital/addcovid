@@ -74,28 +74,37 @@ webix.ui({
                                         $$('form').showProgress();
 
                                         setTimeout(function () {
-                                            webix.ajax('actualized_doc_requests?inn=' + inn).then(function (data) {
-                                                const result = data.json();
-                                                if (result.length === 0) {
-                                                    let html = '<div>Заявка для указанного ИНН отсутствует в базе рассмотренных заявок на портале "Работающая Бурятия".</div>';
-                                                    $$('result').setHTML(html);
-                                                } else {
-                                                    let template = '<table>';
-                                                    template += '<thead><tr><th>Наименование организации</th><th>Дата подачи</th><th>Тип заявки</th><th></th></tr></thead>';
-                                                    template += '<tbody>';
-                                                    result.forEach(item => {
-                                                        const a = "<a href='/typed_form?request_type=" + item.typeRequest.id + "&id=" + item.id + "'>Актуализировать</a>";
-                                                        template += '<tr><td>' + item.organization.name + '</td><td>' + item.timeCreate + '</td><td>' + item.typeRequest.activityKind + '</td><td>' + a + '</td></tr>';
-                                                    });
-                                                    template += '</tbody>';
-                                                    template += '</table>';
+                                            webix.ajax('actualized_doc_requests?inn=' + inn)
+                                                .then(function (data) {
+                                                    const result = data.json();
+                                                    let template;
+                                                    if (result.length === 0) {
+                                                        template = '<p><b>Заявка для указанного ИНН отсутствует в базе рассмотренных заявок на портале "Работающая Бурятия".</b></p>';
+                                                        template += '<p>Проверьте правильность ввода ИНН и повторите поиск.</p>';
+                                                        template += '<p>Если вы ранее не подавали заявку на портале "Работающая Бурятия" воспользуйтесь формой подачи заявки выбрав форму соответствующую вашему виду деятельности. <a href="/">Подать новое заявление</a></p>';
+                                                        template += '<p>Проверить ранее поданные заявки можно на сервисе <a href="http://cr.govrb.ru/org_check">Проверка сведений</a> указав ИНН в форме ввода.</p>';
+                                                        $$('result').setHTML(template);
+                                                    } else {
+                                                        template = '<p style="color: red"><b>Если вы ранее подавали заявку используя форму (Общие основания (более 100 сотрудников)) "Импорт Excel" актуализируйте информацию в шаблоне и отправьте его используя форму <a href="/upload">Общие основания (более 100 сотрудников)</a></b></p>';
+                                                        if (result.length > 1) {
+                                                            template += '<p><b>Выберите для актуализации наиболее подходяющую для вашего вида деятельности форму заявки.</b></p>';
+                                                        }
+                                                        template += '<table>';
+                                                        template += '<thead><tr><th>Наименование организации</th><th>Дата подачи</th><th>Тип заявки</th><th></th></tr></thead>';
+                                                        template += '<tbody>';
+                                                        result.forEach(item => {
+                                                            const a = "<a href='/typed_form?request_type=" + item.typeRequest.id + "&id=" + item.id + "'>Актуализировать</a>";
+                                                            template += '<tr><td>' + item.organization.name + '</td><td>' + item.timeCreate + '</td><td>' + item.typeRequest.activityKind + '</td><td>' + a + '</td></tr>';
+                                                        });
+                                                        template += '</tbody>';
+                                                        template += '</table>';
+                                                    }
                                                     $$('result').setHTML(template);
-                                                }
-                                                $$('form').hideProgress();
-                                            }).catch(function () {
-                                                webix.message('Не удалось получить данные', 'error');
-                                                $$('form').hideProgress();
-                                            });
+                                                    $$('form').hideProgress();
+                                                }).catch(function () {
+                                                    webix.message('Не удалось получить данные', 'error');
+                                                    $$('form').hideProgress();
+                                                });
                                         }, 500);
                                     }
                                 },

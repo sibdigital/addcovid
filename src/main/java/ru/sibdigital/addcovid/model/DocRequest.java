@@ -292,6 +292,14 @@ public class DocRequest {
         this.docAddressFact = docAddressFact;
     }
 
+    public DocRequest getActualizedRequest() {
+        return actualizedRequest;
+    }
+
+    public void setActualizedRequest(DocRequest actualizedRequest) {
+        this.actualizedRequest = actualizedRequest;
+    }
+
     @Basic
     @Column(name = "reject_comment", nullable = false)
     public String getRejectComment() {

@@ -66,11 +66,15 @@ public class RequestService {
     @Autowired
     private RegOrganizationOkvedRepo regOrganizationOkvedRepo;
 
+    @Autowired
+    private RegActualizationHistoryRepo regActualizationHistoryRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
     private static final int BUFFER_SIZE = 4096;
 
+    @Transactional
     public DocRequest addNewRequest(PostFormDto postForm, int requestType) {
 
         String sha256 = null;
@@ -166,7 +170,20 @@ public class RequestService {
 
             String files = postForm.getAttachment();
 
-            docRequest = DocRequest.builder()
+        DocRequest actualizedRequest = null;
+        if (postForm.getActualizedRequestId() != null) {
+            actualizedRequest = docRequestRepo.getOne(postForm.getActualizedRequestId());
+        } else {
+            List<DocRequest> requests = docRequestRepo.getRequestsByInnAndStatusReviewOrderByTimeReviewDesc(
+                    postForm.getOrganizationInn(), ReviewStatuses.CONFIRMED.getValue()).orElse(null);
+            if (requests != null && requests.size() > 0) {
+                actualizedRequest = requests.get(0);
+            }
+        }
+
+        int statusReview = actualizedRequest != null ? ReviewStatuses.ACTUALIZED.getValue() : ReviewStatuses.OPENED.getValue();
+
+        docRequest = DocRequest.builder()
                     .organization(organization)
                     .department(departmentRepo.getOne(postForm.getDepartmentId()))
                     .personOfficeCnt(postForm.getPersonOfficeCnt())
@@ -176,7 +193,7 @@ public class RequestService {
                     .attachmentPath(files)
                     .docPersonList(personList)
                     .docAddressFact(docAddressFactList)
-                    .statusReview(0)
+                    .statusReview(statusReview)
                     .timeReview(Timestamp.valueOf(LocalDateTime.now()))
                     .statusImport(0)
                     .timeImport(Timestamp.valueOf(LocalDateTime.now()))
@@ -188,7 +205,7 @@ public class RequestService {
                     .typeRequest(clsTypeRequestRepo.findById((long) requestType).orElse(null))
                     .additionalAttributes(postForm.getAdditionalAttributes())
                     .isActualization(postForm.getIsActualization())
-                    .actualizedRequest(docRequestRepo.getOne(postForm.getRequestId()))
+                    .actualizedRequest(actualizedRequest)
                     .build();
 
             docRequest = docRequestRepo.save(docRequest);
@@ -204,6 +221,15 @@ public class RequestService {
 
             docAddressFactRepo.saveAll(docRequest.getDocAddressFact());
             docPersonRepo.saveAll(docRequest.getDocPersonList());
+
+            if (actualizedRequest != null) {
+                RegActualizationHistory history = new RegActualizationHistory();
+                history.setDocRequest(docRequest);
+                history.setActualizedDocRequest(actualizedRequest);
+                history.setInn(organization.getInn());
+                history.setTimeActualization(Timestamp.valueOf(LocalDateTime.now()));
+                regActualizationHistoryRepo.save(history);
+            }
 
             return docRequest;
         }

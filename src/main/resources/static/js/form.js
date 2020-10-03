@@ -682,6 +682,15 @@ webix.ready(function() {
                     },
                     view_section('Подача заявки'),
                     {
+                        view: 'checkbox',
+                        name: 'isActualization',
+                        id: 'isActualization',
+                        labelPosition: 'top',
+                        label: 'Актуален',
+                        value: 1,
+                        disabled: true
+                    },
+                    {
                         view: 'textarea',
                         height: 200,
                         readonly: true,

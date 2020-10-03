@@ -183,8 +183,9 @@ public class MainController {
             String errors = validate(postFormDto);
             if(errors.isEmpty()){
                 DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION.getValue());
-
-//            return hash;
+                if (docRequest.getActualizedRequest() != null) {
+                    emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), applicationConstants.getApplicationName(), "Ваша заявка актуализирована.");
+                }
                 return "Заявка принята. Ожидайте ответ на электронную почту.";
             }
             else {
@@ -206,7 +207,9 @@ public class MainController {
             String errors = validate(postFormDto);
             if(errors.isEmpty()){
                 DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.BARBERSHOP.getValue());
-
+                if (docRequest.getActualizedRequest() != null) {
+                    emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), applicationConstants.getApplicationName(), "Ваша заявка актуализирована.");
+                }
                 return "Заявка принята. Ожидайте ответ на электронную почту.";
             }
             else {
@@ -261,7 +264,9 @@ public class MainController {
             String errors = validate(postFormDto);
             if(errors.isEmpty()){
                 DocRequest docRequest = requestService.addNewRequest(postFormDto, idTypeRequest);
-
+                if (docRequest.getActualizedRequest() != null) {
+                    emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), applicationConstants.getApplicationName(), "Ваша заявка актуализирована.");
+                }
                 return "Заявка принята. Ожидайте ответ на электронную почту.";
             }
             else {

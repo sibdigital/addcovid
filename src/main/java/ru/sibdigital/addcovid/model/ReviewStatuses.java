@@ -5,7 +5,8 @@ public enum ReviewStatuses {
     CONFIRMED(1),
     REJECTED(2),
     UPDATED(3),
-    ACCEPTED(4);
+    ACCEPTED(4),
+    ACTUALIZED(1);
 
     private final int value;
     private ReviewStatuses(int value) {

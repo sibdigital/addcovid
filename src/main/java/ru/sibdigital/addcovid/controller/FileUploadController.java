@@ -92,6 +92,7 @@ public class FileUploadController {
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     public String  uploadFiles(@RequestParam("excelFile") MultipartFile excelFile,
                                     @RequestParam("pdfFile") MultipartFile pdfFile,
+                                    @RequestParam("isActualization") boolean isActualization,
                                     @RequestParam("isAgreed") boolean isAgreed,
                                     @RequestParam("isProtected") boolean isProtected,
                                     @RequestParam("reqBasis") String reqBasis,
@@ -130,6 +131,7 @@ public class FileUploadController {
 
             postFormDto.setAttachmentFilename(pdfFile.getOriginalFilename());
             postFormDto.setAttachment(f.getName());
+            postFormDto.setIsActualization(isActualization);
             postFormDto.setIsAgree(isAgreed);
             postFormDto.setIsProtect(isProtected);
             postFormDto.setReqBasis(reqBasis);
