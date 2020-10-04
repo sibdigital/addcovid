@@ -36,16 +36,10 @@ const searchRequests = () => {
                     day: 'numeric',
                 };
                 if (result.length === 0) {
-                    template = '<p><b>Заявка для указанного ИНН отсутствует в базе рассмотренных заявок на портале "Работающая Бурятия".</b></p>';
-                    template += '<p>Проверьте правильность ввода ИНН и повторите поиск.</p>';
-                    template += '<p>Если вы ранее не подавали заявку на портале "Работающая Бурятия" воспользуйтесь формой подачи заявки выбрав форму соответствующую вашему виду деятельности. <a href="/">Подать новое заявление</a></p>';
-                    template += '<p>Проверить ранее поданные заявки можно на сервисе <a href="http://cr.govrb.ru/org_check">Проверка сведений</a> указав ИНН в форме ввода.</p>';
+                    template = MESSAGES.actualization.requestNotFound;
                     $$('result').setHTML(template);
                 } else {
-                    template = '<p style="color: red"><b>Если вы ранее подавали заявку используя форму (Общие основания (более 100 сотрудников)) "Импорт Excel" актуализируйте информацию в шаблоне и отправьте его используя форму <a href="/upload">Общие основания (более 100 сотрудников)</a></b></p>';
-                    if (result.length > 1) {
-                        template += '<p><b>Выберите для актуализации наиболее подходяющую для вашего вида деятельности форму заявки.</b></p>';
-                    }
+                    template = MESSAGES.actualization.requestFound;
                     template += '<div class="table-responsive-sm"> <table class="table">';
                     template += '<thead><tr section="header">' +
                         '<th scope="col" class="text-center" style="width: 30%">Наименование организации</th>' +

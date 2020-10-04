@@ -20,6 +20,7 @@
 <div id="app"></div>
 <script th:inline="javascript">
     const INN = [[${inn}]]
+    const MESSAGES = JSON.parse([[${messages}]])
 </script>
 <script th:src="@{/js/actualize_form.js}"></script>
 </body>

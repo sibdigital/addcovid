@@ -876,7 +876,7 @@ webix.ready(function() {
                                                             if (ID_REQUEST) {
                                                                 webix.alert({
                                                                     title: "Данные формы заявки актуализированы",
-                                                                    text: 'Благодарим за сотрудничество!'
+                                                                    text: MESSAGES.actualization.requestActualized,
                                                                 }).then(function () {
                                                                     $$('label_sogl').hideProgress();
                                                                     window.location.replace('http://работающаябурятия.рф');

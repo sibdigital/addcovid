@@ -19,6 +19,7 @@ import ru.sibdigital.addcovid.repository.ClsDepartmentRepo;
 import ru.sibdigital.addcovid.service.DachaService;
 import ru.sibdigital.addcovid.service.EmailService;
 import ru.sibdigital.addcovid.service.RequestService;
+import ru.sibdigital.addcovid.service.SettingService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -43,6 +44,9 @@ public class MainController {
 
     @Autowired
     private ApplicationConstants applicationConstants;
+
+    @Autowired
+    private SettingService settingService;
 
     @GetMapping
     public String greeting(Map<String, Object> model) throws JsonProcessingException {
@@ -236,6 +240,10 @@ public class MainController {
         model.addAttribute("ref_xlsx_fill_instruction", applicationConstants.getRefXlsxFillInstruction());
         model.addAttribute("subdomain_form", applicationConstants.getSubdomainForm());
         model.addAttribute("ref_working_portal", applicationConstants.getWorkingPortal());
+        ClsSettings settings = settingService.findActual();
+        if (settings != null) {
+            model.addAttribute("messages", settings.getMessages());
+        }
         return "typed_form";
     }
 
@@ -355,6 +363,10 @@ public class MainController {
     public String actualizeForm(@RequestParam(name = "inn", required = false) String inn, Model model) {
         model.addAttribute("application_name", applicationConstants.getApplicationName());
         model.addAttribute("inn", inn);
+        ClsSettings settings = settingService.findActual();
+        if (settings != null) {
+            model.addAttribute("messages", settings.getMessages());
+        }
         return "actualize_form";
     }
 
