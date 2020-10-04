@@ -5,7 +5,6 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Table(name = "cls_settings", schema = "public")
@@ -13,6 +12,8 @@ import java.util.Objects;
         @TypeDef(name = "JsonbType", typeClass = Jsonb.class)
 })
 public class ClsSettings {
+
+    public static String MESSAGES_KEY = "messages";
 
     @Id
     @Column(name = "id", nullable = false)
@@ -25,9 +26,17 @@ public class ClsSettings {
     private Integer status;
 
     @Basic
-    @Column(name = "messages", nullable = true, columnDefinition = "jsonb")
+    @Column(name = "value", nullable = true, columnDefinition = "jsonb")
     @Type(type = "JsonbType")
-    private String messages;
+    private String value;
+
+    @Basic
+    @Column(name = "key", nullable = true)
+    private String key;
+
+    @Basic
+    @Column(name = "string_value", nullable = true)
+    private String stringValue;
 
     public Integer getId() {
         return id;
@@ -45,11 +54,27 @@ public class ClsSettings {
         this.status = status;
     }
 
-    public String getMessages() {
-        return messages;
+    public String getValue() {
+        return value;
     }
 
-    public void setMessages(String messages) {
-        this.messages = messages;
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getStringValue() {
+        return stringValue;
+    }
+
+    public void setStringValue(String stringValue) {
+        this.stringValue = stringValue;
     }
 }

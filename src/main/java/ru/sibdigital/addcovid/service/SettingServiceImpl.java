@@ -14,4 +14,8 @@ public class SettingServiceImpl implements SettingService {
     public ClsSettings findActual() {
         return clsSettingsRepo.getActual().orElse(null);
     }
+
+    public ClsSettings findActualByKey(String key) {
+        return clsSettingsRepo.getActualByKey(key).orElse(null);
+    }
 }

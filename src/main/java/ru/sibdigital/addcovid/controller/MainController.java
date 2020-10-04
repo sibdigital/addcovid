@@ -240,9 +240,9 @@ public class MainController {
         model.addAttribute("ref_xlsx_fill_instruction", applicationConstants.getRefXlsxFillInstruction());
         model.addAttribute("subdomain_form", applicationConstants.getSubdomainForm());
         model.addAttribute("ref_working_portal", applicationConstants.getWorkingPortal());
-        ClsSettings settings = settingService.findActual();
+        ClsSettings settings = settingService.findActualByKey(ClsSettings.MESSAGES_KEY);
         if (settings != null) {
-            model.addAttribute("messages", settings.getMessages());
+            model.addAttribute("messages", settings.getValue());
         }
         return "typed_form";
     }
@@ -363,9 +363,9 @@ public class MainController {
     public String actualizeForm(@RequestParam(name = "inn", required = false) String inn, Model model) {
         model.addAttribute("application_name", applicationConstants.getApplicationName());
         model.addAttribute("inn", inn);
-        ClsSettings settings = settingService.findActual();
+        ClsSettings settings = settingService.findActualByKey(ClsSettings.MESSAGES_KEY);
         if (settings != null) {
-            model.addAttribute("messages", settings.getMessages());
+            model.addAttribute("messages", settings.getValue());
         }
         return "actualize_form";
     }
