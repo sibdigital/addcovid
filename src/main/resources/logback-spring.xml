@@ -37,8 +37,4 @@
         <appender-ref ref="Console" />
         <appender-ref ref="RollingFileByDate" />
     </root>
-    <root level="debug">
-        <appender-ref ref="Console" />
-        <appender-ref ref="RollingFileByDate" />
-    </root>
 </configuration>

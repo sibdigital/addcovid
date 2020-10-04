@@ -30,6 +30,11 @@ const searchRequests = () => {
             .then(function (data) {
                 const result = data.json();
                 let template;
+                var options = {
+                    year: 'numeric',
+                    month: 'numeric',
+                    day: 'numeric',
+                };
                 if (result.length === 0) {
                     template = '<p><b>Заявка для указанного ИНН отсутствует в базе рассмотренных заявок на портале "Работающая Бурятия".</b></p>';
                     template += '<p>Проверьте правильность ввода ИНН и повторите поиск.</p>';
@@ -41,15 +46,30 @@ const searchRequests = () => {
                     if (result.length > 1) {
                         template += '<p><b>Выберите для актуализации наиболее подходяющую для вашего вида деятельности форму заявки.</b></p>';
                     }
-                    template += '<table>';
-                    template += '<thead><tr><th>Наименование организации</th><th>Дата подачи</th><th>Тип заявки</th><th></th></tr></thead>';
+                    template += '<div class="table-responsive-sm"> <table class="table">';
+                    template += '<thead><tr section="header">' +
+                        '<th scope="col" class="text-center" style="width: 30%">Наименование организации</th>' +
+                        '<th scope="col" class="text-center" style="width: 10%" >Дата подачи</th>' +
+                        '<th scope="col" class="text-center" style="width: 10%" >Дата утверждения</th>' +
+                        '<th scope="col" class="text-center" style="width: 30%" >Тип заявки</th>' +
+                        '<th scope="col" class="text-center" style="width: 20%" ></th>' +
+                        '</tr>' +
+                        '</thead>';
                     template += '<tbody>';
                     result.forEach(item => {
                         const a = "<a href='/typed_form?request_type=" + item.typeRequest.id + "&id=" + item.id + "'>Актуализировать</a>";
-                        template += '<tr><td>' + item.organization.name + '</td><td>' + item.timeCreate + '</td><td>' + item.typeRequest.activityKind + '</td><td>' + a + '</td></tr>';
+                        var timeCreate = item.timeCreate ? new Date(item.timeCreate) : "";
+                        var dateReview = item.timeReview ? new Date(item.timeReview) : "";
+                        template += '<tr style="border-bottom:solid grey 2px;">' +
+                            '<td class="text-center">' + item.organization.name + '</td>' +
+                            '<td class="text-center">' + timeCreate.toLocaleString("ru", options) + '</td>' +
+                            '<td class="text-center">' + dateReview.toLocaleString("ru", options) + '</td>' +
+                            '<td class="text-center">' + item.typeRequest.activityKind + '</td>' +
+                            '<td class="text-center">' + a + '</td>' +
+                            '</tr>';
                     });
                     template += '</tbody>';
-                    template += '</table>';
+                    template += '</table> </div>';
                 }
                 $$('result').setHTML(template);
                 $$('form').hideProgress();
@@ -79,7 +99,7 @@ webix.ui({
                             view: 'label',
                             maxWidth: 300,
                             align: 'center',
-                            label: `<span style="font-size: 1.3rem">Актуализация</span>`,
+                            label: `<span style="font-size: 1.3rem">Актуализация утвержденных заявок</span>`,
                         },
                         {}
                     ]
@@ -106,7 +126,7 @@ webix.ui({
                                     view: 'button',
                                     id: 'egrul_load_button',
                                     css: 'webix_primary',
-                                    value: 'Найти предыдущие заявки',
+                                    value: 'Найти утвержденные заявки',
                                     align: 'center',
                                     click: searchRequests
                                 },
