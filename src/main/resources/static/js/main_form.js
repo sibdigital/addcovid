@@ -54,11 +54,10 @@ webix.ready(function() {
         let typeRequests = data.json();
         let vtxt = `<span style="font-size:calc(1.1em  1vmin);text-align: center;">Подайте заявку в соответствии с вашим видом деятельности. </span><br/><br/>
          <a style="font-size:calc(0.8em  1vmin); text-align: center;" href="${SUBDOMAIN_WORK}/form" >Общие основания</a><br/><br/>
-         <a style="font-size: calc(0.8em  1vmin); text-align: center;" href="${SUBDOMAIN_WORK}/upload" >Общие основания (более 100 сотрудников)</a><br/><br/>
-         <a style="font-size: calc(0.8em  1vmin); text-align: center;" href="${SUBDOMAIN_WORK}/barber" >Парикмахерские услуги</a><br/><br/>`;
+         <a style="font-size: calc(0.8em  1vmin); text-align: center;" href="${SUBDOMAIN_WORK}/upload" >Общие основания (более 100 сотрудников)</a><br/><br/>`;
 
         for(var  j = 0; j< typeRequests.length; j++){
-            if (typeRequests[j].id == 1 || typeRequests[j].id == 2 || typeRequests[j].id == 100) {
+            if (typeRequests[j].id == 1 || typeRequests[j].id == 100) {
                 continue;
             }
 
