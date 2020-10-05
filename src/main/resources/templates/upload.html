@@ -33,9 +33,12 @@
 <div class="container" onload="refreshFields(); checkFields()">
     <form name="upload" enctype="multipart/form-data" action="/upload" method="POST">
         <ul class="list-group">
-            <li class="list-group-item"><a download style="text-align: center;" href="${DOWNLOAD_XLSX_TEMPLATE}" target="_blank">Скачать шаблон</a></li>
+            <li class="list-group-item"><a download style="text-align: center;" href="http://работающаябурятия.рф/zayvka.xlsx" target="_blank">Скачать шаблон</a></li>
+            <li class="list-group-item"><a  style="text-align: center;" href="http://работающаябурятия.рф/doc_excel.pdf" target="_blank">Инструкция по заполнению шаблона Excel </a></li>
+            <li class="list-group-item"><a  style="text-align: center;" href="http://работающаябурятия.рф/faq.html" target="_blank">Часто задаваемые вопросы </a></li>
+            <!-- <li class="list-group-item"><a download style="text-align: center;" href="${DOWNLOAD_XLSX_TEMPLATE}" target="_blank">Скачать шаблон</a></li>
             <li class="list-group-item"><a  style="text-align: center;" href="${XLSX_FILL_INSTRUCTION}" target="_blank">Инструкция по заполнению шаблона Excel </a></li>
-            <li class="list-group-item"><a  style="text-align: center;" href="${FAQ}" target="_blank">Часто задаваемые вопросы </a></li>
+            <li class="list-group-item"><a  style="text-align: center;" href="${FAQ}" target="_blank">Часто задаваемые вопросы </a></li> -->
             <li class="list-group-item"><span>Заполните его</span></li>
             <li class="list-group-item">
                 <div><span>Прикрепите заполненный шаблон<span class="text-danger">*</span> : </span>
@@ -67,13 +70,13 @@
                     </label>
                 </div>
             </li>
-            <li class="list-group-item">
+            <!--<li class="list-group-item">
                  <span>
                      Актуален
                      <span class="text-danger">*</span>
                      : <input id="actualization-checkbox" type="checkbox" name="isActualization" checked onchange="checkFields();">
                  </span>
-            </li>
+            </li> -->
             <li class="list-group-item">
 
                 <div id='fake_textarea' style="overflow: auto; width: 100%; height: 200px" contenteditable>
