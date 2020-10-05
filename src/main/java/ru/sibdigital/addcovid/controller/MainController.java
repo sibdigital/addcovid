@@ -188,7 +188,10 @@ public class MainController {
             if(errors.isEmpty()){
                 DocRequest docRequest = requestService.addNewRequest(postFormDto, RequestTypes.ORGANIZATION.getValue());
                 if (docRequest.getActualizedRequest() != null) {
-                    emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), applicationConstants.getApplicationName(), "Ваша заявка актуализирована.");
+                    String actualizedEmailText = settingService.findActualByKey("actualizedEmailText","Ваша заявка актуализирована.");
+                    emailService.sendSimpleMessage(docRequest.getOrganization().getEmail(), applicationConstants.getApplicationName(), actualizedEmailText);
+                    String actualizedMessageServerText = settingService.findActualByKey("actualizedMessageServerText","Ваша заявка актуализирована.");
+                    return actualizedMessageServerText;
                 }
                 return "Заявка принята. Ожидайте ответ на электронную почту.";
             }

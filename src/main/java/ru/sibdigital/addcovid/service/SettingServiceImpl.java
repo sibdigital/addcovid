@@ -18,4 +18,10 @@ public class SettingServiceImpl implements SettingService {
     public ClsSettings findActualByKey(String key) {
         return clsSettingsRepo.getActualByKey(key).orElse(null);
     }
+
+    public String findActualByKey(String key, String defaultValue){
+        ClsSettings settings = findActualByKey(key);
+        String ret = settings != null ? settings.getStringValue() : defaultValue;
+        return ret;
+    }
 }

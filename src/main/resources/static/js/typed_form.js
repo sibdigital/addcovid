@@ -875,7 +875,7 @@ webix.ready(function() {
                                                             // Заявка принята. Ожидайте ответ на электронную почту.
                                                             if (ID_REQUEST) {
                                                                 webix.alert({
-                                                                    title: "Данные формы заявки актуализированы",
+                                                                    title: MESSAGES.actualization.actualizationTitle,
                                                                     text: MESSAGES.actualization.requestActualized,
                                                                 }).then(function () {
                                                                     $$('label_sogl').hideProgress();

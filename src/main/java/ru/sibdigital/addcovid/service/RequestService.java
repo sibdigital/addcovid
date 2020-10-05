@@ -131,43 +131,6 @@ public class RequestService {
                     .map(personDto -> personDto.convertToDocAddressFact())
                     .collect(Collectors.toList());
 
-
-        //int importStatus = ImportStatuses.SUCCESS.getValue();
-/*
-        String filename = "error while upload";
-        try {
-
-            File uploadFolder = new File(uploadingDir);
-            if (!uploadFolder.exists()) {
-                uploadFolder.mkdirs();
-            }
-*/
-/*
-            File file = new File(String.format("%s\\%s_%s",uploadingDir, UUID.randomUUID(),postForm.getAttachment().getOriginalFilename()));
-            postForm.getAttachment().transferTo(file);
-            filename = file.getName();
-*//*
-
-
-            byte[] valueDecoded = Base64.getDecoder().decode(postForm.getAttachment());
-
-            String inputFilename = String.format("%s/%s_%s", uploadFolder.getAbsolutePath(), UUID.randomUUID(), postForm.getAttachmentFilename());
-            FileOutputStream fos;
-
-            fos = new FileOutputStream(inputFilename);
-            fos.write(valueDecoded);
-            fos.close();
-            filename = inputFilename;
-
-        } catch (IOException ex) {
-            //importStatus = ImportStatuses.FILE_ERROR.getValue();
-            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
-        } catch (Exception ex) {
-            //importStatus = ImportStatuses.FILE_ERROR.getValue();
-            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
-        }
-*/
-
             String files = postForm.getAttachment();
 
         DocRequest actualizedRequest = null;

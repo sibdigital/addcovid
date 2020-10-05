@@ -196,6 +196,8 @@ public class DocRequestController {
 
     @GetMapping("/actualized_doc_requests")
     public List<DocRequestPrs> getActualizedRequests(@RequestParam(name = "inn") String inn) {
-        return docRequestPrsRepo.getActualizedRequests(inn);
+        String innParam = inn != null ? inn.trim() : inn;
+        List<DocRequestPrs> list  = docRequestPrsRepo.getActualizedRequests(innParam);
+        return list;
     }
 }

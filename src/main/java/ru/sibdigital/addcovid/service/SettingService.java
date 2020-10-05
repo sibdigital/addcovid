@@ -7,4 +7,6 @@ public interface SettingService {
     ClsSettings findActual();
 
     ClsSettings findActualByKey(String key);
+
+    String findActualByKey(String key, String defaultValue);
 }
