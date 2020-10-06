@@ -74,7 +74,7 @@
                  <span>
                      Актуален
                      <span class="text-danger">*</span>
-                     : <input id="actualization-checkbox" type="checkbox" name="isActualization" checked onchange="checkFields();" disabled="true">
+                     : <input id="actualization-checkbox" type="checkbox" name="isActualization" checked onclick="return false;" onchange="checkFields();">
                  </span>
             </li>
             <li class="list-group-item">
@@ -220,7 +220,6 @@
         }
 
         function checkFields() {
-
             const isDisabled = !(!!fileInputElement.value && actualizationElement.checked && agreedElement.checked && protectElement.checked && !!reqElement.value)
             console.log( 'total', isDisabled)
 
