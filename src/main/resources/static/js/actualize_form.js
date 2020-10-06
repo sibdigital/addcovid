@@ -51,7 +51,11 @@ const searchRequests = () => {
                         '</thead>';
                     template += '<tbody>';
                     result.forEach(item => {
-                        const a = "<a href='/typed_form?request_type=" + item.typeRequest.id + "&id=" + item.id + "'>Актуализировать</a>";
+                        var a = "<a href='/typed_form?request_type=" + item.typeRequest.id + "&id=" + item.id + "'>Актуализировать</a>";
+
+                        if (item.idActualizedRequest != undefined) {
+                            a = "ВЫ АКТУАЛИЗИРОВАЛИ ЗАЯВКУ";
+                        }
                         var timeCreate = item.timeCreate ? new Date(item.timeCreate) : "";
                         var dateReview = item.timeReview ? new Date(item.timeReview) : "";
                         template += '<tr style="border-bottom:solid grey 2px;">' +

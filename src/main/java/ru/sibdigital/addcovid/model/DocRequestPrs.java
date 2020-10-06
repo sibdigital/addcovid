@@ -43,6 +43,9 @@ public class DocRequestPrs implements Serializable {
     private String orgHashCode;
     private String rejectComment;
     private Long old_department_id;
+    @Basic
+    @Column(name = "id_actualized_request", nullable = false)
+    private Long idActualizedRequest;
 
 //    @JsonIgnore
 //    @OneToMany(targetEntity = DocPerson.class, mappedBy="docRequest", fetch = FetchType.LAZY)
@@ -301,5 +304,13 @@ public class DocRequestPrs implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(id, personOfficeCnt, personRemoteCnt, personSlrySaveCnt, attachmentPath, statusReview, timeCreate, statusImport, timeImport, timeReview, isAgree, isProtect, reqBasis, orgHashCode, department, organization);
+    }
+
+    public Long getIdActualizedRequest() {
+        return idActualizedRequest;
+    }
+
+    public void setIdActualizedRequest(Long idActualizedRequest) {
+        this.idActualizedRequest = idActualizedRequest;
     }
 }
