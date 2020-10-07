@@ -64,6 +64,9 @@ public class FileUploadController {
 
         model.addAttribute("errorMessage", model.getAttribute("errorMessage")); //hack to inject value inside html
         model.addAttribute("application_name", applicationConstants.getApplicationName());
+        model.addAttribute("DOWNLOAD_XLSX_TEMPLATE", applicationConstants.getRefDownloadXlsxTemplate());
+        model.addAttribute("XLSX_FILL_INSTRUCTION", applicationConstants.getRefXlsxFillInstruction());
+        model.addAttribute("FAQ", applicationConstants.getRefFaq());
         return "upload";
     }
 
