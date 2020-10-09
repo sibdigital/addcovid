@@ -360,7 +360,7 @@ webix.ready(function() {
                                 editable: true,
                                 id: 'addr_table',
                                 columns: [
-                                    { id: 'id', header: '', css: 'rank'},
+                                    { id: 'index', header: '', css: 'rank'},
                                     {
                                         id: 'addressFact',
                                         header: 'Фактический адрес осуществления деятельности',
@@ -380,7 +380,7 @@ webix.ready(function() {
                                 on:{
                                     'data->onStoreUpdated': function(){
                                         this.data.each(function(obj, i){
-                                            obj.id = i + 1;
+                                            obj.index = i + 1;
                                         });
                                     }
                                 },
@@ -558,7 +558,7 @@ webix.ready(function() {
                                     resizeColumn:true,
                                     readonly: true,
                                     columns: [
-                                        { id: 'id', header: '', css: 'rank', width: 50 },
+                                        { id: 'index', header: '', css: 'rank', width: 50 },
                                         { id: 'lastname', header: 'Фамилия', adjust: true, sort: 'string', fillspace: true },
                                         { id: 'firstname', header: 'Имя', adjust: true, sort: 'string', fillspace: true },
                                         { id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string' },
@@ -567,7 +567,7 @@ webix.ready(function() {
                                     on:{
                                         'data->onStoreUpdated': function(){
                                             this.data.each(function(obj, i){
-                                                obj.id = i + 1;
+                                                obj.index = i + 1;
                                             });
                                         }
                                     },

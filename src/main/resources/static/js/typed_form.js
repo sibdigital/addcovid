@@ -371,7 +371,7 @@ webix.ready(function() {
                                 editable: true,
                                 id: 'addr_table',
                                 columns: [
-                                    { id: 'id', header: '', css: 'rank'},
+                                    { id: 'index', header: '', css: 'rank'},
                                     {
                                         id: 'addressFact',
                                         header: 'Фактический адрес осуществления деятельности',
@@ -391,7 +391,7 @@ webix.ready(function() {
                                 on:{
                                     'data->onStoreUpdated': function(){
                                         this.data.each(function(obj, i){
-                                            obj.id = i + 1;
+                                            obj.index = i + 1;
                                         });
                                     }
                                 },
