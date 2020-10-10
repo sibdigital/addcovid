@@ -76,7 +76,7 @@
                                         return;
                                     }
                                     let type = '';
-                                    if (inn.length === 9) {
+                                    if (inn.length === 10) {
                                         type = 'egrul';
                                     } else if (inn.length === 12) {
                                         type = 'egrip';
@@ -91,14 +91,14 @@
 
                                     setTimeout(function () {
                                         webix.ajax(EGRUL_ADDRESS + '/' + type + '?inn=' + inn).then(function (data) {
-                                            const result = data.json();
-                                            // console.log(result);
-                                            if (!result) {
+                                            const response = data.json();
+                                            if (!response.data) {
                                                 webix.message('Данные не найдены', 'error');
                                                 $$('form').hideProgress();
                                                 return;
                                             }
                                             if (type === 'egrul') {
+                                                const result = response.data;
                                                 let egrulOkvedAdd = [];
                                                 let okvedAdd = '';
                                                 if (result.свОКВЭД.свОКВЭДДоп) {
@@ -133,6 +133,7 @@
                                                     organizationAddressJur: jurAddress
                                                 })
                                             } else {
+                                                const result = response.data;
                                                 let name = result.наимВидИП;
                                                 name += result.свФЛ.фиорус.фамилия ? ' ' + result.свФЛ.фиорус.фамилия : '';
                                                 name += result.свФЛ.фиорус.имя ? ' ' + result.свФЛ.фиорус.имя : '';
