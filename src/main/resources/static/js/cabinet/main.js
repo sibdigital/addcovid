@@ -1328,21 +1328,13 @@ const settings = {
 
 // ***** ВАКЦИНАЦИЯ *****
 
-webix.ui({
+var updateFIOmodal = webix.ui({
     view: "window",
-    width: 400,
+    width: 550,
     position: "center",
     modal: true,
-    head: {
-        view: "toolbar", elements: [
-            {},
-            {
-                view: "button", value: "OK", width: 150, click: function () {
-                    this.getTopParentView().hide();
-                }
-            }
-        ]
-    },
+    close: true,
+    head: "Редактирование списка сотрудников",
     body: {
         view: 'form',
         id: 'form_employee',
@@ -1383,7 +1375,7 @@ webix.ui({
             {
                 view: 'button',
                 align: 'right',
-                maxWidth: 400,
+                maxWidth: 550,
                 css: 'webix_primary',
                 value: 'Добавить',
                 click: function () {
@@ -1406,12 +1398,14 @@ webix.ui({
                                 webix.message(data.text(), 'error');
                             }
                         });
+                    $$('form_employee').clear()
+                    updateFIOmodal.hide()
                 }
             },
         ]
 
     }
-}).show();
+});
 
 const employees = {
     view: 'scrollview',
@@ -1421,30 +1415,35 @@ const employees = {
         rows: [
             {
                 view: 'datatable',
-                id: 'employees_table',
+                id: "employees_table",
                 minHeight: 570,
-                select: 'row',
+                editable: true,
+                select: "cell",
                 navigation: true,
                 resizeColumn: true,
                 pager: 'Pager',
+
                 datafetch: 25,
                 columns: [
                     {
                         header: "Фамилия",
                         template: "#person.lastname#",
                         fillspace: true,
+                        editor: "text",
                         sort: "text"
                     },
                     {
                         header: "Имя",
                         template: "#person.firstname#",
                         fillspace: true,
+                        editor: "text",
                         sort: "text"
                     },
                     {
                         header: "Отчество",
                         template: "#person.patronymic#",
                         fillspace: true,
+                        editor: "text",
                         sort: "text"
                     },/*
                     {
@@ -1488,6 +1487,7 @@ const employees = {
                     onItemDblClick: function (id) {
                         let item = this.getItem(id);
                         $$('form_employee').parse(item);
+                        updateFIOmodal.show();
                     }
                 },
                 url: 'employees'
@@ -1514,6 +1514,19 @@ const employees = {
                     // }
                 ]
             },
+            {
+                view: "button",
+                align: 'right',
+                maxWidth: 200,
+                css: 'webix_primary',
+                value: 'Добавить',
+                click: function ()
+                {
+                    $$('form_employee').clear();
+                    updateFIOmodal.show();
+                }
+            },
+            /*
             {
                 view: 'form',
                 id: 'form_employee',
@@ -1550,7 +1563,7 @@ const employees = {
                         name: 'isVaccinatedCovid',
                         label: 'Привит от COVID-19',
                         labelPosition: 'top'
-                    },*/
+                    },*//*
                     {
                         view: 'button',
                         align: 'right',
@@ -1580,9 +1593,11 @@ const employees = {
                         }
                     },
                 ]
-            }
+            }*/
         ]
+
     }
+
 }
 
 webix.ready(function () {
