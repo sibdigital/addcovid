@@ -1378,6 +1378,7 @@ var updateFIOmodal = webix.ui({
                 maxWidth: 550,
                 css: 'webix_primary',
                 value: 'Добавить',
+                hotkey: "enter",
                 click: function () {
 
                     let params = $$('form_employee').getValues()
@@ -1401,7 +1402,7 @@ var updateFIOmodal = webix.ui({
                     $$('form_employee').clear()
                     updateFIOmodal.hide()
                 }
-            },
+            }
         ]
 
     }
@@ -1414,38 +1415,51 @@ const employees = {
         type: 'space',
         rows: [
             {
+                cols:
+                    [
+                        {
+                            view: "text",
+                            id: "dtFilter",
+                            maxWidth: 400,
+                            placeholder: "Поиск по ФИО",
+                        },
+                        {
+                            view: "button",
+                            maxWidth: 150,
+                            value: "Поиск",
+                            click: filterText
+                        }
+                    ]
+            },
+            {
                 view: 'datatable',
                 id: "employees_table",
                 minHeight: 570,
-                editable: true,
-                select: "cell",
+                select: "row",
                 navigation: true,
                 resizeColumn: true,
                 pager: 'Pager',
-
                 datafetch: 25,
                 columns: [
                     {
                         header: "Фамилия",
                         template: "#person.lastname#",
                         fillspace: true,
-                        editor: "text",
                         sort: "text"
                     },
                     {
                         header: "Имя",
                         template: "#person.firstname#",
                         fillspace: true,
-                        editor: "text",
                         sort: "text"
                     },
                     {
                         header: "Отчество",
                         template: "#person.patronymic#",
                         fillspace: true,
-                        editor: "text",
                         sort: "text"
-                    },/*
+                    },
+                    /*
                     {
                         header: "Привит от гриппа",
                         template: function (obj) {
@@ -1488,6 +1502,7 @@ const employees = {
                         let item = this.getItem(id);
                         $$('form_employee').parse(item);
                         updateFIOmodal.show();
+
                     }
                 },
                 url: 'employees'
@@ -1512,20 +1527,51 @@ const employees = {
                     //         showEmployeeCreateForm();
                     //     }
                     // }
+                    {
+                            view: "button",
+                            align: 'left',
+                            maxWidth: 350,
+                            css: 'webix_primary',
+                            value: 'Добавить',
+                            click: function ()
+                            {
+                                $$('form_employee').clear();
+                                updateFIOmodal.show();
+                            }
+                        },
+                        {
+                            view: 'button',
+                            align: 'right',
+                            maxWidth: 350,
+                            css: 'webix_primary',
+                            value: 'Удалить',
+                            click: function () {
+
+                                let params = $$('employees_table').getSelectedItem()
+
+                                if(!$$("employees_table").getSelectedId()) {
+                                    webix.message("Не выбрана строка!","error");
+                                    return;
+                                }$$("employees_table").remove($$("employees_table").getSelectedId());
+                                webix.ajax()
+                                    .headers({'Content-type': 'application/json'})
+                                    .post('/deleteEmployee', JSON.stringify(params))
+                                    .then(function (data) {
+                                        if (data.text() === "Сотрудник удалён") {
+                                            webix.message("Сотрудник удалён", 'success');
+                                            $$('form_employee').clear()
+                                            $$('employees_table').load('employees');
+                                        } else {
+                                            webix.message(data.text(), 'error');
+                                        }
+                                    });
+                                $$('form_employee').clear()
+                                updateFIOmodal.hide()
+                            }
+                        }
                 ]
             },
-            {
-                view: "button",
-                align: 'right',
-                maxWidth: 200,
-                css: 'webix_primary',
-                value: 'Добавить',
-                click: function ()
-                {
-                    $$('form_employee').clear();
-                    updateFIOmodal.show();
-                }
-            },
+
             /*
             {
                 view: 'form',
@@ -1563,7 +1609,8 @@ const employees = {
                         name: 'isVaccinatedCovid',
                         label: 'Привит от COVID-19',
                         labelPosition: 'top'
-                    },*//*
+                    },*/
+            /*
                     {
                         view: 'button',
                         align: 'right',
@@ -1595,10 +1642,22 @@ const employees = {
                 ]
             }*/
         ]
-
     }
-
 }
+function filterText(node){
+  var text = $$("dtFilter").getValue();
+  if (!text)
+        return $$("employees_table").filter();
+  $$("employees_table").filter(function(obj){
+      webix.message(obj.title,"success")
+      return obj.title == text;
+  });
+}
+webix.attachEvent("onFocusChange", function(to, from){
+    if (from && from.getTopParentView().config.view == "window" && !to){
+        from.getTopParentView().hide();
+    }
+})
 
 webix.ready(function () {
     let layout = webix.ui({

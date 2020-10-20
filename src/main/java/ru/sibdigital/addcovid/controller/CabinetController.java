@@ -217,4 +217,17 @@ public class CabinetController {
         }
         return "Сотрудник добавлен";
     }
+
+    @PostMapping("/deleteEmployee")
+    public @ResponseBody String deleteEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        employeeDto.setOrganizationId(id);
+        try{
+            requestService.deleteEmployee(employeeDto);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+            return "Не удалось удалить сотрудника";
+        }
+        return "Сотрудник удалён";
+    }
 }
