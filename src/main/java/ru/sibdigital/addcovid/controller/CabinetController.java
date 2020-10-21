@@ -20,8 +20,11 @@ import ru.sibdigital.addcovid.repository.DocEmployeeRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.service.RequestService;
 
+import javax.print.Doc;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -203,6 +206,26 @@ public class CabinetController {
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         List<DocEmployee> employees = requestService.getEmployeesByOrganizationId(organization.getId());
         return employees;
+    }
+
+    @PostMapping("/filter")
+    public @ResponseBody List<DocEmployee> getFilteredEmployees(@RequestBody String filterText, HttpSession session){
+        String filter = filterText.trim().toLowerCase();
+        return getEmployees(session).parallelStream()
+                .filter(s -> containsFIO(s, filter))
+                .collect(Collectors.toList());
+    }
+
+    private boolean containsFIO(DocEmployee employee, String filterText){
+        String fio = constructFIO(employee.getPerson());
+        return fio.contains(filterText);
+    }
+
+    private String constructFIO(DocPerson person){
+        String fio = (person.getLastname() + person.getFirstname() + person.getPatronymic())
+                .toLowerCase()
+                .trim();
+        return fio;
     }
 
     @PostMapping("/employee")

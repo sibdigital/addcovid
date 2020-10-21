@@ -1422,6 +1422,21 @@ const employees = {
                             id: "dtFilter",
                             maxWidth: 400,
                             placeholder: "Поиск по ФИО",
+                            /*on: {
+                                onTimedKeyPress(){
+                                    $$("employees_table").clearAll();
+                                    let text = $$("dtFilter").getValue().replace(/\s/g, '').toLowerCase();
+                                    if (!text)
+                                        return $$("employees_table").load("employees");
+                                    else{
+                                        $$("employees_table").load(function(){
+                                        return webix.ajax().
+                                        headers({'Content-type':'application/json'}).
+                                        post("/filter", text);
+                                    });
+                                    }
+                                }
+                            }*/
                         },
                         {
                             view: "button",
@@ -1644,17 +1659,24 @@ const employees = {
         ]
     }
 }
-function filterText(node){
-  var text = $$("dtFilter").getValue();
-  if (!text)
-        return $$("employees_table").filter();
-  $$("employees_table").filter(function(obj){
-      webix.message(obj.title,"success")
-      return obj.title == text;
-  });
+
+//Фильтровать по кнопке поиска
+function filterText() {
+    $$("employees_table").clearAll();
+    $$("employees_table").clearAll();
+    let text = $$("dtFilter").getValue().replace(/\s/g, '').toLowerCase();
+    if (!text)
+        return $$("employees_table").load("employees");
+    else {
+        $$("employees_table").load(function () {
+            return webix.ajax().headers({'Content-type': 'application/json'}).post("/filter", text);
+        });
+    }
+    $$("dtFilter").setValue("")
 }
-webix.attachEvent("onFocusChange", function(to, from){
-    if (from && from.getTopParentView().config.view == "window" && !to){
+
+webix.attachEvent("onFocusChange", function (to, from) {
+    if (from && from.getTopParentView().config.view == "window" && !to) {
         from.getTopParentView().hide();
     }
 })
