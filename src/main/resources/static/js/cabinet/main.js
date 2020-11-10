@@ -215,7 +215,7 @@ const requests = {
 
                                         let vtxt = '<br/>' + `<a href="/upload">Общие основания (более 100 сотрудников)</a><br/><br/>`;
 
-                                        for (let j = 0; j< typeRequests.length; j++) {
+                                        for (let j = 0; j < typeRequests.length; j++) {
                                             if (typeRequests[j].id == 100) {
                                                 continue;
                                             }
@@ -569,9 +569,26 @@ function showRequestCreateForm(idTypeRequest) {
                                                     readonly: true,
                                                     columns: [
                                                         {id: 'index', header: '', css: 'rank', width: 50},
-                                                        {id: 'lastname', header: 'Фамилия', adjust: true, sort: 'string', fillspace: true},
-                                                        {id: 'firstname', header: 'Имя', adjust: true, sort: 'string', fillspace: true},
-                                                        {id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string'},
+                                                        {
+                                                            id: 'lastname',
+                                                            header: 'Фамилия',
+                                                            adjust: true,
+                                                            sort: 'string',
+                                                            fillspace: true
+                                                        },
+                                                        {
+                                                            id: 'firstname',
+                                                            header: 'Имя',
+                                                            adjust: true,
+                                                            sort: 'string',
+                                                            fillspace: true
+                                                        },
+                                                        {
+                                                            id: 'patronymic',
+                                                            header: 'Отчество',
+                                                            adjust: true,
+                                                            sort: 'string'
+                                                        },
                                                         //{ id: 'isagree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
                                                     ],
                                                     on: {
@@ -804,7 +821,7 @@ function showRequestCreateForm(idTypeRequest) {
                                                 value: 'Отменить',
                                                 align: 'center',
                                                 click: function () {
-                                                    $$('sidebar').callEvent('onAfterSelect', [ 'Requests' ]);
+                                                    $$('sidebar').callEvent('onAfterSelect', ['Requests']);
                                                 }
                                             },
                                             {
@@ -942,7 +959,7 @@ function showRequestCreateForm(idTypeRequest) {
                                                                             })
                                                                                 .then(function () {
                                                                                     $$('label_sogl').hideProgress();
-                                                                                    $$('sidebar').callEvent('onAfterSelect', [ 'Requests' ]);
+                                                                                    $$('sidebar').callEvent('onAfterSelect', ['Requests']);
                                                                                 })
                                                                                 .fail(function () {
                                                                                     $$('label_sogl').hideProgress()
@@ -1128,12 +1145,12 @@ function showRequestViewForm(data) {
                                     select: 'row',
                                     editable: true,
                                     id: 'addr_table',
-                                    resizeColumn:true,
+                                    resizeColumn: true,
                                     readonly: true,
                                     // resizeRow:true,
-                                    fixedRowHeight:false,
-                                    rowLineHeight:25,
-                                    rowHeight:25,
+                                    fixedRowHeight: false,
+                                    rowLineHeight: 25,
+                                    rowHeight: 25,
                                     //autowidth:true,
                                     columns: [
                                         {
@@ -1221,19 +1238,18 @@ function showRequestViewForm(data) {
     let fileList = []
     paths.forEach((path, index) => {
         let filename = path.split('\\').pop().split('/').pop()
-        if(filename != '' &&
+        if (filename != '' &&
             ((filename.toUpperCase().indexOf('.PDF') != -1) ||
                 (filename.toUpperCase().indexOf('.ZIP') != -1)
-            )){
+            )) {
             filename = '<a href="' + LINK_PREFIX + filename + LINK_SUFFIX + '" target="_blank">'
                 + filename + '</a>'
-            fileList.push({ id: index, value: filename })
+            fileList.push({id: index, value: filename})
         }
     })
-    if(fileList.length > 0) {
+    if (fileList.length > 0) {
         $$('filename').parse(fileList)
-    }
-    else {
+    } else {
         $$('filename_label').hide()
         $$('filename').hide()
     }
@@ -1310,7 +1326,362 @@ const settings = {
     }
 }
 
-webix.ready(function() {
+// ***** ВАКЦИНАЦИЯ *****
+
+var updateFIOmodal = webix.ui({
+    view: "window",
+    width: 550,
+    position: "center",
+    modal: true,
+    close: true,
+    head: "Редактирование списка сотрудников",
+    body: {
+        view: 'form',
+        id: 'form_employee',
+        complexData: true,
+        elements: [
+            {
+                view: 'text',
+                name: 'person.lastname',
+                label: 'Фамилия',
+                labelPosition: 'top'
+            },
+            {
+                view: 'text',
+                name: 'person.firstname',
+                label: 'Имя',
+                labelPosition: 'top'
+            },
+            {
+                view: 'text',
+                name: 'person.patronymic',
+                label: 'Отчество',
+                labelPosition: 'top'
+            },/*
+                    {
+                        view: 'checkbox',
+                        id: 'isVaccinatedFlu',
+                        name: 'isVaccinatedFlu',
+                        label: 'Привит от гриппа',
+                        labelPosition: 'top'
+                    },
+                    {
+                        view: 'checkbox',
+                        id: 'isVaccinatedCovid',
+                        name: 'isVaccinatedCovid',
+                        label: 'Привит от COVID-19',
+                        labelPosition: 'top'
+                    },*/
+            {
+                view: 'button',
+                align: 'right',
+                maxWidth: 550,
+                css: 'webix_primary',
+                value: 'Добавить',
+                hotkey: "enter",
+                click: function () {
+
+                    let params = $$('form_employee').getValues()
+
+                    webix.ajax()
+                        .headers({'Content-type': 'application/json'})
+                        .post('/employee', JSON.stringify(params))
+                        .then(function (data) {
+                            if (data.text() === 'Сотрудник добавлен') {
+                                $$('form_employee').clear()
+                                if (params.id) {
+                                    webix.message('Сотрудник обновлен', 'success');
+                                } else {
+                                    webix.message(data.text(), 'success');
+                                }
+                                $$('employees_table').load('employees');
+                            } else {
+                                webix.message(data.text(), 'error');
+                            }
+                        });
+                    $$('form_employee').clear()
+                    updateFIOmodal.hide()
+                }
+            }
+        ]
+
+    }
+});
+
+const employees = {
+    view: 'scrollview',
+    scroll: 'xy',
+    body: {
+        type: 'space',
+        rows: [
+            {
+                cols:
+                    [
+                        {
+                            view: "text",
+                            id: "dtFilter",
+                            maxWidth: 400,
+                            placeholder: "Поиск по ФИО",
+                            /*on: {
+                                onTimedKeyPress(){
+                                    $$("employees_table").clearAll();
+                                    let text = $$("dtFilter").getValue().replace(/\s/g, '').toLowerCase();
+                                    if (!text)
+                                        return $$("employees_table").load("employees");
+                                    else{
+                                        $$("employees_table").load(function(){
+                                        return webix.ajax().
+                                        headers({'Content-type':'application/json'}).
+                                        post("/filter", text);
+                                    });
+                                    }
+                                }
+                            }*/
+                        },
+                        {
+                            view: "button",
+                            maxWidth: 150,
+                            value: "Поиск",
+                            click: filterText
+                        }
+                    ]
+            },
+            {
+                view: 'datatable',
+                id: "employees_table",
+                minHeight: 570,
+                select: "row",
+                navigation: true,
+                resizeColumn: true,
+                pager: 'Pager',
+                datafetch: 25,
+                columns: [
+                    {
+                        header: "Фамилия",
+                        template: "#person.lastname#",
+                        fillspace: true,
+                        sort: "text"
+                    },
+                    {
+                        header: "Имя",
+                        template: "#person.firstname#",
+                        fillspace: true,
+                        sort: "text"
+                    },
+                    {
+                        header: "Отчество",
+                        template: "#person.patronymic#",
+                        fillspace: true,
+                        sort: "text"
+                    },
+                    /*
+                    {
+                        header: "Привит от гриппа",
+                        template: function (obj) {
+                            if (obj.isVaccinatedFlu) {
+                                return 'Да';
+                            } else {
+                                return 'Нет';
+                            }
+                        },
+                        fillspace: true,
+                        adjust: true
+                    },
+                    {
+                        header: "Привит от COVID-19",
+                        template: function (obj) {
+                            if (obj.isVaccinatedCovid) {
+                                return 'Да';
+                            } else {
+                                return 'Нет';
+                            }
+                        },
+                        fillspace: true,
+                        adjust: true
+                    }*/
+                ],
+                on: {
+                    onBeforeLoad: function () {
+                        this.showOverlay("Загружаю...");
+                    },
+                    onAfterLoad: function () {
+                        this.hideOverlay();
+                        if (!this.count()) {
+                            this.showOverlay("Отсутствуют данные")
+                        }
+                    },
+                    onLoadError: function () {
+                        this.hideOverlay();
+                    },
+                    onItemDblClick: function (id) {
+                        let item = this.getItem(id);
+                        $$('form_employee').parse(item);
+                        updateFIOmodal.show();
+
+                    }
+                },
+                url: 'employees'
+            },
+            {
+                cols: [
+                    {
+                        view: 'pager',
+                        id: 'Pager',
+                        height: 38,
+                        size: 25,
+                        group: 5,
+                        template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
+                    },
+                    // {
+                    //     view: 'button',
+                    //     align: 'right',
+                    //     maxWidth: 200,
+                    //     css: 'webix_primary',
+                    //     value: 'Добавить сотрудника',
+                    //     click: function () {
+                    //         showEmployeeCreateForm();
+                    //     }
+                    // }
+                    {
+                            view: "button",
+                            align: 'left',
+                            maxWidth: 350,
+                            css: 'webix_primary',
+                            value: 'Добавить',
+                            click: function ()
+                            {
+                                $$('form_employee').clear();
+                                updateFIOmodal.show();
+                            }
+                        },
+                        {
+                            view: 'button',
+                            align: 'right',
+                            maxWidth: 350,
+                            css: 'webix_primary',
+                            value: 'Удалить',
+                            click: function () {
+
+                                let params = $$('employees_table').getSelectedItem()
+
+                                if(!$$("employees_table").getSelectedId()) {
+                                    webix.message("Не выбрана строка!","error");
+                                    return;
+                                }$$("employees_table").remove($$("employees_table").getSelectedId());
+                                webix.ajax()
+                                    .headers({'Content-type': 'application/json'})
+                                    .post('/deleteEmployee', JSON.stringify(params))
+                                    .then(function (data) {
+                                        if (data.text() === "Сотрудник удалён") {
+                                            webix.message("Сотрудник удалён", 'success');
+                                            $$('form_employee').clear()
+                                            $$('employees_table').load('employees');
+                                        } else {
+                                            webix.message(data.text(), 'error');
+                                        }
+                                    });
+                                $$('form_employee').clear()
+                                updateFIOmodal.hide()
+                            }
+                        }
+                ]
+            },
+
+            /*
+            {
+                view: 'form',
+                id: 'form_employee',
+                complexData: true,
+                elements: [
+                    {
+                        view: 'text',
+                        name: 'person.lastname',
+                        label: 'Фамилия',
+                        labelPosition: 'top'
+                    },
+                    {
+                        view: 'text',
+                        name: 'person.firstname',
+                        label: 'Имя',
+                        labelPosition: 'top'
+                    },
+                    {
+                        view: 'text',
+                        name: 'person.patronymic',
+                        label: 'Отчество',
+                        labelPosition: 'top'
+                    },/*
+                    {
+                        view: 'checkbox',
+                        id: 'isVaccinatedFlu',
+                        name: 'isVaccinatedFlu',
+                        label: 'Привит от гриппа',
+                        labelPosition: 'top'
+                    },
+                    {
+                        view: 'checkbox',
+                        id: 'isVaccinatedCovid',
+                        name: 'isVaccinatedCovid',
+                        label: 'Привит от COVID-19',
+                        labelPosition: 'top'
+                    },*/
+            /*
+                    {
+                        view: 'button',
+                        align: 'right',
+                        maxWidth: 200,
+                        css: 'webix_primary',
+                        value: 'Добавить',
+                        click: function () {
+
+                            let params = $$('form_employee').getValues()
+
+                            webix.ajax()
+                                .headers({'Content-type': 'application/json'})
+                                .post('/employee', JSON.stringify(params))
+                                .then(function (data) {
+                                    if (data.text() === 'Сотрудник добавлен') {
+                                        $$('form_employee').clear()
+                                        if (params.id) {
+                                            webix.message('Сотрудник обновлен', 'success');
+                                        } else {
+                                            webix.message(data.text(), 'success');
+                                        }
+                                        $$('employees_table').load('employees');
+                                    } else {
+                                        webix.message(data.text(), 'error');
+                                    }
+                                });
+                        }
+                    },
+                ]
+            }*/
+        ]
+    }
+}
+
+//Фильтровать по кнопке поиска
+function filterText() {
+    $$("employees_table").clearAll();
+    $$("employees_table").clearAll();
+    let text = $$("dtFilter").getValue().replace(/\s/g, '').toLowerCase();
+    if (!text)
+        return $$("employees_table").load("employees");
+    else {
+        $$("employees_table").load(function () {
+            return webix.ajax().headers({'Content-type': 'application/json'}).post("/filter", text);
+        });
+    }
+    $$("dtFilter").setValue("")
+}
+
+webix.attachEvent("onFocusChange", function (to, from) {
+    if (from && from.getTopParentView().config.view == "window" && !to) {
+        from.getTopParentView().hide();
+    }
+})
+
+webix.ready(function () {
     let layout = webix.ui({
         rows: [
             {
@@ -1346,12 +1717,13 @@ webix.ready(function() {
                         // collapsed: true,
                         css: 'webix_dark',
                         data: [
-                            { id: "CommonInfo", value: 'Общая информация' },
-                            { id: "Requests", value: 'Заявки' },
-                            { id: "Settings", value: 'Настройки' },
+                            {id: "CommonInfo", value: 'Общая информация'},
+                            {id: "Employees", value: 'Сотрудники'},
+                            {id: "Requests", value: 'Заявки'},
+                            {id: "Settings", value: 'Настройки'},
                         ],
                         on: {
-                            onAfterSelect: function(id) {
+                            onAfterSelect: function (id) {
                                 let view;
                                 switch (id) {
                                     case 'CommonInfo': {
@@ -1360,6 +1732,10 @@ webix.ready(function() {
                                     }
                                     case 'Requests': {
                                         view = requests;
+                                        break;
+                                    }
+                                    case 'Employees': {
+                                        view = employees;
                                         break;
                                     }
                                     case 'Settings': {
@@ -1385,7 +1761,7 @@ webix.ready(function() {
     })
 
     webix.event(window, "resize", function (event) {
-        layout.define("width",document.body.clientWidth);
+        layout.define("width", document.body.clientWidth);
         layout.resize();
     });
 })

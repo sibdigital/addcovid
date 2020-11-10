@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Locale;
 import java.util.Objects;
 
 @Entity
@@ -46,7 +47,7 @@ public class DocPerson {
     @JsonIgnore
     private DocRequest docRequest;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="id_organization", nullable=false)
     @JsonIgnore
     private ClsOrganization organization;

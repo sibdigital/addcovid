@@ -10,16 +10,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
+import ru.sibdigital.addcovid.dto.EmployeeDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.dto.PrincipalDto;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
 import ru.sibdigital.addcovid.repository.ClsPrincipalRepo;
+import ru.sibdigital.addcovid.repository.DocEmployeeRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.service.RequestService;
 
+import javax.print.Doc;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -42,6 +47,9 @@ public class CabinetController {
 
     @Autowired
     private ApplicationConstants applicationConstants;
+
+    @Autowired
+    private DocEmployeeRepo docEmployeeRepo;
 
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
@@ -189,4 +197,60 @@ public class CabinetController {
         return errors;
     }
 
+    @GetMapping("/employees")
+    public @ResponseBody List<DocEmployee> getEmployees(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        List<DocEmployee> employees = requestService.getEmployeesByOrganizationId(organization.getId());
+        return employees;
+    }
+
+    @PostMapping("/filter")
+    public @ResponseBody List<DocEmployee> getFilteredEmployees(@RequestBody String filterText, HttpSession session){
+        String filter = filterText.trim().toLowerCase();
+        return getEmployees(session).parallelStream()
+                .filter(s -> containsFIO(s, filter))
+                .collect(Collectors.toList());
+    }
+
+    private boolean containsFIO(DocEmployee employee, String filterText){
+        String fio = constructFIO(employee.getPerson());
+        return fio.contains(filterText);
+    }
+
+    private String constructFIO(DocPerson person){
+        String fio = (person.getLastname() + person.getFirstname() + person.getPatronymic())
+                .toLowerCase()
+                .trim();
+        return fio;
+    }
+
+    @PostMapping("/employee")
+    public @ResponseBody String saveEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        employeeDto.setOrganizationId(id);
+        try {
+            requestService.saveEmployee(employeeDto);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "Не удалось добавить сотрудника";
+        }
+        return "Сотрудник добавлен";
+    }
+
+    @PostMapping("/deleteEmployee")
+    public @ResponseBody String deleteEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        employeeDto.setOrganizationId(id);
+        try{
+            requestService.deleteEmployee(employeeDto);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+            return "Не удалось удалить сотрудника";
+        }
+        return "Сотрудник удалён";
+    }
 }

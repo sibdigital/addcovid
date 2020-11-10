@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.dto.EmployeeDto;
 import ru.sibdigital.addcovid.dto.OrganizationDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.*;
@@ -68,6 +69,9 @@ public class RequestService {
 
     @Autowired
     private RegActualizationHistoryRepo regActualizationHistoryRepo;
+
+    @Autowired
+    private DocEmployeeRepo docEmployeeRepo;
 
     @Value("${upload.path:/uploads}")
     String uploadingDir;
@@ -480,5 +484,54 @@ public class RequestService {
         }
 
         return null;
+    }
+
+    public List<DocEmployee> getEmployeesByOrganizationId(Long id) {
+        return docEmployeeRepo.findAllByOrganization(id).orElse(null);
+    }
+
+    @Transactional
+    public DocEmployee saveEmployee(EmployeeDto employeeDto) {
+
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(employeeDto.getOrganizationId()).orElse(null);
+
+        DocPerson docPerson = employeeDto.getPerson().convertToPersonEntity();
+
+        // TODO Удалить после нормализации базы данных
+        DocRequest docRequest = docRequestRepo.findOneByOrganizationId(clsOrganization.getId()).get().get(0);
+        docPerson.setDocRequest(docRequest);
+        docPersonRepo.save(docPerson);
+
+        DocEmployee docEmployee = DocEmployee.builder()
+                .id(employeeDto.getId())
+                .organization(clsOrganization)
+                .person(docPerson)
+                .isVaccinatedFlu(employeeDto.getIsVaccinatedFlu())
+                .isVaccinatedCovid(employeeDto.getIsVaccinatedCovid())
+                .build();
+
+        docEmployeeRepo.save(docEmployee);
+
+        return docEmployee;
+    }
+
+    @Transactional
+    public void deleteEmployee(EmployeeDto employeeDto){
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(employeeDto.getOrganizationId()).orElse(null);
+
+        DocPerson docPerson = employeeDto.getPerson().convertToPersonEntity();
+
+        DocRequest docRequest = docRequestRepo.findOneByOrganizationId(clsOrganization.getId()).get().get(0);
+        docPerson.setDocRequest(docRequest);
+        docPersonRepo.delete(docPerson);
+
+        DocEmployee docEmployee = DocEmployee.builder()
+                .id(employeeDto.getId())
+                .organization(clsOrganization)
+                .person(docPerson)
+                .isVaccinatedFlu(employeeDto.getIsVaccinatedFlu())
+                .isVaccinatedCovid(employeeDto.getIsVaccinatedCovid())
+                .build();
+        docEmployeeRepo.delete(docEmployee);
     }
 }
