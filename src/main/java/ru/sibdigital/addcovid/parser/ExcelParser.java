@@ -2,15 +2,13 @@ package ru.sibdigital.addcovid.parser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.DataFormatter;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.platform.commons.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.dto.EmployeeDto;
 import ru.sibdigital.addcovid.dto.FactAddressDto;
 import ru.sibdigital.addcovid.dto.PersonDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
@@ -30,14 +28,14 @@ public class ExcelParser {
     ClsDepartmentRepo clsDepartmentRepo;
 
     final int MAX_FIRSTNAME_LENGHTH = 100;
-    final int MAX_LASTNAME_LENGHTH  = 100;
-    final int MAX_PATRONYMIC_LENGHTH  = 100;
+    final int MAX_LASTNAME_LENGHTH = 100;
+    final int MAX_PATRONYMIC_LENGHTH = 100;
 
     final String[] SHEET_NAMES = {"ДАННЫЕ О ВАШЕЙ ОРГАНИЗАЦИИ", "АДРЕСНАЯ ИНФОРМАЦИЯ", "РАБОТНИКИ ВЫХОДЯЩИЕ НА РАБОТУ", "КУРИРУЮЩЕЕ МИНИСТЕРСТВО"};
 
-    final String[] ADDRESS_COLUMNS_NAMES = {"Фактический адрес осуществления деятельности","Численность работников, не подлежащих переводу на дистанционный режим работы, осуществляющих деятельность  фактическому адресу"};
-    final String[] DEPARTMENT_COLUMNS_NAMES = {"№","Наимнование органа власти","Выбор","Описание"};
-    final String[] PEOPLE_COLUMNS_NAMES = {"Фамилия","Имя","Отчество"};
+    final String[] ADDRESS_COLUMNS_NAMES = {"Фактический адрес осуществления деятельности", "Численность работников, не подлежащих переводу на дистанционный режим работы, осуществляющих деятельность  фактическому адресу"};
+    final String[] DEPARTMENT_COLUMNS_NAMES = {"№", "Наимнование органа власти", "Выбор", "Описание"};
+    final String[] PEOPLE_COLUMNS_NAMES = {"Фамилия", "Имя", "Отчество"};
 
     final String[] COMMON_ORGANIZATION_INFO = {
             "*Полное наименование организации/фамилия, имя, отчество индивидуального предпринимателя: ",
@@ -81,10 +79,10 @@ public class ExcelParser {
 
     private CheckProtocol parseFile(String name, InputStream inputStream) throws IOException {
         String[] split = name.split("\\.");
-        String ext = split[split.length-1];
-        if(ext.equals("xls")){
+        String ext = split[split.length - 1];
+        if (ext.equals("xls")) {
             return readXLSFile(inputStream);
-        } else if(ext.equals("xlsx")) {
+        } else if (ext.equals("xlsx")) {
             return readXLSXFile(inputStream);
         } else {
             throw new IOException("Не возможно обработать файл в формате ." + ext);
@@ -95,7 +93,7 @@ public class ExcelParser {
     private CheckProtocol readXLSFile(InputStream inputStream) throws IOException {
         HSSFWorkbook workbook = new HSSFWorkbook(inputStream);
 
-        if(workbook.getNumberOfSheets() <= SHEET_NAMES.length) {
+        if (workbook.getNumberOfSheets() <= SHEET_NAMES.length) {
             throw new IOException(String.format("Неверное содержание файла: файл должен содержать %d листа", SHEET_NAMES.length));
         }
 
@@ -112,7 +110,7 @@ public class ExcelParser {
         XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
         // Get first sheet from the workbook
 
-        if(workbook.getNumberOfSheets() <= SHEET_NAMES.length) {
+        if (workbook.getNumberOfSheets() <= SHEET_NAMES.length) {
             throw new IOException(String.format("Неверное содержание файла: файл должен содержать %d листа", SHEET_NAMES.length));
         }
 
@@ -124,28 +122,28 @@ public class ExcelParser {
         return parse(sheetOrganizationInfo, sheetAddressesInfo, sheetPeopleInfo, sheetDepartmnetInfo);
     }
 
-    private CheckProtocol parse(Sheet ...sheets) throws IOException {
+    private CheckProtocol parse(Sheet... sheets) throws IOException {
 
         DataFormatter fmt = new DataFormatter();
 
         PostFormDto postFormDto = new PostFormDto();
         CheckProtocol checkProtocol = new CheckProtocol(postFormDto);
 
-        Iterator<Row> sheetDepartmentRowsIterator = this.checkSheetWithTables(sheets, SHEET_DEPARTMENT_INDEX, DEPARTMENT_COLUMNS_NAMES,1,fmt);
+        Iterator<Row> sheetDepartmentRowsIterator = this.checkSheetWithTables(sheets, SHEET_DEPARTMENT_INDEX, DEPARTMENT_COLUMNS_NAMES, 1, fmt);
         boolean organizationInfoTemplateIsCorrect = this.checkSheetWithOrganizationInfo(sheets, SHEET_ORGANIZATION_INFO_INDEX, fmt);
-        Iterator<Row> sheetAddressesRowsIterator = this.checkSheetWithTables(sheets, SHEET_ADDRESSES_INDEX, ADDRESS_COLUMNS_NAMES,0,fmt);
-        Iterator<Row> sheetPeopleRowsIterator = this.checkSheetWithTables(sheets, SHEET_PEOPLE_INDEX, PEOPLE_COLUMNS_NAMES,0,fmt);
+        Iterator<Row> sheetAddressesRowsIterator = this.checkSheetWithTables(sheets, SHEET_ADDRESSES_INDEX, ADDRESS_COLUMNS_NAMES, 0, fmt);
+        Iterator<Row> sheetPeopleRowsIterator = this.checkSheetWithTables(sheets, SHEET_PEOPLE_INDEX, PEOPLE_COLUMNS_NAMES, 0, fmt);
 
-        if(sheetDepartmentRowsIterator== null) {
+        if (sheetDepartmentRowsIterator == null) {
             throw new IOException("Неизвестная ошибка при обработке страницы: " + SHEET_NAMES[SHEET_DEPARTMENT_INDEX]);
         }
-        if(!organizationInfoTemplateIsCorrect) {
+        if (!organizationInfoTemplateIsCorrect) {
             throw new IOException("Неизвестная ошибка при обработке страницы: " + SHEET_NAMES[SHEET_ORGANIZATION_INFO_INDEX]);
         }
-        if(sheetAddressesRowsIterator == null) {
+        if (sheetAddressesRowsIterator == null) {
             throw new IOException("Неизвестная ошибка при обработке страницы: " + SHEET_NAMES[SHEET_ADDRESSES_INDEX]);
         }
-        if(sheetPeopleRowsIterator == null) {
+        if (sheetPeopleRowsIterator == null) {
             throw new IOException("Неизвестная ошибка при обработке страницы: " + SHEET_NAMES[SHEET_PEOPLE_INDEX]);
         }
         StringBuilder stringBuilder = new StringBuilder();
@@ -156,14 +154,12 @@ public class ExcelParser {
         String globalMessage = stringBuilder.toString();
 
 
-        if(globalMessage.length() != 0){
+        if (globalMessage.length() != 0) {
             checkProtocol.setGlobalMessage(globalMessage);
         }
 
 
         return checkProtocol;
-
-
     }
 
     private boolean checkSheetWithOrganizationInfo(final Sheet[] sheets, final int sheetIndex, final DataFormatter fmt) throws IOException {
@@ -173,9 +169,7 @@ public class ExcelParser {
         int NUMBER_INDEX_START = 10;
 
 
-
-
-        if(!SHEET_NAMES[sheetIndex].equals(sheet.getSheetName())){
+        if (!SHEET_NAMES[sheetIndex].equals(sheet.getSheetName())) {
             throw new IOException(String.format("Неверное содержание файла. %d-ия страниц должна иметь имя: %s", sheetIndex, SHEET_NAMES[sheetIndex]));
         }
 
@@ -199,26 +193,23 @@ public class ExcelParser {
         }
     }
 
-
     private Iterator<Row> checkSheetWithTables(final Sheet[] sheets, final int sheetIndex, final String[] columnsNames, final int startColumnPosition, final DataFormatter fmt) throws IOException {
         Sheet sheet = sheets[sheetIndex];
-        if(!SHEET_NAMES[sheetIndex].equals(sheet.getSheetName())){
+        if (!SHEET_NAMES[sheetIndex].equals(sheet.getSheetName())) {
             throw new IOException(String.format("Неверное содержание файла. %d-ия страниц должна иметь имя: %s", sheetIndex, SHEET_NAMES[sheetIndex]));
         }
 
         Iterator<Row> rowIterator = sheet.iterator();
 
         for (int i = 0; i < startColumnPosition; i++) {
-            if(rowIterator.hasNext()) rowIterator.next();
+            if (rowIterator.hasNext()) rowIterator.next();
         }
 
-
-
-        if(rowIterator.hasNext()) {
+        if (rowIterator.hasNext()) {
             Row names = rowIterator.next();
             for (int i = 0; i < columnsNames.length; i++) {
-                if(!columnsNames[i].equals(fmt.formatCellValue(names.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)))){
-                    throw new IOException(String.format("Неверное содержание файла. Страница %s - колонка № %d должна именноваться: %s", SHEET_NAMES[sheetIndex], i+1, columnsNames[i]));
+                if (!columnsNames[i].equals(fmt.formatCellValue(names.getCell(i, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK)))) {
+                    throw new IOException(String.format("Неверное содержание файла. Страница %s - колонка № %d должна именноваться: %s", SHEET_NAMES[sheetIndex], i + 1, columnsNames[i]));
                 }
             }
         }
@@ -226,19 +217,18 @@ public class ExcelParser {
         return rowIterator;
     }
 
-    private CheckProtocol parseSheetWithOrganizationInfo(Sheet sheet, CheckProtocol checkProtocol, DataFormatter fmt){
+    private CheckProtocol parseSheetWithOrganizationInfo(Sheet sheet, CheckProtocol checkProtocol, DataFormatter fmt) {
 
 
-
-        int success = 0 , error = 0;
+        int success = 0, error = 0;
         PostFormDto postFormDto = checkProtocol.getPostFormDto();
         Cell cell = sheet.getRow(1).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // *Полное наименование организации/фамилия, имя, отчество индивидуального предпринимателя:
         String text = fmt.formatCellValue(cell).trim();
         postFormDto.setOrganizationName(text);
-        if(StringUtils.isBlank(text)) {
+        if (StringUtils.isBlank(text)) {
             postFormDto.setOrganizationNameStatus("Не может быть пустым");
             log.info("setOrganizationNameStatus setted success as false");
-            checkProtocol.setSuccess( false );
+            checkProtocol.setSuccess(false);
             error++;
         } else {
             success++;
@@ -247,10 +237,10 @@ public class ExcelParser {
         cell = sheet.getRow(2).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // *Краткое наименование организации
         text = fmt.formatCellValue(cell).trim();
         postFormDto.setOrganizationShortName(text);
-        if(StringUtils.isBlank(text)) {
+        if (StringUtils.isBlank(text)) {
             postFormDto.setOrganizationShortNameStatus("Не может быть пустым");
             log.info("setOrganizationNameStatus setted success as false");
-            checkProtocol.setSuccess( false );
+            checkProtocol.setSuccess(false);
             error++;
         } else {
             success++;
@@ -259,16 +249,16 @@ public class ExcelParser {
         cell = sheet.getRow(3).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);// *ИНН (10 или 12 цифр)
         text = fmt.formatCellValue(cell).trim();
         postFormDto.setOrganizationInn(text);
-        if(StringUtils.isBlank(text)) {
+        if (StringUtils.isBlank(text)) {
             postFormDto.setOrganizationInnStatus("Не может быть пустым");
             log.info("setOrganizationInnStatus setted success as false");
-            checkProtocol.setSuccess( false );
+            checkProtocol.setSuccess(false);
             error++;
         } else {
-            if(text.length() != 10 && text.length() != 12 ) {
+            if (text.length() != 10 && text.length() != 12) {
                 log.info("setOrganizationInnStatus setted success as false");
                 postFormDto.setOrganizationInnStatus("Должно быть длиной 10 или 12 символов");
-                checkProtocol.setSuccess( false );
+                checkProtocol.setSuccess(false);
                 error++;
             } else {
                 success++;
@@ -278,16 +268,16 @@ public class ExcelParser {
         cell = sheet.getRow(4).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // *ОГРН  (13 цифр)
         text = fmt.formatCellValue(cell).trim();
         postFormDto.setOrganizationOgrn(text);
-        if(StringUtils.isBlank(text)) {
+        if (StringUtils.isBlank(text)) {
             log.info("setOrganizationOgrn setted success as false");
             postFormDto.setOrganizationOgrnStatus("Не может быть пустым");
-            checkProtocol.setSuccess( false );
+            checkProtocol.setSuccess(false);
             error++;
         } else {
-            if(text.length() != 13 && text.length() != 15 ) {
+            if (text.length() != 13 && text.length() != 15) {
                 log.info("setOrganizationOgrn setted success as false");
                 postFormDto.setOrganizationOgrnStatus("Должно быть длиной 13 или 15 символов");
-                checkProtocol.setSuccess( false );
+                checkProtocol.setSuccess(false);
                 error++;
             } else {
                 success++;
@@ -297,10 +287,10 @@ public class ExcelParser {
         cell = sheet.getRow(5).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // *e-mail
         text = fmt.formatCellValue(cell).trim();
         postFormDto.setOrganizationEmail(text);
-        if(StringUtils.isBlank(text)) {
+        if (StringUtils.isBlank(text)) {
             log.info("setOrganizationEmail setted success as false");
             postFormDto.setOrganizationEmailStatus("Не может быть пустым");
-            checkProtocol.setSuccess( false );
+            checkProtocol.setSuccess(false);
             error++;
         } else {
             success++;
@@ -309,10 +299,10 @@ public class ExcelParser {
         cell = sheet.getRow(6).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // *Телефон (любой формат)
         text = fmt.formatCellValue(cell).trim();
         postFormDto.setOrganizationPhone(text);
-        if(StringUtils.isBlank(text)) {
+        if (StringUtils.isBlank(text)) {
             log.info("setOrganizationPhoneStatus setted success as false");
             postFormDto.setOrganizationPhoneStatus("Не может быть пустым");
-            checkProtocol.setSuccess( false );
+            checkProtocol.setSuccess(false);
             error++;
         } else {
             success++;
@@ -325,10 +315,10 @@ public class ExcelParser {
         cell = sheet.getRow(1).getCell(4, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // *Основной вид осуществляемой деятельности (отрасль)
         text = fmt.formatCellValue(cell).trim();
         postFormDto.setOrganizationOkved(text);
-        if(StringUtils.isBlank(text)) {
+        if (StringUtils.isBlank(text)) {
             log.info("setOrganizationOkved setted success as false");
             postFormDto.setOrganizationOkvedStatus("Не может быть пустым");
-            checkProtocol.setSuccess( false );
+            checkProtocol.setSuccess(false);
             error++;
         } else {
             success++;
@@ -356,7 +346,7 @@ public class ExcelParser {
 //                }
 //            } catch (NumberFormatException e) {
 //                log.info("setDepartmentIdStatus setted success as false");
-//                checkProtocol.setSuccess( false ); 
+//                checkProtocol.setSuccess( false );
         //	error++;
 
 //                postFormDto.setDepartmentIdStatus(String.format("Значение \"%s\" не может быть преобразовано в число", text));
@@ -369,10 +359,10 @@ public class ExcelParser {
         cell = sheet.getRow(10).getCell(1, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK); // * Юридический адрес
         text = fmt.formatCellValue(cell).trim();
         postFormDto.setOrganizationAddressJur(text);
-        if(StringUtils.isBlank(text)) {
+        if (StringUtils.isBlank(text)) {
             log.info("setOrganizationAddressJurStatus setted success as false");
             postFormDto.setOrganizationAddressJurStatus("Не может быть пустым");
-            checkProtocol.setSuccess( false );
+            checkProtocol.setSuccess(false);
             error++;
         } else {
             success++;
@@ -760,10 +750,58 @@ public class ExcelParser {
 
     }
 
+    public Workbook parseEmployeesFile(File file) throws IOException {
+        FileInputStream inputStream = new FileInputStream(file);
+        String name = file.getName();
+        return parseEmployeesFile(name, inputStream);
+    }
 
+    private Workbook parseEmployeesFile(String name, InputStream inputStream) throws IOException {
+        String[] split = name.split("\\.");
+        String ext = split[split.length - 1];
+        if (ext.equals("xls")) {
+            return readEmployeesXLSFile(inputStream);
+        } else if (ext.equals("xlsx")) {
+            return readEmployeesXLSXFile(inputStream);
+        } else {
+            throw new IOException("Не возможно обработать файл в формате ." + ext);
+        }
+    }
 
+    private Workbook readEmployeesXLSFile(InputStream inputStream) throws IOException {
+        return new HSSFWorkbook(inputStream);
+    }
 
+    private Workbook readEmployeesXLSXFile(InputStream inputStream) throws IOException {
+        return new XSSFWorkbook(inputStream);
+    }
 
+    public List<EmployeeDto> getEmployeesFromExcel(File uploadedFile, Long id) throws IOException {
+        Workbook workbook = parseEmployeesFile(uploadedFile);
+        Sheet[] sheets = new Sheet[3];
+        sheets[2] = workbook.getSheetAt(0);
+        DataFormatter fmt = new DataFormatter();
 
+        Iterator<Row> sheetPeopleRowsIterator = this.checkSheetWithTables(sheets, SHEET_PEOPLE_INDEX, PEOPLE_COLUMNS_NAMES, 0, fmt);
+        CheckProtocol checkProtocol = parseSheetWithPeople(sheetPeopleRowsIterator, new CheckProtocol(new PostFormDto()), fmt, new StringBuilder());
 
+        List<EmployeeDto> employeeDtoList = new ArrayList<>();
+        List<PersonDto> personDtoList = checkProtocol.getPostFormDto().getPersons();
+
+        for (PersonDto personDto : personDtoList) {
+            EmployeeDto employeeDto = constructEmployee(personDto, id);
+            employeeDtoList.add(employeeDto);
+        }
+
+        workbook.close();
+
+        return employeeDtoList;
+    }
+
+    private EmployeeDto constructEmployee(PersonDto personDto, Long id) {
+        EmployeeDto employeeDto = new EmployeeDto();
+        employeeDto.setPerson(personDto);
+        employeeDto.setOrganizationId(id);
+        return employeeDto;
+    }
 }

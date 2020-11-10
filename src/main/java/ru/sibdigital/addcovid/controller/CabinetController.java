@@ -20,9 +20,7 @@ import ru.sibdigital.addcovid.repository.DocEmployeeRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.service.RequestService;
 
-import javax.print.Doc;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -229,28 +227,28 @@ public class CabinetController {
     }
 
     @PostMapping("/employee")
-    public @ResponseBody String saveEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
+    public @ResponseBody DocEmployee saveEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         employeeDto.setOrganizationId(id);
+        DocEmployee employee = null;
         try {
-            requestService.saveEmployee(employeeDto);
+            employee = requestService.saveEmployee(employeeDto);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return "Не удалось добавить сотрудника";
         }
-        return "Сотрудник добавлен";
+        return employee;
     }
 
     @PostMapping("/deleteEmployee")
-    public @ResponseBody String deleteEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
+    public @ResponseBody EmployeeDto deleteEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         employeeDto.setOrganizationId(id);
         try{
             requestService.deleteEmployee(employeeDto);
         }catch (Exception e){
             log.error(e.getMessage(), e);
-            return "Не удалось удалить сотрудника";
+            return null;
         }
-        return "Сотрудник удалён";
+        return employeeDto;
     }
 }

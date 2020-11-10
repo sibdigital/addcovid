@@ -2,6 +2,7 @@ webix.i18n.setLocale("ru-RU");
 
 const dateFormat = webix.Date.dateToStr("%d.%m.%Y %H:%i:%s")
 
+
 function view_section(title) {
     return {
         view: 'template',
@@ -1337,20 +1338,26 @@ var updateFIOmodal = webix.ui({
     head: "Редактирование списка сотрудников",
     body: {
         view: 'form',
-        id: 'form_employee',
+        id: 'modal_form_employee',
         complexData: true,
+        rules:{
+            "person.lastname":webix.rules.isNotEmpty,
+            "person.firstname":webix.rules.isNotEmpty,
+        },
         elements: [
             {
                 view: 'text',
                 name: 'person.lastname',
                 label: 'Фамилия',
-                labelPosition: 'top'
+                labelPosition: 'top',
+                invalidMessage: "Фамилия не может быть пустой"
             },
             {
                 view: 'text',
                 name: 'person.firstname',
                 label: 'Имя',
-                labelPosition: 'top'
+                labelPosition: 'top',
+                invalidMessage:"Имя не может быть пустым"
             },
             {
                 view: 'text',
@@ -1379,28 +1386,30 @@ var updateFIOmodal = webix.ui({
                 css: 'webix_primary',
                 value: 'Добавить',
                 hotkey: "enter",
+
                 click: function () {
-
-                    let params = $$('form_employee').getValues()
-
-                    webix.ajax()
-                        .headers({'Content-type': 'application/json'})
-                        .post('/employee', JSON.stringify(params))
-                        .then(function (data) {
-                            if (data.text() === 'Сотрудник добавлен') {
-                                $$('form_employee').clear()
-                                if (params.id) {
-                                    webix.message('Сотрудник обновлен', 'success');
+                    var form = this.getParentView();
+                    let params = $$('modal_form_employee').getValues()
+                    if(form.validate()){
+                         webix.ajax()
+                             .headers({'Content-type': 'application/json'})
+                            .post('/employee', JSON.stringify(params))
+                            .then(function (data) {
+                                if (data !== null) {
+                                    $$('modal_form_employee').clear()
+                                    if (params.id) {
+                                        webix.message('Сотрудник обновлен', 'success');
+                                    } else {
+                                        webix.message("Сотрудник добавлен", 'success');
+                                    }
+                                    $$('employees_table').load('employees');
                                 } else {
-                                    webix.message(data.text(), 'success');
+                                    webix.message("Не удалось добавить сотрудника", 'error');
                                 }
-                                $$('employees_table').load('employees');
-                            } else {
-                                webix.message(data.text(), 'error');
-                            }
-                        });
-                    $$('form_employee').clear()
-                    updateFIOmodal.hide()
+                            });
+                        $$('modal_form_employee').clear()
+                        updateFIOmodal.hide()
+                    }
                 }
             }
         ]
@@ -1408,6 +1417,74 @@ var updateFIOmodal = webix.ui({
     }
 });
 
+var importEmployees = webix.ui({
+    view: "window",
+    width: 650,
+    position: "center",
+    modal: true,
+    close: true,
+    head: "Импорт сотрудников",
+    body:
+        {
+            view: 'form',
+            position: 'center',
+            elements: [
+                {
+                    id: 'upload',
+                    view: 'uploader',
+                    css: 'webix_secondary',
+                    value: 'Загрузить Excel',
+                    autosend: false,
+                    upload: '/import-excel',
+                    required: true,
+                    accept: '.xlsx, .xls, .csv',
+                    multiple: true,
+                    link: 'filelist',
+                },
+                {
+                    view: 'list', id: 'filelist', type: 'uploader',
+                    autoheight: true, borderless: true
+                },
+                {
+                    paddingLeft: 10,
+                    view: 'label',
+                    visible: false,
+                    label: '',
+                    id: 'no_pdf'
+                },
+                {
+                    id: 'send_btn',
+                    view: 'button',
+                    css: 'webix_primary',
+                    value: 'Импорт',
+                    align: 'center',
+                    click: function () {
+                        $$('upload').send(function (response) {
+                            let uploadedFiles = []
+                            $$('upload').files.data.each(function (obj) {
+                                let status = obj.status
+                                let name = obj.name
+                                if (status == 'server') {
+                                    let sname = obj.sname
+                                    uploadedFiles.push(sname)
+                                }
+                            })
+                            if (uploadedFiles.length != $$('upload').files.data.count()) {
+                                webix.message('Не удалось загрузить файлы.',"error")
+                                $$('upload').focus()
+                            }
+                            $$('employees_table').load('employees');
+                            $$("upload").files.data.clearAll();
+                            importEmployees.hide();
+                            console.log(uploadedFiles)
+                        })
+                    }
+                }
+            ]
+        }
+});
+
+let usersWindowHeight = window.innerHeight;
 const employees = {
     view: 'scrollview',
     scroll: 'xy',
@@ -1420,9 +1497,10 @@ const employees = {
                         {
                             view: "text",
                             id: "dtFilter",
-                            maxWidth: 400,
+                            maxWidth: 470,
                             placeholder: "Поиск по ФИО",
-                            /*on: {
+                            /*
+                            on: {
                                 onTimedKeyPress(){
                                     $$("employees_table").clearAll();
                                     let text = $$("dtFilter").getValue().replace(/\s/g, '').toLowerCase();
@@ -1436,121 +1514,212 @@ const employees = {
                                     });
                                     }
                                 }
-                            }*/
+                            }
+                            */
                         },
                         {
                             view: "button",
                             maxWidth: 150,
                             value: "Поиск",
+                            css: 'webix_primary',
+                            hotkey: "enter",
                             click: filterText
                         }
                     ]
             },
             {
-                view: 'datatable',
-                id: "employees_table",
-                minHeight: 570,
-                select: "row",
-                navigation: true,
-                resizeColumn: true,
-                pager: 'Pager',
-                datafetch: 25,
-                columns: [
-                    {
-                        header: "Фамилия",
-                        template: "#person.lastname#",
-                        fillspace: true,
-                        sort: "text"
-                    },
-                    {
-                        header: "Имя",
-                        template: "#person.firstname#",
-                        fillspace: true,
-                        sort: "text"
-                    },
-                    {
-                        header: "Отчество",
-                        template: "#person.patronymic#",
-                        fillspace: true,
-                        sort: "text"
-                    },
-                    /*
-                    {
-                        header: "Привит от гриппа",
-                        template: function (obj) {
-                            if (obj.isVaccinatedFlu) {
-                                return 'Да';
-                            } else {
-                                return 'Нет';
-                            }
-                        },
-                        fillspace: true,
-                        adjust: true
-                    },
-                    {
-                        header: "Привит от COVID-19",
-                        template: function (obj) {
-                            if (obj.isVaccinatedCovid) {
-                                return 'Да';
-                            } else {
-                                return 'Нет';
-                            }
-                        },
-                        fillspace: true,
-                        adjust: true
-                    }*/
-                ],
-                on: {
-                    onBeforeLoad: function () {
-                        this.showOverlay("Загружаю...");
-                    },
-                    onAfterLoad: function () {
-                        this.hideOverlay();
-                        if (!this.count()) {
-                            this.showOverlay("Отсутствуют данные")
-                        }
-                    },
-                    onLoadError: function () {
-                        this.hideOverlay();
-                    },
-                    onItemDblClick: function (id) {
-                        let item = this.getItem(id);
-                        $$('form_employee').parse(item);
-                        updateFIOmodal.show();
+                type: 'wide',
+                cols:
+                    [
+                        {
+                            view: 'datatable',
+                            id: "employees_table",
+                            height: usersWindowHeight - 200,
+                            select: "row",
+                            scrollX: false,
+                            navigation: true,
+                            resizeColumn: true,
+                            pager: 'Pager',
+                            datafetch: 25,
+                            columns: [
+                                {
+                                    header: "Фамилия",
+                                    template: "#person.lastname#",
+                                    fillspace: true,
+                                    sort: "text"
+                                },
+                                {
+                                    header: "Имя",
+                                    template: "#person.firstname#",
+                                    fillspace: true,
+                                    sort: "text"
+                                },
+                                {
+                                    header: "Отчество",
+                                    template: "#person.patronymic#",
+                                    fillspace: true,
+                                    sort: "text"
+                                },
+                                /*
+                                {
+                                    header: "Привит от гриппа",
+                                    template: function (obj) {
+                                        if (obj.isVaccinatedFlu) {
+                                            return 'Да';
+                                        } else {
+                                            return 'Нет';
+                                        }
+                                    },
+                                    fillspace: true,
+                                    adjust: true
+                                },
+                                {
+                                    header: "Привит от COVID-19",
+                                    template: function (obj) {
+                                        if (obj.isVaccinatedCovid) {
+                                            return 'Да';
+                                        } else {
+                                            return 'Нет';
+                                        }
+                                    },
+                                    fillspace: true,
+                                    adjust: true
+                                }*/
+                            ],
+                            on: {
+                                onBeforeLoad: function () {
+                                    this.showOverlay("Загружаю...");
+                                },
+                                onAfterLoad: function () {
+                                    this.hideOverlay();
+                                    if (!this.count()) {
+                                        this.showOverlay("Отсутствуют данные")
+                                    }
+                                },
+                                onLoadError: function () {
+                                    this.hideOverlay();
+                                },
+                                onItemClick: function (id) {
+                                    let item = this.getItem(id);
+                                    $$('form_employee').parse(item);
+                                },
+                                onItemDblClick: function (id) {
+                                    let item = this.getItem(id);
+                                    $$('modal_form_employee').parse(item);
+                                    updateFIOmodal.show();
 
-                    }
-                },
-                url: 'employees'
+                                }
+                            },
+                            url: 'employees'
+                        },
+                        {
+                            view: 'form',
+                            id: 'form_employee',
+                            complexData: true,
+                            rules:{
+                                "person.lastname":webix.rules.isNotEmpty,
+                                "person.firstname":webix.rules.isNotEmpty,
+                            },
+                            elements: [
+                                {
+                                    view: 'text',
+                                    name: 'person.lastname',
+                                    label: 'Фамилия',
+                                    labelPosition: 'top',
+                                    invalidMessage: "Фамилия не может быть пустой"
+                                },
+                                {
+
+                                    view: 'text',
+                                    name: 'person.firstname',
+                                    label: 'Имя',
+                                    labelPosition: 'top',
+                                    invalidMessage:"Имя не может быть пустым"
+                                },
+                                {
+                                    view: 'text',
+                                    name: 'person.patronymic',
+                                    label: 'Отчество',
+                                    labelPosition: 'top'
+                                },
+                                /*
+                                {
+                                    view: 'checkbox',
+                                    id: 'isVaccinatedFlu',
+                                    name: 'isVaccinatedFlu',
+                                    label: 'Привит от гриппа',
+                                    labelPosition: 'top'
+                                },
+                                {
+                                    view: 'checkbox',
+                                    id: 'isVaccinatedCovid',
+                                    name: 'isVaccinatedCovid',
+                                    label: 'Привит от COVID-19',
+                                    labelPosition: 'top'
+                                },
+                                */
+                                {
+                                    view: 'button',
+                                    align: 'right',
+                                    maxWidth: 200,
+                                    css: 'webix_primary',
+                                    value: 'Добавить',
+                                    click: function () {
+                                        var form = this.getParentView();
+                                        let params = $$('form_employee').getValues()
+                                        if(form.validate()){
+                                            webix.ajax()
+                                                .headers({'Content-type': 'application/json'})
+                                                .post('/employee', JSON.stringify(params))
+                                                .then(function (data) {
+                                                    if (data !== null) {
+                                                        $$('form_employee').clear()
+                                                        if (params.id) {
+                                                            webix.message('Сотрудник обновлен', 'success');
+                                                        } else {
+                                                            webix.message("Сотрудник добавлен", 'success');
+                                                        }
+                                                        $$('employees_table').load('employees');
+                                                    } else {
+                                                        webix.message("Не удалось добавить сотрудника", 'error');
+                                                    }
+                                                });
+                                        }
+                                    }
+                                },
+                            ]
+                        }
+                    ]
             },
             {
-                cols: [
-                    {
-                        view: 'pager',
-                        id: 'Pager',
-                        height: 38,
-                        size: 25,
-                        group: 5,
-                        template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
-                    },
-                    // {
-                    //     view: 'button',
-                    //     align: 'right',
-                    //     maxWidth: 200,
-                    //     css: 'webix_primary',
-                    //     value: 'Добавить сотрудника',
-                    //     click: function () {
-                    //         showEmployeeCreateForm();
-                    //     }
-                    // }
-                    {
+                cols:
+                    [
+                        {
+                            view: 'pager',
+                            id: 'Pager',
+                            height: 38,
+                            size: 25,
+                            group: 5,
+                            template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
+                        },
+                        {
+                            view: "button",
+                            maxWidth: 350,
+                            value: "Загрузить",
+                            css: 'webix_primary',
+                            click: function () {
+                                $$("upload").files.data.clearAll();
+                                importEmployees.show()
+                            }
+                        },
+                        {
                             view: "button",
                             align: 'left',
                             maxWidth: 350,
                             css: 'webix_primary',
                             value: 'Добавить',
-                            click: function ()
-                            {
-                                $$('form_employee').clear();
+                            click: function () {
+                                $$('modal_form_employee').clear()
                                 updateFIOmodal.show();
                             }
                         },
@@ -1560,109 +1729,42 @@ const employees = {
                             maxWidth: 350,
                             css: 'webix_primary',
                             value: 'Удалить',
+                            hotkey: "delete",
                             click: function () {
 
                                 let params = $$('employees_table').getSelectedItem()
 
-                                if(!$$("employees_table").getSelectedId()) {
-                                    webix.message("Не выбрана строка!","error");
+                                if (!$$("employees_table").getSelectedId()) {
+                                    webix.message("Не выбрана строка!", "error");
                                     return;
-                                }$$("employees_table").remove($$("employees_table").getSelectedId());
+                                }
+                                $$("employees_table").remove($$("employees_table").getSelectedId());
                                 webix.ajax()
                                     .headers({'Content-type': 'application/json'})
                                     .post('/deleteEmployee', JSON.stringify(params))
                                     .then(function (data) {
-                                        if (data.text() === "Сотрудник удалён") {
+                                        if (data !== null) {
                                             webix.message("Сотрудник удалён", 'success');
                                             $$('form_employee').clear()
+                                            $$('modal_form_employee').clear()
                                             $$('employees_table').load('employees');
                                         } else {
-                                            webix.message(data.text(), 'error');
+                                            webix.message("Не удалось удалить сотрудника", 'error');
                                         }
                                     });
                                 $$('form_employee').clear()
+                                $$('modal_form_employee').clear()
                                 updateFIOmodal.hide()
                             }
                         }
-                ]
+                    ]
             },
-
-            /*
-            {
-                view: 'form',
-                id: 'form_employee',
-                complexData: true,
-                elements: [
-                    {
-                        view: 'text',
-                        name: 'person.lastname',
-                        label: 'Фамилия',
-                        labelPosition: 'top'
-                    },
-                    {
-                        view: 'text',
-                        name: 'person.firstname',
-                        label: 'Имя',
-                        labelPosition: 'top'
-                    },
-                    {
-                        view: 'text',
-                        name: 'person.patronymic',
-                        label: 'Отчество',
-                        labelPosition: 'top'
-                    },/*
-                    {
-                        view: 'checkbox',
-                        id: 'isVaccinatedFlu',
-                        name: 'isVaccinatedFlu',
-                        label: 'Привит от гриппа',
-                        labelPosition: 'top'
-                    },
-                    {
-                        view: 'checkbox',
-                        id: 'isVaccinatedCovid',
-                        name: 'isVaccinatedCovid',
-                        label: 'Привит от COVID-19',
-                        labelPosition: 'top'
-                    },*/
-            /*
-                    {
-                        view: 'button',
-                        align: 'right',
-                        maxWidth: 200,
-                        css: 'webix_primary',
-                        value: 'Добавить',
-                        click: function () {
-
-                            let params = $$('form_employee').getValues()
-
-                            webix.ajax()
-                                .headers({'Content-type': 'application/json'})
-                                .post('/employee', JSON.stringify(params))
-                                .then(function (data) {
-                                    if (data.text() === 'Сотрудник добавлен') {
-                                        $$('form_employee').clear()
-                                        if (params.id) {
-                                            webix.message('Сотрудник обновлен', 'success');
-                                        } else {
-                                            webix.message(data.text(), 'success');
-                                        }
-                                        $$('employees_table').load('employees');
-                                    } else {
-                                        webix.message(data.text(), 'error');
-                                    }
-                                });
-                        }
-                    },
-                ]
-            }*/
         ]
     }
 }
 
-//Фильтровать по кнопке поиска
+//Для поиска по кнопке
 function filterText() {
-    $$("employees_table").clearAll();
     $$("employees_table").clearAll();
     let text = $$("dtFilter").getValue().replace(/\s/g, '').toLowerCase();
     if (!text)
@@ -1764,4 +1866,5 @@ webix.ready(function () {
         layout.define("width", document.body.clientWidth);
         layout.resize();
     });
+
 })

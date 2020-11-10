@@ -492,46 +492,73 @@ public class RequestService {
 
     @Transactional
     public DocEmployee saveEmployee(EmployeeDto employeeDto) {
-
-        ClsOrganization clsOrganization = clsOrganizationRepo.findById(employeeDto.getOrganizationId()).orElse(null);
-
         DocPerson docPerson = employeeDto.getPerson().convertToPersonEntity();
 
-        // TODO Удалить после нормализации базы данных
-        DocRequest docRequest = docRequestRepo.findOneByOrganizationId(clsOrganization.getId()).get().get(0);
-        docPerson.setDocRequest(docRequest);
-        docPersonRepo.save(docPerson);
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(employeeDto.getOrganizationId()).orElse(null);
+        //DocRequest docRequest = docRequestRepo.findOneByOrganizationId(clsOrganization.getId()).get().get(0);
+        DocEmployee docEmployee;
+        Long personId = employeeDto.getPerson().getId();
 
-        DocEmployee docEmployee = DocEmployee.builder()
-                .id(employeeDto.getId())
-                .organization(clsOrganization)
-                .person(docPerson)
-                .isVaccinatedFlu(employeeDto.getIsVaccinatedFlu())
-                .isVaccinatedCovid(employeeDto.getIsVaccinatedCovid())
-                .build();
+        if(personId!=null){          //Если существует person с personId в таблице doc_person
+            docPerson.setId(personId);
+             docEmployee = constructUpdatePerson(docPerson,employeeDto,clsOrganization);
+        }else{
+            docEmployee = constructNewPerson(docPerson,employeeDto,clsOrganization);
+        }
 
         docEmployeeRepo.save(docEmployee);
 
         return docEmployee;
     }
 
-    @Transactional
-    public void deleteEmployee(EmployeeDto employeeDto){
-        ClsOrganization clsOrganization = clsOrganizationRepo.findById(employeeDto.getOrganizationId()).orElse(null);
+    //Добавление нового сотрудника
+    public DocEmployee constructNewPerson(DocPerson docPerson, EmployeeDto employeeDto, ClsOrganization clsOrganization){
+        docPersonRepo.save(docPerson);
 
-        DocPerson docPerson = employeeDto.getPerson().convertToPersonEntity();
-
-        DocRequest docRequest = docRequestRepo.findOneByOrganizationId(clsOrganization.getId()).get().get(0);
-        docPerson.setDocRequest(docRequest);
-        docPersonRepo.delete(docPerson);
-
-        DocEmployee docEmployee = DocEmployee.builder()
+        DocEmployee newEmployee = DocEmployee.builder()
                 .id(employeeDto.getId())
                 .organization(clsOrganization)
                 .person(docPerson)
                 .isVaccinatedFlu(employeeDto.getIsVaccinatedFlu())
                 .isVaccinatedCovid(employeeDto.getIsVaccinatedCovid())
                 .build();
-        docEmployeeRepo.delete(docEmployee);
+
+        return newEmployee;
+     }
+
+    //Добавление отредактированного сотрудника
+    public DocEmployee constructUpdatePerson(DocPerson docPerson, EmployeeDto employeeDto, ClsOrganization clsOrganization){
+
+        Long personId = docPerson.getId();
+        DocPerson updatePerson = new DocPerson();
+        Optional<DocPerson> optionalDocPerson = docPersonRepo.findById(personId);
+        if(optionalDocPerson.isPresent()){
+
+            updatePerson = optionalDocPerson.get();
+        }
+        updatePerson.setId(personId);
+        updatePerson.setFirstname(docPerson.getFirstname());
+        updatePerson.setLastname(docPerson.getLastname());
+        updatePerson.setPatronymic(docPerson.getPatronymic());
+        docPersonRepo.save(updatePerson);
+
+        DocEmployee updatedEmployee = DocEmployee.builder()
+                .id(employeeDto.getId())
+                .organization(clsOrganization)
+                .person(updatePerson)
+                .isVaccinatedFlu(employeeDto.getIsVaccinatedFlu())
+                .isVaccinatedCovid(employeeDto.getIsVaccinatedCovid())
+                .build();
+
+        return updatedEmployee;
+    }
+
+    @Transactional
+    public void deleteEmployee(EmployeeDto employeeDto){
+        Long personId = employeeDto.getPerson().getId();
+
+        docEmployeeRepo.deleteById(employeeDto.getId());
+        docPersonRepo.deleteById(personId);
+
     }
 }
