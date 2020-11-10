@@ -11,7 +11,6 @@
 <body>
 <div id="login"></div>
 <!--<div th:text="${message}" style="color: red;"></div>-->
-
 <script th:inline="javascript">
     let message = [[${message}]] || ''
 
@@ -23,10 +22,16 @@
         webix.message("Введен неверный логин или пароль", "error")
     }
 
+    webix.html.addStyle(".myClass .webix_button{  background: #475466; color: #FFFFFF;} .myClass .webix_button:hover {background-color: #586980;}");
+
     webix.ui(
         {
+            type:"form",
+            css: {
+                "background":"#ccd7e6 !important" //#323B55"#ccd7e6
+            },
             rows: [
-                {
+                /*{
                     view: 'toolbar',
                     //height: 40,
                     autoheight: true,
@@ -38,55 +43,93 @@
                             label: `<span style="font-size: 1.3rem">${appName}. Личный кабинет</span>`,
                         },
                     ]
+                },*/
+                {
+                    gravity: 0.9,
                 },
                 {
-                    gravity: 0.2,
-                },
-                {
-                    cols: [
-                        {},
-                        {
-                            container: 'login',
-                            view: "form",
-                            id: "log_form",
-                            width: 400,
-                            height: 200,
-                            margintop: 50,
-                            elements: [
-                                {view: "text", label: "ИНН", name: "username", labelWidth: 150},
-                                {view: "text", type: "password", label: "Пароль", name: "password", labelWidth: 150},
-                                {
-                                    margin: 5, cols: [
-                                        {view: "button", value: "Войти", css: "webix_primary", click: submit},
-                                        //{ view:"button", value:"Cancel"}
-                                    ]
+                    view: "align",
+                    align: "middle,center",
+                    body: {
+                        cols: [
+                            {
+                                margin:0,
+                                padding:{
+                                    top:55, bottom:25
                                 },
-                                // {
-                                //     view: 'label',
-                                //     label: message //'<span style="color: red;"' + message + '</span>'
-                                // },
-                                {
-                                    cols: [
-                                        {
-                                            view: 'label',
-                                            label: '<a href="/registration">Регистрация</a>'
-                                        },
-                                        {
-                                            view: 'label',
-                                            align: 'right',
-                                            label: '<a href="/recovery">Не могу войти</a>'
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {}
-                    ]
+                                width: 400,
+                                css: {
+                                    "background":"#475466 !important" //#2b334a
+                                },
+                                rows: [
+                                    {
+                                        view: "label",
+                                        height: 200,
+                                        align: "center",
+                                        template: "<img src = \"logo.png\">"
+                                    },
+                                    { view:"label", label:`<span style="font-size: 1.5rem; color: #ccd7e6">Добро пожаловать!</span>`,height:50, align:"center" },
+                                    { view:"label", label:`<span style="font-size: 1rem; color: #fff6f6">Информационная система</span>`,  height:50, align:"center" },
+                                    { view:"label", label:`<span style="font-size: 1rem; color: #fff6f6">Работающая бурятия</span>`,height:50, align:"center"},
+                                    { view:"label", label:`<span style="font-size: 0.8rem; color: #fff6f6">©2020</span>`,height:50, align:"center" },
+                                ]
+
+                            },
+                            {
+                                container: 'login',
+                                view: "form",
+                                align: 'center',
+                                id: "log_form",
+                                width: 350,
+                                autoheight: true,
+                                elements: [
+                                    {},
+                                    {
+                                        view:"label",
+                                        label:`<span style="font-size: 1.1rem; color: #6e6e6e">Вход</span>`
+                                    },
+                                    {
+                                        view: "text",
+                                        placeholder: "ИНН",
+                                        name: "username",
+                                    },
+                                    {
+                                        view: "text",
+                                        type: "password",
+                                        placeholder: "Пароль",
+                                        name: "password",
+                                    },
+                                    {
+                                        cols: [
+                                            {
+                                                margin: 5, cols: [
+                                                    {view: "button", value: "Войти", width: 100, css: 'myClass', click: submit},
+                                                    //{ view:"button", value:"Cancel"}
+                                                ]
+                                            },
+                                            {
+                                                view: 'label',
+                                                align: 'right',
+                                                label: '<a href="/registration" style=" margin-right: 10px; color: #6e6e6e">Регистрация</a> <a href="/recovery" style="color: #6e6e6e">Не могу войти</a>'
+                                            }
+                                        ]
+                                    },
+
+                                    // {
+                                    //     view: 'label',
+                                    //     label: message //'<span style="color: red;"' + message + '</span>'
+                                    // },
+                                    {}
+                                ]
+                            }
+                        ]
+                    }
                 },
                 {}
-        ]
-    });
-    function submit(){
+            ]
+        });
+
+    function submit() {
         //webix.message(JSON.stringify($$("log_form").getValues(), null, 2));
         webix.send("perform_login", $$("log_form").getValues());
     }

@@ -47,30 +47,35 @@ const commonInfo = {
                                 required: true
                             },
                             {
-                                view: 'text',
-                                name: 'inn',
-                                label: 'ИНН',
-                                labelPosition: 'top',
-                                validate: function (val) {
-                                    return !isNaN(val * 1);
-                                },
-                                //attributes:{ type:"number" },
-                                invalidMessage: 'Поле не может быть пустым',
-                                required: true
+                                cols: [
+                                    {
+                                        view: 'text',
+                                        name: 'inn',
+                                        label: 'ИНН',
+                                        labelPosition: 'top',
+                                        validate: function (val) {
+                                            return !isNaN(val * 1);
+                                        },
+                                        //attributes:{ type:"number" },
+                                        invalidMessage: 'Поле не может быть пустым',
+                                        required: true
+                                    },
+                                    {
+                                        view: 'text',
+                                        name: 'ogrn',
+                                        label: 'ОГРН',
+                                        validate: function (val) {
+                                            return !isNaN(val * 1);
+                                        },
+                                        //attributes:{ type:"number" },
+                                        labelPosition: 'top',
+                                        //validate:webix.rules.isNumber(),
+                                        invalidMessage: 'Поле не может быть пустым',
+                                        required: true
+                                    },
+                                ]
                             },
-                            {
-                                view: 'text',
-                                name: 'ogrn',
-                                label: 'ОГРН',
-                                validate: function (val) {
-                                    return !isNaN(val * 1);
-                                },
-                                //attributes:{ type:"number" },
-                                labelPosition: 'top',
-                                //validate:webix.rules.isNumber(),
-                                invalidMessage: 'Поле не может быть пустым',
-                                required: true
-                            },
+
                             {
                                 view: 'text',
                                 name: 'okved',
@@ -95,22 +100,27 @@ const commonInfo = {
                                 required: true
                             },
                             {
-                                view: 'text',
-                                name: 'email',
-                                label: 'Адрес электронной почты',
-                                labelPosition: 'top',
-                                validate: webix.rules.isEmail,
-                                invalidMessage: 'Поле не может быть пустым',
-                                required: true
+                                cols: [
+                                    {
+                                    view: 'text',
+                                    name: 'email',
+                                    label: 'Адрес электронной почты',
+                                    labelPosition: 'top',
+                                    validate: webix.rules.isEmail,
+                                    invalidMessage: 'Поле не может быть пустым',
+                                    required: true
+                                    },
+                                    {
+                                        view: 'text',
+                                        name: 'phone',
+                                        label: 'Телефон',
+                                        labelPosition: 'top',
+                                        invalidMessage: 'Поле не может быть пустым',
+                                        required: true
+                                    },
+                                ]
                             },
-                            {
-                                view: 'text',
-                                name: 'phone',
-                                label: 'Телефон',
-                                labelPosition: 'top',
-                                invalidMessage: 'Поле не может быть пустым',
-                                required: true
-                            },
+
                         ]
                     }
                 ],
@@ -1340,9 +1350,9 @@ var updateFIOmodal = webix.ui({
         view: 'form',
         id: 'modal_form_employee',
         complexData: true,
-        rules:{
-            "person.lastname":webix.rules.isNotEmpty,
-            "person.firstname":webix.rules.isNotEmpty,
+        rules: {
+            "person.lastname": webix.rules.isNotEmpty,
+            "person.firstname": webix.rules.isNotEmpty,
         },
         elements: [
             {
@@ -1357,7 +1367,7 @@ var updateFIOmodal = webix.ui({
                 name: 'person.firstname',
                 label: 'Имя',
                 labelPosition: 'top',
-                invalidMessage:"Имя не может быть пустым"
+                invalidMessage: "Имя не может быть пустым"
             },
             {
                 view: 'text',
@@ -1390,9 +1400,9 @@ var updateFIOmodal = webix.ui({
                 click: function () {
                     var form = this.getParentView();
                     let params = $$('modal_form_employee').getValues()
-                    if(form.validate()){
-                         webix.ajax()
-                             .headers({'Content-type': 'application/json'})
+                    if (form.validate()) {
+                        webix.ajax()
+                            .headers({'Content-type': 'application/json'})
                             .post('/employee', JSON.stringify(params))
                             .then(function (data) {
                                 if (data !== null) {
@@ -1470,7 +1480,7 @@ var importEmployees = webix.ui({
                                 }
                             })
                             if (uploadedFiles.length != $$('upload').files.data.count()) {
-                                webix.message('Не удалось загрузить файлы.',"error")
+                                webix.message('Не удалось загрузить файлы.', "error")
                                 $$('upload').focus()
                             }
                             $$('employees_table').load('employees');
@@ -1481,6 +1491,24 @@ var importEmployees = webix.ui({
                     }
                 }
             ]
+        }
+});
+
+uploadEmployees = webix.ui({
+    view: "window",
+    width: 550,
+    position: "center",
+    modal: true,
+    close: true,
+    head: "Загрузка сотрудников",
+    body:
+        {
+            view: 'form',
+            id: 'emp_upload',
+            complexData: true,
+            elements:
+                []
+
         }
 });
 
@@ -1616,9 +1644,9 @@ const employees = {
                             view: 'form',
                             id: 'form_employee',
                             complexData: true,
-                            rules:{
-                                "person.lastname":webix.rules.isNotEmpty,
-                                "person.firstname":webix.rules.isNotEmpty,
+                            rules: {
+                                "person.lastname": webix.rules.isNotEmpty,
+                                "person.firstname": webix.rules.isNotEmpty,
                             },
                             elements: [
                                 {
@@ -1634,7 +1662,7 @@ const employees = {
                                     name: 'person.firstname',
                                     label: 'Имя',
                                     labelPosition: 'top',
-                                    invalidMessage:"Имя не может быть пустым"
+                                    invalidMessage: "Имя не может быть пустым"
                                 },
                                 {
                                     view: 'text',
@@ -1667,7 +1695,7 @@ const employees = {
                                     click: function () {
                                         var form = this.getParentView();
                                         let params = $$('form_employee').getValues()
-                                        if(form.validate()){
+                                        if (form.validate()) {
                                             webix.ajax()
                                                 .headers({'Content-type': 'application/json'})
                                                 .post('/employee', JSON.stringify(params))
@@ -1802,6 +1830,11 @@ webix.ready(function () {
                     },
                     {
                         view: 'label',
+                        width: 40,
+                        template: "<img height='35px' width='35px' src = \"favicon.ico\">"
+                    },
+                    {
+                        view: 'label',
                         label: `<span style="font-size: 1.0rem">Личный кабинет</span>`,
                     },
                     {
@@ -1819,10 +1852,10 @@ webix.ready(function () {
                         // collapsed: true,
                         css: 'webix_dark',
                         data: [
-                            {id: "CommonInfo", value: 'Общая информация'},
-                            {id: "Employees", value: 'Сотрудники'},
-                            {id: "Requests", value: 'Заявки'},
-                            {id: "Settings", value: 'Настройки'},
+                            {id: "CommonInfo",icon:"mdi mdi-information", value: 'Общая информация'},
+                            {id: "Employees", icon:"mdi mdi-account-group" , value: 'Сотрудники'},
+                            {id: "Requests", icon:"wxi-file",value: 'Заявки'},
+                            {id: "Settings",  icon:"mdi mdi-cogs", value: 'Настройки'},
                         ],
                         on: {
                             onAfterSelect: function (id) {
