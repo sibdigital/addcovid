@@ -1,7 +1,7 @@
 webix.i18n.setLocale("ru-RU");
 
 const dateFormat = webix.Date.dateToStr("%d.%m.%Y %H:%i:%s")
-
+let userWindowHeight = window.innerHeight;
 
 function view_section(title) {
     return {
@@ -41,17 +41,25 @@ const commonInfo = {
                             {
                                 view: 'text',
                                 name: 'shortName',
+                                id: 'shortOrganizationName',
                                 label: 'Краткое наименование организации',
                                 labelPosition: 'top',
                                 invalidMessage: 'Поле не может быть пустым',
                                 required: true
                             },
                             {
+                                id:"innplace",
+                                rows:[]
+                            },
+                            {
+                                responsive: 'innplace',
                                 cols: [
                                     {
                                         view: 'text',
                                         name: 'inn',
+                                        id: "inn",
                                         label: 'ИНН',
+                                        minWidth: 200,
                                         labelPosition: 'top',
                                         validate: function (val) {
                                             return !isNaN(val * 1);
@@ -63,7 +71,9 @@ const commonInfo = {
                                     {
                                         view: 'text',
                                         name: 'ogrn',
+                                        id: 'ogrn',
                                         label: 'ОГРН',
+                                        minWidth: 200,
                                         validate: function (val) {
                                             return !isNaN(val * 1);
                                         },
@@ -87,6 +97,7 @@ const commonInfo = {
                             {
                                 view: 'textarea',
                                 name: 'okvedAdd',
+                                id: 'okvedAdd',
                                 label: 'Дополнительные виды осуществляемой деятельности',
                                 height: 100,
                                 labelPosition: 'top'
@@ -100,19 +111,26 @@ const commonInfo = {
                                 required: true
                             },
                             {
+                                id:"emailPlace",
+                                rows:[]
+                            },
+                            {
+                                responsive: "emailPlace",
                                 cols: [
                                     {
-                                    view: 'text',
-                                    name: 'email',
-                                    label: 'Адрес электронной почты',
-                                    labelPosition: 'top',
-                                    validate: webix.rules.isEmail,
-                                    invalidMessage: 'Поле не может быть пустым',
-                                    required: true
+                                        view: 'text',
+                                        name: 'email',
+                                        minWidth: 200,
+                                        label: 'Адрес электронной почты',
+                                        labelPosition: 'top',
+                                        validate: webix.rules.isEmail,
+                                        invalidMessage: 'Поле не может быть пустым',
+                                        required: true
                                     },
                                     {
                                         view: 'text',
                                         name: 'phone',
+                                        minWidth: 200,
                                         label: 'Телефон',
                                         labelPosition: 'top',
                                         invalidMessage: 'Поле не может быть пустым',
@@ -156,6 +174,7 @@ const requests = {
                                 id: "typeRequest",
                                 header: "Тип заявки",
                                 template: "#typeRequest.activityKind#",
+                                minWidth: 110,
                                 fillspace: true
                             },
                             {
@@ -163,7 +182,6 @@ const requests = {
                                 header: "Дата подачи",
                                 adjust: true,
                                 format: dateFormat,
-                                fillspace: true
                             },
                             {
                                 id: "status",
@@ -172,9 +190,9 @@ const requests = {
                                 adjust: true,
                                 width: 300
                             },
-                            {id: "personSlrySaveCnt", header: "Числ. с сохр. зп", adjust: true},
-                            {id: "personOfficeCnt", header: "Числ. работающих", adjust: true},
-                            {id: "personRemoteCnt", header: "Числе. удал. режим", adjust: true},
+                            {id: "personSlrySaveCnt", header: "Числ. с сохр. зп", minWidth: 160, fillspace: true},
+                            {id: "personOfficeCnt", header: "Числ. работающих", minWidth: 160, fillspace: true},
+                            {id: "personRemoteCnt", header: "Числе. удал. режим", minWidth: 160, fillspace: true},
                         ],
                         scheme: {
                             $init: function (obj) {
@@ -204,10 +222,20 @@ const requests = {
                         url: 'org_requests'
                     },
                     {
+                        align: 'center, middle',
+                        body:
+                            {
+                                id: 'requestPagerIn',              //pager responsive-target
+                                rows: []
+                            },
+                    },
+                    {
+                        responsive: "requestPagerIn",
                         cols: [
                             {
                                 view: 'pager',
                                 id: 'Pager',
+                                minWidth: 220,
                                 height: 38,
                                 size: 25,
                                 group: 5,
@@ -216,7 +244,8 @@ const requests = {
                             {
                                 view: 'button',
                                 align: 'right',
-                                maxWidth: 200,
+                                minWidth: 220,
+                                maxWidth: 350,
                                 css: 'webix_primary',
                                 value: 'Подать заявку',
                                 click: function () {
@@ -1025,7 +1054,7 @@ function showRequestCreateForm(idTypeRequest) {
             // $$('desc_departments').setValue(descDepartments);
         });
 
-        $$('activityKind').setHTML('<span style="">Тип заявки: ' + typeRequest.activityKind + '</span>');
+        $$('activityKind').setHTML('<span class = "text-success" style="">Тип заявки: ' + typeRequest.activityKind + '</span>');
         let department = typeRequest.department;
         if (department) {
             departmentId = (department.id);
@@ -1339,8 +1368,10 @@ const settings = {
 
 // ***** ВАКЦИНАЦИЯ *****
 
-var updateFIOmodal = webix.ui({
+let updateFIOmodal = webix.ui({
     view: "window",
+    id: "updateModal",
+    minWidth: 200,
     width: 550,
     position: "center",
     modal: true,
@@ -1374,7 +1405,8 @@ var updateFIOmodal = webix.ui({
                 name: 'person.patronymic',
                 label: 'Отчество',
                 labelPosition: 'top'
-            },/*
+            },
+            /*
                     {
                         view: 'checkbox',
                         id: 'isVaccinatedFlu',
@@ -1392,7 +1424,6 @@ var updateFIOmodal = webix.ui({
             {
                 view: 'button',
                 align: 'right',
-                maxWidth: 550,
                 css: 'webix_primary',
                 value: 'Добавить',
                 hotkey: "enter",
@@ -1427,9 +1458,10 @@ var updateFIOmodal = webix.ui({
     }
 });
 
-var importEmployees = webix.ui({
+let importEmployees = webix.ui({
     view: "window",
-    width: 650,
+    id: "importModal",
+    width: 550,
     position: "center",
     modal: true,
     close: true,
@@ -1483,6 +1515,7 @@ var importEmployees = webix.ui({
                                 webix.message('Не удалось загрузить файлы.', "error")
                                 $$('upload').focus()
                             }
+                            $$('employees_table').clearAll();
                             $$('employees_table').load('employees');
                             $$("upload").files.data.clearAll();
                             importEmployees.hide();
@@ -1494,25 +1527,6 @@ var importEmployees = webix.ui({
         }
 });
 
-uploadEmployees = webix.ui({
-    view: "window",
-    width: 550,
-    position: "center",
-    modal: true,
-    close: true,
-    head: "Загрузка сотрудников",
-    body:
-        {
-            view: 'form',
-            id: 'emp_upload',
-            complexData: true,
-            elements:
-                []
-
-        }
-});
-
-let usersWindowHeight = window.innerHeight;
 const employees = {
     view: 'scrollview',
     scroll: 'xy',
@@ -1547,246 +1561,282 @@ const employees = {
                         },
                         {
                             view: "button",
+                            id: "findButton",
                             maxWidth: 150,
                             value: "Поиск",
                             css: 'webix_primary',
                             hotkey: "enter",
-                            click: filterText
+                            click: function (){
+                                filterText();
+                                $$("dtFilter").setValue("");
+                            }
                         }
                     ]
             },
             {
-                type: 'wide',
-                cols:
-                    [
-                        {
-                            view: 'datatable',
-                            id: "employees_table",
-                            height: usersWindowHeight - 200,
-                            select: "row",
-                            scrollX: false,
-                            navigation: true,
-                            resizeColumn: true,
-                            pager: 'Pager',
-                            datafetch: 25,
-                            columns: [
+                id: 'tableIn',                              //employess_table responsive-target
+                margin: 10,
+                rows: [
+                    {
+                        align: 'center, middle',
+                        body:
+                            {
+                                id: 'pagerIn',              //pager responsive-target
+                                rows: []
+                            },
+                    },
+                    {
+                        type: 'wide',
+                        responsive: 'tableIn',              //move in tableIn
+                        cols:
+                            [
                                 {
-                                    header: "Фамилия",
-                                    template: "#person.lastname#",
-                                    fillspace: true,
-                                    sort: "text"
-                                },
-                                {
-                                    header: "Имя",
-                                    template: "#person.firstname#",
-                                    fillspace: true,
-                                    sort: "text"
-                                },
-                                {
-                                    header: "Отчество",
-                                    template: "#person.patronymic#",
-                                    fillspace: true,
-                                    sort: "text"
-                                },
-                                /*
-                                {
-                                    header: "Привит от гриппа",
-                                    template: function (obj) {
-                                        if (obj.isVaccinatedFlu) {
-                                            return 'Да';
-                                        } else {
-                                            return 'Нет';
-                                        }
-                                    },
-                                    fillspace: true,
-                                    adjust: true
-                                },
-                                {
-                                    header: "Привит от COVID-19",
-                                    template: function (obj) {
-                                        if (obj.isVaccinatedCovid) {
-                                            return 'Да';
-                                        } else {
-                                            return 'Нет';
-                                        }
-                                    },
-                                    fillspace: true,
-                                    adjust: true
-                                }*/
-                            ],
-                            on: {
-                                onBeforeLoad: function () {
-                                    this.showOverlay("Загружаю...");
-                                },
-                                onAfterLoad: function () {
-                                    this.hideOverlay();
-                                    if (!this.count()) {
-                                        this.showOverlay("Отсутствуют данные")
-                                    }
-                                },
-                                onLoadError: function () {
-                                    this.hideOverlay();
-                                },
-                                onItemClick: function (id) {
-                                    let item = this.getItem(id);
-                                    $$('form_employee').parse(item);
-                                },
-                                onItemDblClick: function (id) {
-                                    let item = this.getItem(id);
-                                    $$('modal_form_employee').parse(item);
-                                    updateFIOmodal.show();
+                                    view: 'datatable',
+                                    id: "employees_table",
+                                    height: userWindowHeight - 200,
+                                    minWidth: 220,
+                                    select: "row",
+                                    navigation: true,
+                                    resizeColumn: true,
+                                    pager: 'Pager',
+                                    datafetch: 25,
+                                    columns: [
+                                        {
+                                            header: "Фамилия",
+                                            template: "#person.lastname#",
+                                            minWidth: 130, fillspace: true,
+                                            sort: "text"
+                                        },
+                                        {
+                                            header: "Имя",
+                                            template: "#person.firstname#",
+                                            adjust: true, minWidth: 150,
+                                            sort: "text"
+                                        },
+                                        {
+                                            header: "Отчество",
+                                            template: "#person.patronymic#",
+                                            minWidth: 160, fillspace: true,
+                                            sort: "text"
+                                        },
+                                        /*
+                                        {
+                                            header: "Привит от гриппа",
+                                            template: function (obj) {
+                                                if (obj.isVaccinatedFlu) {
+                                                    return 'Да';
+                                                } else {
+                                                    return 'Нет';
+                                                }
+                                            },
+                                            fillspace: true,
+                                            adjust: true
+                                        },
+                                        {
+                                            header: "Привит от COVID-19",
+                                            template: function (obj) {
+                                                if (obj.isVaccinatedCovid) {
+                                                    return 'Да';
+                                                } else {
+                                                    return 'Нет';
+                                                }
+                                            },
+                                            fillspace: true,
+                                            adjust: true
+                                        }*/
+                                    ],
+                                    on: {
+                                        onBeforeLoad: function () {
+                                            this.showOverlay("Загружаю...");
+                                        },
+                                        onAfterLoad: function () {
+                                            this.hideOverlay();
+                                            if (!this.count()) {
+                                                this.showOverlay("Отсутствуют данные")
+                                            }
+                                        },
+                                        onLoadError: function () {
+                                            this.hideOverlay();
+                                        },
+                                        onItemClick: function (id) {
+                                            let item = this.getItem(id);
+                                            $$('form_employee').parse(item);
+                                        },
+                                        onItemDblClick: function (id) {
+                                            let item = this.getItem(id);
+                                            $$('modal_form_employee').parse(item);
+                                            updateFIOmodal.show();
 
+                                        }
+                                    },
+                                    url: 'employees'
+                                },
+                                {
+                                    view: 'form',
+                                    id: 'form_employee',
+                                    minWidth: 220,
+                                    width: 300,
+                                    complexData: true,
+                                    rules: {
+                                        "person.lastname": webix.rules.isNotEmpty,
+                                        "person.firstname": webix.rules.isNotEmpty,
+                                    },
+                                    elements: [
+                                        {
+                                            view: 'text',
+                                            name: 'person.lastname',
+                                            label: 'Фамилия',
+                                            labelPosition: 'top',
+                                            invalidMessage: "Фамилия не может быть пустой"
+                                        },
+                                        {
+
+                                            view: 'text',
+                                            name: 'person.firstname',
+                                            label: 'Имя',
+                                            labelPosition: 'top',
+                                            invalidMessage: "Имя не может быть пустым"
+                                        },
+                                        {
+                                            view: 'text',
+                                            name: 'person.patronymic',
+                                            label: 'Отчество',
+                                            labelPosition: 'top'
+                                        },
+                                        /*
+                                        {
+                                            view: 'checkbox',
+                                            id: 'isVaccinatedFlu',
+                                            name: 'isVaccinatedFlu',
+                                            label: 'Привит от гриппа',
+                                            labelPosition: 'top'
+                                        },
+                                        {
+                                            view: 'checkbox',
+                                            id: 'isVaccinatedCovid',
+                                            name: 'isVaccinatedCovid',
+                                            label: 'Привит от COVID-19',
+                                            labelPosition: 'top'
+                                        },
+                                        */
+                                        {
+                                            view: 'button',
+                                            align: 'right',
+                                            css: 'webix_primary',
+                                            value: 'Добавить',
+                                            click: function () {
+                                                var form = this.getParentView();
+                                                let params = $$('form_employee').getValues()
+                                                if (form.validate()) {
+                                                    webix.ajax()
+                                                        .headers({'Content-type': 'application/json'})
+                                                        .post('/employee', JSON.stringify(params))
+                                                        .then(function (data) {
+                                                            if (data !== null) {
+                                                                $$('form_employee').clear()
+                                                                if (params.id) {
+                                                                    webix.message('Сотрудник обновлен', 'success');
+                                                                } else {
+                                                                    webix.message("Сотрудник добавлен", 'success');
+                                                                }
+                                                                $$('employees_table').load('employees');
+                                                            } else {
+                                                                webix.message("Не удалось добавить сотрудника", 'error');
+                                                            }
+                                                        });
+                                                }
+                                            }
+                                        },
+                                    ]
                                 }
-                            },
-                            url: 'employees'
-                        },
-                        {
-                            view: 'form',
-                            id: 'form_employee',
-                            complexData: true,
-                            rules: {
-                                "person.lastname": webix.rules.isNotEmpty,
-                                "person.firstname": webix.rules.isNotEmpty,
-                            },
-                            elements: [
-                                {
-                                    view: 'text',
-                                    name: 'person.lastname',
-                                    label: 'Фамилия',
-                                    labelPosition: 'top',
-                                    invalidMessage: "Фамилия не может быть пустой"
-                                },
-                                {
-
-                                    view: 'text',
-                                    name: 'person.firstname',
-                                    label: 'Имя',
-                                    labelPosition: 'top',
-                                    invalidMessage: "Имя не может быть пустым"
-                                },
-                                {
-                                    view: 'text',
-                                    name: 'person.patronymic',
-                                    label: 'Отчество',
-                                    labelPosition: 'top'
-                                },
-                                /*
-                                {
-                                    view: 'checkbox',
-                                    id: 'isVaccinatedFlu',
-                                    name: 'isVaccinatedFlu',
-                                    label: 'Привит от гриппа',
-                                    labelPosition: 'top'
-                                },
-                                {
-                                    view: 'checkbox',
-                                    id: 'isVaccinatedCovid',
-                                    name: 'isVaccinatedCovid',
-                                    label: 'Привит от COVID-19',
-                                    labelPosition: 'top'
-                                },
-                                */
-                                {
-                                    view: 'button',
-                                    align: 'right',
-                                    maxWidth: 200,
-                                    css: 'webix_primary',
-                                    value: 'Добавить',
-                                    click: function () {
-                                        var form = this.getParentView();
-                                        let params = $$('form_employee').getValues()
-                                        if (form.validate()) {
-                                            webix.ajax()
-                                                .headers({'Content-type': 'application/json'})
-                                                .post('/employee', JSON.stringify(params))
-                                                .then(function (data) {
-                                                    if (data !== null) {
-                                                        $$('form_employee').clear()
-                                                        if (params.id) {
-                                                            webix.message('Сотрудник обновлен', 'success');
-                                                        } else {
-                                                            webix.message("Сотрудник добавлен", 'success');
-                                                        }
-                                                        $$('employees_table').load('employees');
-                                                    } else {
-                                                        webix.message("Не удалось добавить сотрудника", 'error');
-                                                    }
-                                                });
-                                        }
-                                    }
-                                },
                             ]
-                        }
-                    ]
+                    },
+
+                ]
             },
-            {
+            {           //move in pagerIn
                 cols:
                     [
                         {
                             view: 'pager',
                             id: 'Pager',
+                            minWidth: 220,
                             height: 38,
                             size: 25,
                             group: 5,
                             template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
                         },
                         {
-                            view: "button",
-                            maxWidth: 350,
-                            value: "Загрузить",
-                            css: 'webix_primary',
-                            click: function () {
-                                $$("upload").files.data.clearAll();
-                                importEmployees.show()
-                            }
-                        },
-                        {
-                            view: "button",
-                            align: 'left',
-                            maxWidth: 350,
-                            css: 'webix_primary',
-                            value: 'Добавить',
-                            click: function () {
-                                $$('modal_form_employee').clear()
-                                updateFIOmodal.show();
-                            }
-                        },
-                        {
-                            view: 'button',
-                            align: 'right',
-                            maxWidth: 350,
-                            css: 'webix_primary',
-                            value: 'Удалить',
-                            hotkey: "delete",
-                            click: function () {
-
-                                let params = $$('employees_table').getSelectedItem()
-
-                                if (!$$("employees_table").getSelectedId()) {
-                                    webix.message("Не выбрана строка!", "error");
-                                    return;
+                            cols:[
+                            {
+                                view: "button",
+                                id: "uploadButton",
+                                minWidth: 100,
+                                maxWidth: 350,
+                                value: "Загрузить",
+                                css: 'webix_primary',
+                                click: function () {
+                                    $$("upload").files.data.clearAll();
+                                    importEmployees.show()
                                 }
-                                $$("employees_table").remove($$("employees_table").getSelectedId());
-                                webix.ajax()
-                                    .headers({'Content-type': 'application/json'})
-                                    .post('/deleteEmployee', JSON.stringify(params))
-                                    .then(function (data) {
-                                        if (data !== null) {
-                                            webix.message("Сотрудник удалён", 'success');
-                                            $$('form_employee').clear()
-                                            $$('modal_form_employee').clear()
-                                            $$('employees_table').load('employees');
-                                        } else {
-                                            webix.message("Не удалось удалить сотрудника", 'error');
-                                        }
-                                    });
-                                $$('form_employee').clear()
-                                $$('modal_form_employee').clear()
-                                updateFIOmodal.hide()
+                            },
+                            {
+                                view: "button",
+                                align: 'left',
+                                minWidth: 100,
+                                maxWidth: 350,
+                                css: 'webix_primary',
+                                value: 'Добавить',
+                                click: function () {
+                                    $$('modal_form_employee').clear()
+                                    updateFIOmodal.show();
+                                }
+                            },
+                            {
+                                view: 'button',
+                                align: 'right',
+                                minWidth: 100,
+                                maxWidth: 350,
+                                css: 'webix_primary',
+                                value: 'Удалить',
+                                hotkey: "delete",
+                                click: function () {
+
+                                    let params = $$('employees_table').getSelectedItem()
+
+                                    if (!$$("employees_table").getSelectedId()) {
+                                        webix.message("Не выбрана строка!", "error");
+                                        return;
+                                    }
+                                    $$("employees_table").remove($$("employees_table").getSelectedId());
+                                    webix.ajax()
+                                        .headers({'Content-type': 'application/json'})
+                                        .post('/deleteEmployee', JSON.stringify(params))
+                                        .then(function (data) {
+                                            if (data !== null) {
+                                                webix.message("Сотрудник удалён", 'success');
+                                                $$('form_employee').clear()
+                                                $$('modal_form_employee').clear()
+                                                $$('employees_table').load('employees');
+                                            } else {
+                                                webix.message("Не удалось удалить сотрудника", 'error');
+                                            }
+                                        });
+                                    $$('form_employee').clear()
+                                    $$('modal_form_employee').clear()
+                                    updateFIOmodal.hide()
+                                }
                             }
+                            ]
                         }
+
+
                     ]
             },
+            {
+                id: 'btnsIn',
+                rows:[]
+            }
         ]
     }
 }
@@ -1802,9 +1852,9 @@ function filterText() {
             return webix.ajax().headers({'Content-type': 'application/json'}).post("/filter", text);
         });
     }
-    $$("dtFilter").setValue("")
 }
 
+//Закрытие модального окна при смене фокуса
 webix.attachEvent("onFocusChange", function (to, from) {
     if (from && from.getTopParentView().config.view == "window" && !to) {
         from.getTopParentView().hide();
@@ -1849,13 +1899,13 @@ webix.ready(function () {
                     {
                         view: 'sidebar',
                         id: 'sidebar',
-                        // collapsed: true,
+                        collapsed: true,
                         css: 'webix_dark',
                         data: [
-                            {id: "CommonInfo",icon:"mdi mdi-information", value: 'Общая информация'},
-                            {id: "Employees", icon:"mdi mdi-account-group" , value: 'Сотрудники'},
-                            {id: "Requests", icon:"wxi-file",value: 'Заявки'},
-                            {id: "Settings",  icon:"mdi mdi-cogs", value: 'Настройки'},
+                            {id: "CommonInfo", icon: "mdi mdi-information", value: 'Общая информация'},
+                            {id: "Employees", icon: "mdi mdi-account-group", value: 'Сотрудники'},
+                            {id: "Requests", icon: "wxi-file", value: 'Заявки'},
+                            {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
                         ],
                         on: {
                             onAfterSelect: function (id) {
@@ -1900,4 +1950,40 @@ webix.ready(function () {
         layout.resize();
     });
 
+    //responsive events
+    webix.attachEvent("onResponsiveHide", function (id) {
+
+        //when employees_table was moved
+        if (id === "employees_table") {
+            resizeContent()
+            $$('findButton').hide();
+            $$('dtFilter').attachEvent("onTimedKeyPress", function (id) {
+                filterText()
+            });
+            $$('sidebar').hide();
+
+            $$("btnsIn").addView($$('uploadButton'), 0);
+            $$('Pager').config.group = 2;
+            $$("pagerIn").addView($$('Pager'),0)
+
+        }else if (id === "inn"){
+
+            $$("organizationName").config.label = "Наим. орг./ФИО ИП";$$("organizationName").refresh();
+            $$("shortOrganizationName").config.label = "Краткое наим. орг."; $$("shortOrganizationName").refresh();
+            $$("organizationOkved").config.label = "Осн. вид деятельности"; $$("organizationOkved").refresh();
+            $$("okvedAdd").config.label = "Доп. виды деятельности"; $$("okvedAdd").refresh();
+
+        }
+    })
 })
+
+function resizeContent(){
+    let tableWidth = $$('employees_table').config.width;
+    $$('form_employee').define({
+        width: tableWidth,
+    });$$('form_employee').resize();
+
+    updateFIOmodal.config.head = "RJAONDSJNDAJDNJD";
+    updateFIOmodal.config.width = 320; updateFIOmodal.resize();
+    importEmployees.config.width = 320; importEmployees.resize();
+}
