@@ -569,6 +569,9 @@ webix.ready(function() {
                                 {
                                     id: 'person_table',
                                     view: 'datatable',
+                                    url: 'doc_persons/' + ID_REQUEST,
+                                    pager: 'Pager',
+                                    datafetch: 50,
                                     height: 400,
                                     name: 'persons',
                                     select: 'row',
@@ -589,6 +592,13 @@ webix.ready(function() {
                                         }
                                     },
                                     data: []
+                                },
+                                {
+                                    view: 'pager',
+                                    id: 'Pager',
+                                    size: 50,
+                                    group: 5,
+                                    template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
                                 },
                                 {
                                     view: 'form',
@@ -1034,10 +1044,6 @@ webix.ready(function() {
             $$('personOfficeCnt').setValue(data.personOfficeCnt);
         });
 
-        let person_table_data = new webix.DataCollection({
-            url: 'doc_persons/' + ID_REQUEST
-        })
-        $$('person_table').sync(person_table_data);
         let addr_table_data = new webix.DataCollection({
             url: 'doc_address_fact/' + ID_REQUEST
         })
