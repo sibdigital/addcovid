@@ -1,5 +1,7 @@
 package ru.sibdigital.addcovid.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -47,4 +49,7 @@ public interface DocPersonRepo extends JpaRepository<DocPerson, Long> {
 
     @Query(nativeQuery = true, value = "select * from doc_person where id_request = :id_request")
     Optional<List<DocPerson>> findByDocRequest(Long id_request);
+
+    @Query(nativeQuery = true, value = "select * from doc_person where id_request = :id_request")
+    Page<DocPerson> findAllByDocRequest(Long id_request, Pageable pageable);
 }

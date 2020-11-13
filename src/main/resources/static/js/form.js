@@ -609,6 +609,8 @@ webix.ready(function() {
                                 {
                                     id: 'person_table',
                                     view: 'datatable',
+                                    pager: 'Pager',
+                                    datafetch: 50,
                                     height: 400,
                                     name: 'persons',
                                     select: 'row',
@@ -629,6 +631,13 @@ webix.ready(function() {
                                         },
                                     },
                                     data: []
+                                },
+                                {
+                                    view: 'pager',
+                                    id: 'Pager',
+                                    size: 50,
+                                    group: 5,
+                                    template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
                                 },
                                 {
                                     view: 'form',
