@@ -174,7 +174,7 @@ const requests = {
                                 id: "typeRequest",
                                 header: "Тип заявки",
                                 template: "#typeRequest.activityKind#",
-                                minWidth: 110,
+                                minWidth: 350,
                                 fillspace: true
                             },
                             {
@@ -306,6 +306,16 @@ let uploadFilename = '';
 let pred_date = new Date();
 let upload_chack_error = 'Загружать можно только PDF-файлы и ZIP-архивы!';
 
+webix.html.addStyle(
+    ".personalTemplateStyle .webix_template {" +
+    "font-family: Roboto, sans-serif;" +
+    "font-size: 14px;" +
+    "font-weight: 500;" +
+    "color: #313131;" +
+    "padding: 8px 3px !important;" +
+    "}"
+);
+
 function showRequestCreateForm(idTypeRequest) {
 
     ID_TYPE_REQUEST = idTypeRequest;
@@ -329,22 +339,39 @@ function showRequestCreateForm(idTypeRequest) {
                                 complexData: true,
                                 elements: [
                                     {
-                                        view: 'label',
-                                        css: {'white-space':'normal !important '},
+                                        view: 'template',
+                                        borderless: true,
+                                        css: 'personalTemplateStyle',
                                         id: 'activityKind',
                                         autoheight: true,
-                                        // align: 'center'
                                     },
                                     {
-                                        view: 'select',
-                                        id: 'departmentId',
-                                        name: 'departmentId',
-                                        label: 'Министерство, курирующее вашу деятельность',
-                                        labelPosition: 'top',
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true,
-                                        options: [],
+                                        rows:[
+                                            {
+                                                view: 'template',
+                                                borderless: true,
+                                                css:{
+                                                    'font-family' : 'Roboto, sans-serif;',
+                                                    'font-size' : '14px;',
+                                                    'font-weight' : '500;',
+                                                    'color' : '#313131;',
+                                                },
+                                                template: 'Министерство, курирующее вашу деятельность <span style = "color: red">*</span>',
+                                                autoheight: true
+
+                                            },
+                                            {
+                                                view: 'select',
+                                                id: 'departmentId',
+                                                name: 'departmentId',
+                                                labelPosition: 'top',
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true,
+                                                options: [],
+                                            },
+                                        ]
                                     },
+
                                     view_section('Обоснование заявки'),
                                     {
                                         rows: [
@@ -360,13 +387,19 @@ function showRequestCreateForm(idTypeRequest) {
                                                 labelPosition: 'top'
                                             },
                                             {
-                                                view: 'label',
-                                                label: '<span style="text-align: center; color: red">Для загрузки нескольких файлов выбирайте их с зажатой клавишей Ctrl или заранее сожмите в ZIP-архив и загрузите его</span>',
+                                                view: 'template',
+                                                css: 'personalTemplateStyle',
+                                                borderless: true,
+                                                template: '<span style="text-align: center; color: red">Для загрузки нескольких файлов выбирайте их с зажатой клавишей Ctrl или заранее сожмите в ZIP-архив и загрузите его</span>',
+                                                autoheight: true,
                                                 //css: 'main_label'
                                             },
                                             {
-                                                view: 'label',
-                                                label: '<span  style="text-align: center; color: red">Общий размер загружаемых файлов не должен превышать 60 Мб</span>',
+                                                view: 'template',
+                                                css: 'personalTemplateStyle',
+                                                borderless: true,
+                                                template: '<span  style="text-align: center; color: red">Общий размер загружаемых файлов не должен превышать 60 Мб</span>',
+                                                autoheight: true,
                                                 //css: 'main_label'
                                             },
                                             {
@@ -591,25 +624,65 @@ function showRequestCreateForm(idTypeRequest) {
                                                 hidden: true
                                             },
                                             {
-                                                view: 'text', name: 'personRemoteCnt',
-                                                label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
-                                                invalidMessage: 'Поле не может быть пустым',
-                                                validate: function (val) {
-                                                    return !isNaN(val * 1) && (val.trim() !== '')
-                                                },
-                                                required: true,
-                                                labelPosition: 'top'
+                                                type: 'space',
+                                                borderless: true,
+                                                padding: {bottom: 0},
+                                                rows:[
+                                                    {
+                                                        view: 'template',
+                                                        borderless: true,
+                                                        css: {
+                                                            'font-family' : 'Roboto, sans-serif;',
+                                                            'font-size' : '14px;',
+                                                            'font-weight' : '500;',
+                                                            'color' : '#313131;',
+                                                            'background-color' : '#EBEDF0',
+                                                        },
+                                                        template: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
+                                                        autoheight: true,
+                                                    },
+                                                    {
+                                                        view: 'text', name: 'personRemoteCnt',
+                                                        //label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
+                                                        invalidMessage: 'Поле не может быть пустым',
+                                                        validate: function (val) {
+                                                            return !isNaN(val * 1) && (val.trim() !== '')
+                                                        },
+                                                        required: true,
+                                                    },
+                                                ]
                                             },
                                             {
-                                                view: 'text', name: 'personOfficeCnt',
-                                                label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
-                                                labelPosition: 'top',
-                                                validate: function (val) {
-                                                    return !isNaN(val * 1) && (val.trim() !== '')
-                                                },
-                                                invalidMessage: 'Поле не может быть пустым',
-                                                required: true
+                                                type: 'space',
+                                                borderless: true,
+                                                padding: {top: 0},
+                                                rows:[
+                                                    {
+                                                        view: 'template',
+                                                        borderless: true,
+                                                        css: {
+                                                            'font-family' : 'Roboto, sans-serif;',
+                                                            'font-size' : '14px;',
+                                                            'font-weight' : '500;',
+                                                            'color' : '#313131;',
+                                                            'background-color' : '#EBEDF0',
+                                                        },
+                                                        template: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
+                                                        autoheight: true,
+                                                    },
+                                                    {
+                                                        view: 'text', name: 'personOfficeCnt',
+                                                        //label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
+
+                                                        validate: function (val) {
+                                                            return !isNaN(val * 1) && (val.trim() !== '')
+                                                        },
+                                                        invalidMessage: 'Поле не может быть пустым',
+                                                        required: true
+                                                    },
+                                                ],
                                             },
+
                                         ]
                                     },
                                     view_section('Данные о ваших работниках, чья деятельность предусматривает выход на работу (Обязательный для заполнения раздел)'),
@@ -670,6 +743,7 @@ function showRequestCreateForm(idTypeRequest) {
                                                         {
                                                             type: 'space',
                                                             id: 'form_person_rows',
+                                                            hidden: true,
                                                             rows:[]
                                                         },
                                                         {
@@ -842,25 +916,35 @@ function showRequestCreateForm(idTypeRequest) {
                                         template: ''
                                     },
                                     {
-                                        view: 'checkbox',
-                                        name: 'isAgree',
-                                        id: 'isAgree',
-                                        labelPosition: 'top',
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true,
-                                        label: 'Подтверждаю согласие работников на обработку персональных данных',
-                                        on: {
-                                            onChange(newv, oldv) {
-                                                let cnt = $$('person_table').data.count();
-                                                let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
-                                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0 && !is_no_pdf) {
-                                                    $$('send_btn').enable();
-                                                } else {
-                                                    $$('send_btn').disable();
+                                        rows:[
+                                            {
+                                                view: 'template',
+                                                borderless: true,
+                                                css: 'personalTemplateStyle',
+                                                template: 'Подтверждаю согласие работников на обработку персональных данных <span style = "color: red">*</span>',
+                                                autoheight: true
+                                            },
+                                            {
+                                                view: 'checkbox',
+                                                name: 'isAgree',
+                                                id: 'isAgree',
+                                                labelPosition: 'top',
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true,
+                                                on: {
+                                                    onChange(newv, oldv) {
+                                                        let cnt = $$('person_table').data.count();
+                                                        let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
+                                                        if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0 && !is_no_pdf) {
+                                                            $$('send_btn').enable();
+                                                        } else {
+                                                            $$('send_btn').disable();
+                                                        }
+                                                        //$$('send_btn').disabled = !($$('isAgree').getValue() && $$('isProtect').getValue() )
+                                                    }
                                                 }
-                                                //$$('send_btn').disabled = !($$('isAgree').getValue() && $$('isProtect').getValue() )
-                                            }
-                                        }
+                                            },
+                                        ]
                                     },
                                     {
                                         view: 'template',
@@ -870,31 +954,49 @@ function showRequestCreateForm(idTypeRequest) {
                                         scroll: true,
                                         template: ''
                                     },
-                                    {
-                                        view: 'checkbox',
-                                        name: 'isProtect',
-                                        id: 'isProtect',
-                                        labelPosition: 'top',
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true,
-                                        label: 'Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия',
-                                        on: {
-                                            onChange(newv, oldv) {
-                                                let cnt = $$('person_table').data.count();
-                                                let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
-                                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0 && !is_no_pdf) {
-                                                    $$('send_btn').enable();
-                                                } else {
-                                                    $$('send_btn').disable();
+                                    { rows:
+                                            [
+                                             {
+                                                view: 'template',
+                                                borderless: true,
+                                                css: 'personalTemplateStyle',
+                                                template: 'Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия <span style = "color: red">*</span>',
+                                                autoheight: true
+                                             },
+                                             {
+                                                view: 'checkbox',
+                                                name: 'isProtect',
+                                                id: 'isProtect',
+                                                labelPosition: 'top',
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true,
+                                                on: {
+                                                    onChange(newv, oldv) {
+                                                        let cnt = $$('person_table').data.count();
+                                                        let is_no_pdf = $$('no_pdf').getValue() == upload_chack_error;
+                                                        if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1 && cnt > 0 && !is_no_pdf) {
+                                                            $$('send_btn').enable();
+                                                        } else {
+                                                            $$('send_btn').disable();
+                                                        }
+                                                    }
                                                 }
-                                            }
-                                        }
+                                            },
+                                        ]
                                     },
                                     {
-                                        id: 'label_sogl',
-                                        view: 'label',
-                                        label: 'Информация мною прочитана и я согласен с ней при подаче заявки',
-                                        align: 'center'
+                                        view: 'template',
+                                        borderless: true,
+                                        css: {
+                                            'font-family' : 'Roboto, sans-serif',
+                                            'font-size' : '14px;',
+                                            'font-weight' : '500;',
+                                            'color' : '#313131;',
+                                            'padding' : ' 0px 3px !important;',
+                                            'text-align' : 'center'
+                                        },
+                                        template: 'Информация мною прочитана и я согласен с ней при подаче заявки',
+                                        autoheight: true
                                     },
                                     {
                                         id: 'send_request_btn_rows',
@@ -1105,7 +1207,8 @@ function showRequestCreateForm(idTypeRequest) {
             // $$('desc_departments').setValue(descDepartments);
         });
 
-        $$('activityKind').setValue('<span>Тип заявки: ' + typeRequest.activityKind + '</span>');
+        $$('activityKind').setHTML('<span style="font-family: Roboto, sans-serif;font-size: 14px;font-weight: 500;color: #313131;">' +
+            'Тип заявки: ' + typeRequest.activityKind + '</span>');
         let department = typeRequest.department;
         if (department) {
             departmentId = (department.id);
@@ -2027,8 +2130,6 @@ webix.ready(function () {
 
     })
 
-
-
 })
 
 function adaptiveCommonInfo(){
@@ -2070,6 +2171,7 @@ function adaptiveRequests(){
             rows:[]
         },0); $$('requestTextRows').addView($$('addressFact')); $$('requestTextRows').addView($$('personOfficeFactCnt'));
 
+        $$('form_person_rows').show();
         $$('form_person_rows').addView($$('person_lastname')); $$('form_person_rows').addView($$('person_firstname'));
         $$('form_person_rows').addView($$('person_patronymic'));
 
@@ -2078,6 +2180,5 @@ function adaptiveRequests(){
 
         $$('upload').config.height = 80; $$('upload').resize();
     }
-
 
 }
