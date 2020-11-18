@@ -986,6 +986,7 @@ function showRequestCreateForm(idTypeRequest) {
                                     },
                                     {
                                         view: 'template',
+                                        id: 'label_sogl',
                                         borderless: true,
                                         css: {
                                             'font-family' : 'Roboto, sans-serif',
@@ -1908,7 +1909,7 @@ const employees = {
 
                 ]
             },
-            {           //move in pagerIn
+            {
                 cols:
                     [
                         {

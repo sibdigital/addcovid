@@ -148,7 +148,6 @@ function removeAddr(){
         )
 }
 
-
 let uploadFile = '';
 let uploadFilename = '';
 let pred_date = new Date();
@@ -156,7 +155,15 @@ let upload_chack_error = 'Загружать можно только PDF-фай�
 
 let departmentId;
 
-webix.ready(function() {
+webix.html.addStyle(
+    ".typed_form_template .webix_template {" +
+    "background-color: #DDDDDD;" +
+    "font-size: 15px;" +
+    "padding: 0px 3px;" +
+    "}"
+);
+
+webix.ready(function () {
     let layout = webix.ui({
         container: 'app',
         autowidth: true,
@@ -220,138 +227,167 @@ webix.ready(function() {
                 elements: [
                     view_section('Данные о вашей организации'),
                     {
-                        type: 'space',
+                        type: "space",
                         margin: 5,
+                        id:"org_data_cols",
                         cols: [
                             {
+                                id: 'org_data_rows_column1',
                                 rows: [
-                                    {
-                                        view: 'text',
-                                        name: 'organizationName',
-                                        id: 'organizationName',
-                                        label: 'Полное наименование организации/фамилия, имя, отчество индивидуального предпринимателя',
-                                        labelPosition: 'top',
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true
-                                    },
-                                    {
-                                        view: 'text',
-                                        name: 'organizationShortName',
-                                        id: 'organizationShortName',
-                                        label: 'Краткое наименование организации',
-                                        labelPosition: 'top',
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true
-                                    },
-                                    {
-                                        cols: [
+                                            {
+                                                view: 'template',
+                                                autoheight: true,
+                                                css: 'typed_form_template',
+                                                borderless: true,
+                                                template: 'Полное наименование организации/фамилия, имя, отчество индивидуального предпринимателя <span style="color: red">*</span>'
+                                            },
                                             {
                                                 view: 'text',
-                                                name: 'organizationInn',
-                                                id: 'organizationInn',
-                                                label: 'ИНН',
-                                                labelPosition: 'top',
-                                                validate: function (val) {
-                                                    return !isNaN(val * 1);
-                                                },
-                                                //attributes:{ type:"number" },
+                                                name: 'organizationName',
+                                                id: 'organizationName',
                                                 invalidMessage: 'Поле не может быть пустым',
                                                 required: true
                                             },
                                             {
-                                                view: 'checkbox',
-                                                name: 'isSelfEmployed',
-                                                id: 'isSelfEmployed',
+                                                view: 'text',
+                                                name: 'organizationShortName',
+                                                id: 'organizationShortName',
+                                                label: 'Краткое наименование организации',
                                                 labelPosition: 'top',
-                                                label: 'Самозанятый',
-                                                on: {
-                                                    onChange(newv, oldv) {
-                                                        if (newv === 1) {
-                                                            $$('organizationOgrn').setValue('');
-                                                            $$('organizationOgrn').disable();
-                                                        } else {
-                                                            $$('organizationOgrn').enable();
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true
+                                            },
+                                            {
+                                                cols: [
+                                                    {
+                                                        view: 'text',
+                                                        name: 'organizationInn',
+                                                        id: 'organizationInn',
+                                                        label: 'ИНН',
+                                                        labelPosition: 'top',
+                                                        validate: function (val) {
+                                                            return !isNaN(val * 1);
+                                                        },
+                                                        //attributes:{ type:"number" },
+                                                        invalidMessage: 'Поле не может быть пустым',
+                                                        required: true
+                                                    },
+                                                    {
+                                                        view: 'checkbox',
+                                                        name: 'isSelfEmployed',
+                                                        id: 'isSelfEmployed',
+                                                        labelPosition: 'top',
+                                                        label: 'Самозанятый',
+                                                        on: {
+                                                            onChange(newv, oldv) {
+                                                                if (newv === 1) {
+                                                                    $$('organizationOgrn').setValue('');
+                                                                    $$('organizationOgrn').disable();
+                                                                } else {
+                                                                    $$('organizationOgrn').enable();
+                                                                }
+                                                            }
                                                         }
                                                     }
-                                                }
-                                            }
+                                                ]
+                                            },
+                                            {
+                                                view: 'text',
+                                                id: 'organizationOgrn',
+                                                name: 'organizationOgrn',
+                                                label: 'ОГРН',
+                                                validate: function(val){
+                                                    return !isNaN(val*1);
+                                                },
+                                                //attributes:{ type:"number" },
+                                                labelPosition: 'top',
+                                                //validate:webix.rules.isNumber(),
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true
+                                            },
+                                            {
+                                                view: 'text',
+                                                name: 'organizationEmail',
+                                                id: 'organizationEmail',
+                                                label: 'e-mail',
+                                                labelPosition: 'top',
+                                                validate:webix.rules.isEmail,
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true
+                                            },
+                                            {
+                                                view: 'text',
+                                                name: 'organizationPhone',
+                                                id: 'organizationPhone',
+                                                label: 'Телефон',
+                                                labelPosition: 'top',
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true
+                                            },
                                         ]
-                                    },
-                                    {
-                                        view: 'text',
-                                        id: 'organizationOgrn',
-                                        name: 'organizationOgrn',
-                                        label: 'ОГРН',
-                                        validate: function(val){
-                                            return !isNaN(val*1);
-                                        },
-                                        //attributes:{ type:"number" },
-                                        labelPosition: 'top',
-                                        //validate:webix.rules.isNumber(),
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true
-                                    },
-                                    {
-                                        view: 'text',
-                                        name: 'organizationEmail',
-                                        id: 'organizationEmail',
-                                        label: 'e-mail',
-                                        labelPosition: 'top',
-                                        validate:webix.rules.isEmail,
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true
-                                    },
-                                    {
-                                        view: 'text',
-                                        name: 'organizationPhone',
-                                        id: 'organizationPhone',
-                                        label: 'Телефон',
-                                        labelPosition: 'top',
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true
-                                    },
-                                ]
                             },
                             {
+                                id: 'org_data_rows_column2',
                                 rows: [
-                                    {
-                                        view: 'text',
-                                        name: 'organizationOkved',
-                                        id: 'organizationOkved',
-                                        label: 'Основной вид осуществляемой деятельности (отрасль)',
-                                        labelPosition: 'top',
-                                        required: true
-                                    },
-                                    {
-                                        view: 'textarea',
-                                        name: 'organizationOkvedAdd',
-                                        id: 'organizationOkvedAdd',
-                                        label: 'Дополнительные виды осуществляемой деятельности',
-                                        height: 100,
-                                        labelPosition: 'top'
-                                    },
-                                    {
-                                        view: 'select',
-                                        id: 'departmentId',
-                                        name: 'departmentId',
-                                        label: 'Министерство, курирующее вашу деятельность',
-                                        labelPosition: 'top',
-                                        invalidMessage: 'Поле не может быть пустым',
-                                        required: true,
-                                        options: [],
-                                    },
-                                    {
-                                        view: 'textarea',
-                                        id: 'desc_departments',
-                                        label: '* области деятельности министерств',
-                                        labelPosition: 'top',
-                                        height: 150,
-                                        readonly: true,
-                                    }
-                                ]
-                            }
+                                            {
+                                                view: 'template',
+                                                autoheight: true,
+                                                css: 'typed_form_template',
+                                                borderless: true,
+                                                template: 'Основной вид осуществляемой деятельности (отрасль) <span style="color: red">*</span>'
+                                            },
+                                            {
+                                                view: 'text',
+                                                name: 'organizationOkved',
+                                                id: 'organizationOkved',
+                                                required: true
+                                            },
+                                            {
+
+                                                view: 'template',
+                                                autoheight: true,
+                                                css: 'typed_form_template',
+                                                borderless: true,
+                                                template: 'Дополнительные виды осуществляемой деятельности <span style="color: red">*</span>'
+
+                                            },
+                                            {
+                                                view: 'textarea',
+                                                name: 'organizationOkvedAdd',
+                                                id: 'organizationOkvedAdd',
+                                                height: 100,
+                                            },
+                                            {
+                                                view: 'template',
+                                                autoheight: true,
+                                                css: 'typed_form_template',
+                                                borderless: true,
+                                                template: 'Министерство, курирующее вашу деятельность <span style="color: red">*</span>'
+                                            },
+                                            {
+                                                view: 'select',
+                                                id: 'departmentId',
+                                                name: 'departmentId',
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true,
+                                                options: [],
+                                            },
+                                            {
+                                                view: 'textarea',
+                                                id: 'desc_departments',
+                                                label: '* области деятельности министерств',
+                                                labelPosition: 'top',
+                                                height: 150,
+                                                readonly: true,
+                                            }
+                                        ]
+                            },
+
                         ]
+
+
                     },
+
                     view_section('Адресная информация'),
                     {
                         view: 'textarea',
@@ -383,7 +419,8 @@ webix.ready(function() {
                                         id: 'personOfficeFactCnt',
                                         header: 'Численность работников, не подлежащих переводу на дистанционный режим работы, осуществляющих деятельность по указанному в  пункте 11 настоящей формы фактическому адресу',
                                         //editor: 'text',
-                                        fillspace: true
+                                        fillspace: true,
+                                        minWidth: 1300
                                         //width: 200
                                     }
                                 ],
@@ -402,24 +439,49 @@ webix.ready(function() {
                                 elements: [
                                     {
                                         type: 'space',
-                                        cols: [
-                                            {view: 'text', name: 'addressFact', label: 'Фактический адрес', labelPosition: 'top', required: true },
-                                            {view: 'text', name: 'personOfficeFactCnt', inputWidth: '250', label: 'Численность работников', labelPosition: 'top',
-                                                invalidMessage: 'Поле не может быть пустым',
-                                                required: true,
+                                        id: 'input_rows',
+                                        rows: [
+                                            {
+                                                responsive: 'input_rows',
+                                                cols: [
+                                                    {
+                                                        view: 'text',
+                                                        name: 'addressFact',
+                                                        id: 'addressFactId',
+                                                        minWidth: 150,
+                                                        label: 'Фактический адрес',
+                                                        labelPosition: 'top',
+                                                        required: true
+                                                    },
+                                                    {
+                                                        view: 'text',
+                                                        name: 'personOfficeFactCnt',
+                                                        id: 'personOfficeFactCntId',
+                                                        minWidth: 150,
+                                                        label: 'Численность работников',
+                                                        labelPosition: 'top',
+                                                        invalidMessage: 'Поле не может быть пустым',
+                                                        required: true,
+                                                    }
+                                                ]
                                             },
-                                            {},
                                         ]
                                     },
                                     {
-                                        //type: 'space',
-                                        margin: 5,
-                                        cols: [
-                                            {view: 'button', value: 'Добавить', width: 150, click: addAddr },
-                                            {view: 'button', value: 'Изменить', width: 150, click: editAddr },
-                                            {view: 'button', value: 'Удалить', width: 150, click: removeAddr}
-                                        ]
-                                    }
+                                        id: 'button_rows',
+                                        rows: [
+                                            {
+                                                //type: 'space',
+                                                responsive: 'button_rows',
+                                                margin: 5,
+                                                cols: [
+                                                    {view: 'button', value: 'Добавить', minWidth: 150, click: addAddr},
+                                                    {view: 'button', value: 'Изменить', minWidth: 150, click: editAddr},
+                                                    {view: 'button', value: 'Удалить', minWidth: 150, click: removeAddr}
+                                                ]
+                                            }
+                                        ],
+                                    },
                                 ]
                             }
                         ]
@@ -438,19 +500,24 @@ webix.ready(function() {
                                 labelPosition: 'top'
                             },
                             {
-                                view: 'label',
-                                label: '<span  style="text-align: center; color: red">Для загрузки нескольких файлов выбирайте их с зажатой клавишей Ctrl или заранее сожмите в ZIP-архив и загрузите его</span>',
+                                view: 'template',
+                                borderless: true,
+                                autoheight: true,
+                                template: '<span  style="text-align: center; color: red">Для загрузки нескольких файлов выбирайте их с зажатой клавишей Ctrl или заранее сожмите в ZIP-архив и загрузите его</span>',
                                 //css: 'main_label'
                             },
                             {
-                                view: 'label',
-                                label: '<span  style="text-align: center; color: red">Общий размер загружаемых файлов не должен превышать 60 Мб</span>',
+                                view: 'template',
+                                autoheight: true,
+                                borderless: true,
+                                template: '<span  style="text-align: center; color: red">Общий размер загружаемых файлов не должен превышать 60 Мб</span>',
                                 //css: 'main_label'
                             },
                             {
                                 id: 'upload',
                                 view: 'uploader',
                                 css: 'webix_secondary',
+                                autoheight: true,
                                 value: 'Загрузить PDF-файл(-ы) или ZIP-архив(-ы)  с пояснением обоснования',
                                 autosend: false,
                                 upload: '/uploadpart',
@@ -579,9 +646,9 @@ webix.ready(function() {
                                     readonly: true,
                                     columns: [
                                         { id: 'index', header: '', css: 'rank', width: 50 },
-                                        { id: 'lastname', header: 'Фамилия', adjust: true, sort: 'string', fillspace: true },
-                                        { id: 'firstname', header: 'Имя', adjust: true, sort: 'string', fillspace: true },
-                                        { id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string' },
+                                        { id: 'lastname', header: 'Фамилия', width: 300, sort: 'string'},
+                                        { id: 'firstname', header: 'Имя',  width: 200, sort: 'string'},
+                                        { id: 'patronymic', header: 'Отчество', minWidth: 300, sort: 'string', fillspace: true  },
                                         //{ id: 'isagree', header: 'Согласие', width: 100, template: '{common.checkbox()}', css: 'center' }
                                     ],
                                     on:{
@@ -607,24 +674,36 @@ webix.ready(function() {
                                         {
                                             type: 'space',
                                             margin: 0,
-                                            cols: [
-                                                {view: 'text', name: 'lastname', inputWidth: '250', label: 'Фамилия', labelPosition: 'top' },
-                                                {view: 'text', name: 'firstname', inputWidth: '250', label: 'Имя', labelPosition: 'top'},
-                                                {view: 'text', name: 'patronymic', inputWidth: '250', label: 'Отчество', labelPosition: 'top'},
-                                                //{view: 'checkbox', label: 'Согласие', name: 'isagree', id: 'agree_checkbox'},
-                                                {},
+                                            id: 'form_person_rows',
+                                            rows:[
+                                                {
+                                                    responsive: 'form_person_rows',
+                                                    cols: [
+                                                        {view: 'text', name: 'lastname', minWidth: 220, label: 'Фамилия', labelPosition: 'top' },
+                                                        {view: 'text', name: 'firstname', minWidth: 220, label: 'Имя', labelPosition: 'top'},
+                                                        {view: 'text', name: 'patronymic', minWidth: 220, label: 'Отчество', labelPosition: 'top'},
+                                                        //{view: 'checkbox', label: 'Согласие', name: 'isagree', id: 'agree_checkbox'},
+                                                    ]
+                                                }
+
                                             ]
+
                                         },
                                         {
-                                            //type: 'space',
-                                            margin: 5,
-                                            cols: [
-                                                {view: 'button', value: 'Добавить', width: 150, click: addPerson },
-                                                {view: 'button', value: 'Изменить', width: 150, click: editPerson },
-                                                {view: 'button', value: 'Удалить', width: 150, click: removePerson},
-                                                {view: 'button', value: 'Очистить', id: 'clearPersonsBtn', width: 150, disabled: true, click: clearPersons}
-                                            ]
-                                        }
+                                        id: 'button_rows_form_person', margin: 5,
+                                        rows: [
+                                            {
+                                                //type: 'space',
+                                                responsive: 'button_rows_form_person',
+                                                cols: [
+                                                    {view: 'button', value: 'Добавить', minWidth: 150, click: addPerson },
+                                                    {view: 'button', value: 'Изменить', minWidth: 150, click: editPerson },
+                                                    {view: 'button', value: 'Удалить', minWidth: 150, click: removePerson},
+                                                    {view: 'button', value: 'Очистить', id: 'clearPersonsBtn', minWidth: 150, disabled: true, click: clearPersons}
+                                                    ]
+                                            }
+                                            ],
+                                        },
                                     ]
                                 }
                             ]
@@ -1053,8 +1132,23 @@ webix.ready(function() {
     }
 
     webix.event(window, "resize", function (event) {
-        layout.define("width",document.body.clientWidth);
+        layout.define("width", document.body.clientWidth);
         layout.resize();
     });
     webix.extend($$('label_sogl'), webix.ProgressBar);
+
+   if (document.body.clientWidth < 760) {
+       $$('form').addView({
+           type: 'space',
+           margin: 5,
+           id: 'org_data_rows',
+           rows: []
+       }, 1);
+       $$('org_data_rows').addView($$('org_data_rows_column1'));
+       $$('org_data_rows').addView($$('org_data_rows_column2'));
+       $$('form').removeView($$('org_data_cols'));
+
+       $$('upload').config.height = 60; $$('upload').resize();
+   }
+
 })

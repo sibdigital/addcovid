@@ -78,9 +78,19 @@ const searchRequests = () => {
     }, 500);
 };
 
+webix.html.addStyle(
+    ".personalTemplateStyle .webix_template {" +
+    "font-family: Roboto, sans-serif;" +
+    "font-size: 14px;" +
+    "font-weight: 500;" +
+    "color: #313131;" +
+    "}"
+);
+
 webix.ui({
     container: 'app',
     height: document.body.clientHeight,
+    width: document.body.clientWidth,
     css: {margin: 'auto'},
     rows: [
         {
@@ -94,10 +104,23 @@ webix.ui({
                     cols: [
                         {},
                         {
-                            view: 'label',
-                            maxWidth: 300,
-                            align: 'center',
-                            label: `<span style="font-size: 1.3rem">Актуализация утвержденных заявок</span>`,
+                            /*view: 'template',
+                            borderless: true,
+                            css:{
+                                'font-family' : 'Roboto, sans-serif;',
+                                'font-size' : '14px;',
+                                'font-weight' : '500;',
+                                'color' : '#313131;',
+                            },
+                            template: 'Министерство, курирующее вашу деятельность <span style = "color: red">*</span>',*/
+
+                            view: 'template',
+                            minWidth: 175,
+                            maxWidth: 450,
+                            borderless: true,
+                            css: 'personalTemplateStyle',
+                            template: `<span style="font-size: 1.3rem">Актуализация утвержденных заявок</span>`,
+                            autoheight: true
                         },
                         {}
                     ]
@@ -115,6 +138,7 @@ webix.ui({
                             cols: [
                                 {
                                     view: 'text',
+                                    minWidth: 200,
                                     name: 'searchInn',
                                     id: 'searchInn',
                                     // label: 'ИНН',
@@ -122,6 +146,7 @@ webix.ui({
                                 },
                                 {
                                     view: 'button',
+                                    minWidth: 200,
                                     id: 'egrul_load_button',
                                     css: 'webix_primary',
                                     value: 'Найти утвержденные заявки',
@@ -149,4 +174,12 @@ webix.ready(function () {
         $$('searchInn').setValue(INN);
         searchRequests();
     }
+
+    if(document.body.clientWidth < 480){
+        $$('form').addView({
+            id: 'form_rows',
+            rows:[]
+        },0); $$('form_rows').addView($$('searchInn')); $$('form_rows').addView($$('egrul_load_button'));
+    }
+
 });
