@@ -1729,20 +1729,20 @@ const employees = {
                     ]
             },
             {
-                id: 'tableIn',                              //employess_table responsive-target
+                id: 'tableIn',
                 margin: 10,
                 rows: [
-                    {
+                   {
                         align: 'center, middle',
                         body:
                             {
-                                id: 'pagerIn',              //pager responsive-target
+                                id: 'pagerIn',
                                 rows: []
                             },
                     },
                     {
                         type: 'wide',
-                        responsive: 'tableIn',              //move in tableIn
+                        responsive: 'tableIn',
                         cols:
                             [
                                 {
@@ -1922,66 +1922,67 @@ const employees = {
                             template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
                         },
                         {
+                            responsive: 'btnsIn',
                             cols:[
-                            {
-                                view: "button",
-                                id: "uploadButton",
-                                minWidth: 100,
-                                maxWidth: 350,
-                                value: "Загрузить",
-                                css: 'webix_primary',
-                                click: function () {
-                                    $$("upload").files.data.clearAll();
-                                    importEmployees.show()
-                                }
-                            },
-                            {
-                                view: "button",
-                                align: 'left',
-                                minWidth: 100,
-                                maxWidth: 350,
-                                css: 'webix_primary',
-                                value: 'Добавить',
-                                click: function () {
-                                    $$('modal_form_employee').clear()
-                                    updateFIOmodal.show();
-                                }
-                            },
-                            {
-                                view: 'button',
-                                align: 'right',
-                                minWidth: 100,
-                                maxWidth: 350,
-                                css: 'webix_primary',
-                                value: 'Удалить',
-                                hotkey: "delete",
-                                click: function () {
-
-                                    let params = $$('employees_table').getSelectedItem()
-
-                                    if (!$$("employees_table").getSelectedId()) {
-                                        webix.message("Не выбрана строка!", "error");
-                                        return;
+                                {
+                                    view: "button",
+                                    align: 'left',
+                                    minWidth: 150,
+                                    maxWidth: 350,
+                                    css: 'webix_primary',
+                                    value: 'Добавить',
+                                    click: function () {
+                                        $$('modal_form_employee').clear()
+                                        updateFIOmodal.show();
                                     }
-                                    $$("employees_table").remove($$("employees_table").getSelectedId());
-                                    webix.ajax()
-                                        .headers({'Content-type': 'application/json'})
-                                        .post('/deleteEmployee', JSON.stringify(params))
-                                        .then(function (data) {
-                                            if (data !== null) {
-                                                webix.message("Сотрудник удалён", 'success');
-                                                $$('form_employee').clear()
-                                                $$('modal_form_employee').clear()
-                                                $$('employees_table').load('employees');
-                                            } else {
-                                                webix.message("Не удалось удалить сотрудника", 'error');
-                                            }
-                                        });
-                                    $$('form_employee').clear()
-                                    $$('modal_form_employee').clear()
-                                    updateFIOmodal.hide()
-                                }
-                            }
+                                },
+                                {
+                                    view: 'button',
+                                    align: 'right',
+                                    minWidth: 150,
+                                    maxWidth: 350,
+                                    css: 'webix_primary',
+                                    value: 'Удалить',
+                                    hotkey: "delete",
+                                    click: function () {
+
+                                        let params = $$('employees_table').getSelectedItem()
+
+                                        if (!$$("employees_table").getSelectedId()) {
+                                            webix.message("Не выбрана строка!", "error");
+                                            return;
+                                        }
+                                        $$("employees_table").remove($$("employees_table").getSelectedId());
+                                        webix.ajax()
+                                            .headers({'Content-type': 'application/json'})
+                                            .post('/deleteEmployee', JSON.stringify(params))
+                                            .then(function (data) {
+                                                if (data !== null) {
+                                                    webix.message("Сотрудник удалён", 'success');
+                                                    $$('form_employee').clear()
+                                                    $$('modal_form_employee').clear()
+                                                    $$('employees_table').load('employees');
+                                                } else {
+                                                    webix.message("Не удалось удалить сотрудника", 'error');
+                                                }
+                                            });
+                                        $$('form_employee').clear()
+                                        $$('modal_form_employee').clear()
+                                        updateFIOmodal.hide()
+                                    }
+                                },
+                                {
+                                    view: "button",
+                                    id: "uploadButton",
+                                    minWidth: 150,
+                                    maxWidth: 350,
+                                    value: "Загрузить",
+                                    css: 'webix_primary',
+                                    click: function () {
+                                        $$("upload").files.data.clearAll();
+                                        importEmployees.show()
+                                    }
+                                },
                             ]
                         }
 
@@ -2105,6 +2106,10 @@ webix.ready(function () {
     webix.event(window, "resize", function (event) {
         layout.define("width", document.body.clientWidth);
         layout.resize();
+        if (document.body.clientWidth > 720){
+
+           $$('form_employee').config.width = 300; $$('form_employee').resize();
+        }
     });
 
     //responsive events
