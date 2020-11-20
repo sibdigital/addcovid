@@ -5,15 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${application_name}">. Личный кабинет</title>
     <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.css}">
-    <link rel="stylesheet" href="https://cdn.materialdesignicons.com/2.7.94/css/materialdesignicons.css" type="text/css" charset="utf-8">
+    <link type="text/css" rel="stylesheet" th:href="@{/libs/materialdesignicons.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
+    <script th:src="@{/libs/bootstrap.js}"></script>
     <script th:src="@{/libs/webix.min.js}"></script>
     <script th:src="@{/libs/routie.min.js}"></script>
     <script th:src="@{/libs/jquery-3.4.1.min.js}"></script>
+
     <style>
+
+        .user_shortName{
+            line-height: 34px;
+            font-family: Roboto, sans-serif;
+            font-size: 16px;
+            font-weight: 500;
+            color: #475466;
+            letter-spacing: 0px;
+        }
+
+        .user_menu_items{
+            line-height: 34px;
+            font-family: Roboto, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475466;
+            letter-spacing: 0px;
+        }
+        .webix_view.webix_window.webix_popup.webix_menu a{
+            color: #475466;
+        }
+
+        .webix_view.webix_window.webix_popup.webix_menu a:hover{
+            color: #1CA1C1 !important;
+        }
+        .user_shortName:hover{
+            color: #1CA1C1 !important;
+        }
+
         body {margin: 0}
         .boldLabel {
             font-weight: bold; border-width: 2px; border-style: solid; border-color: #000000;
         }
+
+        .user_avatar{
+            margin-right: 12px;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            right: 8px;
+            top: 8px;
+            background: rgba(228, 230, 240, 0.8);
+            color: #94a1b3;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .user_avatar:hover{
+            box-shadow: #1CA1C1 0 0 2px 2px;
+        }
+
+        .members .webix_dataview_item{
+            border-color: #fff;
+            line-height: 15px;
+            text-align: center;
+            padding:10px;
+        }
+
+        .members .webix_dataview_item:focus{
+            outline: none;
+        }
+
+        .members .webix_dataview_item.webix_selected{
+            background: #fff;
+            color: #555;
+        }
+
+        .members .webix_dataview_item .name{
+            font-size: 13px;
+        }
+
+        .members .webix_dataview_item.webix_selected .large_avatar{
+            width: 44px;
+            height: 44px;
+            border: 2px solid #5ea3d2;
+        }
+
+        .members .webix_dataview_item.webix_selected .name{
+            color: #1872ae;
+            font-size: 14px;
+        }
+
+        .members .webix_dataview_item .large_avatar:hover {
+            width: 44px;
+            height: 44px;
+        }
+
+        .list_avatar{
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            float: left;
+            margin-top: 1px;
+            margin-right: 10px;
+        }
+
+        .image{
+            width:100%;
+            height: auto;
+            max-width: 400px;
+            max-height: 280px;
+        }
+
+        .webix_noselect img{
+            -ms-user-select: none;
+        }
+
     </style>
 </head>
 <body>

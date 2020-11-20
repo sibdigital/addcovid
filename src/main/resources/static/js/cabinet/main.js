@@ -1,7 +1,7 @@
 webix.i18n.setLocale("ru-RU");
 
 const dateFormat = webix.Date.dateToStr("%d.%m.%Y %H:%i:%s")
-
+let userWindowHeight = window.innerHeight;
 
 function view_section(title) {
     return {
@@ -102,13 +102,13 @@ const commonInfo = {
                             {
                                 cols: [
                                     {
-                                    view: 'text',
-                                    name: 'email',
-                                    label: 'Адрес электронной почты',
-                                    labelPosition: 'top',
-                                    validate: webix.rules.isEmail,
-                                    invalidMessage: 'Поле не может быть пустым',
-                                    required: true
+                                        view: 'text',
+                                        name: 'email',
+                                        label: 'Адрес электронной почты',
+                                        labelPosition: 'top',
+                                        validate: webix.rules.isEmail,
+                                        invalidMessage: 'Поле не может быть пустым',
+                                        required: true
                                     },
                                     {
                                         view: 'text',
@@ -1272,6 +1272,7 @@ function showRequestViewForm(data) {
     }
 }
 
+
 // ***** НАСТРОЙКИ *****
 
 const settings = {
@@ -1339,8 +1340,10 @@ const settings = {
 
 // ***** ВАКЦИНАЦИЯ *****
 
-var updateFIOmodal = webix.ui({
+let updateFIOmodal = webix.ui({
     view: "window",
+    id: "updateModal",
+    minWidth: 200,
     width: 550,
     position: "center",
     modal: true,
@@ -1374,25 +1377,25 @@ var updateFIOmodal = webix.ui({
                 name: 'person.patronymic',
                 label: 'Отчество',
                 labelPosition: 'top'
-            },/*
-                    {
-                        view: 'checkbox',
-                        id: 'isVaccinatedFlu',
-                        name: 'isVaccinatedFlu',
-                        label: 'Привит от гриппа',
-                        labelPosition: 'top'
-                    },
-                    {
-                        view: 'checkbox',
-                        id: 'isVaccinatedCovid',
-                        name: 'isVaccinatedCovid',
-                        label: 'Привит от COVID-19',
-                        labelPosition: 'top'
-                    },*/
+            },
+            /*
+            {
+            view: 'checkbox',
+            id: 'isVaccinatedFlu',
+            name: 'isVaccinatedFlu',
+            label: 'Привит от гриппа',
+            labelPosition: 'top'
+            },
+            {
+            view: 'checkbox',
+            id: 'isVaccinatedCovid',
+            name: 'isVaccinatedCovid',
+            label: 'Привит от COVID-19',
+            labelPosition: 'top'
+            },*/
             {
                 view: 'button',
                 align: 'right',
-                maxWidth: 550,
                 css: 'webix_primary',
                 value: 'Добавить',
                 hotkey: "enter",
@@ -1427,9 +1430,10 @@ var updateFIOmodal = webix.ui({
     }
 });
 
-var importEmployees = webix.ui({
+let importEmployees = webix.ui({
     view: "window",
-    width: 650,
+    id: "importModal",
+    width: 550,
     position: "center",
     modal: true,
     close: true,
@@ -1483,6 +1487,7 @@ var importEmployees = webix.ui({
                                 webix.message('Не удалось загрузить файлы.', "error")
                                 $$('upload').focus()
                             }
+                            $$('employees_table').clearAll();
                             $$('employees_table').load('employees');
                             $$("upload").files.data.clearAll();
                             importEmployees.hide();
@@ -1494,25 +1499,6 @@ var importEmployees = webix.ui({
         }
 });
 
-uploadEmployees = webix.ui({
-    view: "window",
-    width: 550,
-    position: "center",
-    modal: true,
-    close: true,
-    head: "Загрузка сотрудников",
-    body:
-        {
-            view: 'form',
-            id: 'emp_upload',
-            complexData: true,
-            elements:
-                []
-
-        }
-});
-
-let usersWindowHeight = window.innerHeight;
 const employees = {
     view: 'scrollview',
     scroll: 'xy',
@@ -1562,7 +1548,7 @@ const employees = {
                         {
                             view: 'datatable',
                             id: "employees_table",
-                            height: usersWindowHeight - 200,
+                            height: userWindowHeight - 200,
                             select: "row",
                             scrollX: false,
                             navigation: true,
@@ -1802,21 +1788,52 @@ function filterText() {
             return webix.ajax().headers({'Content-type': 'application/json'}).post("/filter", text);
         });
     }
-    $$("dtFilter").setValue("")
 }
 
+//Закрытие модального окна при смене фокуса
 webix.attachEvent("onFocusChange", function (to, from) {
     if (from && from.getTopParentView().config.view == "window" && !to) {
         from.getTopParentView().hide();
     }
 })
 
+let UsercontextMenu = webix.ui({
+    view: "contextmenu",
+    css: 'user_menu_items',
+    data: [ "Изменить аватар", { $template:"Separator" }, {id: 'logout', value:'Выход' } ],
+    on:{
+        onItemClick:(id) =>{
+            if(id === 'logout'){
+                webix.send("/logout")
+            }
+        },
+        onMouseOut: () => {
+            UsercontextMenu.hide()
+        },
+    }
+});
+
+function showDropDownMenu(span){
+    if(span.offsetWidth < 100){
+        UsercontextMenu.config.width = 100; UsercontextMenu.resize();
+    }else{
+        UsercontextMenu.config.width = span.offsetWidth+25; UsercontextMenu.resize();
+    }
+    let toolBarHeight = $$('toolbar').config.height
+    UsercontextMenu.show({
+        x:document.body.clientWidth-span.offsetWidth-50,y:toolBarHeight
+    })
+}
+
 webix.ready(function () {
+
     let layout = webix.ui({
         rows: [
             {
                 view: 'toolbar',
-                // padding: 5,
+                id: 'toolbar',
+// padding: 5,
+                height: 45,
                 elements: [
                     {
                         view: 'button',
@@ -1829,19 +1846,27 @@ webix.ready(function () {
                         }
                     },
                     {
-                        view: 'label',
-                        width: 40,
-                        template: "<img height='35px' width='35px' src = \"favicon.ico\">"
+                        align: 'left',
+                        cols:[
+                            {
+                                view: 'label',
+                                width: 40,
+                                template: "<img height='40px' width='40px' src = \"favicon.ico\">"
+                            },
+                            {
+                                view: 'label',
+                                label: `<span style="font-size: 1.0rem">Личный кабинет</span>`,
+                            },
+                        ]
                     },
                     {
-                        view: 'label',
-                        label: `<span style="font-size: 1.0rem">Личный кабинет</span>`,
+                        view: 'template',
+                        borderless: true,
+                        template: "<div style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> " +
+                            "<span id='username' onmouseover=\"showDropDownMenu(document.getElementById('username'));\"" +
+                            "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
+                        url: 'organization',
                     },
-                    {
-                        view: 'label',
-                        label: '<a href="/logout" title="Выйти">Выйти</a>',
-                        align: 'right'
-                    }
                 ]
             },
             {
@@ -1849,13 +1874,13 @@ webix.ready(function () {
                     {
                         view: 'sidebar',
                         id: 'sidebar',
-                        // collapsed: true,
+                        //collapsed: true,
                         css: 'webix_dark',
                         data: [
-                            {id: "CommonInfo",icon:"mdi mdi-information", value: 'Общая информация'},
-                            {id: "Employees", icon:"mdi mdi-account-group" , value: 'Сотрудники'},
-                            {id: "Requests", icon:"wxi-file",value: 'Заявки'},
-                            {id: "Settings",  icon:"mdi mdi-cogs", value: 'Настройки'},
+                            {id: "CommonInfo", icon: "mdi mdi-information", value: 'Общая информация'},
+                            {id: "Employees", icon: "mdi mdi-account-group", value: 'Сотрудники'},
+                            {id: "Requests", icon: "wxi-file", value: 'Заявки'},
+                            {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
                         ],
                         on: {
                             onAfterSelect: function (id) {
