@@ -832,7 +832,7 @@ function showRequestCreateForm(idTypeRequest) {
                                                 value: 'Отменить',
                                                 align: 'center',
                                                 click: function () {
-                                                    $$('sidebar').callEvent('onAfterSelect', ['Requests']);
+                                                    $$('sidebar').callEvent('onMenuItemClick', ['Requests']);
                                                 }
                                             },
                                             {
@@ -970,7 +970,7 @@ function showRequestCreateForm(idTypeRequest) {
                                                                             })
                                                                                 .then(function () {
                                                                                     $$('label_sogl').hideProgress();
-                                                                                    $$('sidebar').callEvent('onAfterSelect', ['Requests']);
+                                                                                    $$('sidebar').callEvent('onMenuItemClick', ['Requests']);
                                                                                 })
                                                                                 .fail(function () {
                                                                                     $$('label_sogl').hideProgress()
@@ -1548,7 +1548,7 @@ const employees = {
                         {
                             view: 'datatable',
                             id: "employees_table",
-                            height: userWindowHeight - 200,
+                            height: userWindowHeight - 185,
                             select: "row",
                             scrollX: false,
                             navigation: true,
@@ -1807,9 +1807,9 @@ let UsercontextMenu = webix.ui({
                 webix.send("/logout")
             }
         },
-        onMouseOut: () => {
-            UsercontextMenu.hide()
-        },
+        // onMouseOut: () => {
+        //     UsercontextMenu.hide()
+        // },
     }
 });
 
@@ -1819,71 +1819,56 @@ function showDropDownMenu(span){
     }else{
         UsercontextMenu.config.width = span.offsetWidth+25; UsercontextMenu.resize();
     }
-    let toolBarHeight = $$('toolbar').config.height
+    let toolBarHeight = $$('toolbar').config.height - 5;
     UsercontextMenu.show({
         x:document.body.clientWidth-span.offsetWidth-50,y:toolBarHeight
     })
 }
 
+function setRequestsBadge(){
+    webix.ajax("org_requests").then(function(data){
+        let requestsCount = data.json().length;
+        let request = $$('sidebar').getItem("Requests");
+        request.badge = requestsCount;
+        $$('sidebar').updateItem("Requests",request);
+    });
+}
+
 webix.ready(function () {
 
     let layout = webix.ui({
-        rows: [
+        cols: [
             {
-                view: 'toolbar',
-                id: 'toolbar',
-// padding: 5,
-                height: 45,
-                elements: [
+                width: 230,
+                rows: [
                     {
-                        view: 'button',
-                        type: 'icon',
-                        icon: 'wxi-dots',
-                        // css: 'webix_primary',
-                        width: 37,
-                        click: function () {
-                            $$('sidebar').toggle();
-                        }
+                        view: 'label',
+                        css: {
+                            'background-color':'#565B67 !important',
+                            'color':'#FFFFFF'
+                        },
+                        align: 'center',
+                        height: 46,
+                        label: `<div style="color: white; font-size: 18px; font-family: Roboto, sans-serif; padding: 0 12px 0 10px;">Личный кабинет</div>`,
                     },
                     {
-                        align: 'left',
-                        cols:[
-                            {
-                                view: 'label',
-                                width: 40,
-                                template: "<img height='40px' width='40px' src = \"favicon.ico\">"
-                            },
-                            {
-                                view: 'label',
-                                label: `<span style="font-size: 1.0rem">Личный кабинет</span>`,
-                            },
-                        ]
-                    },
-                    {
-                        view: 'template',
-                        borderless: true,
-                        template: "<div style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> " +
-                            "<span id='username' onmouseover=\"showDropDownMenu(document.getElementById('username'));\"" +
-                            "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
-                        url: 'organization',
-                    },
-                ]
-            },
-            {
-                cols: [
-                    {
-                        view: 'sidebar',
+                        view: 'menu',
                         id: 'sidebar',
+                        css: 'my_menubar',
                         //collapsed: true,
-                        css: 'webix_dark',
+                        layout: 'y',
                         data: [
-                            {id: "CommonInfo", icon: "mdi mdi-information", value: 'Общая информация'},
-                            {id: "Employees", icon: "mdi mdi-account-group", value: 'Сотрудники'},
-                            {id: "Requests", icon: "wxi-file", value: 'Заявки'},
-                            {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
+                            {id: "CommonInfo", $css: 'my_menubar_item', icon: "mdi mdi-information", value: 'Общая информация'},
+                            {id: "Employees", $css: 'my_menubar_item', icon: "mdi mdi-account-group", value: 'Сотрудники'},
+                            {id: "Requests", $css: 'my_menubar_item', icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
+                            {id: "Settings", $css: 'my_menubar_item', icon: "mdi mdi-cogs", value: 'Настройки'},
                         ],
+                        type:{
+                            subsign:true,
+                            height:44
+                        },
                         on: {
-                            onAfterSelect: function (id) {
+                            onMenuItemClick: function (id) {
                                 let view;
                                 switch (id) {
                                     case 'CommonInfo': {
@@ -1912,6 +1897,53 @@ webix.ready(function () {
                             }
                         }
                     },
+                ]
+            },
+            {
+                rows: [
+
+                    {
+                        view: 'toolbar',
+                        id: 'toolbar',
+                        // padding: 5,
+                        height: 45,
+                        elements: [
+                            // {
+                            //     view: 'button',
+                            //     type: 'icon',
+                            //     icon: 'wxi-dots',
+                            //     // css: 'webix_primary',
+                            //     width: 37,
+                            //     click: function () {
+                            //         if ($$('sidebar').config.hidden)
+                            //             $$('sidebar').show();
+                            //         else $$('sidebar').hide();
+                            //     }
+                            // },
+                            {
+                                align: 'left',
+                                cols: [
+                                    {
+                                        view: 'label',
+                                        width: 40,
+                                        template: "<img height='40px' width='40px' src = \"favicon.ico\">"
+                                    },
+                                    {
+                                        view: 'label',
+                                        label: `<span style="font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
+                                    },
+                                ]
+                            },
+                            {
+                                view: 'template',
+                                borderless: true,
+                                template: "<div style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> " +
+                                    "<span id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\"" +
+                                    "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
+                                url: 'organization',
+                            },
+                        ]
+                    },
                     {
                         id: 'content'
                     }
@@ -1919,7 +1951,6 @@ webix.ready(function () {
             }
         ]
     })
-
     webix.event(window, "resize", function (event) {
         layout.define("width", document.body.clientWidth);
         layout.resize();
