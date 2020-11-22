@@ -22,6 +22,7 @@ const commonInfo = {
             {
                 view: 'form',
                 id: 'form',
+                autoheight:true,
                 complexData: true,
                 elements: [
                     view_section('Данные о вашей организации'),
@@ -75,21 +76,44 @@ const commonInfo = {
                                     },
                                 ]
                             },
-
                             {
-                                view: 'text',
-                                name: 'okved',
-                                id: 'organizationOkved',
-                                label: 'Основной вид осуществляемой деятельности (отрасль)',
-                                labelPosition: 'top',
-                                required: true
+                                rows:
+                                    [
+                                        {
+                                            height: 30,
+                                            view: 'label',
+                                            label: 'Основной вид осуществляемой деятельности (отрасль)',
+                                        },
+                                        {
+                                            autoheight: true,
+                                            template: '<div class="chip">#okved#</div>', //<span class="mdi mdi-close"></span>
+                                            url: 'organization',
+                                        },
+                                    ]
                             },
                             {
-                                view: 'textarea',
-                                name: 'okvedAdd',
-                                label: 'Дополнительные виды осуществляемой деятельности',
-                                height: 100,
-                                labelPosition: 'top'
+                                rows:
+                                    [
+                                        {
+                                            height: 30,
+                                            view: 'label',
+                                            label: 'Дополнительные виды осуществляемой деятельности',
+                                        },
+                                        {
+                                            view: "list",
+                                            layout: 'x',
+                                            css:{'white-space':'normal !important;'},
+                                            autoheight: true,
+                                            height: 100,
+                                            scroll: false,
+                                            //template: '<div class="chip">#id#</div>',
+                                            url: "orgOkvedAdd",
+                                            type:{
+                                                css: "chip",
+                                                height:'auto'
+                                            },
+                                        }
+                                    ]
                             },
                             {
                                 view: 'textarea',
@@ -1858,14 +1882,14 @@ webix.ready(function () {
                         //collapsed: true,
                         layout: 'y',
                         data: [
-                            {id: "CommonInfo", $css: 'my_menubar_item', icon: "mdi mdi-information", value: 'Общая информация'},
-                            {id: "Employees", $css: 'my_menubar_item', icon: "mdi mdi-account-group", value: 'Сотрудники'},
-                            {id: "Requests", $css: 'my_menubar_item', icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
-                            {id: "Settings", $css: 'my_menubar_item', icon: "mdi mdi-cogs", value: 'Настройки'},
+                            {id: "CommonInfo", icon: "mdi mdi-information", value: 'Общая информация'},
+                            {id: "Employees", icon: "mdi mdi-account-group", value: 'Сотрудники'},
+                            {id: "Requests",  icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
+                            {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
                         ],
                         type:{
-                            subsign:true,
-                            height:44
+                            css: 'my_menubar_item',
+                            height: 44
                         },
                         on: {
                             onMenuItemClick: function (id) {

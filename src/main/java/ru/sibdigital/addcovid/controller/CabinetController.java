@@ -21,6 +21,7 @@ import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,6 +71,17 @@ public class CabinetController {
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         return organization;
+    }
+
+    @GetMapping("/orgOkvedAdd")
+    public @ResponseBody List<String> getOrganizationOkvedAdd(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        String orgOkvedAdd = clsOrganizationRepo.findById(id).orElse(null).getOkvedAdd();
+        String[] okveds = orgOkvedAdd.split("\r\n");
+        return Arrays.asList(okveds);
     }
 
     @GetMapping("/org_requests")

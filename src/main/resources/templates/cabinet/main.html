@@ -7,88 +7,11 @@
     <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.css}">
     <link type="text/css" rel="stylesheet" th:href="@{/libs/materialdesignicons.css}">
     <link type="text/css" rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/cabinet/cabinet.css}">
 
     <script th:src="@{/libs/webix.min.js}"></script>
     <script th:src="@{/libs/routie.min.js}"></script>
     <script th:src="@{/libs/jquery-3.4.1.min.js}"></script>
-
-    <style>
-
-        .user_shortName{
-            line-height: 34px;
-            font-family: Roboto, sans-serif;
-            font-size: 16px;
-            font-weight: 500;
-            color: #475466;
-            letter-spacing: 0px;
-        }
-
-        .user_menu_items{
-            line-height: 34px;
-            font-family: Roboto, sans-serif;
-            font-size: 14px;
-            font-weight: 500;
-            color: #475466;
-            letter-spacing: 0px;
-        }
-
-        .webix_view.webix_window.webix_popup.webix_menu a{
-            color: #475466 !important;
-        }
-
-        .webix_view.webix_window.webix_popup.webix_menu a:hover{
-            color: #1CA1C1 !important;
-        }
-
-        .user_shortName:hover{
-            color: #1CA1C1 !important;
-        }
-
-        body {margin: 0}
-        .boldLabel {
-            font-weight: bold; border-width: 2px; border-style: solid; border-color: #000000;
-        }
-
-        .user_avatar{
-            margin-right: 12px;
-            width: 32px;
-            height: 32px;
-            line-height: 32px;
-            right: 8px;
-            top: 8px;
-            background: rgba(228, 230, 240, 0.8);
-            color: #94a1b3;
-            border-radius: 50%;
-            overflow: hidden;
-        }
-
-        .user_avatar:hover{
-            box-shadow: #1CA1C1 0 0 2px 2px;
-        }
-
-        .my_menubar {
-            background-color: #4A4E58;
-            border-right: 1px;
-            border-color: #4A4E58;
-            color: #FFFFFF;
-        }
-        .webix_badge {
-            margin: 9px 0 0 12px !important;
-        }
-
-        .my_menubar_item {
-            background-color: #4A4E58 !important;
-            line-height: 40px;
-            border-color: #4A4E58 !important;
-            color: #FFFFFF !important;
-        }
-
-        .my_menubar_item:hover {
-            background-color: #373a42 !important;
-            color: #FFFFFF !important;
-        }
-
-    </style>
 </head>
 <body>
 <script th:inline="javascript">
@@ -97,6 +20,6 @@
     const LINK_PREFIX = [[${link_prefix}]]
     const LINK_SUFFIX = [[${link_suffix}]]
 </script>
-<script th:src="@{/js/cabinet/main.js}"></script>
+<script th:src="@{js/cabinet/main.js}"></script>
 </body>
 </html>
