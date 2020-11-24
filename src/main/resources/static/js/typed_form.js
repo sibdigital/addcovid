@@ -863,8 +863,8 @@ webix.ready(function () {
                                         params.organizationInn = params.organizationInn.trim();
                                         params.organizationOgrn = params.organizationOgrn.trim();
 
-                                        if(params.organizationInn.length > 12 ){
-                                            webix.message('Превышена длина ИНН', 'error')
+                                        if(!(params.organizationInn.length == 12 || params.organizationInn.length == 10) ){
+                                            webix.message('Проверьте длину ИНН', 'error')
                                             return false
                                         }
 
@@ -873,8 +873,8 @@ webix.ready(function () {
                                             return false
                                         }
 
-                                        if(params.organizationOgrn.length > 15){
-                                            webix.message('Превышена длина ОГРН', 'error')
+                                        if(!(params.organizationOgrn.length == 13 || params.organizationOgrn.length == 15) ){
+                                            webix.message('Проверьте длину ОГРН', 'error')
                                             return false
                                         }
 

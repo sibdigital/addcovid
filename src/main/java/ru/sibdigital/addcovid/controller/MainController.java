@@ -94,8 +94,8 @@ public class MainController {
             }
             if(postFormDto.getOrganizationInn() == null || postFormDto.getOrganizationInn().isEmpty() ){
                 errors +=  "Заполните ИНН";
-            }else if(postFormDto.getOrganizationInn().length() > 12 ){
-                errors +=  "Превышена длина ИНН";
+            }else if(!(postFormDto.getOrganizationInn().length() == 12 || postFormDto.getOrganizationInn().length() == 10)){
+                errors +=  "Неправильная длина ИНН";
             }
             boolean validateOgrn = false;
             if (postFormDto.getIsSelfEmployed() == null || postFormDto.getIsSelfEmployed().booleanValue() == false) {
@@ -104,8 +104,8 @@ public class MainController {
             if (validateOgrn) {
                 if (postFormDto.getOrganizationOgrn() == null || postFormDto.getOrganizationOgrn().isEmpty()) {
                     errors += "Заполните ОГРН";
-                } else if (postFormDto.getOrganizationInn().length() > 15) {
-                    errors += "Превышена длина ОГРН";
+                } else if (!(postFormDto.getOrganizationInn().length() == 15 || postFormDto.getOrganizationInn().length() == 13)) {
+                    errors += "Неправильная длина ОГРН";
                 }
             }
             if(postFormDto.getOrganizationPhone() == null || postFormDto.getOrganizationPhone().length() > 100){
