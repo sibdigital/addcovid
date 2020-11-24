@@ -23,9 +23,10 @@
 
     webix.i18n.setLocale("ru-RU");
 
-    webix.ui({
+    let regLayout = webix.ui({
         container: 'app',
         height: document.body.clientHeight,
+        minWidth: 280,
         width: 768,
         css: {margin: 'auto'},
         rows: [
@@ -56,12 +57,18 @@
                 complexData: true,
                 elements: [
                     {
+                        id: "egrulBtnIn",
+                        rows:[]
+                    },
+                    {
                         id: 'egrul_search',
+                        responsive: "egrulBtnIn",
                         cols: [
                             {
                                 view: 'button',
                                 id: 'egrul_load_button',
                                 css: 'webix_primary',
+                                minWidth: 250,
                                 value: 'Заполнить по ИНН',
                                 align: 'center',
                                 click: function () {
@@ -179,6 +186,7 @@
                                 view: 'text',
                                 name: 'searchInn',
                                 id: 'searchInn',
+                                minWidth: 250,
                                 // label: 'ИНН',
                                 placeholder: 'ИНН',
                             },
@@ -206,11 +214,18 @@
                                 required: true
                             },
                             {
+
+                                id: 'spaceRows',
+                                rows:[]
+                            },
+                            {
+                                responsive: "spaceRows",
                                 cols: [
                                     {
                                         view: 'text',
                                         id: 'organizationInn',
                                         name: 'organizationInn',
+                                        minWidth: 250,
                                         label: 'ИНН',
                                         labelPosition: 'top',
                                         validate: webix.rules.isNumber,
@@ -220,6 +235,7 @@
                                         view: 'checkbox',
                                         name: 'isSelfEmployed',
                                         labelPosition: 'top',
+                                        minWidth: 90,
                                         label: 'Самозанятый',
                                         on: {
                                             onChange(newv, oldv) {
@@ -395,6 +411,15 @@
         if (EGRUL_ADDRESS) {
             webix.extend($$('form'), webix.ProgressBar);
             $$('egrul_search').show();
+        }
+
+        if (document.body.clientWidth < 480){
+            regLayout.config.width = document.body.clientWidth; regLayout.resize();
+            $$("organizationName").config.label = "Наим. орг./ФИО ИП"; $$("organizationName").refresh();
+            $$("organizationShortName").config.label = "Краткое наим. огр."; $$("organizationShortName").refresh();
+            $$("organizationOkved").config.label = "Осн. вид деятельности"; $$("organizationOkved").refresh();
+            $$("organizationOkvedAdd").config.label = "Доп. виды деятельности"; $$("organizationOkvedAdd").refresh();
+
         }
     })
 </script>
