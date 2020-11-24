@@ -12,6 +12,11 @@
     color: #1CA1C1 !important;
 }
 
+img {
+  vertical-align: middle;
+  border-style: none;
+}
+
 .user_avatar{
     margin-right: 12px;
     width: 32px;
