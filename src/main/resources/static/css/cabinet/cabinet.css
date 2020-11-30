@@ -103,7 +103,7 @@ body {margin: 0}
 
 .chip:focus {
     outline: none;
-    background-color: #26a69a;
+    background-color: #1CA1C1;
     color: #fff;
 }
 

@@ -6,7 +6,6 @@
     <title th:text="${application_name}">. Личный кабинет</title>
     <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.css}">
     <link type="text/css" rel="stylesheet" th:href="@{/libs/materialdesignicons.css}">
-    <link type="text/css" rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <link type="text/css" rel="stylesheet" th:href="@{/css/cabinet/cabinet.css}">
 
     <script th:src="@{/libs/webix.min.js}"></script>
@@ -20,6 +19,10 @@
     const LINK_PREFIX = [[${link_prefix}]]
     const LINK_SUFFIX = [[${link_suffix}]]
 </script>
-<script th:src="@{js/cabinet/main.js}"></script>
+<script th:src="@{/js/cabinet/main.js}"></script>
+<script th:src="@{/js/cabinet/common_info.js}"></script>
+<script th:src="@{/js/cabinet/employees.js}"></script>
+<script th:src="@{/js/cabinet/requests.js}"></script>
+<script th:src="@{/js/cabinet/settings.js}"></script>
 </body>
 </html>
