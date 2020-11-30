@@ -38,9 +38,10 @@ let UsercontextMenu = webix.ui({
     view: "contextmenu",
     css: 'user_menu_items',
     data: [
-        {id: "CommonInfo",  value: 'Общая информация'},
-        {id: "Employees", value: 'Сотрудники'},
-        {id: "Requests", value: 'Заявки', badge: setRequestsBadge()},
+        {id: "CommonInfo",  value: 'Профиль'},
+        {id: "Contacts", value: 'Контактная информация'},
+        {id: "Mailing", value: 'Рассылки', badge: setRequestsBadge()},
+        {id: "Help", value: 'Помощь'},
         {id: "Settings", value: 'Настройки'},
         { $template:"Separator" },
         {id: 'Exit', value: 'Выход'}
@@ -48,34 +49,27 @@ let UsercontextMenu = webix.ui({
     on: {
         onMenuItemClick: function (id) {
             let view;
-            switch (id) {
-                case 'CommonInfo': {
-                    view = commonInfo;
-                    break;
-                }
-                case 'Requests': {
-                    view = requests;
-                    break;
-                }
-                case 'Employees': {
-                    view = employees;
-                    break;
-                }
-                case 'Settings': {
-                    view = settings;
-                    break;
-                }
-                case 'Exit': {
-                    webix.send("/logout")
-                    break;
-                }
+            if (id == 'CommonInfo'){
+                view = commonInfo;
+            }else if (id == 'Contacts'){
+                view = contacts;
+            }else if (id == 'Mailing'){
+                view = mailing;
+            }else if (id == 'Help'){
+                view = settings;
+            }else if (id == 'Settings'){
+                view = settings;
+            }else if (id == 'Exit'){
+                webix.send("/logout");
             }
-            webix.ui({
-                id: 'content',
-                rows: [
-                    view
-                ]
-            }, $$('content'))
+            if (view != null) {
+                webix.ui({
+                    id: 'content',
+                    rows: [
+                        view
+                    ]
+                }, $$('content'))
+            }
         }
     }
 });
@@ -129,6 +123,10 @@ webix.ready(function () {
                         data: [
                             {id: "CommonInfo", icon: "mdi mdi-information", value: 'Общая информация'},
                             {id: "Employees", icon: "mdi mdi-account-group", value: 'Сотрудники'},
+                            {id: "Documents", icon: "mdi mdi-cogs", value: 'Документы'},
+                            {id: "Address", icon: "mdi mdi-cogs", value: 'Фактические адреса'},
+                            {id: "Prescript", icon: "mdi mdi-cogs", value: 'Предписания'},
+                            {id: "News", icon: "mdi mdi-cogs", value: 'Новости'},
                             {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
                             {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
                         ],
@@ -139,30 +137,32 @@ webix.ready(function () {
                         on: {
                             onMenuItemClick: function (id) {
                                 let view;
-                                switch (id) {
-                                    case 'CommonInfo': {
-                                        view = commonInfo;
-                                        break;
-                                    }
-                                    case 'Requests': {
-                                        view = requests;
-                                        break;
-                                    }
-                                    case 'Employees': {
-                                        view = employees;
-                                        break;
-                                    }
-                                    case 'Settings': {
-                                        view = settings;
-                                        break;
-                                    }
+
+                                if (id == 'CommonInfo'){
+                                    view = commonInfo;
+                                }else if (id == 'Requests'){
+                                    view = requests;
+                                }else if (id == 'Employees'){
+                                    view = employees;
+                                }else if (id == 'Settings'){
+                                    view = settings;
+                                }else if (id == 'Documents'){
+                                    view = documents;
+                                }else if (id == 'Address'){
+                                    view = address;
+                                }else if (id == 'Prescript'){
+                                    view = prescript;
+                                }else if (id == 'News'){
+                                    view = news;
                                 }
-                                webix.ui({
-                                    id: 'content',
-                                    rows: [
-                                        view
-                                    ]
-                                }, $$('content'))
+                                if (view != null) {
+                                    webix.ui({
+                                        id: 'content',
+                                        rows: [
+                                            view
+                                        ]
+                                    }, $$('content'));
+                                }
                             }
                         }
                     },
