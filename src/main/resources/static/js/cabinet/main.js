@@ -87,20 +87,49 @@ const commonInfo = {
                             },
 
                             {
-                                view: 'text',
-                                name: 'okved',
-                                id: 'organizationOkved',
-                                label: 'Основной вид осуществляемой деятельности (отрасль)',
-                                labelPosition: 'top',
-                                required: true
+                                rows:
+                                    [
+                                        {
+                                            height: 30,
+                                            view: 'label',
+                                            label: 'Основной вид осуществляемой деятельности (отрасль)',
+                                        },
+                                        {
+                                            view: 'list',
+                                            layout: 'x',
+                                            css:{'white-space':'normal !important;'},
+                                            scroll: false,
+                                            height: 50,
+                                            template: '#kindCode# - #kindName#',
+                                            url: 'reg_organization_okved', //<span class="mdi mdi-close"></span>
+                                            type:{
+                                                css: "chip",
+                                                height:'auto'
+                                            },
+                                        },
+                                    ]
                             },
                             {
-                                view: 'textarea',
-                                name: 'okvedAdd',
-                                id: 'okvedAdd',
-                                label: 'Дополнительные виды осуществляемой деятельности',
-                                height: 100,
-                                labelPosition: 'top'
+                                rows:
+                                    [
+                                        {
+                                            height: 30,
+                                            view: 'label',
+                                            label: 'Дополнительные виды осуществляемой деятельности',
+                                        },
+                                        {
+                                            view: "list",
+                                            layout: 'x',
+                                            css:{'white-space':'normal !important;'},
+                                            height: 150,
+                                            template: '#kindCode# - #kindName#',
+                                            url: "reg_organization_okved_add",
+                                            type:{
+                                                css: "chip",
+                                                height:'auto'
+                                            },
+                                        }
+                                    ]
                             },
                             {
                                 view: 'textarea',
@@ -344,6 +373,7 @@ function showRequestCreateForm(idTypeRequest) {
                                         css: 'personalTemplateStyle',
                                         id: 'activityKind',
                                         autoheight: true,
+                                        // align: 'center'
                                     },
                                     {
                                         rows:[
@@ -371,7 +401,6 @@ function showRequestCreateForm(idTypeRequest) {
                                             },
                                         ]
                                     },
-
                                     view_section('Обоснование заявки'),
                                     {
                                         rows: [
@@ -682,7 +711,6 @@ function showRequestCreateForm(idTypeRequest) {
                                                     },
                                                 ],
                                             },
-
                                         ]
                                     },
                                     view_section('Данные о ваших работниках, чья деятельность предусматривает выход на работу (Обязательный для заполнения раздел)'),
@@ -1013,7 +1041,7 @@ function showRequestCreateForm(idTypeRequest) {
                                                 minWidth: 150,
                                                 align: 'center',
                                                 click: function () {
-                                                    $$('sidebar').callEvent('onAfterSelect', ['Requests']);
+                                                    $$('menu').callEvent('onMenuItemClick', ['Requests']);
                                                 }
                                             },
                                             {
@@ -1152,7 +1180,7 @@ function showRequestCreateForm(idTypeRequest) {
                                                                             })
                                                                                 .then(function () {
                                                                                     $$('label_sogl').hideProgress();
-                                                                                    $$('sidebar').callEvent('onAfterSelect', ['Requests']);
+                                                                                    $$('menu').callEvent('onMenuItemClick', ['Requests']);
                                                                                 })
                                                                                 .fail(function () {
                                                                                     $$('label_sogl').hideProgress()
@@ -1184,8 +1212,7 @@ function showRequestCreateForm(idTypeRequest) {
                                 ],
                             }
                         ]
-                    },
-
+                    }
                 }
             ]
         }, $$('content'))
@@ -1560,8 +1587,7 @@ let updateFIOmodal = webix.ui({
                 name: 'person.patronymic',
                 label: 'Отчество',
                 labelPosition: 'top'
-            },
-            /*
+            },/*
                     {
                         view: 'checkbox',
                         id: 'isVaccinatedFlu',
@@ -1723,7 +1749,6 @@ const employees = {
                             hotkey: "enter",
                             click: function (){
                                 filterText();
-                                $$("dtFilter").setValue("");
                             }
                         }
                     ]
@@ -1985,8 +2010,6 @@ const employees = {
                                 },
                             ]
                         }
-
-
                     ]
             },
             {
@@ -2008,65 +2031,119 @@ function filterText() {
             return webix.ajax().headers({'Content-type': 'application/json'}).post("/filter", text);
         });
     }
+    $$("dtFilter").setValue("")
 }
 
-//Закрытие модального окна при смене фокуса
 webix.attachEvent("onFocusChange", function (to, from) {
     if (from && from.getTopParentView().config.view == "window" && !to) {
         from.getTopParentView().hide();
     }
 })
 
-webix.ready(function () {
-
-
-    let layout = webix.ui({
-        rows: [
-            {
-                view: 'toolbar',
-                // padding: 5,
-                elements: [
-                    {
-                        view: 'button',
-                        type: 'icon',
-                        icon: 'wxi-dots',
-                        // css: 'webix_primary',
-                        width: 37,
-                        click: function () {
-                            $$('sidebar').toggle();
-                        }
-                    },
-                    {
-                        view: 'label',
-                        width: 40,
-                        template: "<img height='35px' width='35px' src = \"favicon.ico\">"
-                    },
-                    {
-                        view: 'label',
-                        label: `<span style="font-size: 1.0rem">Личный кабинет</span>`,
-                    },
-                    {
-                        view: 'label',
-                        label: '<a href="/logout" title="Выйти">Выйти</a>',
-                        align: 'right'
-                    }
+let UsercontextMenu = webix.ui({
+    view: "contextmenu",
+    css: 'user_menu_items',
+    data: [
+        {id: "CommonInfo",  value: 'Общая информация'},
+        {id: "Employees", value: 'Сотрудники'},
+        {id: "Requests", value: 'Заявки', badge: setRequestsBadge()},
+        {id: "Settings", value: 'Настройки'},
+        { $template:"Separator" },
+        {id: 'Exit', value: 'Выход'}
+        ], //"Изменить аватар", ,
+    on: {
+        onMenuItemClick: function (id) {
+            let view;
+            switch (id) {
+                case 'CommonInfo': {
+                    view = commonInfo;
+                    break;
+                }
+                case 'Requests': {
+                    view = requests;
+                    break;
+                }
+                case 'Employees': {
+                    view = employees;
+                    break;
+                }
+                case 'Settings': {
+                    view = settings;
+                    break;
+                }
+                case 'Exit': {
+                    webix.send("/logout")
+                    break;
+                }
+            }
+            webix.ui({
+                id: 'content',
+                rows: [
+                    view
                 ]
-            },
+            }, $$('content'))
+        }
+    }
+});
+
+function showDropDownMenu(span){
+    if(span.offsetWidth < 100){
+        UsercontextMenu.config.width = 100; UsercontextMenu.resize();
+    }else{
+        UsercontextMenu.config.width = span.offsetWidth+40; UsercontextMenu.resize();
+    }
+    let toolBarHeight = $$('toolbar').config.height - 5;
+    UsercontextMenu.show({
+        x:document.body.clientWidth-span.offsetWidth-50,y:toolBarHeight
+    })
+}
+
+function setRequestsBadge(){
+    webix.ajax("org_requests").then(function(data){
+        let requestsCount = data.json().length;
+        let request = $$('menu').getItem("Requests");
+        request.badge = requestsCount;
+        $$('menu').updateItem("Requests", request);
+    });
+}
+
+webix.ready(function () {
+    let layout = webix.ui({
+        cols: [
             {
-                cols: [
+                width: 230,
+                id: 'menuRow',
+                rows: [
                     {
-                        view: 'sidebar',
-                        id: 'sidebar',
-                        collapsed: true,
-                        css: 'webix_dark',
+                        view: 'label',
+                        id: 'labelLK',
+                        css: {
+                            'background-color': '#565B67 !important',
+                            'color': '#FFFFFF'
+                        },
+                        align: 'center',
+                        height: 46,
+                        label: `<div style="color: white; font-size: 18px; font-family: Roboto, 
+                                sans-serif; padding: 0 12px 0 10px;">Личный кабинет</div>`,
+                    },
+                    {
+                        view: 'menu',
+                        id: 'menu',
+                        css: 'my_menubar',
+                        //collapsed: true,
+                        layout: 'y',
                         data: [
                             {id: "CommonInfo", icon: "mdi mdi-information", value: 'Общая информация'},
                             {id: "Employees", icon: "mdi mdi-account-group", value: 'Сотрудники'},
-                            {id: "Requests", icon: "wxi-file", value: 'Заявки'},
+                            {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
                             {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
                         ],
+                        type: {
+                            css: 'my_menubar_item',
+                            height: 44
+                        },
                         on: {
-                            onAfterSelect: function (id) {
+                            onMenuItemClick: function (id) {
                                 let view;
                                 switch (id) {
                                     case 'CommonInfo': {
@@ -2094,6 +2171,60 @@ webix.ready(function () {
                                 }, $$('content'))
                             }
                         }
+                    },
+                ]
+            },
+            {
+                rows: [
+
+                    {
+                        view: 'toolbar',
+                        id: 'toolbar',
+                        // padding: 5,
+                        height: 45,
+                        elements: [
+                            // {
+                            //     view: 'button',
+                            //     type: 'icon',
+                            //     icon: 'wxi-dots',
+                            //     // css: 'webix_primary',
+                            //     width: 37,
+                            //     click: function () {
+                            //         if ($$('menu').config.hidden)
+                            //             $$('menu').show();
+                            //         else $$('menu').hide();
+                            //     }
+                            // },
+                            {
+                                align: 'left',
+                                cols: [
+                                    {
+                                        view: 'label',
+                                        width: 40,
+                                        template: "<img height='40px' width='40px' src = \"favicon.ico\">",
+                                        click: () => {
+                                            webix.html.addCss($$("menuRow").$view, "animated swing")
+                                            let menuSide = $$('menuRow');
+                                            if (menuSide.config.hidden) {
+                                                menuSide.show()
+                                            } else menuSide.hide();
+                                        }
+                                    },
+                                    {
+                                        view: 'label',
+                                        label: `<span style="font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
+                                    },
+                                ]
+                            },
+                            {
+                                view: 'template',
+                                borderless: true,
+                                template: "<div style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> " +
+                                    "<span id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\"" +
+                                    "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
+                                url: 'organization',
+                            },
+                        ]
                     },
                     {
                         id: 'content'
@@ -2142,8 +2273,6 @@ function adaptiveCommonInfo(){
 
     $$("organizationName").config.label = "Наим. орг./ФИО ИП";$$("organizationName").refresh();
     $$("shortOrganizationName").config.label = "Краткое наим. орг."; $$("shortOrganizationName").refresh();
-    $$("organizationOkved").config.label = "Осн. вид деятельности"; $$("organizationOkved").refresh();
-    $$("okvedAdd").config.label = "Доп. виды деятельности"; $$("okvedAdd").refresh();
 
 }
 

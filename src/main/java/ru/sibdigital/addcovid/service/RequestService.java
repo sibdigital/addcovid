@@ -490,6 +490,14 @@ public class RequestService {
         return docEmployeeRepo.findAllByOrganization(id).orElse(null);
     }
 
+    public List<RegOrganizationOkved> getRegOrganizationOkvedAddByIdOrganization(Long id) {
+        return regOrganizationOkvedRepo.findAllByIdOrganizationIsNotMain(id).orElse(null);
+    }
+
+    public RegOrganizationOkved getRegOrganizationOkvedByIdOrganization(Long id) {
+        return regOrganizationOkvedRepo.findAllByIdOrganizationIsMain(id).orElse(null);
+    }
+
     @Transactional
     public DocEmployee saveEmployee(EmployeeDto employeeDto) {
         DocPerson docPerson = employeeDto.getPerson().convertToPersonEntity();

@@ -14,13 +14,13 @@ import ru.sibdigital.addcovid.dto.EmployeeDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.dto.PrincipalDto;
 import ru.sibdigital.addcovid.model.*;
-import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
-import ru.sibdigital.addcovid.repository.ClsPrincipalRepo;
-import ru.sibdigital.addcovid.repository.DocEmployeeRepo;
-import ru.sibdigital.addcovid.repository.DocRequestRepo;
+import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpSession;
+import java.io.Console;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,6 +70,28 @@ public class CabinetController {
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         return organization;
+    }
+
+    @GetMapping("/reg_organization_okved_add")
+    public @ResponseBody List<Okved> getOrganizationNotMainOkveds(HttpSession session) {
+           Long id = (Long) session.getAttribute("id_organization");
+           if (id == null) return null;
+
+           List<RegOrganizationOkved> regOrganizationOkveds = requestService.getRegOrganizationOkvedAddByIdOrganization(id);
+
+           List<Okved> organizationOkveds = regOrganizationOkveds.stream().map((s) -> s.getRegOrganizationOkvedId().getOkved()).collect(Collectors.toList());
+
+           return organizationOkveds;
+    }
+
+    @GetMapping("/reg_organization_okved")
+    public @ResponseBody Okved getOrganizationMainOkved(HttpSession session) {
+           Long id = (Long) session.getAttribute("id_organization");
+           if (id == null) return null;
+           RegOrganizationOkved regOrganizationOkved = requestService.getRegOrganizationOkvedByIdOrganization(id);
+           Okved organizationOkved = regOrganizationOkved.getRegOrganizationOkvedId().getOkved();
+
+           return organizationOkved;
     }
 
     @GetMapping("/org_requests")
