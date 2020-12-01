@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.dto.EmployeeDto;
+import ru.sibdigital.addcovid.dto.OrganizationContactDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.dto.PrincipalDto;
 import ru.sibdigital.addcovid.model.*;
@@ -215,6 +216,43 @@ public class CabinetController {
         }
 
         return errors;
+    }
+
+    @GetMapping("/org_contacts")
+    public @ResponseBody List<ClsOrganizationContact> getOrgContacts(HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        List<ClsOrganizationContact> organizationContacts = requestService.getAllClsOrganizationContactByOrganizationId(organization.getId());
+        return organizationContacts;
+    }
+
+    @PostMapping("/save_contact")
+    public @ResponseBody ClsOrganizationContact saveOrgContact(@RequestBody OrganizationContactDto organizationContactDto, HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        organizationContactDto.setOrganizationId(id);
+        ClsOrganizationContact clsOrganizationContact = null;
+        try {
+            clsOrganizationContact = requestService.saveOrgContact(organizationContactDto);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return clsOrganizationContact;
+    }
+
+    @PostMapping("/delete_org_contact")
+    public @ResponseBody OrganizationContactDto deleteOrgContact(@RequestBody OrganizationContactDto organizationContactDto, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        organizationContactDto.setOrganizationId(id);
+        try{
+            requestService.deleteOrgContact(organizationContactDto);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+            return null;
+        }
+        return organizationContactDto;
     }
 
     @GetMapping("/employees")

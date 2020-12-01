@@ -128,6 +128,7 @@ webix.ready(function () {
                             {id: "Prescript", icon: "mdi mdi-text-box-check-outline", value: 'Предписания'},
                             {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
                             {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
+                            {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Контакты'},
                             {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
                         ],
                         type: {
@@ -154,6 +155,8 @@ webix.ready(function () {
                                     view = prescript;
                                 }else if (id == 'News'){
                                     view = news;
+                                }else if (id == 'Contacts'){
+                                    view = contacts;
                                 }
                                 if (view != null) {
                                     webix.ui({
