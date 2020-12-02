@@ -170,25 +170,8 @@ body {margin: 0}
 .contactValue{
     position: absolute;
     padding-left: 5px;
+    /*white-space: normal !important;*/
     width: 400px;
     text-align:left;
     top: 50px
-}
-.title_long{
-    height:40px;
-    line-height:20px;
-    overflow:hidden;
-    font-weight:bold;
-    float: left;
-    padding-left: 5px;
-    width: 400px;
-}
-
-.rank{
-    font-size: 14px;
-    color:#df6910;
-    font-weight:bold;
-    float: left;
-    line-height:20px;
-    height:40px;
 }

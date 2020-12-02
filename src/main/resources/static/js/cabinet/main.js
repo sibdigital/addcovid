@@ -76,9 +76,9 @@ let UsercontextMenu = webix.ui({
 
 function showDropDownMenu(span){
     if(span.offsetWidth < 100){
-        UsercontextMenu.config.width = 100; UsercontextMenu.resize();
+        UsercontextMenu.config.width = 190; UsercontextMenu.resize();
     }else{
-        UsercontextMenu.config.width = span.offsetWidth+40; UsercontextMenu.resize();
+        UsercontextMenu.config.width = span.offsetWidth+80; UsercontextMenu.resize();
     }
     let toolBarHeight = $$('toolbar').config.height - 5;
     UsercontextMenu.show({

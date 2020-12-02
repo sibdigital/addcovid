@@ -509,8 +509,8 @@ public class RequestService {
                 .id(organizationContactDto.getId())
                 .organization(clsOrganization)
                 .type(organizationContactDto.getType())
-                .contactValue(organizationContactDto.getContactValue())
-                .contactPerson(organizationContactDto.getContactPerson())
+                .contactValue(organizationContactDto.getContactValue().trim())
+                .contactPerson(organizationContactDto.getContactPerson().trim())
                 .build();
 
         clsOrganizationContactRepo.save(clsOrganizationContact);
