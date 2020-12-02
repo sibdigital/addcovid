@@ -491,7 +491,7 @@ public class RequestService {
     }
 
     public List<RegOrganizationOkved> getRegOrganizationOkvedAddByIdOrganization(Long id) {
-        return regOrganizationOkvedRepo.findAllByIdOrganizationIsNotMain(id).orElse(null);
+        return regOrganizationOkvedRepo.findAllByIdOrganizationIsNotMain(id).orElse(new ArrayList<>());
     }
 
     public RegOrganizationOkved getRegOrganizationOkvedByIdOrganization(Long id) {

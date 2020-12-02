@@ -73,25 +73,33 @@ public class CabinetController {
     }
 
     @GetMapping("/reg_organization_okved_add")
-    public @ResponseBody List<Okved> getOrganizationNotMainOkveds(HttpSession session) {
-           Long id = (Long) session.getAttribute("id_organization");
-           if (id == null) return null;
+    public @ResponseBody
+    List<Okved> getOrganizationNotMainOkveds(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        List<RegOrganizationOkved> regOrganizationOkveds = requestService.getRegOrganizationOkvedAddByIdOrganization(id);
 
-           List<RegOrganizationOkved> regOrganizationOkveds = requestService.getRegOrganizationOkvedAddByIdOrganization(id);
+        List<Okved> organizationOkveds = regOrganizationOkveds.stream().map((s) -> s.getRegOrganizationOkvedId().getOkved()).collect(Collectors.toList());
 
-           List<Okved> organizationOkveds = regOrganizationOkveds.stream().map((s) -> s.getRegOrganizationOkvedId().getOkved()).collect(Collectors.toList());
-
-           return organizationOkveds;
+        return organizationOkveds;
     }
 
     @GetMapping("/reg_organization_okved")
-    public @ResponseBody Okved getOrganizationMainOkved(HttpSession session) {
-           Long id = (Long) session.getAttribute("id_organization");
-           if (id == null) return null;
-           RegOrganizationOkved regOrganizationOkved = requestService.getRegOrganizationOkvedByIdOrganization(id);
-           Okved organizationOkved = regOrganizationOkved.getRegOrganizationOkvedId().getOkved();
+    public @ResponseBody
+    Okved getOrganizationMainOkved(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        Okved organizationOkved = null;
+        RegOrganizationOkved regOrganizationOkved = requestService.getRegOrganizationOkvedByIdOrganization(id);
+        if (regOrganizationOkved != null) {
+            organizationOkved = regOrganizationOkved.getRegOrganizationOkvedId().getOkved();
+        }
 
-           return organizationOkved;
+        return organizationOkved;
     }
 
     @GetMapping("/org_requests")
