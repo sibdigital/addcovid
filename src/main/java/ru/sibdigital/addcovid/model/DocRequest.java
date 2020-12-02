@@ -329,6 +329,10 @@ public class DocRequest {
                 result = "Одобрена";
             } else if (getStatusReview() == ReviewStatuses.REJECTED.getValue()) {
                 result = "Отклонена";
+            } else if (getStatusReview() == ReviewStatuses.NEW.getValue()) {
+                result = "Новая";
+            } else if (getStatusReview() == ReviewStatuses.EXPIRED.getValue()) {
+                result = "Просрочена";
             }
         }
         return result;
@@ -340,6 +344,10 @@ public class DocRequest {
 
     public void setAdditionalAttributes(AdditionalAttributes additionalAttributes) {
         this.additionalAttributes = additionalAttributes;
+    }
+
+    public boolean isNew() {
+        return this.getStatusReview() == ReviewStatuses.NEW.getValue();
     }
 
     @Override

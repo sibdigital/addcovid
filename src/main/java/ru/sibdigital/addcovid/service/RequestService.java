@@ -598,5 +598,23 @@ public class RequestService {
         return clsOrganizationContactRepo.findAllByOrganization(id).orElse(null);
     }
 
+    /**
+     * Метод предназначен для сохранения заявки по предписанию
+     *
+     * @param postForm
+     * @return
+     */
+    @Transactional
+    public DocRequest saveNewRequest(PostFormDto postForm) {
+        DocRequest docRequest = docRequestRepo.findById(postForm.getRequestId()).orElse(null);
+        docRequest.setAgree(postForm.getIsAgree());
+        docRequest.setProtect(postForm.getIsProtect());
+        docRequest.setAdditionalAttributes(postForm.getAdditionalAttributes());
+        docRequest.setStatusReview(ReviewStatuses.OPENED.getValue());
+
+        docRequestRepo.save(docRequest);
+
+        return docRequest;
+    }
 
 }

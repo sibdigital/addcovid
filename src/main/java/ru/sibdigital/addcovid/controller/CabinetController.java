@@ -319,4 +319,41 @@ public class CabinetController {
         }
         return employeeDto;
     }
+
+    @PostMapping("/cabinet/new_request")
+    public @ResponseBody String postNewRequest(@RequestBody PostFormDto postFormDto) {
+        try {
+            String errors = validateNewRequest(postFormDto);
+            if (errors.isEmpty()) {
+                requestService.saveNewRequest(postFormDto);
+                return "Заявка принята. Ожидайте ответ на электронную почту.";
+            } else {
+                return errors;
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "Невозможно подать заявку";
+        }
+    }
+
+    private String validateNewRequest(PostFormDto postFormDto) {
+        String errors = "";
+        try {
+            if (postFormDto.getIsAgree() == false) {
+                errors += "Необходимо подтвердить согласие работников на обработку персональных данных\n";
+            }
+            if (postFormDto.getIsProtect() == false) {
+                errors += "Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия\n";
+            }
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            errors += "Неправильно заполнены необходимые поля\n";
+        }
+
+        if (!errors.isEmpty()) {
+            errors = "ЗАЯВКА НЕ ВНЕСЕНА. ОБНАРУЖЕНЫ ОШИБКИ ЗАПОЛНЕНИЯ: " + errors;
+        }
+
+        return errors;
+    }
 }
