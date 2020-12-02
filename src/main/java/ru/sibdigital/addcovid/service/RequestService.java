@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.dto.EmployeeDto;
+import ru.sibdigital.addcovid.dto.OrganizationContactDto;
 import ru.sibdigital.addcovid.dto.OrganizationDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.*;
@@ -57,6 +58,9 @@ public class RequestService {
 
     @Autowired
     private ClsPrincipalRepo clsPrincipalRepo;
+
+    @Autowired
+    private ClsOrganizationContactRepo clsOrganizationContactRepo;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -499,6 +503,26 @@ public class RequestService {
     }
 
     @Transactional
+    public ClsOrganizationContact saveOrgContact(OrganizationContactDto organizationContactDto) {
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(organizationContactDto.getOrganizationId()).orElse(null);
+        ClsOrganizationContact clsOrganizationContact = ClsOrganizationContact.builder()
+                .id(organizationContactDto.getId())
+                .organization(clsOrganization)
+                .type(organizationContactDto.getType())
+                .contactValue(organizationContactDto.getContactValue().trim())
+                .contactPerson(organizationContactDto.getContactPerson().trim())
+                .build();
+
+        clsOrganizationContactRepo.save(clsOrganizationContact);
+        return clsOrganizationContact;
+    }
+
+    @Transactional
+    public void deleteOrgContact(OrganizationContactDto organizationContactDto){
+        clsOrganizationContactRepo.deleteById(organizationContactDto.getId());
+    }
+
+    @Transactional
     public DocEmployee saveEmployee(EmployeeDto employeeDto) {
         DocPerson docPerson = employeeDto.getPerson().convertToPersonEntity();
 
@@ -569,4 +593,10 @@ public class RequestService {
         docPersonRepo.deleteById(personId);
 
     }
+
+    public List<ClsOrganizationContact> getAllClsOrganizationContactByOrganizationId(Long id){
+        return clsOrganizationContactRepo.findAllByOrganization(id).orElse(null);
+    }
+
+
 }
