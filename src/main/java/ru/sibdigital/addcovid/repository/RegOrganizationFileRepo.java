@@ -12,5 +12,8 @@ import java.util.Optional;
 
 @Repository
 public interface RegOrganizationFileRepo extends JpaRepository<RegOrganizationFile, Long> {
+    @Query("select rof " +
+            "from RegOrganizationFile rof " +
+            "where rof.clsOrganizationByIdOrganization = :organization and rof.deleted = false")
     List<RegOrganizationFile> findRegOrganizationFileByOrganization(ClsOrganization organization);
 }

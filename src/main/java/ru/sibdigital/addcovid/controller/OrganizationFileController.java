@@ -76,12 +76,12 @@ public class OrganizationFileController {
             final String absolutePath = Paths.get(uploadingDir).toFile().getAbsolutePath();
             final String filename = organization.getId().toString() + "_" + UUID.randomUUID();
             final String originalFilename = part.getOriginalFilename();
-            File file = new File(String.format("%s/%s", absolutePath, filename));
+            String extension = getFileExtension(originalFilename);
+            File file = new File(String.format("%s/%s.%s", absolutePath, filename, extension));
             part.transferTo(file);
 
             final String fileHash = getFileHash(file);
             final long size = Files.size(file.toPath());
-            String extension = getFileExtension(file);
 
             RegOrganizationFile rof = RegOrganizationFile.builder()
                     .clsOrganizationByIdOrganization(organization)
@@ -99,8 +99,6 @@ public class OrganizationFileController {
             }
 
             regOrganizationFile= organizationFileRepo.save(rof);
-
-            //return "{ \"status\": \"server\", \"sname\": \"" + String.format("/%s/%s", uploadingDir, file.getName()) + "\" }";
 
         } catch (IOException ex){
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
@@ -124,9 +122,8 @@ public class OrganizationFileController {
         return result;
     }
 
-    private String getFileExtension(File file) {
-        String name = file.getName();
-        int lastIndexOf = name.lastIndexOf(".");
+    private String getFileExtension(String name) {
+         int lastIndexOf = name.lastIndexOf(".");
         if (lastIndexOf == -1) {
             return ""; // empty extension
         }
