@@ -50,6 +50,9 @@ public class CabinetController {
     @Autowired
     private DocEmployeeRepo docEmployeeRepo;
 
+    @Autowired
+    private ClsNewsRepo clsNewsRepo;
+
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -318,5 +321,11 @@ public class CabinetController {
             return null;
         }
         return employeeDto;
+    }
+
+    @GetMapping("/newsfeed")
+    public @ResponseBody List<ClsNews> getNewsList(HttpSession session) {
+        List<ClsNews> newsList = clsNewsRepo.findAll().stream().collect(Collectors.toList());
+        return newsList;
     }
 }

@@ -9,6 +9,10 @@ const news = {
                 id: 'form',
                 complexData: true,
                 elements: [
+                    {
+                        view: 'list',
+                        url: 'newsfeed',
+                    }
                 ],
                 //url: 'documents'
             }
