@@ -7,9 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.model.ClsOrganization;
 import ru.sibdigital.addcovid.model.DocRequest;
@@ -18,6 +16,7 @@ import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.repository.RegOrganizationFileRepo;
 
+import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.IOException;
@@ -46,23 +45,30 @@ public class OrganizationFileController {
     String uploadingDir;
 
     @PostMapping(value = "/upload_files", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> uploadFile(@RequestParam(value = "upload") MultipartFile part,
-                                             @RequestParam("idOrganization") Long idOrganization,
-                                             @RequestParam("idDocRequest") Long idDocRequest){
+    public ResponseEntity<Object> uploadFile(@RequestParam(value = "upload") MultipartFile part, HttpSession session,
+                                             @RequestParam(required = false) Long idDocRequest){
 
+        Long idOrganization = (Long) session.getAttribute("id_organization");
         ResponseEntity<Object> responseEntity;
         if (Files.notExists(Paths.get(uploadingDir))) {
             responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"cause\": \"Ошибка сохранения\"}");
         }else {
 
             final Optional<ClsOrganization> oorg = organizationRepo.findById(idOrganization);
-            final DocRequest docRequest = docRequestRepo.findById(idDocRequest).orElse(null);
+
+            DocRequest docRequest;
+            if (idDocRequest == null) {
+                docRequest = null;
+            }
+            else {
+                docRequest = docRequestRepo.findById(idDocRequest).orElse(null);
+            }
 
             if (oorg.isPresent()) {
                 final RegOrganizationFile regOrganizationFile = load(part, oorg.get(), docRequest);
                 responseEntity = ResponseEntity.ok().body(regOrganizationFile);
             } else {
-                responseEntity = ResponseEntity.badRequest().body("{\"cause\": \"Отсутствует орагнизация\"}");
+                responseEntity = ResponseEntity.badRequest().body("{\"cause\": \"Отсутствует организация\"}");
             }
         }
 
@@ -128,5 +134,10 @@ public class OrganizationFileController {
             return ""; // empty extension
         }
         return name.substring(lastIndexOf);
+    }
+
+    @GetMapping("/org_files")
+    public @ResponseBody List<RegOrganizationFile> getRegOrgFileName() {
+        return organizationFileRepo.findAll();
     }
 }

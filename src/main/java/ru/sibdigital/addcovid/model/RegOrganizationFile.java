@@ -29,6 +29,8 @@ public class RegOrganizationFile {
 
     @Id
     @Column(name = "id")
+    @SequenceGenerator(name = "REG_ORGANIZATION_FILE_SEQ_GEN", sequenceName = "REG_ORGANIZATION_FILE_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REG_ORGANIZATION_FILE_SEQ_GEN")
     public int getId() {
         return id;
     }

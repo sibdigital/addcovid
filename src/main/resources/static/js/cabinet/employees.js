@@ -452,7 +452,6 @@ const employees = {
                                     value: "Загрузить",
                                     css: 'webix_primary',
                                     click: function () {
-                                        $$("upload").files.data.clearAll();
                                         importEmployees.show()
                                     }
                                 },

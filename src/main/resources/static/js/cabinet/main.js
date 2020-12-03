@@ -234,10 +234,6 @@ webix.ready(function () {
     webix.event(window, "resize", function (event) {
         layout.define("width", document.body.clientWidth);
         layout.resize();
-        if (document.body.clientWidth > 720){
-
-           $$('form_employee').config.width = 300; $$('form_employee').resize();
-        }
     });
 
     //responsive events

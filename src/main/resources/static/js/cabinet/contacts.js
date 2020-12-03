@@ -27,10 +27,10 @@ const contacts = {
                                 let item = this.getItem(id);
                                 $$('contact_form').parse(item);
                                 let contactValue = $$('contactValueText').getValue();
-                                if(webix.rules.isEmail(contactValue)){
+                                if (webix.rules.isEmail(contactValue)) {
                                     $$('type_combo').setValue("2")
                                     changeComboConfig(2)
-                                }else{
+                                } else {
                                     $$('type_combo').setValue("1")
                                     changeComboConfig(1)
                                 }
@@ -67,8 +67,8 @@ const contacts = {
                                     {id: 1, value: "Номер телефона"},
                                     {id: 2, value: "Почтовый адрес"}
                                 ],
-                                on:{
-                                    onChange:() => {
+                                on: {
+                                    onChange: () => {
                                         let currentComboValue = $$('type_combo').getValue();
                                         changeComboConfig(currentComboValue)
                                     }
@@ -106,10 +106,10 @@ const contacts = {
                             },
                             {}
                         ],
-                        elementsConfig:{
-                            on:{
-                                  "onChange":function(){
-                                      this.validate();
+                        elementsConfig: {
+                            on: {
+                                "onChange": function () {
+                                    this.validate();
                                 }
                             }
                         }
@@ -142,10 +142,10 @@ function addContact() {
             });
         form.clear()
         form.clearValidation()
-        if (params["type"] == 0){
+        if (params["type"] == 0) {
             $$('type_combo').setValue('2')
-        }else{
-             $$('type_combo').setValue('1')
+        } else {
+            $$('type_combo').setValue('1')
         }
     }
 }
@@ -166,16 +166,14 @@ function deleteContact() {
         });
 }
 
-function changeComboConfig(val){
-    if(val === 2){
+function changeComboConfig(val) {
+    if (val === 2) {
         $$('contactValueText').config.label = "Почта";
         $$('contactValueText').config.placeholder = "sibdigital@mail.ru";
         $$('contactValueText').config.validate = webix.rules.isEmail;
         $$('contactValueText').config.invalidMessage = "Неверный формат почты"
         $$('contactValueText').refresh();
-    }
-    else if(val === 1)
-    {
+    } else if (val === 1) {
         $$('contactValueText').config.label = "Номер телефона";
         $$('contactValueText').config.placeholder = "+7 (xxx) xxx-xx-xx";
         $$('contactValueText').config.validate = webix.rules.isNotEmpty;
