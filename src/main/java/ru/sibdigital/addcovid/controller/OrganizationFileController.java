@@ -55,18 +55,25 @@ public class OrganizationFileController {
         }else {
 
             final Optional<ClsOrganization> oorg = organizationRepo.findById(idOrganization);
-
-            DocRequest docRequest;
-            if (idDocRequest == null) {
-                docRequest = null;
-            }
-            else {
-                docRequest = docRequestRepo.findById(idDocRequest).orElse(null);
-            }
+            DocRequest docRequest = idDocRequest == null ?
+                    null : docRequestRepo.findById(idDocRequest).orElse(null);
 
             if (oorg.isPresent()) {
-                final RegOrganizationFile regOrganizationFile = load(part, oorg.get(), docRequest);
-                responseEntity = ResponseEntity.ok().body(regOrganizationFile);
+
+                RegOrganizationFile regOrganizationFile = construct (part, oorg.get(), docRequest);
+
+                if (regOrganizationFile != null){
+                    if (regOrganizationFile.getId() == 0) {
+                        regOrganizationFile = organizationFileRepo.save(regOrganizationFile);
+                        responseEntity = ResponseEntity.ok().body(regOrganizationFile);
+                    }else{
+                        responseEntity = ResponseEntity.ok()
+                                .body("{\"cause\": \"Вы уже загружали этот файл\"" +
+                                        "\"file\": \"" + regOrganizationFile.getOriginalFileName() + "\"}");
+                    }
+                }else{
+                    responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"cause\": \"Ошибка сохранения\"}");
+                }
             } else {
                 responseEntity = ResponseEntity.badRequest().body("{\"cause\": \"Отсутствует организация\"}");
             }
@@ -75,8 +82,8 @@ public class OrganizationFileController {
         return responseEntity;//ResponseEntity.ok().body(requestService.uploadFile(file));
     }
 
-    private RegOrganizationFile load (MultipartFile part, ClsOrganization organization, DocRequest docRequest){
-        RegOrganizationFile regOrganizationFile = null;
+    private RegOrganizationFile construct (MultipartFile part, ClsOrganization organization, DocRequest docRequest){
+        RegOrganizationFile rof = null;
         try {
 
             final String absolutePath = Paths.get(uploadingDir).toFile().getAbsolutePath();
@@ -89,29 +96,33 @@ public class OrganizationFileController {
             final String fileHash = getFileHash(file);
             final long size = Files.size(file.toPath());
 
-            RegOrganizationFile rof = RegOrganizationFile.builder()
-                    .clsOrganizationByIdOrganization(organization)
-                    .attachmentPath(String.format("%s/%s", uploadingDir, filename))
-                    .fileName(filename)
-                    .originalFileName(originalFilename)
-                    .isDeleted(false)
-                    .fileExtension(extension)
-                    .fileSize(size)
-                    .hash(fileHash)
-                    .timeCreate(new Timestamp(System.currentTimeMillis()))
-                    .build();
-            if (docRequest != null){
-                rof.setDocRequestByIdRequest(docRequest);
-            }
+            final List<RegOrganizationFile> files= organizationFileRepo.findRegOrganizationFileByOrganizationAndHash(organization, fileHash);
 
-            regOrganizationFile= organizationFileRepo.save(rof);
+            if (!files.isEmpty()){
+                rof = files.get(0);
+            }else{
+                rof = RegOrganizationFile.builder()
+                        .clsOrganizationByIdOrganization(organization)
+                        .attachmentPath(String.format("%s/%s", uploadingDir, filename))
+                        .fileName(filename)
+                        .originalFileName(originalFilename)
+                        .isDeleted(false)
+                        .fileExtension(extension)
+                        .fileSize(size)
+                        .hash(fileHash)
+                        .timeCreate(new Timestamp(System.currentTimeMillis()))
+                        .build();
+                if (docRequest != null){
+                    rof.setDocRequestByIdRequest(docRequest);
+                }
+            }
 
         } catch (IOException ex){
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         } catch (Exception ex) {
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         }
-        return regOrganizationFile;
+        return rof;
     }
 
     private String getFileHash(File file){
