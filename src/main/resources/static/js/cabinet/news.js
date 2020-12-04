@@ -9,7 +9,7 @@ var lastSpeakers = [{
     "id":5,
     "event_id":1,
     "author":"Министерство спорта",
-    "message":"Описание новости 2",
+    "message":"<b><font face=\"arial\">Уважаемые пользователи портала \"Работающая Бурятия\"!</font></b><div><p style=\"margin-top: 7px; margin-bottom: 7px; color: rgb(0, 0, 0); letter-spacing: normal; text-align: justify;\"><font face=\"arial\">Научная библиотека им. Н.И. Лобачевского обращает ваше внимание, что многие библиотечные ресурсы доступны в удаленном режиме. Среди них:&nbsp;<a href=\"https://kpfu.ru/library/setevye-resursy/elektronno-bibliotechnye-sistemy\" style=\"text-decoration-line: none; color: rgb(85, 26, 139); cursor: pointer;\">электронные-библиотечные системы</a>,&nbsp;<a href=\"https://kpfu.ru/library/setevye-resursy/rossijskie-setevye-resursy\" style=\"text-decoration-line: none; color: rgb(85, 26, 139); cursor: pointer;\">российские</a>&nbsp;и&nbsp;<a href=\"https://kpfu.ru/library/setevye-resursy/zarubezhnye-setevye-resursy\" style=\"text-decoration-line: none; color: rgb(85, 26, 139); cursor: pointer;\">зарубежные сетевые ресурсы</a>,&nbsp;<a href=\"https://allfind.kpfu.ru/Search/Results?type=AllFields&amp;filter%5B%5D=collection%3A%22%D0%AD%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BD%D0%BD%D1%8B%D0%B5+%D0%BA%D0%BE%D0%BB%D0%BB%D0%B5%D0%BA%D1%86%D0%B8%D0%B8%22\" style=\"text-decoration-line: none; color: rgb(85, 26, 139); cursor: pointer;\">цифровые коллекции документов</a>&nbsp;из фондов библиотеки,&nbsp;<a href=\"https://allfind.kpfu.ru/Search/Results?type=AllFields&amp;filter%5B%5D=building%3A%22%D0%A0%D0%B5%D0%BF%D0%BE%D0%B7%D0%B8%D1%82%D0%BE%D1%80%D0%B8%D0%B9+%D0%9A%D0%A4%D0%A3%22\" style=\"text-decoration-line: none; color: rgb(85, 26, 139); cursor: pointer;\">электронный архив научно-образовательных ресурсов КФУ</a>, включающий в т.ч. учебно-методические пособия, курсы и конспекты лекций.</font></p><p style=\"margin-top: 7px; margin-bottom: 7px; color: rgb(0, 0, 0); letter-spacing: normal; text-align: justify;\"><font face=\"arial\">Также на сайте библиотеки остаются доступны сервисы:&nbsp;<strong style=\"\">виртуальная справочная служба&nbsp;<a href=\"https://kpfu.ru/library/vopros-bibliografu\" style=\"text-decoration-line: none; color: rgb(85, 26, 139); cursor: pointer;\">«Вопрос библиографу»</a></strong>&nbsp;и&nbsp;<a href=\"https://kpfu.ru/library/internet-priemnaya\" style=\"text-decoration-line: none; color: rgb(85, 26, 139); cursor: pointer;\"><strong>Интернет-приемная</strong></a>. Задавайте свои вопросы, и наши специалисты постараются Вам помочь.&nbsp;</font></p><p style=\"margin-top: 7px; margin-bottom: 7px; color: rgb(0, 0, 0); letter-spacing: normal; text-align: justify;\"><font face=\"arial\"><br></font></p></div>",
     "heading":"Заголовок новости 2",
     "startTime":"02.12.2020"
 },{
@@ -21,24 +21,55 @@ var lastSpeakers = [{
     "startTime":"01.12.2020"
 }];
 
+webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
+    ".custom_item{\n" +
+    "            border:1px solid #1CA1C1;\n" +
+    "            border-radius:5px;\n" +
+    "            margin:10px 5px;\n" +
+    "            overflow:hidden;\n" +
+    "            padding:10px;\n" +
+    "        }\n" +
+    "        .newtime{\n" +
+    "            background-color:#DDFFDD;\n" +
+    "        }\n" +
+    "        .oldtime{\n" +
+    "            background-color:#DDDDFF;\n" +
+    "        }\n" +
+    "        .oldtime, .newtime{\n" +
+    "            border-radius:4px;\n" +
+    "        }");
 
 function getLastNewsData() {
 
 }
 
 
-function getLastNewsTemplate() {
+function getLastNewsTemplate_1() {
     return {
         id:"tweets",
         view:"list",
         template:"<span><p style=\"text-align: center;\"><strong>#heading#</strong></p></span>\n" +
             "<br>\n" +
             "<span><p style=\"text-align: left;\">#message#</p><span>\n" +
+            "<br>\n" +
             "<span><p style=\"text-align: right;\">Дата публикации: #startTime#</p><span>",
         type:{
-            height:190
+            height:300
         },
         select:false,
+        data: lastSpeakers
+    };
+}
+
+function getLastNewsTemplate() {
+    return {
+        view:"list",
+        height:600,
+        type:{
+            templateStart:"<div item_id='id' class='custom_item'>",
+            template:"#heading#<br><div style='text-align:right;'>Дата публикации: #startTime#</div>",
+            templateEnd:"</div>"
+        },
         data: lastSpeakers
     };
 }
