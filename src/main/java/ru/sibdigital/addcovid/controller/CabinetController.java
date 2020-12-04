@@ -328,4 +328,10 @@ public class CabinetController {
         List<ClsNews> newsList = clsNewsRepo.findAll().stream().collect(Collectors.toList());
         return newsList;
     }
+
+    @GetMapping("/first_news")
+    public @ResponseBody String getFirstNews(HttpSession session) {
+        ClsNews clsNews = clsNewsRepo.findById(Long.parseLong("1")).orElse(null);
+        return clsNews.getMessage();
+    }
 }
