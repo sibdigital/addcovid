@@ -77,6 +77,9 @@ public class RequestService {
     @Autowired
     private DocEmployeeRepo docEmployeeRepo;
 
+    @Autowired
+    private RegOrganizationAddressFactRepo regOrganizationAddressFactRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
@@ -520,6 +523,29 @@ public class RequestService {
     @Transactional
     public void deleteOrgContact(OrganizationContactDto organizationContactDto){
         clsOrganizationContactRepo.deleteById(organizationContactDto.getId());
+    }
+
+    @Transactional
+    public RegOrganizationAddressFact saveRegOrgAddressFact(RegOrganizationAddressFact regOrganizationAddressFactToSave, Long organizationId) {
+//        RegOrganizationAddressFact regOrganizationAddressFact = regOrganizationAddressFactRepo.findById(regOrganizationAddressFactToSave.getId()).orElse(null);
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(organizationId).orElse(null);
+        //DocRequest docRequest = docRequestRepo.findById(8422L).orElse(null);
+        //RegOrganizationAddressFact regOrgAddrSave = regOrganizationAddressFact == null ? regOrganizationAddressFactToSave : regOrganizationAddressFact;
+        RegOrganizationAddressFact regOrgAddrSave = RegOrganizationAddressFact.builder()
+                .organization(clsOrganization)
+                .docRequest(null)
+                .timeCreate(new Date())
+                .fiasRegionObjectGuid("123")
+                .fiasRaionObjectGuid("123")
+                .fullAddress("123")
+                .build();
+        regOrganizationAddressFactRepo.save(regOrgAddrSave);
+        return regOrgAddrSave;
+    }
+
+    @Transactional
+    public void deleteRegOrgAddressFact(RegOrganizationAddressFact regOrganizationAddressFact) {
+        regOrganizationAddressFactRepo.deleteById(regOrganizationAddressFact.getId());
     }
 
     @Transactional

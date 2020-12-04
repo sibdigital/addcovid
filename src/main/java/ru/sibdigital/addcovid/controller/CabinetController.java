@@ -19,10 +19,7 @@ import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpSession;
-import java.io.Console;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -49,6 +46,15 @@ public class CabinetController {
 
     @Autowired
     private DocEmployeeRepo docEmployeeRepo;
+
+    @Autowired
+    private DocAddressFactRepo docAddressFactRepo;
+
+    @Autowired
+    private RegOrganizationAddressFactRepo regOrganizationAddressFactRepo;
+
+    @Autowired
+    private FiasAddrObjectRepo fiasAddrObjectRepo;
 
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
@@ -318,5 +324,83 @@ public class CabinetController {
             return null;
         }
         return employeeDto;
+    }
+
+    @GetMapping("/address_fact")
+    public @ResponseBody List<DocAddressFact> getAddressFactList(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        Optional<List<DocRequest>> requests = docRequestRepo.findOneByOrganizationId(organization.getId());
+        List<Long> requestsId = new ArrayList<>();
+
+        if (requests.isEmpty()) {
+            return null;
+        }
+
+//        for (DocRequest docRequest : requests.get()) {
+//            requestsId.add(docRequest.getId());
+//        }
+        requestsId.add(402L);
+
+        List<DocAddressFact> addressFacts = new ArrayList<>();
+        for (Long requestId : requestsId) {
+            Optional<List<DocAddressFact>> addressFact = docAddressFactRepo.findByDocRequest(requestId);
+            addressFact.ifPresent(addressFacts::addAll);
+        }
+
+        return addressFacts;
+    }
+
+    @GetMapping("/address_facts")
+    public @ResponseBody  List<Map<String, Object>> getAddressFactsList(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        Integer _id = 6186;
+        List<Map<String, Object>> result = regOrganizationAddressFactRepo.findByIdOrganization(_id);
+        return result;
+    }
+
+    @PostMapping("/save_address_fact")
+    public @ResponseBody RegOrganizationAddressFact saveRegAddressFact(@RequestBody RegOrganizationAddressFact regOrganizationAddressFact, HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        Enumeration<String> atrs = session.getAttributeNames();
+        RegOrganizationAddressFact _regOrganizationAddressFact = null;
+        try {
+            _regOrganizationAddressFact = requestService.saveRegOrgAddressFact(regOrganizationAddressFact, id);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return _regOrganizationAddressFact;
+    }
+
+    @GetMapping("/regions")
+    public @ResponseBody List<Map<String, Object>> getRegions() {
+//        List<Map<String, Object>> result = fiasAddrObjectRepo.findRegions();
+        List<Map<String, Object>> res = new ArrayList<>();
+
+        res.add(new HashMap<String, Object>() {{ put("name", (Object)"Республика Бурятия"); put("fiasRegionObjectGuid", (Object)"123"); put("fiasRaionObjectGuid", (Object)"123"); put("fiasRegionObjectGuid", (Object)"123");   }});
+        res.add(new HashMap<String, Object>() {{ put("name", (Object)"Республика Башкортостан"); put("fiasRegionObjectGuid", (Object)"123");  put("fiasRaionObjectGuid", (Object)"123"); put("fullAddress", (Object)"123"); }});
+        res.add(new HashMap<String, Object>() {{ put("name", (Object)"Республика Тыва"); put("fiasRegionObjectGuid", (Object)"123");  put("fiasRaionObjectGuid", (Object)"123"); put("fullAddress", (Object)"123"); }});
+
+        return res;
+    }
+
+    @GetMapping("/cities")
+    public @ResponseBody List<Map<String, Object>> getCities() {
+//        List<Map<String, Object>> result = fiasAddrObjectRepo.findCities();
+        List<Map<String, Object>> res = new ArrayList<>();
+
+        res.add(new HashMap<String, Object>(){{ put("name", (Object)"Владивосток"); }});
+        res.add(new HashMap<String, Object>() {{ put("name", (Object)"Москва"); }});
+        res.add(new HashMap<String, Object>() {{ put("name", (Object)"Иркутск"); }});
+        res.add(new HashMap<String, Object>() {{ put("name", (Object)"Чита"); }});
+        res.add(new HashMap<String, Object>() {{ put("name", (Object)"Улан-Удэ"); }});
+
+        return res;
     }
 }
