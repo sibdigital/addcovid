@@ -13,12 +13,17 @@ const documents = {
                         css: 'contacts',
                         scroll: false,
                         select: 1,
+                        template:
+                            "<div id='2' class='overall'>" +
+                                "<div id='1' style='position: relative'>" +
+                                    "<div class='doc_title'>#originalFileName#</div>" +
+                                    "<div id='del_button' style='position: absolute;top: 0; right: 0;' ondblclick='del_file()' class='mdi mdi-close-thick'></div>" +
+                                "</div>" +
+                                "<div class='contactValue'>#timeCreate#</div>" +
+                            "</div>",
                         url: "org_files",
                         xCount: 2,
                         type: {
-                            template: "<div class='overall'>" +
-                                "<div class='doc_title'>#originalFileName#</div>" +
-                                "</div>",
                             height: "auto",
                             width: "auto"
                         },
@@ -55,10 +60,9 @@ const documents = {
                                     $$('upload').send(function (response) {
                                         let uploadedFiles = []
                                         $$('upload').files.data.each(function (obj) {
-                                            let cause = obj.status
+                                            let status = obj.status
                                             let name = obj.name
-                                            if(cause == 'server') {
-                                                webix.message(name)
+                                            if(status == 'server'){
                                                 let sname = obj.sname
                                                 uploadedFiles.push(sname)
                                             }
@@ -70,7 +74,6 @@ const documents = {
                                         }
                                         $$("upload").files.data.clearAll();
                                         $$('docs_grid').load('org_files');
-                                        console.log(uploadedFiles)
                                     })
                                 }
                             },
@@ -81,4 +84,19 @@ const documents = {
             }
         ],
     }
+}
+
+function del_file(){
+    let param = $$('docs_grid').getSelectedId()
+    webix.ajax()
+        .headers({'Content-type': 'application/json'})
+        .post('/delete_file', JSON.stringify(param))
+        .then(function (data) {
+            if (data !== null) {
+                $$("docs_grid").remove($$("docs_grid").getSelectedId());
+                webix.message("Файл удалён", 'success');
+            } else {
+                webix.message("Не удалось удалить файл", 'error');
+            }
+        });
 }

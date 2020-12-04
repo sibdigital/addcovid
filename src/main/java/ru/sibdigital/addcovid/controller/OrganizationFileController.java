@@ -15,6 +15,8 @@ import ru.sibdigital.addcovid.model.RegOrganizationFile;
 import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.repository.RegOrganizationFileRepo;
+import ru.sibdigital.addcovid.service.OrganizationFileService;
+import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
@@ -40,6 +42,12 @@ public class OrganizationFileController {
 
     @Autowired
     DocRequestRepo docRequestRepo;
+
+    @Autowired
+    private OrganizationFileService organizationFileService;
+
+    @Autowired
+    ClsOrganizationRepo clsOrganizationRepo;
 
     @Value("${upload.path:/uploads}")
     String uploadingDir;
@@ -148,7 +156,21 @@ public class OrganizationFileController {
     }
 
     @GetMapping("/org_files")
-    public @ResponseBody List<RegOrganizationFile> getRegOrgFileName() {
-        return organizationFileRepo.findAll();
+    public @ResponseBody List<RegOrganizationFile> getRegOrgFileName(HttpSession session) {
+        Long idOrganization = (Long) session.getAttribute("id_organization");
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(idOrganization).orElse(null);
+        return organizationFileRepo.findRegOrganizationFileByOrganization(clsOrganization);
+    }
+
+    @PostMapping("/delete_file")
+    public @ResponseBody int deleteFile(@RequestBody int id){
+        System.out.println(id);
+        try{
+            organizationFileService.updateFileStatusById(id);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+            return -1;
+        }
+        return id;
     }
 }
