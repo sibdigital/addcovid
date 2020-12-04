@@ -1,11 +1,4 @@
 var lastSpeakers = [{
-    "id":6,
-    "event_id":1,
-    "author":"Министерство финансов",
-    "message":"Описание новости 1",
-    "heading":"Заголовок новости 1",
-    "startTime":"03.12.2020"
-},{
     "id":5,
     "event_id":1,
     "author":"Министерство спорта",
@@ -23,21 +16,15 @@ var lastSpeakers = [{
 
 webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
     ".custom_item{\n" +
-    "            border:1px solid #1CA1C1;\n" +
-    "            border-radius:5px;\n" +
-    "            margin:10px 5px;\n" +
-    "            overflow:hidden;\n" +
-    "            padding:10px;\n" +
-    "        }\n" +
-    "        .newtime{\n" +
-    "            background-color:#DDFFDD;\n" +
-    "        }\n" +
-    "        .oldtime{\n" +
-    "            background-color:#DDDDFF;\n" +
-    "        }\n" +
-    "        .oldtime, .newtime{\n" +
-    "            border-radius:4px;\n" +
-    "        }");
+    "\n" +
+    "    border:1px solid #1CA1C1;\n" +
+    "    border-radius:10px;\n" +
+    "    margin:10px 5px;\n" +
+    "    margin:10px 5px;\n" +
+    "  \tbox-shadow: 0 0 10px rgba(0,0,0,0.5);\n" +
+    "    padding:10px;\n" +
+    "  }");
+
 
 function getLastNewsData() {
 
@@ -64,11 +51,10 @@ function getLastNewsTemplate_1() {
 function getLastNewsTemplate() {
     return {
         view:"list",
-        height:600,
         type:{
             templateStart:"<div item_id='id' class='custom_item'>",
-            template:"#heading#<br><div style='text-align:right;'>Дата публикации: #startTime#</div>",
-            templateEnd:"</div>"
+            template:"#heading#<br><br> #message#",
+            templateEnd:"<div style='text-align:right;'>Дата публикации: #startTime#</div></div>"
         },
         data: lastSpeakers
     };
