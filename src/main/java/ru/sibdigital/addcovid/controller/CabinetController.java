@@ -10,16 +10,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
+import ru.sibdigital.addcovid.dto.EmployeeDto;
+import ru.sibdigital.addcovid.dto.OrganizationContactDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.dto.PrincipalDto;
 import ru.sibdigital.addcovid.model.*;
-import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
-import ru.sibdigital.addcovid.repository.ClsPrincipalRepo;
-import ru.sibdigital.addcovid.repository.DocRequestRepo;
+import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpSession;
+import java.io.Console;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -43,6 +47,12 @@ public class CabinetController {
     @Autowired
     private ApplicationConstants applicationConstants;
 
+    @Autowired
+    private DocEmployeeRepo docEmployeeRepo;
+
+    @Autowired
+    private ClsNewsRepo clsNewsRepo;
+
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -64,6 +74,36 @@ public class CabinetController {
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         return organization;
+    }
+
+    @GetMapping("/reg_organization_okved_add")
+    public @ResponseBody
+    List<Okved> getOrganizationNotMainOkveds(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        List<RegOrganizationOkved> regOrganizationOkveds = requestService.getRegOrganizationOkvedAddByIdOrganization(id);
+
+        List<Okved> organizationOkveds = regOrganizationOkveds.stream().map((s) -> s.getRegOrganizationOkvedId().getOkved()).collect(Collectors.toList());
+
+        return organizationOkveds;
+    }
+
+    @GetMapping("/reg_organization_okved")
+    public @ResponseBody
+    Okved getOrganizationMainOkved(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        Okved organizationOkved = null;
+        RegOrganizationOkved regOrganizationOkved = requestService.getRegOrganizationOkvedByIdOrganization(id);
+        if (regOrganizationOkved != null) {
+            organizationOkved = regOrganizationOkved.getRegOrganizationOkvedId().getOkved();
+        }
+
+        return organizationOkved;
     }
 
     @GetMapping("/org_requests")
@@ -189,4 +229,109 @@ public class CabinetController {
         return errors;
     }
 
+    @GetMapping("/org_contacts")
+    public @ResponseBody List<ClsOrganizationContact> getOrgContacts(HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        List<ClsOrganizationContact> organizationContacts = requestService.getAllClsOrganizationContactByOrganizationId(organization.getId());
+        return organizationContacts;
+    }
+
+    @PostMapping("/save_contact")
+    public @ResponseBody ClsOrganizationContact saveOrgContact(@RequestBody OrganizationContactDto organizationContactDto, HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        organizationContactDto.setOrganizationId(id);
+        ClsOrganizationContact clsOrganizationContact = null;
+        try {
+            clsOrganizationContact = requestService.saveOrgContact(organizationContactDto);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return clsOrganizationContact;
+    }
+
+    @PostMapping("/delete_org_contact")
+    public @ResponseBody OrganizationContactDto deleteOrgContact(@RequestBody OrganizationContactDto organizationContactDto, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        organizationContactDto.setOrganizationId(id);
+        try{
+            requestService.deleteOrgContact(organizationContactDto);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+            return null;
+        }
+        return organizationContactDto;
+    }
+
+    @GetMapping("/employees")
+    public @ResponseBody List<DocEmployee> getEmployees(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        List<DocEmployee> employees = requestService.getEmployeesByOrganizationId(organization.getId());
+        return employees;
+    }
+
+    @PostMapping("/filter")
+    public @ResponseBody List<DocEmployee> getFilteredEmployees(@RequestBody String filterText, HttpSession session){
+        String filter = filterText.trim().toLowerCase();
+        return getEmployees(session).parallelStream()
+                .filter(s -> containsFIO(s, filter))
+                .collect(Collectors.toList());
+    }
+
+    private boolean containsFIO(DocEmployee employee, String filterText){
+        String fio = constructFIO(employee.getPerson());
+        return fio.contains(filterText);
+    }
+
+    private String constructFIO(DocPerson person){
+        String fio = (person.getLastname() + person.getFirstname() + person.getPatronymic())
+                .toLowerCase()
+                .trim();
+        return fio;
+    }
+
+    @PostMapping("/employee")
+    public @ResponseBody DocEmployee saveEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        employeeDto.setOrganizationId(id);
+        DocEmployee employee = null;
+        try {
+            employee = requestService.saveEmployee(employeeDto);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return employee;
+    }
+
+    @PostMapping("/deleteEmployee")
+    public @ResponseBody EmployeeDto deleteEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        employeeDto.setOrganizationId(id);
+        try{
+            requestService.deleteEmployee(employeeDto);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+            return null;
+        }
+        return employeeDto;
+    }
+
+    @GetMapping("/newsfeed")
+    public @ResponseBody List<ClsNews> getNewsList(HttpSession session) {
+        List<ClsNews> newsList = clsNewsRepo.findAll().stream().collect(Collectors.toList());
+        return newsList;
+    }
+
+    @GetMapping("/first_news")
+    public @ResponseBody String getFirstNews(HttpSession session) {
+        ClsNews clsNews = clsNewsRepo.findById(Long.parseLong("1")).orElse(null);
+        return clsNews.getMessage();
+    }
 }

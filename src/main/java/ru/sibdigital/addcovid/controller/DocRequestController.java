@@ -3,6 +3,8 @@ package ru.sibdigital.addcovid.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
@@ -13,10 +15,7 @@ import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpSession;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 @RestController
@@ -151,8 +150,20 @@ public class DocRequestController {
     }
 
     @GetMapping("/doc_persons/{id_request}")
-    public Optional<List<DocPerson>> getListPerson(@PathVariable("id_request") Long id_request, HttpSession session){
-        return docPersonRepo.findByDocRequest(id_request);
+    public Map<String, Object> listPerson(@PathVariable("id_request") Long id_request,
+                                                   @RequestParam(value = "start", required = false) Integer start,
+                                                   @RequestParam(value = "count", required = false) Integer count,
+                                                   HttpSession session){
+        int page = start == null ? 0 : start / 50;
+        int size = count == null ? 50 : count;
+
+        Page<DocPerson> docPersons = docPersonRepo.findAllByDocRequest(id_request, PageRequest.of(page, size));
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("data", docPersons.getContent());
+        result.put("pos", (long) page * size);
+        result.put("total_count", docPersons.getTotalElements());
+        return result;
     }
 
     @GetMapping("/doc_address_fact/{id_request}")

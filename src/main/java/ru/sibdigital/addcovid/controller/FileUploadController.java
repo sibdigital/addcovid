@@ -10,13 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
+import ru.sibdigital.addcovid.dto.EmployeeDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.ClsExcel;
 import ru.sibdigital.addcovid.model.RequestTypes;
@@ -25,13 +23,14 @@ import ru.sibdigital.addcovid.parser.ExcelParser;
 import ru.sibdigital.addcovid.repository.ClsExcelRepo;
 import ru.sibdigital.addcovid.service.RequestService;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Base64;
+import java.util.*;
 
 @Log4j2
 @Controller
@@ -235,8 +234,49 @@ public class FileUploadController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
 
+    @PostMapping(value = "/import-excel")
+    public ResponseEntity<String> addEmployeeFromExcel(@RequestParam(value = "upload") MultipartFile file, HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        File uploadedFile = saveExcelFile(file);
+        try {
+            List<EmployeeDto> employeesList = excelParser.getEmployeesFromExcel(uploadedFile, id);
+            employeesList.forEach(s -> requestService.saveEmployee(s));
 
+        }catch (IOException ex){
+            log.error("ERROR", ex);
+            return ResponseEntity.ok().body("{ \"status\": \"error\" }");
+        }
+
+        return ResponseEntity.ok().body("{ \"status\": \"server\", \"sname\": \"" + String.format("/%s/%s", uploadingDir, file.getName()) + "\" }");
+    }
+
+    //TODO дублирует saveAttachment
+    private File saveExcelFile(MultipartFile file){
+        File uploadDir = new File(uploadingDir);
+        File uploadedFile = null;
+        try {
+            if (!uploadDir.exists()) {
+                uploadDir.mkdir();
+            } else {
+                deleteAnyFilesInDir(uploadDir);
+            }
+            uploadedFile = saveFile(file);
+        }
+        catch (Exception ex) {
+            log.error(String.format("file was not saved cause: %s", ex.getMessage()));
+        }
+        return uploadedFile;
+    }
+
+    //Удаление прочих файлов
+    public void deleteAnyFilesInDir(File uploadDir){
+        String[] entries = uploadDir.list();
+        for(String s: entries){
+            File currentFile = new File(uploadDir.getPath(),s);
+            currentFile.delete();
+        }
     }
 
 }

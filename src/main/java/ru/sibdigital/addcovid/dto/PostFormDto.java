@@ -81,27 +81,27 @@ public class PostFormDto {
 
     private AdditionalAttributes additionalAttributes;
 
-    public String getOrganizationInn(){
-        return this.organizationInn.trim();
-    }
-
-    public String getOrganizationName(){
-        return this.organizationName.trim();
-    }
-
-    public String getOrganizationShortName() {
-        return this.organizationShortName.trim();
-    }
-
-    public String getOrganizationEmail() {
-        return this.organizationEmail.trim();
-    }
-
-    public String getOrganizationPhone() {
-        return this.organizationPhone.trim();
-    }
-
-    public String getOrganizationOgrn() {
-        return this.organizationOgrn.trim();
-    }
+//    public String getOrganizationInn(){
+//        return this.organizationInn.trim();
+//    }
+//
+//    public String getOrganizationName(){
+//        return this.organizationName.trim();
+//    }
+//
+//    public String getOrganizationShortName() {
+//        return this.organizationShortName.trim();
+//    }
+//
+//    public String getOrganizationEmail() {
+//        return this.organizationEmail.trim();
+//    }
+//
+//    public String getOrganizationPhone() {
+//        return this.organizationPhone.trim();
+//    }
+//
+//    public String getOrganizationOgrn() {
+//        return this.organizationOgrn.trim();
+//    }
 }

@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${application_name}">. Личный кабинет</title>
     <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/libs/materialdesignicons.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/cabinet/cabinet.css}">
+
     <script th:src="@{/libs/webix.min.js}"></script>
     <script th:src="@{/libs/routie.min.js}"></script>
     <script th:src="@{/libs/jquery-3.4.1.min.js}"></script>
-    <style>
-        body {margin: 0}
-        .boldLabel {
-            font-weight: bold; border-width: 2px; border-style: solid; border-color: #000000;
-        }
-    </style>
 </head>
 <body>
 <script th:inline="javascript">
@@ -23,5 +20,15 @@
     const LINK_SUFFIX = [[${link_suffix}]]
 </script>
 <script th:src="@{/js/cabinet/main.js}"></script>
+<script th:src="@{/js/cabinet/common_info.js}"></script>
+<script th:src="@{/js/cabinet/employees.js}"></script>
+<script th:src="@{/js/cabinet/requests.js}"></script>
+<script th:src="@{/js/cabinet/settings.js}"></script>
+<script th:src="@{/js/cabinet/documents.js}"></script>
+<script th:src="@{/js/cabinet/address.js}"></script>
+<script th:src="@{/js/cabinet/prescript.js}"></script>
+<script th:src="@{/js/cabinet/news.js}"></script>
+<script th:src="@{/js/cabinet/mailing.js}"></script>
+<script th:src="@{/js/cabinet/contacts.js}"></script>
 </body>
 </html>

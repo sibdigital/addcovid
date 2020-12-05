@@ -609,6 +609,8 @@ webix.ready(function() {
                                 {
                                     id: 'person_table',
                                     view: 'datatable',
+                                    pager: 'Pager',
+                                    datafetch: 50,
                                     height: 400,
                                     name: 'persons',
                                     select: 'row',
@@ -629,6 +631,13 @@ webix.ready(function() {
                                         },
                                     },
                                     data: []
+                                },
+                                {
+                                    view: 'pager',
+                                    id: 'Pager',
+                                    size: 50,
+                                    group: 5,
+                                    template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
                                 },
                                 {
                                     view: 'form',
@@ -774,8 +783,8 @@ webix.ready(function() {
                                         params.organizationInn = params.organizationInn.trim();
                                         params.organizationOgrn = params.organizationOgrn.trim();
 
-                                        if(params.organizationInn.length > 12 ){
-                                            webix.message('Превышена длина ИНН', 'error')
+                                        iif(!(params.organizationInn.length == 12 || params.organizationInn.length == 10) ){
+                                            webix.message('Проверьте длину ИНН', 'error')
                                             return false
                                         }
 
@@ -784,8 +793,8 @@ webix.ready(function() {
                                             return false
                                         }
 
-                                        if(params.organizationOgrn.length > 15){
-                                            webix.message('Превышена длина ОГРН', 'error')
+                                        if(!(params.organizationOgrn.length == 13 || params.organizationOgrn.length == 15) ){
+                                            webix.message('Проверьте длину ОГРН', 'error')
                                             return false
                                         }
 

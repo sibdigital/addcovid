@@ -13,6 +13,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class PersonDto {
+    private Long id;
     private String lastname;
     private String firstname;
     private String patronymic;
@@ -27,7 +28,7 @@ public class PersonDto {
                .build();
    }
 
-   public String getFIO() {
+    public String getFIO() {
        String fio = "";
        if (Objects.nonNull(this.lastname)) {
            fio += this.lastname;

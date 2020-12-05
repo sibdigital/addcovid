@@ -1,0 +1,177 @@
+/*--UserField--*/
+.user_shortName{
+    line-height: 34px;
+    font-family: Roboto, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #475466;
+    letter-spacing: 0;
+}
+
+.user_shortName:hover{
+    color: #1CA1C1 !important;
+}
+
+img {
+  vertical-align: middle;
+  border-style: none;
+}
+
+.user_avatar{
+    margin-right: 12px;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    right: 8px;
+    top: 8px;
+    background: rgba(228, 230, 240, 0.8);
+    color: #94a1b3;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.user_avatar:hover{
+    box-shadow: #1CA1C1 0 0 2px 2px;
+}
+
+.user_menu_items{
+    line-height: 34px;
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475466;
+    letter-spacing: 0;
+}
+
+.webix_view.webix_window.webix_popup.webix_menu a{
+    color: #475466 !important;
+}
+
+.webix_view.webix_window.webix_popup.webix_menu a:hover{
+    color: #1CA1C1 !important;
+}
+
+/*--MenuDESIGN--*/
+
+.my_menubar {
+    background-color: #4A4E58;
+    border-right: 1px;
+    border-color: #4A4E58;
+    color: #FFFFFF;
+}
+
+.webix_badge {
+    margin: 9px 0 0 12px !important;
+}
+
+.my_menubar_item {
+    background-color: #4A4E58 !important;
+    line-height: 40px;
+    border-color: #4A4E58 !important;
+    color: #FFFFFF !important;
+}
+
+.my_menubar_item:hover {
+    background-color: #373a42 !important;
+    color: #FFFFFF !important;
+}
+
+.webix_list_item .webix_icon {
+    margin-right: 12px !important;
+}
+
+body {margin: 0}
+.boldLabel {
+    font-weight: bold; border-width: 2px; border-style: solid; border-color: #000000;
+}
+
+/* CHIPS */
+
+.chip {
+    display: inline-block;
+    height: 32px;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.6);
+    line-height: 32px;
+    padding: 0 12px;
+    border-radius: 16px;
+    background-color: #e4e4e4;
+    margin-bottom: 5px;
+    margin-right: 5px;
+}
+
+.chip:focus {
+    outline: none;
+    background-color: #1CA1C1;
+    color: #fff;
+}
+
+.chip > img {
+    float: left;
+    margin: 0 8px 0 -12px;
+    height: 32px;
+    width: 32px;
+    border-radius: 50%;
+}
+
+.chip .close {
+    cursor: pointer;
+    float: right;
+    font-size: 16px;
+    line-height: 32px;
+    padding-left: 8px;
+}
+
+.webix_list-x .webix_list_item {
+    margin: 5px 0 0 12px;
+}
+
+.contacts .webix_dataview_item, .contacts .webix_dataview_item.webix_selected{
+    padding: 5px 3px;
+    border-color: #fff;
+    background-image:none;
+    background-color:#fff;
+}
+.contacts .webix_dataview_item.webix_selected .overall{
+    background: #e1e4ea;
+}
+
+.overall{
+    position: relative;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 8px;
+    height: 65px;
+    padding: 10px;
+    color: #303030;
+    text-shadow: 0 1px 0 #FFFFFF;
+    background-color: #e1e4ea;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0,#edeff4), color-stop(1, #e1e4ea));
+    background: -o-linear-gradient(top, #edeff4 0% , #e1e4ea 100%);
+    background: -ms-linear-gradient(top, #edeff4 0% , #e1e4ea 100%);
+    background: -moz-linear-gradient(top, #edeff4 0% , #e1e4ea 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0,#edeff4), color-stop(1, #e1e4ea));
+    box-shadow: 0 1px 1px #d4d7de;
+}
+
+.contactPerson{
+    line-height: 20px;
+    font-family: Roboto, sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #475466;
+    letter-spacing: 0;
+    height:40px;
+    float: left;
+    padding-left: 5px;
+    width: 200px;
+}
+.contactValue{
+    position: absolute;
+    padding-left: 5px;
+    /*white-space: normal !important;*/
+    width: 400px;
+    text-align:left;
+    top: 50px
+}

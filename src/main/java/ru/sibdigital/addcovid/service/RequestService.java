@@ -8,6 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.dto.EmployeeDto;
+import ru.sibdigital.addcovid.dto.OrganizationContactDto;
 import ru.sibdigital.addcovid.dto.OrganizationDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.*;
@@ -58,6 +60,9 @@ public class RequestService {
     private ClsPrincipalRepo clsPrincipalRepo;
 
     @Autowired
+    private ClsOrganizationContactRepo clsOrganizationContactRepo;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -68,6 +73,9 @@ public class RequestService {
 
     @Autowired
     private RegActualizationHistoryRepo regActualizationHistoryRepo;
+
+    @Autowired
+    private DocEmployeeRepo docEmployeeRepo;
 
     @Value("${upload.path:/uploads}")
     String uploadingDir;
@@ -481,4 +489,114 @@ public class RequestService {
 
         return null;
     }
+
+    public List<DocEmployee> getEmployeesByOrganizationId(Long id) {
+        return docEmployeeRepo.findAllByOrganization(id).orElse(null);
+    }
+
+    public List<RegOrganizationOkved> getRegOrganizationOkvedAddByIdOrganization(Long id) {
+        return regOrganizationOkvedRepo.findAllByIdOrganizationIsNotMain(id).orElse(new ArrayList<>());
+    }
+
+    public RegOrganizationOkved getRegOrganizationOkvedByIdOrganization(Long id) {
+        return regOrganizationOkvedRepo.findAllByIdOrganizationIsMain(id).orElse(null);
+    }
+
+    @Transactional
+    public ClsOrganizationContact saveOrgContact(OrganizationContactDto organizationContactDto) {
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(organizationContactDto.getOrganizationId()).orElse(null);
+        ClsOrganizationContact clsOrganizationContact = ClsOrganizationContact.builder()
+                .id(organizationContactDto.getId())
+                .organization(clsOrganization)
+                .type(organizationContactDto.getType())
+                .contactValue(organizationContactDto.getContactValue().trim())
+                .contactPerson(organizationContactDto.getContactPerson().trim())
+                .build();
+
+        clsOrganizationContactRepo.save(clsOrganizationContact);
+        return clsOrganizationContact;
+    }
+
+    @Transactional
+    public void deleteOrgContact(OrganizationContactDto organizationContactDto){
+        clsOrganizationContactRepo.deleteById(organizationContactDto.getId());
+    }
+
+    @Transactional
+    public DocEmployee saveEmployee(EmployeeDto employeeDto) {
+        DocPerson docPerson = employeeDto.getPerson().convertToPersonEntity();
+
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(employeeDto.getOrganizationId()).orElse(null);
+        //DocRequest docRequest = docRequestRepo.findOneByOrganizationId(clsOrganization.getId()).get().get(0);
+        DocEmployee docEmployee;
+        Long personId = employeeDto.getPerson().getId();
+
+        if(personId!=null){          //Если существует person с personId в таблице doc_person
+            docPerson.setId(personId);
+             docEmployee = constructUpdatePerson(docPerson,employeeDto,clsOrganization);
+        }else{
+            docEmployee = constructNewPerson(docPerson,employeeDto,clsOrganization);
+        }
+
+        docEmployeeRepo.save(docEmployee);
+
+        return docEmployee;
+    }
+
+    //Добавление нового сотрудника
+    public DocEmployee constructNewPerson(DocPerson docPerson, EmployeeDto employeeDto, ClsOrganization clsOrganization){
+        docPersonRepo.save(docPerson);
+
+        DocEmployee newEmployee = DocEmployee.builder()
+                .id(employeeDto.getId())
+                .organization(clsOrganization)
+                .person(docPerson)
+                .isVaccinatedFlu(employeeDto.getIsVaccinatedFlu())
+                .isVaccinatedCovid(employeeDto.getIsVaccinatedCovid())
+                .build();
+
+        return newEmployee;
+     }
+
+    //Добавление отредактированного сотрудника
+    public DocEmployee constructUpdatePerson(DocPerson docPerson, EmployeeDto employeeDto, ClsOrganization clsOrganization){
+
+        Long personId = docPerson.getId();
+        DocPerson updatePerson = new DocPerson();
+        Optional<DocPerson> optionalDocPerson = docPersonRepo.findById(personId);
+        if(optionalDocPerson.isPresent()){
+
+            updatePerson = optionalDocPerson.get();
+        }
+        updatePerson.setId(personId);
+        updatePerson.setFirstname(docPerson.getFirstname());
+        updatePerson.setLastname(docPerson.getLastname());
+        updatePerson.setPatronymic(docPerson.getPatronymic());
+        docPersonRepo.save(updatePerson);
+
+        DocEmployee updatedEmployee = DocEmployee.builder()
+                .id(employeeDto.getId())
+                .organization(clsOrganization)
+                .person(updatePerson)
+                .isVaccinatedFlu(employeeDto.getIsVaccinatedFlu())
+                .isVaccinatedCovid(employeeDto.getIsVaccinatedCovid())
+                .build();
+
+        return updatedEmployee;
+    }
+
+    @Transactional
+    public void deleteEmployee(EmployeeDto employeeDto){
+        Long personId = employeeDto.getPerson().getId();
+
+        docEmployeeRepo.deleteById(employeeDto.getId());
+        docPersonRepo.deleteById(personId);
+
+    }
+
+    public List<ClsOrganizationContact> getAllClsOrganizationContactByOrganizationId(Long id){
+        return clsOrganizationContactRepo.findAllByOrganization(id).orElse(null);
+    }
+
+
 }

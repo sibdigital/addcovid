@@ -1841,7 +1841,7 @@ button,
 }
 .webix_dtable_focused .webix_column > div.webix_row_select,
 .webix_dtable_focused .webix_column > div.webix_column_select {
-  background: #edeff5;
+  background: #d0dcec;
 }
 .webix_window {
   position: absolute;
