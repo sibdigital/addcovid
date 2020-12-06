@@ -20,6 +20,7 @@ import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpSession;
 import java.io.Console;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -329,7 +330,7 @@ public class CabinetController {
         if (id == null) {
             return null;
         }
-        List<ClsNews> newsList = clsNewsRepo.getNewsByOrganization_Id(id).stream().collect(Collectors.toList());
+        List<ClsNews> newsList = clsNewsRepo.getNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
         return newsList;
     }
 }

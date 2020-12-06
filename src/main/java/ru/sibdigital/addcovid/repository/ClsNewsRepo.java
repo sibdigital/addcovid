@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.sibdigital.addcovid.model.ClsNews;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ public interface ClsNewsRepo extends JpaRepository<ClsNews, Long> {
     @Query(nativeQuery = true,
             value = "SELECT cls_news.*\n" +
                     "       FROM cls_news\n" +
-                    "        INNER JOIN \n" +
+                    "        INNER JOIN\n" +
                     "            (SELECT reg_news_organization.id_news\n" +
                     "            from reg_news_organization\n" +
                     "            WHERE id_organization = :id_organization\n" +
@@ -42,6 +43,8 @@ public interface ClsNewsRepo extends JpaRepository<ClsNews, Long> {
                     "                FROM doc_request\n" +
                     "                WHERE id_organization = :id_organization) AS drs\n" +
                     "            ON reg_news_status.status_review = drs.status_review) as news_by_org\n" +
-                    "        ON cls_news.id = news_by_org.id_news")
-    List<ClsNews> getNewsByOrganization_Id(Long id_organization);
+                    "        ON cls_news.id = news_by_org.id_news\n" +
+                    "WHERE start_time < :current_time\n" +
+                    "ORDER BY start_time DESC")
+    List<ClsNews> getNewsByOrganization_Id(Long id_organization, Timestamp current_time);
 }
