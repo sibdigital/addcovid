@@ -98,7 +98,7 @@ public class OrganizationFileController {
             final String filename = organization.getId().toString() + "_" + UUID.randomUUID();
             final String originalFilename = part.getOriginalFilename();
             String extension = getFileExtension(originalFilename);
-            File file = new File(String.format("%s/%s.%s", absolutePath, filename, extension));
+            File file = new File(String.format("%s/%s%s", absolutePath, filename, extension));
             part.transferTo(file);
 
             final String fileHash = getFileHash(file);

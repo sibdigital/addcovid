@@ -13,16 +13,26 @@ const documents = {
                         css: 'contacts',
                         scroll: false,
                         select: 1,
-                        template:
-                            "<div id='2' class='overall'>" +
-                                "<div id='1' style='position: relative'>" +
-                                    "<div class='doc_title'>#originalFileName#</div>" +
-                                    "<div id='del_button' style='position: absolute;top: 0; right: 0;' ondblclick='del_file()' class='mdi mdi-close-thick'></div>" +
-                                "</div>" +
-                                "<div class='contactValue'>#timeCreate#</div>" +
-                            "</div>",
+                        template: function (obj){
+                            let docImg;
+                            let downloadTime = obj.timeCreate.substr(11,8) + ', ' +  obj.timeCreate.substr(0, 10)
+                            if(obj.fileExtension == ".zip"){
+                                docImg = "zip.png"
+                            }else{
+                                docImg = "pdf.png"
+                            }
+                            return "<div id='2' class='overall'>" +
+                            "<div>" +
+                            "<img style='position: absolute' src = "+docImg+"> " +
+                            "<div class='doc_title'>"+obj.originalFileName.slice(0, -4)+"</div>" +
+                            "<div id='del_button' style='position: absolute;top: 0; right: 5px;' ondblclick='del_file()' class='mdi mdi-close-thick'></div>" +
+                            "<div class='doc_time_create'>"+downloadTime+"</div>" +
+                            "<div class='download_docs'><img class='mdi mdi-download-outline'><a style='text-decoration: none; color: #1ca1c1' href=/uploads/"+obj.fileName+obj.fileExtension+" download>Скачать файл</a></div>" +
+                            "</div>" +
+                            "</div>"
+                        },
                         url: "org_files",
-                        xCount: 2,
+                        xCount: 3,
                         type: {
                             height: "auto",
                             width: "auto"

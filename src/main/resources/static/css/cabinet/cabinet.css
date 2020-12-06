@@ -138,6 +138,7 @@ body {margin: 0}
 }
 
 .overall{
+    position: relative;
     border-radius: 4px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 8px;
@@ -168,14 +169,17 @@ body {margin: 0}
 }
 
 .contactValue{
+    position:absolute;
     padding-left: 5px;
     /*white-space: normal !important;*/
     width: 100%;
     text-align:left;
-    top: 65%
+    top: 50%
 }
 
 .doc_title{
+    left: 80px;
+    position:absolute;
     line-height: 20px;
     font-family: Roboto, sans-serif;
     font-size: 16px;
@@ -189,8 +193,19 @@ body {margin: 0}
 }
 
 .doc_time_create{
+    position: absolute;
     padding-left: 5px;
+    left: 80px;
     /*white-space: normal !important;*/
     width: 100%;
+    top: 40%;
     text-align:left;
+}
+
+.download_docs{
+    position: absolute;
+    left: 80px;
+    padding-left: 5px;
+    width: 100%;
+    top: 65%;
 }
