@@ -27,7 +27,9 @@ function getNewsTemplate() {
                 else
                     return "<div item_id='id' class='custom_item'>"
             },
-            template:"#heading#<br><br> #message#",
+            template: function (obj) {
+                return "<h3 style=\"color: #2e6c80;\"><a href = \"news\\" + obj.id + "\">" + obj.heading + "</a></h3>" + obj.message
+            },
             templateEnd:function (obj) {
                 let startTime = new Date(Date.parse(obj.startTime))
                 let startTimeString = startTime.getDay() + "." + startTime.getMonth() + "." + startTime.getFullYear()
