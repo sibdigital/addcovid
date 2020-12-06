@@ -20,9 +20,7 @@ import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpSession;
 import java.io.Console;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,6 +48,12 @@ public class CabinetController {
     @Autowired
     private DocEmployeeRepo docEmployeeRepo;
 
+    @Autowired
+    private RegOrganizationAddressFactRepo regOrganizationAddressFactRepo;
+
+    @Autowired
+    private FiasAddrObjectRepo fiasAddrObjectRepo;
+
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -64,7 +68,8 @@ public class CabinetController {
     }
 
     @GetMapping("/organization")
-    public @ResponseBody ClsOrganization getOrganization(HttpSession session) {
+    public @ResponseBody
+    ClsOrganization getOrganization(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
@@ -104,7 +109,8 @@ public class CabinetController {
     }
 
     @GetMapping("/org_requests")
-    public @ResponseBody List<DocRequest> getRequests(HttpSession session) {
+    public @ResponseBody
+    List<DocRequest> getRequests(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
@@ -115,7 +121,8 @@ public class CabinetController {
     }
 
     @PostMapping("/save_pass")
-    public @ResponseBody String savePassword(@RequestBody PrincipalDto principalDto, HttpSession session) {
+    public @ResponseBody
+    String savePassword(@RequestBody PrincipalDto principalDto, HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return "Пароль не обновлен";
@@ -131,8 +138,9 @@ public class CabinetController {
     }
 
     @PostMapping("/cabinet/typed_form")
-    public @ResponseBody String postTypedForm(@RequestParam("request_type") Integer idTypeRequest,
-                                              @RequestBody PostFormDto postFormDto) {
+    public @ResponseBody
+    String postTypedForm(@RequestParam("request_type") Integer idTypeRequest,
+                         @RequestBody PostFormDto postFormDto) {
 
         try {
             ClsTypeRequest clsTypeRequest = requestService.getClsTypeRequestById(idTypeRequest);
@@ -143,14 +151,13 @@ public class CabinetController {
             }
             //валидация
             String errors = validate(postFormDto);
-            if(errors.isEmpty()){
+            if (errors.isEmpty()) {
                 DocRequest docRequest = requestService.addNewRequest(postFormDto, idTypeRequest);
                 return "Заявка принята. Ожидайте ответ на электронную почту.";
-            }
-            else {
+            } else {
                 return errors;
             }
-        } catch(Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             return "Невозможно сохранить заявку";
         }
@@ -167,15 +174,15 @@ public class CabinetController {
             if (postFormDto.getIsProtect() == false) {
                 errors += "Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия\n";
             }
-            if (postFormDto.getPersons() == null ||postFormDto.getPersons().isEmpty()) {
+            if (postFormDto.getPersons() == null || postFormDto.getPersons().isEmpty()) {
                 errors += "Необходимо заполнить список работников\n";
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
             errors += "Неправильно заполнены необходимые поля\n";
         }
 
-        if (!errors.isEmpty()){
+        if (!errors.isEmpty()) {
             errors = "ЗАЯВКА НЕ ВНЕСЕНА. ОБНАРУЖЕНЫ ОШИБКИ ЗАПОЛНЕНИЯ: " + errors;
         }
 
@@ -183,7 +190,8 @@ public class CabinetController {
     }
 
     @PostMapping("/cabinet/personal_form")
-    public @ResponseBody String postPersonalForm(@RequestBody PostFormDto postFormDto) {
+    public @ResponseBody
+    String postPersonalForm(@RequestBody PostFormDto postFormDto) {
         try {
             String errors = validatePersonalForm(postFormDto);
             if (errors.isEmpty()) {
@@ -193,7 +201,7 @@ public class CabinetController {
             } else {
                 return errors;
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             return "Невозможно сохранить уведомление!";
         }
@@ -227,7 +235,8 @@ public class CabinetController {
     }
 
     @GetMapping("/org_contacts")
-    public @ResponseBody List<ClsOrganizationContact> getOrgContacts(HttpSession session){
+    public @ResponseBody
+    List<ClsOrganizationContact> getOrgContacts(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
@@ -238,7 +247,8 @@ public class CabinetController {
     }
 
     @PostMapping("/save_contact")
-    public @ResponseBody ClsOrganizationContact saveOrgContact(@RequestBody OrganizationContactDto organizationContactDto, HttpSession session){
+    public @ResponseBody
+    ClsOrganizationContact saveOrgContact(@RequestBody OrganizationContactDto organizationContactDto, HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         organizationContactDto.setOrganizationId(id);
         ClsOrganizationContact clsOrganizationContact = null;
@@ -251,12 +261,13 @@ public class CabinetController {
     }
 
     @PostMapping("/delete_org_contact")
-    public @ResponseBody OrganizationContactDto deleteOrgContact(@RequestBody OrganizationContactDto organizationContactDto, HttpSession session) {
+    public @ResponseBody
+    OrganizationContactDto deleteOrgContact(@RequestBody OrganizationContactDto organizationContactDto, HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         organizationContactDto.setOrganizationId(id);
-        try{
+        try {
             requestService.deleteOrgContact(organizationContactDto);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             return null;
         }
@@ -264,7 +275,8 @@ public class CabinetController {
     }
 
     @GetMapping("/employees")
-    public @ResponseBody List<DocEmployee> getEmployees(HttpSession session) {
+    public @ResponseBody
+    List<DocEmployee> getEmployees(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
@@ -275,19 +287,20 @@ public class CabinetController {
     }
 
     @PostMapping("/filter")
-    public @ResponseBody List<DocEmployee> getFilteredEmployees(@RequestBody String filterText, HttpSession session){
+    public @ResponseBody
+    List<DocEmployee> getFilteredEmployees(@RequestBody String filterText, HttpSession session) {
         String filter = filterText.trim().toLowerCase();
         return getEmployees(session).parallelStream()
                 .filter(s -> containsFIO(s, filter))
                 .collect(Collectors.toList());
     }
 
-    private boolean containsFIO(DocEmployee employee, String filterText){
+    private boolean containsFIO(DocEmployee employee, String filterText) {
         String fio = constructFIO(employee.getPerson());
         return fio.contains(filterText);
     }
 
-    private String constructFIO(DocPerson person){
+    private String constructFIO(DocPerson person) {
         String fio = (person.getLastname() + person.getFirstname() + person.getPatronymic())
                 .toLowerCase()
                 .trim();
@@ -295,7 +308,8 @@ public class CabinetController {
     }
 
     @PostMapping("/employee")
-    public @ResponseBody DocEmployee saveEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
+    public @ResponseBody
+    DocEmployee saveEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         employeeDto.setOrganizationId(id);
         DocEmployee employee = null;
@@ -308,15 +322,99 @@ public class CabinetController {
     }
 
     @PostMapping("/deleteEmployee")
-    public @ResponseBody EmployeeDto deleteEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
+    public @ResponseBody
+    EmployeeDto deleteEmployee(@RequestBody EmployeeDto employeeDto, HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         employeeDto.setOrganizationId(id);
-        try{
+        try {
             requestService.deleteEmployee(employeeDto);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             return null;
         }
         return employeeDto;
+    }
+
+    @GetMapping("/address_fact")
+    public @ResponseBody
+    List<Map<String, Object>> getOrgAddressFact(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        //Map<String, Object> regs = regOrganizationAddressFactRepo.findByOrganizationId(id).orElse(null);
+        List<Map<String, Object>> regOrganizationAddressFacts = regOrganizationAddressFactRepo.findByOrganizationId(id).orElse(null);
+        return regOrganizationAddressFacts;
+//        return null;
+    }
+
+    @GetMapping("/fias")
+    public @ResponseBody
+    List<Map<String, Object>> getFiasAddrObjectList(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        //List<FiasAddrObject> fiasAddrObjectList = fiasAddrObjectRepo.findAll();
+        //FiasAddrObject fias = fiasAddrObjectRepo.findById(1L).orElse(null);
+        List<Map<String, Object>> fias = fiasAddrObjectRepo.findByL("1");
+        return fias;
+//        try {
+//        } catch (Exception e) {
+//
+//        }
+//        try {
+//            List<FiasAddrObject> fiasAddrObjectList = fiasAddrObjectRepo.findByLevel("1").orElse(null);
+//            return fiasAddrObjectList;
+//        } catch (Exception e) {
+//        }
+//        return null;
+    }
+
+    @GetMapping("/regions")
+    public @ResponseBody
+    List<Map<String, Object>> getRegions(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        List<Map<String, Object>> fias = fiasAddrObjectRepo.findRegions();
+        return fias;
+    }
+
+    @GetMapping("/cities")
+    public @ResponseBody
+    List<Map<String, Object>> getCities(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        List<Map<String, Object>> fias = fiasAddrObjectRepo.findCities();
+        return fias;
+    }
+
+    @PostMapping("/save_address_fact")
+    public @ResponseBody
+    RegOrganizationAddressFact saveAddresFact(@RequestBody RegOrganizationAddressFact regOrganizationAddressFact, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        regOrganizationAddressFact.setOrganizationId(Integer.parseInt(id.toString()));
+
+//        Map<String, Object> region = fiasAddrObjectRepo.findRegion(regOrganizationAddressFact.getFiasRegionGuid()).orElse(null);
+//        Map<String, Object> raion = fiasAddrObjectRepo.findCityOrRaion(regOrganizationAddressFact.getFiasRaionGuid()).orElse(null);
+//
+//        if (region == null || raion == null) {
+//            return null;
+//        }
+//
+//        regOrganizationAddressFact.setFiasRegionGuid((String) region.get("objectguid"));
+//        regOrganizationAddressFact.setFiasRaionGuid((String) raion.get("objectguid"));
+
+        try {
+            requestService.saveRegOrgAddFact(regOrganizationAddressFact);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+        return regOrganizationAddressFact;
     }
 }

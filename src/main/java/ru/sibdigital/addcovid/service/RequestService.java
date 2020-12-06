@@ -77,6 +77,9 @@ public class RequestService {
     @Autowired
     private DocEmployeeRepo docEmployeeRepo;
 
+    @Autowired
+    private RegOrganizationAddressFactRepo regOrganizationAddressFactRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
@@ -598,5 +601,28 @@ public class RequestService {
         return clsOrganizationContactRepo.findAllByOrganization(id).orElse(null);
     }
 
+    public RegOrganizationAddressFact saveRegOrgAddFact(RegOrganizationAddressFact regOrganizationAddressFact) {
+        RegOrganizationAddressFact regOrganizationAddressFactToSave = RegOrganizationAddressFact.builder()
+                .id(regOrganizationAddressFact.getId())
+                .organizationId(regOrganizationAddressFact.getOrganizationId())
+                .docRequestAddressFact(null)
+                .isDeleted(false)
+                .timeCreate(new Timestamp(System.currentTimeMillis()))
+                .fiasObjectGuid(regOrganizationAddressFact.getFiasObjectGuid())
+                .fiasRegionGuid(regOrganizationAddressFact.getFiasRegionGuid())
+                .fiasRaionGuid(regOrganizationAddressFact.getFiasRaionGuid())
+                .fullAddress(regOrganizationAddressFact.getFullAddress())
+                .isHand(false)
+                .build();
 
+        regOrganizationAddressFactRepo.insertOrg(
+                regOrganizationAddressFactToSave.getOrganizationId(),
+                //regOrganizationAddressFactToSave.getDocRequestAddressFact().getId(),
+                regOrganizationAddressFactToSave.getFiasObjectGuid(),
+                regOrganizationAddressFactToSave.getFiasRegionGuid(),
+                regOrganizationAddressFactToSave.getFiasRaionGuid(),
+                regOrganizationAddressFactToSave.getFullAddress()
+        );
+        return regOrganizationAddressFactToSave;
+    }
 }
