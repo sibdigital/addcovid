@@ -20,6 +20,8 @@ import ru.sibdigital.addcovid.service.RequestService;
 
 import javax.servlet.http.HttpSession;
 import java.io.Console;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +51,9 @@ public class CabinetController {
 
     @Autowired
     private DocEmployeeRepo docEmployeeRepo;
+
+    @Autowired
+    private ClsNewsRepo clsNewsRepo;
 
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
@@ -318,5 +323,29 @@ public class CabinetController {
             return null;
         }
         return employeeDto;
+    }
+
+    @GetMapping("/newsfeed")
+    public @ResponseBody List<ClsNews> getNewsList(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        List<ClsNews> newsList = clsNewsRepo.getNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
+        return newsList;
+    }
+
+    @GetMapping("/news/{id_news}")
+    public @ResponseBody String getNewsById(@PathVariable("id_news") Long id_news){
+        ClsNews clsNews = clsNewsRepo.findById(id_news).orElse(null);
+        if (clsNews != null) {
+            SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+            String startTimeString = format.format(clsNews.getStartTime());
+            String newsString = "<div><h3 style=\"color: #2e6c80;\">" + clsNews.getHeading()  + "</h3>" + clsNews.getMessage() + "</div>"+
+                    "<div style='text-align:right;'>Дата публикации: " + startTimeString+ "</div></div>";
+            return newsString;
+        }
+        else
+            return "";
     }
 }
