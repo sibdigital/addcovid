@@ -16,16 +16,40 @@ import java.util.Optional;
 @Repository
 public interface FiasAddrObjectRepo extends JpaRepository<FIASAddrObject, Long> {
 
-    @Query(nativeQuery = true, value = "set search_path = \"fias\";\n" +
-            "select *\n" +
-            "from addr_object as ao\n" +
-            "where ao.level='1'\n" +
-            "\n")
+    @Query(nativeQuery = true, value = "select * from fias.addr_object where level = :level")
+    Optional<List<FIASAddrObject>> findByLevel(String level);
+
+    @Query(nativeQuery = true, value = "select id, objectguid, name " +
+            " from fias.addr_object where level = :level")
+    List<Map<String, Object>> findByL(String level);
+
+    @Query(nativeQuery = true, value = "select fao.id, fao.objectguid, fao.name as value \n" +
+            " from fias.addr_object as fao\n" +
+            " where level='1'" +
+            " order by fao.name")
     List<Map<String, Object>> findRegions();
 
-    @Query(nativeQuery = true, value = "set search_path = \"fias\";\n" +
-            "select *\n" +
-            "from addr_object as ao\n" +
-            "where ao.level='4' or ao.level='5' or ao.level='6';\n")
+    @Query(nativeQuery = true, value = "select * " +
+            " from fias.addr_object where level = '1' and name = :name")
+    Optional<Map<String, Object>> findRegion(String name);
+
+    @Query(nativeQuery = true, value = "select fao.id, fao.objectguid, fao.name as value " +
+            " from fias.addr_object as fao where level='4' or level='5' or level='6'" +
+            " order by fao.name")
     List<Map<String, Object>> findCities();
+
+    @Query(nativeQuery = true, value = "with sdr as (\n" +
+            "    select fao.objectid\n" +
+            "    from fias.adm_hierarchy_item as fao\n" +
+            "    where fao.parentobjid = :regionObjectId\n" +
+            ")\n" +
+            "select fao.id, fao.objectguid, fao.name as value\n" +
+            "from fias.addr_object as fao\n" +
+            "    inner join sdr\n" +
+            "        on (fao.objectid) = (sdr.objectid)")
+    List<Map<String, Object>> findCities(Long regionObjectId);
+
+    @Query(nativeQuery = true, value = "select * " +
+            " from fias.addr_object where level = '5' and name = :name")
+    Optional<Map<String, Object>> findCityOrRaion(String name);
 }

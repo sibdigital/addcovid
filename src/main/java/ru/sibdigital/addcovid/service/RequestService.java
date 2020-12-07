@@ -532,20 +532,23 @@ public class RequestService {
         //DocRequest docRequest = docRequestRepo.findById(8422L).orElse(null);
         //RegOrganizationAddressFact regOrgAddrSave = regOrganizationAddressFact == null ? regOrganizationAddressFactToSave : regOrganizationAddressFact;
         RegOrganizationAddressFact regOrgAddrSave = RegOrganizationAddressFact.builder()
-                .organization(clsOrganization)
-                .docRequest(null)
-                .timeCreate(new Date())
-                .fiasRegionObjectGuid("123")
-                .fiasRaionObjectGuid("123")
-                .fullAddress("123")
+                .organizationId(Integer.parseInt(organizationId.toString()))
+                .docRequestAddressFact(null)
+                .isDeleted(false)
+                .timeCreate(new Timestamp(System.currentTimeMillis()))
+                .fiasObjectGuid(regOrganizationAddressFactToSave.getFiasObjectGuid())
+                .fiasRegionGuid(regOrganizationAddressFactToSave.getFiasRegionGuid())
+                .fiasRaionGuid(regOrganizationAddressFactToSave.getFiasRaionGuid())
+                .fullAddress(regOrganizationAddressFactToSave.getFullAddress())
+                .isHand(false)
                 .build();
-        regOrganizationAddressFactRepo.save(regOrgAddrSave);
+        regOrganizationAddressFactRepo.insertOrg(regOrgAddrSave.getOrganizationId(), regOrgAddrSave.getFiasObjectGuid(), regOrgAddrSave.getFiasRegionGuid(), regOrgAddrSave.getFiasRaionGuid(), regOrgAddrSave.getFullAddress());
         return regOrgAddrSave;
     }
 
     @Transactional
     public void deleteRegOrgAddressFact(RegOrganizationAddressFact regOrganizationAddressFact) {
-        regOrganizationAddressFactRepo.deleteById(regOrganizationAddressFact.getId());
+        regOrganizationAddressFactRepo.customDeleteById(regOrganizationAddressFact.getId());
     }
 
     @Transactional

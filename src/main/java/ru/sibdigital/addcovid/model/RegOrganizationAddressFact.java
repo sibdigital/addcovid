@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -17,56 +17,22 @@ import java.util.Objects;
 public class RegOrganizationAddressFact {
     @Id
     @Column(name = "id", nullable = false)
-    @SequenceGenerator(name = "REG_ORGANIZATION_ADDRESS_FACT_SEQ_GEN", sequenceName = "reg_organization_address_fact_id_seq", allocationSize = 1, schema = "public")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REG_ORGANIZATION_ADDRESS_FACT_SEQ_GEN")
+    @SequenceGenerator(name = "REG_ORG_ADDR_FACT_SEQ_GEN", sequenceName = "reg_organization_address_fact_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REG_ORG_ADDR_FACT_SEQ_GEN")
     private Long id;
-
-    @Basic
-    @Column(name = "fullAddress")
-    private String fullAddress;
-
-    @Basic
-    @Column(name = "isDeleted")
+    private Integer organizationId;
     private boolean isDeleted = false;
-
-    @Basic
-    @Column(name = "timeCreate")
-    private Date timeCreate;
-
-    @Basic
-    @Column(name = "fiasRegionObjectGuid")
-    private String fiasRegionObjectGuid;
-
-    @Basic
-    @Column(name = "fiasRaionObjectGuid")
-    private String fiasRaionObjectGuid;
-
-
-    @Basic
-    @Column(name = "isHand")
+    private Timestamp timeCreate;
+    private String fiasObjectGuid;
+    private String fiasRegionGuid;
+    private String fiasRaionGuid;
+    private String fullAddress;
     private boolean isHand = false;
 
-//    @JsonIgnore
-//    @ManyToOne
-//    @JoinColumn(name="id_request", nullable=false)
-//    private DocRequest docRequestAddressFact;
-
+    @JoinColumn(name="id_request", referencedColumnName = "id", nullable = true)
     @OneToOne
-    @JoinColumn(name = "id_organization", referencedColumnName = "id")
-    private ClsOrganization organization;
-
-    @OneToOne
-    @JoinColumn(name="id_request", referencedColumnName = "id")
     @JsonIgnore
-    private DocRequest docRequest;
-
-//    public Long getOrganizationId() {
-//        return organization.getId();
-//    }
-//
-//    public void setOrganizationId(Integer organizationId) {
-//        this.organizationId = organizationId;
-//    }
+    private DocRequest docRequestAddressFact;
 
     public Long getId() {
         return id;
@@ -76,38 +42,58 @@ public class RegOrganizationAddressFact {
         this.id = id;
     }
 
-    public boolean getIsDeleted() {
+    @Basic
+    @Column(name = "is_deleted")
+    public boolean isDeleted() {
         return isDeleted;
     }
 
-    public void setIsDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 
-    public Date getTimeCreate() {
+    @Basic
+    @Column(name = "time_create")
+    public Timestamp getTimeCreate() {
         return timeCreate;
     }
 
-    public void setTimeCreate(Date timeCreate) {
+    public void setTimeCreate(Timestamp timeCreate) {
         this.timeCreate = timeCreate;
     }
 
-    public String getFiasRegionObjectGuid() {
-        return fiasRegionObjectGuid;
+    @Basic
+    @Column(name = "fias_objectguid")
+    public String getFiasObjectGuid() {
+        return fiasObjectGuid;
     }
 
-    public void setFiasRegionObjectGuid(String fiasRegionObjectGuid) {
-        this.fiasRegionObjectGuid = fiasRegionObjectGuid;
+    public void setFiasObjectGuid(String fiasObjectGuid) {
+        this.fiasObjectGuid = fiasObjectGuid;
     }
 
-    public String getFiasRaionObjectGuid() {
-        return fiasRaionObjectGuid;
+    @Basic
+    @Column(name = "fias_region_objectguid")
+    public String getFiasRegionGuid() {
+        return fiasRegionGuid;
     }
 
-    public void setFiasRaionObjectGuid(String fiasRaionObjectGuid) {
-        this.fiasRaionObjectGuid = fiasRaionObjectGuid;
+    public void setFiasRegionGuid(String fiasRegionGuid) {
+        this.fiasRegionGuid = fiasRegionGuid;
     }
 
+    @Basic
+    @Column(name = "fias_raion_objectguid")
+    public String getFiasRaionGuid() {
+        return fiasRaionGuid;
+    }
+
+    public void setFiasRaionGuid(String fiasRaionGuid) {
+        this.fiasRaionGuid = fiasRaionGuid;
+    }
+
+    @Basic
+    @Column(name = "full_address")
     public String getFullAddress() {
         return fullAddress;
     }
@@ -116,28 +102,32 @@ public class RegOrganizationAddressFact {
         this.fullAddress = fullAddress;
     }
 
-    public boolean getIsHand() {
+    @Basic
+    @Column(name = "is_hand")
+    public boolean isHand() {
         return isHand;
     }
 
-    public void setFullAddress(boolean isHand) {
-        this.isHand = isHand;
+    public void setHand(boolean hand) {
+        isHand = hand;
     }
 
-    public ClsOrganization getOrganization() {
-        return organization;
+    @Basic
+    @Column(name = "id_organization")
+    public Integer getOrganizationId() {
+        return this.organizationId;
     }
 
-    public void setOrganization(ClsOrganization organization) {
-        this.organization = organization;
+    public void setOrganizationId(Integer organizationId) {
+        this.organizationId = organizationId;
     }
 
-    public DocRequest getDocRequest() {
-        return docRequest;
+    @JsonIgnore
+    public DocRequest getDocRequestAddressFact() {
+        return docRequestAddressFact;
     }
-
-    public void setDocRequest(DocRequest docRequest) {
-        this.docRequest = docRequest;
+    public void setDocRequestAddressFact(DocRequest docRequestAddressFact) {
+        this.docRequestAddressFact = docRequestAddressFact;
     }
 
     @Override
@@ -146,17 +136,20 @@ public class RegOrganizationAddressFact {
         if (o == null || getClass() != o.getClass()) return false;
         RegOrganizationAddressFact that = (RegOrganizationAddressFact) o;
         return Objects.equals(id, that.id) &&
-                Objects.equals(isDeleted, that.isDeleted) &&
+                //Objects.equals(organization.getId(), that.organization.getId()) &&
+                Objects.equals(organizationId, that.organizationId) &&
+                Objects.equals(docRequestAddressFact.getId(), that.docRequestAddressFact.getId()) &&
                 Objects.equals(timeCreate, that.timeCreate) &&
-                Objects.equals(fiasRegionObjectGuid, that.fiasRegionObjectGuid) &&
-                Objects.equals(fiasRaionObjectGuid, that.fiasRaionObjectGuid) &&
-                Objects.equals(fullAddress, that.fullAddress) &&
-                Objects.equals(isHand, that.isHand);
+                Objects.equals(isDeleted, that.isDeleted) &&
+                Objects.equals(fiasObjectGuid, that.fiasObjectGuid) &&
+                Objects.equals(fiasRaionGuid, that.fiasRaionGuid) &&
+                Objects.equals(fiasRegionGuid, that.fiasRegionGuid);
+
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, isDeleted, timeCreate, fiasRegionObjectGuid, fiasRaionObjectGuid, fullAddress, isHand);
+        return Objects.hash(id, isDeleted, isHand, timeCreate, fiasObjectGuid, fiasRegionGuid, fiasRaionGuid, fullAddress);
     }
 
 
