@@ -443,6 +443,7 @@ public class RequestService {
                 .idTypeOrganization(typeOrganization)
                 .principal(clsPrincipal)
                 .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
+                .isActivated(false)
                 .hashCode(code)
                 .build();
 

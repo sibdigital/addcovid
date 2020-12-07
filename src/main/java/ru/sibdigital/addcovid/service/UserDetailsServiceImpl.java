@@ -26,7 +26,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         ClsOrganization organization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
 
         User.UserBuilder builder = null;
-        if (organization != null) {
+        if (organization != null && organization.getActivated().booleanValue()) {
             ClsPrincipal principal = organization.getPrincipal();
             if (principal != null) {
                 builder = User.withUsername(inn);
