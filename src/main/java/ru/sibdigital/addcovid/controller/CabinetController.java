@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
+import ru.sibdigital.addcovid.dto.ClsMailingListDto;
 import ru.sibdigital.addcovid.dto.EmployeeDto;
 import ru.sibdigital.addcovid.dto.OrganizationContactDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
@@ -54,6 +55,12 @@ public class CabinetController {
 
     @Autowired
     private ClsNewsRepo clsNewsRepo;
+
+    @Autowired
+    private ClsMailingListRepo clsMailingListRepo;
+
+    @Autowired
+    private RegMailingListFollowerRepo regMailingListFollowerRepo;
 
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
@@ -347,5 +354,74 @@ public class CabinetController {
         }
         else
             return "";
+    }
+
+    @GetMapping("/my_mailing_list")
+    public @ResponseBody List<ClsMailingList> getMyMailingList(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        if (organization != null && organization.getPrincipal() != null) {
+            ClsPrincipal principal = organization.getPrincipal();
+            List<ClsMailingList> mailingList = clsMailingListRepo.findMyMailingList(principal.getId());
+            return mailingList;
+        }
+        else {
+            return null;
+        }
+    }
+
+    @GetMapping("/available_not_mine_mailing_list")
+    public @ResponseBody List<ClsMailingList> getAvailableMailingList(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        if (organization != null && organization.getPrincipal() != null) {
+            ClsPrincipal principal = organization.getPrincipal();
+            List<ClsMailingList> mailingList = clsMailingListRepo.findAvailableMailingListNotMine(principal.getId());
+            return mailingList;
+        }
+        else {
+            return null;
+        }
+    }
+
+    @PostMapping("/saveMailing")
+    public @ResponseBody
+    String saveMailing(@RequestBody List<ClsMailingListDto> clsMailingListDtos, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        if (organization != null && organization.getPrincipal() != null) {
+            ClsPrincipal principal = organization.getPrincipal();
+            for (ClsMailingListDto clsMailingListDto : clsMailingListDtos) {
+                try {
+                    requestService.saveMailing(clsMailingListDto, principal);
+                }
+                catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    return null;
+                }
+            }
+        }
+        return "Рассылки сохранены";
+    }
+
+
+    @PostMapping("/deactivateMailing")
+    public @ResponseBody
+    String deactivateMailing(@RequestBody List<ClsMailingListDto> clsMailingListDtos, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        if (organization != null && organization.getPrincipal() != null) {
+            ClsPrincipal principal = organization.getPrincipal();
+            for (ClsMailingListDto clsMailingListDto : clsMailingListDtos) {
+                try {
+                    requestService.deactivateMailing(clsMailingListDto, principal);
+                }
+                catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    return "Не получилось деактивировать рассылку: " + clsMailingListDto.getName();
+                }
+            }
+        }
+        return "Рассылки деактивированы";
     }
 }

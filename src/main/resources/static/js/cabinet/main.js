@@ -157,6 +157,8 @@ webix.ready(function () {
                                     view = news;
                                 }else if (id == 'Contacts'){
                                     view = contacts;
+                                }else if (id == 'Mailing'){
+                                    view = mailing;
                                 }
                                 if (view != null) {
                                     webix.ui({
