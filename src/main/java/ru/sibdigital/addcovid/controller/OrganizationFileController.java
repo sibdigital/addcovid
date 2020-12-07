@@ -53,13 +53,16 @@ public class OrganizationFileController {
     String uploadingDir;
 
     @PostMapping(value = "/upload_files", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
     public ResponseEntity<Object> uploadFile(@RequestParam(value = "upload") MultipartFile part, HttpSession session,
                                              @RequestParam(required = false) Long idDocRequest){
 
         Long idOrganization = (Long) session.getAttribute("id_organization");
         ResponseEntity<Object> responseEntity;
         if (Files.notExists(Paths.get(uploadingDir))) {
-            responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"cause\": \"Ошибка сохранения\"}");
+            responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"status\": \"server\"," +
+                            "\"cause\": \"Ошибка сохранения\"}");
         }else {
 
             final Optional<ClsOrganization> oorg = organizationRepo.findById(idOrganization);
@@ -73,17 +76,25 @@ public class OrganizationFileController {
                 if (regOrganizationFile != null){
                     if (regOrganizationFile.getId() == 0) {
                         regOrganizationFile = organizationFileRepo.save(regOrganizationFile);
-                        responseEntity = ResponseEntity.ok().body(regOrganizationFile);
+                        responseEntity = ResponseEntity.ok()
+                                .body("{\"cause\": \"Файл успешно загружен\"," +
+                                        "\"status\": \"server\"," +
+                                        "\"sname\": \"" + regOrganizationFile.getOriginalFileName() + "\"}");
                     }else{
                         responseEntity = ResponseEntity.ok()
-                                .body("{\"cause\": \"Вы уже загружали этот файл\"" +
-                                        "\"file\": \"" + regOrganizationFile.getOriginalFileName() + "\"}");
+                                .body("{\"cause\": \"Вы уже загружали этот файл\"," +
+                                        "\"status\": \"server\"," +
+                                        "\"sname\": \"" + regOrganizationFile.getOriginalFileName() + "\"}");
                     }
                 }else{
-                    responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"cause\": \"Ошибка сохранения\"}");
+                    responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("{\"status\": \"server\"," +
+                                     "\"cause\":\"Ошибка сохранения\"}");
                 }
             } else {
-                responseEntity = ResponseEntity.badRequest().body("{\"cause\": \"Отсутствует организация\"}");
+                responseEntity = ResponseEntity.badRequest()
+                        .body("{\"status\": \"server\"," +
+                                "\"cause\": \"Отсутствует организация\"}");
             }
         }
 
@@ -164,7 +175,6 @@ public class OrganizationFileController {
 
     @PostMapping("/delete_file")
     public @ResponseBody int deleteFile(@RequestBody int id){
-        System.out.println(id);
         try{
             organizationFileService.updateFileStatusById(id);
         }catch (Exception e){

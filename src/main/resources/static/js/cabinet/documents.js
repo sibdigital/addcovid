@@ -27,12 +27,12 @@ const documents = {
                             "<div class='doc_title'>"+obj.originalFileName.slice(0, -4)+"</div>" +
                             "<div id='del_button' style='position: absolute;top: 0; right: 5px;' ondblclick='del_file()' class='mdi mdi-close-thick'></div>" +
                             "<div class='doc_time_create'>"+downloadTime+"</div>" +
-                            "<div class='download_docs'><img class='mdi mdi-download-outline'><a style='text-decoration: none; color: #1ca1c1' href=/uploads/"+obj.fileName+obj.fileExtension+" download>Скачать файл</a></div>" +
+                            "<div class='download_docs'><a style='text-decoration: none; color: #1ca1c1' href=/uploads/"+obj.fileName+obj.fileExtension+" download>Скачать файл</a></div>" +
                             "</div>" +
                             "</div>"
                         },
                         url: "org_files",
-                        xCount: 3,
+                        xCount: 2,
                         type: {
                             height: "auto",
                             width: "auto"
@@ -55,6 +55,9 @@ const documents = {
                                 accept: 'application/pdf, application/zip',
                                 multiple: true,
                                 link: 'filelist',
+                                formData:{
+                                    cause: '123'
+                                }
                             },
                             {
                                 view: 'list', id: 'filelist', type: 'uploader',
@@ -68,19 +71,23 @@ const documents = {
                                 align: 'center',
                                 click: function () {
                                     $$('upload').send(function (response) {
-                                        let uploadedFiles = []
-                                        $$('upload').files.data.each(function (obj) {
-                                            let status = obj.status
-                                            let name = obj.name
-                                            if(status == 'server'){
-                                                let sname = obj.sname
-                                                uploadedFiles.push(sname)
-                                            }
+                                        if(response.status == "server")
+                                        {
+                                            if(response.cause == "Файл успешно загружен"){
 
-                                        })
-                                        if (uploadedFiles.length != $$('upload').files.data.count()) {
-                                            webix.message('Не удалось загрузить файлы.', "error")
-                                            $$('upload').focus()
+                                                webix.message(response.cause + ": " + response.sname, "success")
+                                                console.log(response.cause)
+
+                                            }
+                                            else if(response.cause == "Ошибка сохранения" || response.cause == "Отсутствует организация"){
+
+                                                webix.message(response.cause, "error")
+                                                console.log(response.cause)
+
+                                            }else if(response.cause == "Вы уже загружали этот файл"){
+                                                webix.message(response.cause + ": " + response.sname, "error")
+                                                console.log(response.cause)
+                                            }
                                         }
                                         $$("upload").files.data.clearAll();
                                         $$('docs_grid').load('org_files');
@@ -98,15 +105,22 @@ const documents = {
 
 function del_file(){
     let param = $$('docs_grid').getSelectedId()
-    webix.ajax()
-        .headers({'Content-type': 'application/json'})
-        .post('/delete_file', JSON.stringify(param))
-        .then(function (data) {
-            if (data !== null) {
-                $$("docs_grid").remove($$("docs_grid").getSelectedId());
-                webix.message("Файл удалён", 'success');
-            } else {
-                webix.message("Не удалось удалить файл", 'error');
-            }
-        });
+    webix.confirm({
+        title:"Подтверждение",
+        type:"confirm-warning",
+        ok:"Yes", cancel:"No",
+        text:"Вы уверены что хотите удалить файл?"
+    }).then(function(){
+        webix.ajax()
+            .headers({'Content-type': 'application/json'})
+            .post('/delete_file', JSON.stringify(param))
+            .then(function (data) {
+                if (data !== null) {
+                    $$("docs_grid").remove($$("docs_grid").getSelectedId());
+                    webix.message("Файл удалён", 'success');
+                } else {
+                    webix.message("Не удалось удалить файл", 'error');
+                }
+            });
+      })
 }
