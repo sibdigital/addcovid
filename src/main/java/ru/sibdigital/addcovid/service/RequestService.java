@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.dto.ClsMailingListDto;
 import ru.sibdigital.addcovid.dto.EmployeeDto;
 import ru.sibdigital.addcovid.dto.OrganizationContactDto;
 import ru.sibdigital.addcovid.dto.OrganizationDto;
@@ -76,6 +77,12 @@ public class RequestService {
 
     @Autowired
     private DocEmployeeRepo docEmployeeRepo;
+
+    @Autowired
+    private RegMailingListFollowerRepo regMailingListFollowerRepo;
+
+    @Autowired
+    private ClsMailingListRepo clsMailingListRepo;
 
     @Value("${upload.path:/uploads}")
     String uploadingDir;
@@ -599,8 +606,62 @@ public class RequestService {
 
     }
 
+    @Transactional
+    public void saveMailing(ClsMailingListDto clsMailingListDto, ClsPrincipal principal){
+        Long id_clsMailingList = clsMailingListDto.getId();
+        ClsMailingList clsMailingList = clsMailingListRepo.findById(id_clsMailingList).orElse(null);
+        RegMailingListFollower regMailingListFollower = regMailingListFollowerRepo.findByPrincipalAndMailingList(principal, clsMailingList);
+        if (regMailingListFollower == null) {
+            regMailingListFollower = new RegMailingListFollower();
+            regMailingListFollower.setPrincipal(principal);
+            regMailingListFollower.setMailingList(clsMailingList);
+            regMailingListFollower.setActivationDate(new Timestamp(new Date().getTime()));
+            regMailingListFollowerRepo.save(regMailingListFollower);
+        }
+        else {
+            // Если был деактивирован
+            if (regMailingListFollower.getDectivationDate() != null) {
+                regMailingListFollower.setDectivationDate(null);
+                regMailingListFollower.setActivationDate(new Timestamp(new Date().getTime()));
+                regMailingListFollowerRepo.save(regMailingListFollower);
+            }
+        }
+    }
+
+    @Transactional
+    public void deactivateMailing(ClsMailingListDto clsMailingListDto, ClsPrincipal principal){
+        Long id_clsMailingList = clsMailingListDto.getId();
+        ClsMailingList clsMailingList = clsMailingListRepo.findById(id_clsMailingList).orElse(null);
+        RegMailingListFollower regMailingListFollower = regMailingListFollowerRepo.findByPrincipalAndMailingList(principal, clsMailingList);
+        if (regMailingListFollower != null) {
+            if (regMailingListFollower.getDectivationDate() == null) {
+                regMailingListFollower.setDectivationDate(new Timestamp(new Date().getTime()));
+                regMailingListFollowerRepo.save(regMailingListFollower);
+            }
+        }
+    }
+
     public List<ClsOrganizationContact> getAllClsOrganizationContactByOrganizationId(Long id){
         return clsOrganizationContactRepo.findAllByOrganization(id).orElse(null);
+    }
+
+    /**
+     * Метод предназначен для сохранения заявки по предписанию
+     *
+     * @param postForm
+     * @return
+     */
+    @Transactional
+    public DocRequest saveNewRequest(PostFormDto postForm) {
+        DocRequest docRequest = docRequestRepo.findById(postForm.getRequestId()).orElse(null);
+        docRequest.setAgree(postForm.getIsAgree());
+        docRequest.setProtect(postForm.getIsProtect());
+        docRequest.setAdditionalAttributes(postForm.getAdditionalAttributes());
+        docRequest.setStatusReview(ReviewStatuses.OPENED.getValue());
+
+        docRequestRepo.save(docRequest);
+
+        return docRequest;
     }
 
     public String activateOrganization(String inn, String code) {
@@ -629,4 +690,5 @@ public class RequestService {
         }
         return message;
     }
+
 }
