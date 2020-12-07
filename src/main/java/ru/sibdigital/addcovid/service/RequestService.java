@@ -427,6 +427,8 @@ public class RequestService {
             typeOrganization = OrganizationTypes.SELF_EMPLOYED.getValue();
         }
 
+        String code = SHA256Generator.generate(organizationDto.getOrganizationInn(), organizationDto.getOrganizationName());
+
         ClsOrganization clsOrganization = ClsOrganization.builder()
                 .name(organizationDto.getOrganizationName())
                 .shortName(organizationDto.getOrganizationShortName())
@@ -440,6 +442,8 @@ public class RequestService {
                 .statusImport(0)
                 .idTypeOrganization(typeOrganization)
                 .principal(clsPrincipal)
+                .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
+                .hashCode(code)
                 .build();
 
         clsOrganizationRepo.save(clsOrganization);
@@ -598,5 +602,30 @@ public class RequestService {
         return clsOrganizationContactRepo.findAllByOrganization(id).orElse(null);
     }
 
-
+    public String activateOrganization(String inn, String code) {
+        String message = "";
+        try {
+            ClsOrganization clsOrganization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
+            if (clsOrganization != null) {
+                if (clsOrganization.getHashCode().equals(code)) {
+                    if (!clsOrganization.getActivated().booleanValue()) {
+                        clsOrganization.setActivated(true);
+                        clsOrganization.setHashCode(SHA256Generator.generate(clsOrganization.getInn(), clsOrganization.getName(), clsOrganization.getEmail()));
+                        clsOrganizationRepo.save(clsOrganization);
+                        message = "Учётная запись успешно активирована.";
+                    } else {
+                        message = "Активация не требуется.";
+                    }
+                } else {
+                    message = "Неверный код! Активация не выполнена.";
+                }
+            } else {
+                message = "Учетная запись не найдена!";
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            message = "Не удалось активировать учётную запись!";
+        }
+        return message;
+    }
 }

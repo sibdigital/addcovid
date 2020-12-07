@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:utext="${application_name}"></title>
+    <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.min.css}">
+    <script th:src="@{/libs/webix.min.js}"></script>
+    <style>
+        body {margin: 0}
+        .boldLabel {
+            font-weight: bold; border-width: 2px; border-style: solid; border-color: #000000;
+        }
+    </style>
+</head>
+<body>
+<div id="app"></div>
+<script th:inline="javascript">
+    const APPLICATION_NAME = [[${application_name}]]
+    const MESSAGE = [[${message}]]
+
+    webix.i18n.setLocale("ru-RU");
+
+    webix.ui({
+        container: 'app',
+        height: document.body.clientHeight,
+        maxWidth: 360,
+        css: {margin: 'auto', marginTop: 'auto'},
+        rows: [
+            {
+                view: 'toolbar',
+                autoheight: true,
+                id: 't1',
+                rows: [
+                    {
+                        responsive: 't1',
+                        css: 'webix_dark',
+                        cols: [
+                            {
+                                view: 'label',
+                                align: 'center',
+                                label: `<span style="font-size: 1.3rem">Активация учетной записи</span>`,
+                            },
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'form',
+                view: 'form',
+                complexData: true,
+                elements: [
+                    {
+                        view: 'label',
+                        label: MESSAGE
+                    },
+                    {
+                        view: 'button',
+                        css: 'webix_primary',
+                        value: 'Отмена',
+                        click: () => { window.location.href = '/login' }
+                    },
+                ]
+            }
+        ]
+    })
+</script>
+</body>
+</html>
