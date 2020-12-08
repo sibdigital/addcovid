@@ -378,4 +378,27 @@ public class CabinetController {
         return result;
     }
 
+    @GetMapping("/streets")
+    public @ResponseBody List<Map<String, Object>> getStreets(
+            @RequestParam(value = "objectid", required = false) Long raionObjectId
+    ) {
+        List<Map<String, Object>> result = null;
+        if (raionObjectId != null) {
+            result = fiasAddrObjectRepo.findStreetsByRaionOrCity(raionObjectId);
+        }
+
+        return result;
+    }
+
+    @GetMapping("/house")
+    public @ResponseBody List<Map<String, Object>> getHome(
+            @RequestParam(value = "objectid", required = false) Long streetObjectId
+    ) {
+        List<Map<String, Object>> result = null;
+        if (streetObjectId != null) {
+            result = fiasAddrObjectRepo.findHouseByStreet(streetObjectId);
+        }
+
+        return result;
+    }
 }
