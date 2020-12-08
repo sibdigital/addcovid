@@ -23,9 +23,7 @@ import javax.servlet.http.HttpSession;
 import java.io.Console;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -61,6 +59,15 @@ public class CabinetController {
 
     @Autowired
     private RegMailingListFollowerRepo regMailingListFollowerRepo;
+
+    @Autowired
+    private DocAddressFactRepo docAddressFactRepo;
+
+    @Autowired
+    private RegOrganizationAddressFactRepo regOrganizationAddressFactRepo;
+
+    @Autowired
+    private FiasAddrObjectRepo fiasAddrObjectRepo;
 
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
@@ -461,4 +468,57 @@ public class CabinetController {
 
         return errors;
     }
+
+    @GetMapping("/address_facts")
+    public @ResponseBody  List<Map<String, Object>> getAddressFactsList(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        List<Map<String, Object>> result = regOrganizationAddressFactRepo.findByIdOrganization(Integer.parseInt(id.toString()));
+        return result;
+    }
+
+    @PostMapping("/save_address_fact")
+    public @ResponseBody RegOrganizationAddressFact saveRegAddressFact(@RequestBody RegOrganizationAddressFact regOrganizationAddressFact, HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        RegOrganizationAddressFact _regOrganizationAddressFact = null;
+        try {
+            _regOrganizationAddressFact = requestService.saveRegOrgAddressFact(regOrganizationAddressFact, id);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return _regOrganizationAddressFact;
+    }
+
+    @PostMapping("/delete_address_fact")
+    public @ResponseBody void deleteRegAddressFact(@RequestBody RegOrganizationAddressFact regOrganizationAddressFact){
+        try {
+            requestService.deleteRegOrgAddressFact(regOrganizationAddressFact);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    @GetMapping("/regions")
+    public @ResponseBody List<Map<String, Object>> getRegions() {
+        List<Map<String, Object>> result = fiasAddrObjectRepo.findRegions();
+        return result;
+    }
+
+    @GetMapping("/cities")
+    public @ResponseBody List<Map<String, Object>> getCities(
+            @RequestParam(value = "objectid", required = false) String regionCode
+    ) {
+        List<Map<String, Object>> result = null;
+        if (regionCode == null) {
+            result = fiasAddrObjectRepo.findCities();
+        } else {
+
+            result = fiasAddrObjectRepo.findCities(Long.parseLong(regionCode));
+        }
+
+        return result;
+    }
+
 }

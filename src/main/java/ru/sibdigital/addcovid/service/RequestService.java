@@ -84,6 +84,9 @@ public class RequestService {
     @Autowired
     private ClsMailingListRepo clsMailingListRepo;
 
+    @Autowired
+    private RegOrganizationAddressFactRepo regOrganizationAddressFactRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
@@ -532,6 +535,32 @@ public class RequestService {
     @Transactional
     public void deleteOrgContact(OrganizationContactDto organizationContactDto){
         clsOrganizationContactRepo.deleteById(organizationContactDto.getId());
+    }
+
+    @Transactional
+    public RegOrganizationAddressFact saveRegOrgAddressFact(RegOrganizationAddressFact regOrganizationAddressFactToSave, Long organizationId) {
+//        RegOrganizationAddressFact regOrganizationAddressFact = regOrganizationAddressFactRepo.findById(regOrganizationAddressFactToSave.getId()).orElse(null);
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(organizationId).orElse(null);
+        //DocRequest docRequest = docRequestRepo.findById(8422L).orElse(null);
+        //RegOrganizationAddressFact regOrgAddrSave = regOrganizationAddressFact == null ? regOrganizationAddressFactToSave : regOrganizationAddressFact;
+        RegOrganizationAddressFact regOrgAddrSave = RegOrganizationAddressFact.builder()
+                .organizationId(Integer.parseInt(organizationId.toString()))
+                .docRequestAddressFact(null)
+                .isDeleted(false)
+                .timeCreate(new Timestamp(System.currentTimeMillis()))
+                .fiasObjectGuid(regOrganizationAddressFactToSave.getFiasObjectGuid())
+                .fiasRegionGuid(regOrganizationAddressFactToSave.getFiasRegionGuid())
+                .fiasRaionGuid(regOrganizationAddressFactToSave.getFiasRaionGuid())
+                .fullAddress(regOrganizationAddressFactToSave.getFullAddress())
+                .isHand(false)
+                .build();
+        regOrganizationAddressFactRepo.insertOrg(regOrgAddrSave.getOrganizationId(), regOrgAddrSave.getFiasObjectGuid(), regOrgAddrSave.getFiasRegionGuid(), regOrgAddrSave.getFiasRaionGuid(), regOrgAddrSave.getFullAddress());
+        return regOrgAddrSave;
+    }
+
+    @Transactional
+    public void deleteRegOrgAddressFact(RegOrganizationAddressFact regOrganizationAddressFact) {
+        regOrganizationAddressFactRepo.customDeleteById(regOrganizationAddressFact.getId());
     }
 
     @Transactional
