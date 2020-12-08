@@ -34,7 +34,7 @@ const requests = {
                             {
                                 id: "status",
                                 header: "Статус",
-                                template: "#statusReview#",
+                                template: "#statusReviewName#",
                                 adjust: true,
                                 width: 300
                             },
@@ -60,10 +60,14 @@ const requests = {
                             onLoadError: function () {
                                 this.hideOverlay();
                             },
-                            onItemDblClick: function (id) {
+                            onItemClick: function (id) {
                                 let item = this.getItem(id);
                                 setTimeout(function () {
-                                    showRequestViewForm(item)
+                                    if (item.new) {
+                                        showRequestWizard(item);
+                                    } else {
+                                        showRequestViewForm(item);
+                                    }
                                 }, 10);
                             }
                         },
@@ -146,6 +150,329 @@ const requests = {
         ]
     }
 }
+
+function showRequestWizard(data) {
+    webix.ui({
+        id: 'content',
+        rows: [
+            {
+                view: 'scrollview',
+                scroll: 'xy',
+                body: {
+                    type: 'space',
+                    rows: [
+                        {
+                            view: 'form',
+                            id: 'newRequestForm',
+                            minWidth: 200,
+                            complexData: true,
+                            elements: [
+                                {
+                                    view: 'multiview',
+                                    id: 'wizard',
+                                    cells: [
+                                        {
+                                            rows: [
+                                                { type: 'header', template: 'Шаг 1. Приложите документы' },
+                                                documents,
+                                                {
+                                                    cols: [
+                                                        {},
+                                                        {
+                                                            view: 'button',
+                                                            css: 'webix_primary',
+                                                            maxWidth: 301,
+                                                            value: 'Продолжить',
+                                                            click: next
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            rows: [
+                                                { type: 'header', template: 'Шаг 2. Актуализируйте список сотрудников' },
+                                                employees,
+                                                {
+                                                    cols: [
+                                                        {},
+                                                        {
+                                                            view: 'button',
+                                                            css: 'webix_primary',
+                                                            maxWidth: 301,
+                                                            value: 'Назад',
+                                                            click: back
+                                                        },
+                                                        {
+                                                            view: 'button',
+                                                            css: 'webix_primary',
+                                                            maxWidth: 301,
+                                                            value: 'Продолжить',
+                                                            click: next
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            rows: [
+                                                { type: 'header', template: 'Шаг 3. Актуализируйте список фактических адресов' },
+                                                address,
+                                                {
+                                                    cols: [
+                                                        {},
+                                                        {
+                                                            view: 'button',
+                                                            css: 'webix_primary',
+                                                            maxWidth: 301,
+                                                            value: 'Назад',
+                                                            click: back
+                                                        },
+                                                        {
+                                                            view: 'button',
+                                                            css: 'webix_primary',
+                                                            maxWidth: 301,
+                                                            value: 'Продолжить',
+                                                            click: next
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            rows: [
+                                                { type: 'header', template: 'Шаг 4. Ознакомьтесь с предписаниями' },
+                                                {
+                                                    type: 'form',
+                                                    rows: [
+                                                        {
+                                                            view: 'template',
+                                                            id: 'consent',
+                                                            height: 200,
+                                                            readonly: true,
+                                                            scroll: true,
+                                                            template: ''
+                                                        },
+                                                        {
+                                                            rows: [
+                                                                {
+                                                                    view: 'template',
+                                                                    borderless: true,
+                                                                    css: 'personalTemplateStyle',
+                                                                    template: 'Подтверждаю согласие работников на обработку персональных данных <span style = "color: red">*</span>',
+                                                                    autoheight: true
+                                                                },
+                                                                {
+                                                                    view: 'checkbox',
+                                                                    name: 'isAgree',
+                                                                    id: 'isAgree',
+                                                                    labelPosition: 'top',
+                                                                    invalidMessage: 'Поле не может быть пустым',
+                                                                    required: true,
+                                                                    on: {
+                                                                        onChange(newv, oldv) {
+                                                                            if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1) {
+                                                                                $$('send_btn').enable();
+                                                                            } else {
+                                                                                $$('send_btn').disable();
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                            ]
+                                                        },
+                                                        {
+                                                            view: 'template',
+                                                            id: 'prescription',
+                                                            height: 550,
+                                                            readonly: true,
+                                                            scroll: true,
+                                                            template: ''
+                                                        },
+                                                        {
+                                                            rows:
+                                                                [
+                                                                    {
+                                                                        view: 'template',
+                                                                        borderless: true,
+                                                                        css: 'personalTemplateStyle',
+                                                                        template: 'Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия <span style = "color: red">*</span>',
+                                                                        autoheight: true
+                                                                    },
+                                                                    {
+                                                                        view: 'checkbox',
+                                                                        name: 'isProtect',
+                                                                        id: 'isProtect',
+                                                                        labelPosition: 'top',
+                                                                        invalidMessage: 'Поле не может быть пустым',
+                                                                        required: true,
+                                                                        on: {
+                                                                            onChange(newv, oldv) {
+                                                                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1) {
+                                                                                    $$('send_btn').enable();
+                                                                                } else {
+                                                                                    $$('send_btn').disable();
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                ]
+                                                        },
+                                                        {
+                                                            view: 'template',
+                                                            id: 'label_sogl',
+                                                            borderless: true,
+                                                            css: {
+                                                                'font-family': 'Roboto, sans-serif',
+                                                                'font-size': '14px;',
+                                                                'font-weight': '500;',
+                                                                'color': '#313131;',
+                                                                'padding': ' 0px 3px !important;',
+                                                                'text-align': 'center'
+                                                            },
+                                                            template: 'Информация мною прочитана и я согласен с ней при подаче заявки',
+                                                            autoheight: true
+                                                        },
+                                                        {
+                                                            cols: [
+                                                                {},
+                                                                {
+                                                                    view: 'button',
+                                                                    css: 'webix_primary',
+                                                                    value: 'Отменить',
+                                                                    minWidth: 150,
+                                                                    align: 'center',
+                                                                    click: function () {
+                                                                        $$('menu').callEvent('onMenuItemClick', ['Requests']);
+                                                                    }
+                                                                },
+                                                                {
+                                                                    id: 'send_btn',
+                                                                    view: 'button',
+                                                                    css: 'webix_primary',
+                                                                    minWidth: 150,
+                                                                    value: 'Подать заявку',
+                                                                    disabled: true,
+                                                                    align: 'center',
+                                                                    click: function () {
+                                                                        this.disabled = true;
+
+                                                                        if ($$('newRequestForm').validate()) {
+
+                                                                            let params = $$('newRequestForm').getValues();
+
+                                                                            params.requestId = data.id;
+
+                                                                            if (params.isAgree != 1) {
+                                                                                webix.message('Необходимо подтвердить согласие работников на обработку персональных данных', 'error')
+                                                                                return false
+                                                                            }
+                                                                            if (params.isProtect != 1) {
+                                                                                webix.message('Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия', 'error')
+                                                                                return false
+                                                                            }
+
+                                                                            $$('newRequestForm').showProgress({
+                                                                                type: 'icon',
+                                                                                delay: 5000
+                                                                            })
+
+                                                                            webix.ajax()
+                                                                                .headers({'Content-type': 'application/json'})
+                                                                                .post('/cabinet/new_request', JSON.stringify(params))
+                                                                                .then(function (data) {
+                                                                                    const text = data.text();
+                                                                                    console.log(text);
+                                                                                    let errorText = "ЗАЯВКА НЕ ВНЕСЕНА. ОБНАРУЖЕНЫ ОШИБКИ ЗАПОЛНЕНИЯ: ";
+                                                                                    if (text.includes(errorText)) {
+                                                                                        webix.alert({
+                                                                                            title: "ИСПРАВЬТЕ ОШИБКИ",
+                                                                                            ok: "Вернуться к заполнению заявки",
+                                                                                            text: text
+                                                                                        });
+                                                                                        $$('newRequestForm').hideProgress();
+                                                                                    } else if (text.includes("Невозможно подать заявку")) {
+                                                                                        webix.alert({
+                                                                                            title: "ВНИМАНИЕ!",
+                                                                                            ok: "ОК",
+                                                                                            text: text
+                                                                                        });
+                                                                                        $$('newRequestForm').hideProgress();
+                                                                                    } else {
+                                                                                        webix.alert({
+                                                                                            title: "Заявка подана",
+                                                                                            ok: "ОК",
+                                                                                            text: text
+                                                                                        })
+                                                                                            .then(function () {
+                                                                                                $$('newRequestForm').hideProgress();
+                                                                                                $$('menu').callEvent('onMenuItemClick', ['Requests']);
+                                                                                            })
+                                                                                            .fail(function () {
+                                                                                                $$('newRequestForm').hideProgress()
+                                                                                                $$('newRequestForm').clear();
+                                                                                            });
+                                                                                    }
+                                                                                })
+                                                                        } else {
+                                                                            webix.message('Не заполнены обязательные поля. Для просмотра прокрутите страницу вверх', 'error')
+                                                                        }
+                                                                    }
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ]
+    }, $$('content'));
+
+    webix.ajax('cls_type_request/' + data.typeRequest.id).then(function (data) {
+
+        let typeRequest = data.json();
+
+        $$('prescription').setHTML(typeRequest.prescription);
+        $$('consent').setHTML(typeRequest.consent);
+
+        if (typeRequest.settings) {
+            const settings = JSON.parse(typeRequest.settings, function (key, value) {
+                if (value === 'webix.rules.isChecked') {
+                    return webix.rules.isChecked;
+                }
+                return value;
+            });
+            if (settings.fields) {
+                settings.fields.forEach(field => {
+                    $$('form').addView(field.ui, field.pos);
+                })
+            }
+        }
+
+        webix.extend($$('newRequestForm'), webix.ProgressBar);
+    });
+}
+
+function back() {
+    $$("wizard").back();
+}
+
+function next() {
+    const parentCell = this.getParentView().getParentView();
+    const index = $$("wizard").index(parentCell);
+    const next = $$("wizard").getChildViews()[index + 1]
+    if (next) {
+        next.show();
+    }
+}
+
 function showRequestCreateForm(idTypeRequest) {
 
     ID_TYPE_REQUEST = idTypeRequest;

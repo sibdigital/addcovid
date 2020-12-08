@@ -7,9 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.model.ClsOrganization;
 import ru.sibdigital.addcovid.model.DocRequest;
@@ -17,7 +15,10 @@ import ru.sibdigital.addcovid.model.RegOrganizationFile;
 import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
 import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.repository.RegOrganizationFileRepo;
+import ru.sibdigital.addcovid.service.OrganizationFileService;
+import ru.sibdigital.addcovid.service.RequestService;
 
+import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.IOException;
@@ -42,70 +43,105 @@ public class OrganizationFileController {
     @Autowired
     DocRequestRepo docRequestRepo;
 
+    @Autowired
+    private OrganizationFileService organizationFileService;
+
+    @Autowired
+    ClsOrganizationRepo clsOrganizationRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
     @PostMapping(value = "/upload_files", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> uploadFile(@RequestParam(value = "upload") MultipartFile part,
-                                             @RequestParam("idOrganization") Long idOrganization,
-                                             @RequestParam("idDocRequest") Long idDocRequest){
+    @ResponseBody
+    public ResponseEntity<Object> uploadFile(@RequestParam(value = "upload") MultipartFile part, HttpSession session,
+                                             @RequestParam(required = false) Long idDocRequest){
 
+        Long idOrganization = (Long) session.getAttribute("id_organization");
         ResponseEntity<Object> responseEntity;
         if (Files.notExists(Paths.get(uploadingDir))) {
-            responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{\"cause\": \"Ошибка сохранения\"}");
+            responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"status\": \"server\"," +
+                            "\"cause\": \"Ошибка сохранения\"}");
         }else {
 
             final Optional<ClsOrganization> oorg = organizationRepo.findById(idOrganization);
-            final DocRequest docRequest = docRequestRepo.findById(idDocRequest).orElse(null);
+            DocRequest docRequest = idDocRequest == null ?
+                    null : docRequestRepo.findById(idDocRequest).orElse(null);
 
             if (oorg.isPresent()) {
-                final RegOrganizationFile regOrganizationFile = load(part, oorg.get(), docRequest);
-                responseEntity = ResponseEntity.ok().body(regOrganizationFile);
+
+                RegOrganizationFile regOrganizationFile = construct (part, oorg.get(), docRequest);
+
+                if (regOrganizationFile != null){
+                    if (regOrganizationFile.getId() == 0) {
+                        regOrganizationFile = organizationFileRepo.save(regOrganizationFile);
+                        responseEntity = ResponseEntity.ok()
+                                .body("{\"cause\": \"Файл успешно загружен\"," +
+                                        "\"status\": \"server\"," +
+                                        "\"sname\": \"" + regOrganizationFile.getOriginalFileName() + "\"}");
+                    }else{
+                        responseEntity = ResponseEntity.ok()
+                                .body("{\"cause\": \"Вы уже загружали этот файл\"," +
+                                        "\"status\": \"server\"," +
+                                        "\"sname\": \"" + regOrganizationFile.getOriginalFileName() + "\"}");
+                    }
+                }else{
+                    responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body("{\"status\": \"server\"," +
+                                     "\"cause\":\"Ошибка сохранения\"}");
+                }
             } else {
-                responseEntity = ResponseEntity.badRequest().body("{\"cause\": \"Отсутствует орагнизация\"}");
+                responseEntity = ResponseEntity.badRequest()
+                        .body("{\"status\": \"server\"," +
+                                "\"cause\": \"Отсутствует организация\"}");
             }
         }
 
         return responseEntity;//ResponseEntity.ok().body(requestService.uploadFile(file));
     }
 
-    private RegOrganizationFile load (MultipartFile part, ClsOrganization organization, DocRequest docRequest){
-        RegOrganizationFile regOrganizationFile = null;
+    private RegOrganizationFile construct (MultipartFile part, ClsOrganization organization, DocRequest docRequest){
+        RegOrganizationFile rof = null;
         try {
 
             final String absolutePath = Paths.get(uploadingDir).toFile().getAbsolutePath();
             final String filename = organization.getId().toString() + "_" + UUID.randomUUID();
             final String originalFilename = part.getOriginalFilename();
             String extension = getFileExtension(originalFilename);
-            File file = new File(String.format("%s/%s.%s", absolutePath, filename, extension));
+            File file = new File(String.format("%s/%s%s", absolutePath, filename, extension));
             part.transferTo(file);
 
             final String fileHash = getFileHash(file);
             final long size = Files.size(file.toPath());
 
-            RegOrganizationFile rof = RegOrganizationFile.builder()
-                    .clsOrganizationByIdOrganization(organization)
-                    .attachmentPath(String.format("%s/%s", uploadingDir, filename))
-                    .fileName(filename)
-                    .originalFileName(originalFilename)
-                    .isDeleted(false)
-                    .fileExtension(extension)
-                    .fileSize(size)
-                    .hash(fileHash)
-                    .timeCreate(new Timestamp(System.currentTimeMillis()))
-                    .build();
-            if (docRequest != null){
-                rof.setDocRequestByIdRequest(docRequest);
-            }
+            final List<RegOrganizationFile> files= organizationFileRepo.findRegOrganizationFileByOrganizationAndHash(organization, fileHash);
 
-            regOrganizationFile= organizationFileRepo.save(rof);
+            if (!files.isEmpty()){
+                rof = files.get(0);
+            }else{
+                rof = RegOrganizationFile.builder()
+                        .clsOrganizationByIdOrganization(organization)
+                        .attachmentPath(String.format("%s/%s", uploadingDir, filename))
+                        .fileName(filename)
+                        .originalFileName(originalFilename)
+                        .isDeleted(false)
+                        .fileExtension(extension)
+                        .fileSize(size)
+                        .hash(fileHash)
+                        .timeCreate(new Timestamp(System.currentTimeMillis()))
+                        .build();
+                if (docRequest != null){
+                    rof.setDocRequestByIdRequest(docRequest);
+                }
+            }
 
         } catch (IOException ex){
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         } catch (Exception ex) {
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         }
-        return regOrganizationFile;
+        return rof;
     }
 
     private String getFileHash(File file){
@@ -128,5 +164,23 @@ public class OrganizationFileController {
             return ""; // empty extension
         }
         return name.substring(lastIndexOf);
+    }
+
+    @GetMapping("/org_files")
+    public @ResponseBody List<RegOrganizationFile> getRegOrgFileName(HttpSession session) {
+        Long idOrganization = (Long) session.getAttribute("id_organization");
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(idOrganization).orElse(null);
+        return organizationFileRepo.findRegOrganizationFileByOrganization(clsOrganization);
+    }
+
+    @PostMapping("/delete_file")
+    public @ResponseBody int deleteFile(@RequestBody int id){
+        try{
+            organizationFileService.updateFileStatusById(id);
+        }catch (Exception e){
+            log.error(e.getMessage(), e);
+            return -1;
+        }
+        return id;
     }
 }

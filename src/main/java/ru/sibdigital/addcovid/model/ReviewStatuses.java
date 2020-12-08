@@ -1,6 +1,8 @@
 package ru.sibdigital.addcovid.model;
 
 public enum ReviewStatuses {
+    NEW(100),
+    EXPIRED(101),
     OPENED(0),
     CONFIRMED(1),
     REJECTED(2),

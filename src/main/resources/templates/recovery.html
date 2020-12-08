@@ -25,7 +25,7 @@
     webix.ui({
         container: 'app',
         height: document.body.clientHeight,
-        width: 360,
+        maxWidth: 360,
         css: {margin: 'auto', marginTop: 'auto'},
         rows: [
             {
@@ -52,20 +52,25 @@
                 complexData: true,
                 elements: [
                     {
-                        type: 'space',
-                        margin: 5,
                         rows: [
                             {
                                 view: 'text',
                                 id: 'inn',
                                 name: 'inn',
-                                label: 'ИНН',
+                                // label: 'ИНН',
                                 labelPosition: 'top',
+                                placeholder: 'ИНН',
                                 required: true,
                                 validate: webix.rules.isNumber,
                                 invalidMessage: 'Неправильный формат ИНН'
                             }
                         ]
+                    },
+                    {
+                        view: 'button',
+                        css: 'webix_primary',
+                        value: 'Отмена',
+                        click: () => { window.location.href = '/login' }
                     },
                     {
                         id: 'send_btn',
