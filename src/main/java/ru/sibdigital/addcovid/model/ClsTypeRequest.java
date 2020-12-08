@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cls_type_request", schema = "public")
@@ -29,6 +31,13 @@ public class ClsTypeRequest {
     @OneToOne
     @JoinColumn(name = "id_department", referencedColumnName = "id")
     private ClsDepartment department;
+
+    @OneToMany(mappedBy = "regTypeRequestRestrictionTypeId.clsTypeRequest")
+    private Set<RegTypeRequestRestrictionType> regTypeRequestRestrictionTypes;
+
+    @OrderBy("num asc")
+    @OneToMany(targetEntity = RegTypeRequestPrescription.class, mappedBy = "typeRequest", fetch = FetchType.LAZY)
+    private List<RegTypeRequestPrescription> regTypeRequestPrescriptions;
 
     public Long getId() {
         return id;
@@ -124,6 +133,22 @@ public class ClsTypeRequest {
 
     public void setConsent(String consent) {
         this.consent = consent;
+    }
+
+    public Set<RegTypeRequestRestrictionType> getRegTypeRequestRestrictionTypes() {
+        return regTypeRequestRestrictionTypes;
+    }
+
+    public void setRegTypeRequestRestrictionTypes(Set<RegTypeRequestRestrictionType> regTypeRequestRestrictionTypes) {
+        this.regTypeRequestRestrictionTypes = regTypeRequestRestrictionTypes;
+    }
+
+    public List<RegTypeRequestPrescription> getRegTypeRequestPrescriptions() {
+        return regTypeRequestPrescriptions;
+    }
+
+    public void setRegTypeRequestPrescriptions(List<RegTypeRequestPrescription> regTypeRequestPrescriptions) {
+        this.regTypeRequestPrescriptions = regTypeRequestPrescriptions;
     }
 
     @Override

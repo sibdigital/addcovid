@@ -454,9 +454,9 @@ public class CabinetController {
             if (postFormDto.getIsAgree() == false) {
                 errors += "Необходимо подтвердить согласие работников на обработку персональных данных\n";
             }
-            if (postFormDto.getIsProtect() == false) {
-                errors += "Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия\n";
-            }
+//            if (postFormDto.getIsProtect() == false) {
+//                errors += "Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия\n";
+//            }
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
             errors += "Неправильно заполнены необходимые поля\n";
