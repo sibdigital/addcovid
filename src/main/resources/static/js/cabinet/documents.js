@@ -3,15 +3,18 @@ const documents = {
     scroll: 'xy',
     body: {
         type: 'space',
+        id: 'documentsMainLayout',
         rows: [
             {
                 type: 'wide',
+                responsive: 'documentsMainLayout',
                 cols:[
                     {
                         view: "dataview",
                         id: "docs_grid",
                         css: 'contacts',
-                        scroll: false,
+                        scroll:'y',
+                        minWidth:320,
                         select: 1,
                         template: function (obj){
                             let docImg;
@@ -35,12 +38,15 @@ const documents = {
                         xCount: 2,
                         type: {
                             height: "auto",
-                            width: "auto"
+                            width: "auto",
+                            float: "right"
                         },
                     },
                     {
                         gravity: 0.4,
                         view: 'form',
+                        id: 'formDocsLoad',
+                        minWidth: 200,
                         position: 'center',
                         elements: [
                             {gravity: 0.6},
@@ -54,13 +60,13 @@ const documents = {
                                 required: true,
                                 accept: 'application/pdf, application/zip',
                                 multiple: true,
-                                link: 'filelist',
+                                link: 'docslist',
                                 formData:{
                                     cause: '123'
                                 }
                             },
                             {
-                                view: 'list', id: 'filelist', type: 'uploader',
+                                view: 'list', id: 'docslist', type: 'uploader',
                                 autoheight: true, borderless: true
                             },
                             {

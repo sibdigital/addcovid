@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:utext="${application_name}"></title>
     <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.min.css}">
+    <link rel="stylesheet" th:href="@{/css/cabinet/cabinet.css}" type="text/css">
     <script th:src="@{/libs/webix.min.js}"></script>
     <script th:src="@{/libs/routie.min.js}"></script>
     <script th:src="@{/libs/jquery-3.4.1.min.js}"></script>
@@ -16,355 +17,412 @@
     </style>
 </head>
 <body>
-<div id="app"></div>
+<div id="app" style="background-color: #ccd7e6 !important"></div>
 <script th:inline="javascript">
     const APPLICATION_NAME = [[${application_name}]];
     const EGRUL_ADDRESS = [[${egrul_address}]]
-
+    let windowHeight = window.innerHeight
     webix.i18n.setLocale("ru-RU");
 
     let regLayout = webix.ui({
         container: 'app',
-        height: document.body.clientHeight,
-        maxWidth: 768,
+        height: windowHeight,
         css: {margin: 'auto'},
         rows: [
             {
-                view: 'toolbar',
-                autoheight: true,
-                id: 't1',
-                rows: [
-                    {
-                        responsive: 't1',
-                        css: 'webix_dark',
-                        cols: [
-                            {},
-                            {
-                                view: 'label',
-                                width: 300,
-                                align: 'center',
-                                label: `<span style="font-size: 1.3rem">Регистрация</span>`,
-                            },
-                            {}
-                        ]
-                    }
-                ]
+                gravity: 0.9,
             },
             {
-                id: 'form',
-                view: 'form',
-                complexData: true,
-                elements: [
-                    {
-                        view: 'multiview',
-                        id: 'wizard',
-                        cells: [
-                            {
-                                rows: [
+                view: "align",
+                align: "middle,center",
+                body: {
+                    cols: [
+                        {
+                            view: "align",
+                            align: "middle,center",
+                            body: {
+                                cols: [
                                     {
-                                        view: 'text',
-                                        name: 'searchInn',
-                                        id: 'searchInn',
-                                        minWidth: 250,
-                                        // label: 'ИНН',
-                                        placeholder: 'ИНН',
-                                    },
-                                    {
-                                        cols: [
-                                            {
-                                                view: 'button',
-                                                css: 'webix_primary',
-                                                value: 'Отмена',
-                                                click: () => { window.location.href = '/login' }
-                                            },
-                                            {
-                                                view: 'button',
-                                                id: 'egrul_load_button',
-                                                css: 'webix_primary',
-                                                value: 'Продолжить',
-                                                align: 'center',
-                                                click: () => {
-                                                    $$('egrul_load_button').disable();
-                                                    $$('searchInn').showProgress();
-
-                                                    setTimeout(function () {
-                                                        const inn = $$('searchInn').getValue();
-                                                        if (inn === '') {
-                                                            $$('searchInn').focus();
-                                                            webix.message('ИНН не введен', 'error');
-                                                            $$('searchInn').hideProgress();
-                                                            $$('egrul_load_button').enable();
-                                                            return;
-                                                        } else if (isNaN(inn)) {
-                                                            $$('searchInn').focus();
-                                                            webix.message('ИНН не соответствует формату', 'error');
-                                                            $$('searchInn').hideProgress();
-                                                            $$('egrul_load_button').enable();
-                                                            return;
-                                                        }
-
-                                                        let type = '';
-                                                        if (inn.length === 10) {
-                                                            type = 'egrul';
-                                                        } else if (inn.length === 12) {
-                                                            type = 'egrip';
-                                                        }
-                                                        if (type === '') {
-                                                            $$('searchInn').focus();
-                                                            webix.message('ИНН не соответствует формату', 'error');
-                                                            $$('searchInn').hideProgress();
-                                                            $$('egrul_load_button').enable();
-                                                            return;
-                                                        }
-
-                                                        webix.ajax().get('checkInn?inn=' + inn).then(function (data) {
-                                                            const result = data.text();
-                                                            if (result !== 'ИНН не зарегистрирован') {
-                                                                webix.message(result, 'error');
-                                                                $$('searchInn').hideProgress();
-                                                                $$('egrul_load_button').enable();
-                                                            } else {
-                                                                loadData(type, inn);
-                                                                $$('egrul_load_button').enable();
-                                                            }
-                                                        })
-                                                    }, 500);
-                                                }
-                                            },
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                rows: [
-                                    {
+                                        id: "leftLayout",
+                                        margin: 0,
+                                        padding: {
+                                            top: 55, bottom: 25
+                                        },
+                                        width: 350,
+                                        css: {
+                                            "background": "#475466 !important" //#2b334a
+                                        },
                                         rows: [
                                             {
-                                                view: 'text',
-                                                id: 'organizationInn',
-                                                name: 'organizationInn',
-                                                minWidth: 250,
-                                                label: 'ИНН',
-                                                labelPosition: 'top',
-                                                validate: webix.rules.isNumber,
-                                                readonly: true,
-                                                required: true
+                                                view: "label",
+                                                height: 200,
+                                                id: "logo",
+                                                align: "center",
+                                                template: "<img src = \"logo.png\">"
                                             },
                                             {
-                                                view: 'text',
-                                                id: 'organizationName',
-                                                name: 'organizationName',
-                                                label: 'Наименование организации/ИП',
-                                                labelPosition: 'top',
-                                                readonly: true,
-                                                required: true
+                                                view: "label",
+                                                label: `<span style="font-size: 1.5rem; color: #ccd7e6">Регистрация на портале</span>`,
+                                                height: 50,
+                                                align: "center"
                                             },
                                             {
-                                                view: 'text',
-                                                id: 'organizationShortName',
-                                                name: 'organizationShortName',
-                                                label: 'Краткое наименование организации',
-                                                labelPosition: 'top',
-                                                hidden: true,
-                                                required: true
+                                                view: "label",
+                                                label: `<span style="font-size: 1.2rem; color: #ccd7e6">"${APPLICATION_NAME}"</span>`,
+                                                height: 50,
+                                                align: "center"
                                             },
                                             {
-                                                view: 'checkbox',
-                                                name: 'isSelfEmployed',
-                                                labelPosition: 'top',
-                                                minWidth: 90,
-                                                label: 'Самозанятый',
-                                                hidden: true,
-                                                on: {
-                                                    onChange(newv, oldv) {
-                                                        if (newv === 1) {
-                                                            $$('organizationOgrn').setValue('');
-                                                            $$('organizationOgrn').disable();
-                                                        } else {
-                                                            $$('organizationOgrn').enable();
-                                                        }
-                                                    }
-                                                }
+                                                view: "label",
+                                                label: `<span style="font-size: 1rem; color: #fff6f6">Шаг 1</span>`,
+                                                height: 50,
+                                                align: "center"
                                             },
                                             {
-                                                view: 'text',
-                                                id: 'organizationOgrn',
-                                                name: 'organizationOgrn',
-                                                label: 'ОГРН',
-                                                validate: webix.rules.isNumber,
-                                                labelPosition: 'top',
-                                                hidden: true,
-                                                required: true
+                                                view: "template",
+                                                css:{"background-color":"#475466", "text-align":"center"},
+                                                borderless: true,
+                                                template: `<span style="font-size: 0.8rem; color: #fff6f6">На шаге 1 Вам необходимо ввести ИНН Вашей организации. ИНН будет сверен с ЕГРЮЛ и ЕГРИП.</span>`,
+                                                height: 50,
+                                                align: "center"
                                             },
-                                            {
-                                                view: 'text',
-                                                id: 'organizationOkved',
-                                                name: 'organizationOkved',
-                                                label: 'Основной вид осуществляемой деятельности (отрасль)',
-                                                labelPosition: 'top',
-                                                placeholder: '01.11',
-                                                required: true,
-                                                hidden: true,
-                                                on: {
-                                                    onKeyPress(code, event) {
-                                                        if (code === 32) {
-                                                            return false;
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                view: 'textarea',
-                                                id: 'organizationOkvedAdd',
-                                                name: 'organizationOkvedAdd',
-                                                label: 'Дополнительные виды осуществляемой деятельности',
-                                                height: 100,
-                                                labelPosition: 'top',
-                                                placeholder: '01.13\n01.13.1',
-                                                hidden: true,
-                                                on: {
-                                                    onKeyPress(code, event) {
-                                                        if (code === 32) {
-                                                            this.setValue(this.getValue() + '\n')
-                                                            return false;
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                view: 'textarea',
-                                                id: 'organizationAddressJur',
-                                                name: 'organizationAddressJur',
-                                                label: 'Юридический адрес',
-                                                labelPosition: 'top',
-                                                height: 80,
-                                                hidden: true,
-                                                required: true
-                                            },
-                                            {
-                                                view: 'text',
-                                                id: 'organizationEmail',
-                                                name: 'organizationEmail',
-                                                label: 'Адрес электронной почты',
-                                                labelPosition: 'top',
-                                                validate: webix.rules.isEmail,
-                                                required: true
-                                            },
-                                            {
-                                                view: 'text',
-                                                name: 'organizationPhone',
-                                                label: 'Телефон',
-                                                labelPosition: 'top',
-                                                hidden: true,
-                                                required: true
-                                            },
-                                            {
-                                                view: 'text',
-                                                id: 'password',
-                                                name: 'password',
-                                                type: 'password',
-                                                label: 'Пароль',
-                                                labelPosition: 'top',
-                                                required: true,
-                                                attributes: {autocomplete: 'new-password'},
-                                            },
-                                            {
-                                                view: 'template',
-                                                type: 'clean',
-                                                autoheight: true,
-                                                css: { 'color': 'red' },
-                                                template: 'После регистрации, на указанный адрес электронной почты, будет отправлено письмо со ссылкой на активацию учётной записи.'
-                                            }
                                         ]
+
                                     },
                                     {
-                                        cols: [
+                                        id: 'form',
+                                        view: 'form',
+                                        maxWidth: 450,
+                                        width: 350,
+                                        minWidth: 250,
+                                        complexData: true,
+                                        elements: [
+                                            {},
                                             {
-                                                view: 'button',
-                                                css: 'webix_primary',
-                                                value: 'Назад',
-                                                click: back
-                                            },
-                                            {
-                                                id: 'send_btn',
-                                                view: 'button',
-                                                css: 'webix_primary',
-                                                value: 'Зарегистрироваться',
-                                                align: 'center',
-                                                click: function () {
-                                                    this.disable();
+                                                view: 'multiview',
+                                                id: 'wizard',
+                                                cells: [
+                                                    {
+                                                        rows: [
+                                                            {
+                                                                view:"label",
+                                                                label:`<span style="font-size: 1.1rem; color: #6e6e6e">Введите ИНН Вашей организации</span>`
+                                                            },
+                                                            {
+                                                                view: 'text',
+                                                                name: 'searchInn',
+                                                                id: 'searchInn',
+                                                                minWidth: 250,
+                                                                // label: 'ИНН',
+                                                                placeholder: 'ИНН',
+                                                            },
+                                                            {height: 10},
+                                                            {
+                                                                cols: [
+                                                                    {
+                                                                        view: 'button',
+                                                                        css: 'myClass',
+                                                                        value: 'Отмена',
+                                                                        click: () => { window.location.href = '/login' }
+                                                                    },
+                                                                    {width: 5},
+                                                                    {
+                                                                        view: 'button',
+                                                                        id: 'egrul_load_button',
+                                                                        css: 'myClass',
+                                                                        value: 'Продолжить',
+                                                                        align: 'center',
+                                                                        click: () => {
+                                                                            $$('egrul_load_button').disable();
+                                                                            $$('searchInn').showProgress();
 
-                                                    if ($$('form').validate()) {
+                                                                            setTimeout(function () {
+                                                                                const inn = $$('searchInn').getValue();
+                                                                                if (inn === '') {
+                                                                                    $$('searchInn').focus();
+                                                                                    webix.message('ИНН не введен', 'error');
+                                                                                    $$('searchInn').hideProgress();
+                                                                                    $$('egrul_load_button').enable();
+                                                                                    return;
+                                                                                } else if (isNaN(inn)) {
+                                                                                    $$('searchInn').focus();
+                                                                                    webix.message('ИНН не соответствует формату', 'error');
+                                                                                    $$('searchInn').hideProgress();
+                                                                                    $$('egrul_load_button').enable();
+                                                                                    return;
+                                                                                }
 
-                                                        let params = $$('form').getValues();
+                                                                                let type = '';
+                                                                                if (inn.length === 10) {
+                                                                                    type = 'egrul';
+                                                                                } else if (inn.length === 12) {
+                                                                                    type = 'egrip';
+                                                                                }
+                                                                                if (type === '') {
+                                                                                    $$('searchInn').focus();
+                                                                                    webix.message('ИНН не соответствует формату', 'error');
+                                                                                    $$('searchInn').hideProgress();
+                                                                                    $$('egrul_load_button').enable();
+                                                                                    return;
+                                                                                }
 
-                                                        if (params.organizationShortName.length > 255) {
-                                                            webix.message('Превышена длина краткого наименования', 'error')
-                                                            return false
-                                                        }
-
-                                                        params.organizationInn = params.organizationInn.trim();
-                                                        params.organizationOgrn = params.organizationOgrn.trim();
-
-                                                        if (params.organizationInn.length > 12) {
-                                                            webix.message('Превышена длина ИНН', 'error');
-                                                            return false;
-                                                        }
-
-                                                        if (params.organizationOgrn.length > 15) {
-                                                            webix.message('Превышена длина ОГРН', 'error');
-                                                            return false;
-                                                        }
-
-                                                        if (params.organizationAddressJur.length > 255) {
-                                                            webix.message('Превышена длина юридического адреса', 'error')
-                                                            return false
-                                                        }
-
-                                                        if (params.organizationEmail.length > 100) {
-                                                            webix.message('Превышена длина электронной почты', 'error');
-                                                            return false;
-                                                        } else {
-                                                            let bad_val = params.organizationEmail.indexOf("*") > -1
-                                                                || params.organizationEmail.indexOf("+") > -1
-                                                                || params.organizationEmail.indexOf('"') > -1;
-                                                            if (bad_val == true) {
-                                                                webix.message('Недопустимые символы в адресе электронной почты', 'error');
-                                                                return false;
+                                                                                webix.ajax().get('checkInn?inn=' + inn).then(function (data) {
+                                                                                    const result = data.text();
+                                                                                    if (result !== 'ИНН не зарегистрирован') {
+                                                                                        webix.message(result, 'error');
+                                                                                        $$('searchInn').hideProgress();
+                                                                                        $$('egrul_load_button').enable();
+                                                                                    } else {
+                                                                                        loadData(type, inn);
+                                                                                        $$('egrul_load_button').enable();
+                                                                                    }
+                                                                                })
+                                                                            }, 500);
+                                                                        }
+                                                                    },
+                                                                ]
                                                             }
-                                                        }
+                                                        ]
+                                                    },
+                                                    {
+                                                        rows: [
+                                                            {
+                                                                rows: [
+                                                                    {
+                                                                        view: 'text',
+                                                                        id: 'organizationInn',
+                                                                        name: 'organizationInn',
+                                                                        minWidth: 250,
+                                                                        label: 'ИНН',
+                                                                        labelPosition: 'top',
+                                                                        validate: webix.rules.isNumber,
+                                                                        readonly: true,
+                                                                        required: true
+                                                                    },
+                                                                    {
+                                                                        view: 'text',
+                                                                        id: 'organizationName',
+                                                                        name: 'organizationName',
+                                                                        label: 'Наименование организации/ИП',
+                                                                        labelPosition: 'top',
+                                                                        readonly: true,
+                                                                        required: true
+                                                                    },
+                                                                    {
+                                                                        view: 'text',
+                                                                        id: 'organizationShortName',
+                                                                        name: 'organizationShortName',
+                                                                        label: 'Краткое наименование организации',
+                                                                        labelPosition: 'top',
+                                                                        hidden: true,
+                                                                        required: true
+                                                                    },
+                                                                    {
+                                                                        view: 'checkbox',
+                                                                        name: 'isSelfEmployed',
+                                                                        labelPosition: 'top',
+                                                                        minWidth: 90,
+                                                                        label: 'Самозанятый',
+                                                                        hidden: true,
+                                                                        on: {
+                                                                            onChange(newv, oldv) {
+                                                                                if (newv === 1) {
+                                                                                    $$('organizationOgrn').setValue('');
+                                                                                    $$('organizationOgrn').disable();
+                                                                                } else {
+                                                                                    $$('organizationOgrn').enable();
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        view: 'text',
+                                                                        id: 'organizationOgrn',
+                                                                        name: 'organizationOgrn',
+                                                                        label: 'ОГРН',
+                                                                        validate: webix.rules.isNumber,
+                                                                        labelPosition: 'top',
+                                                                        hidden: true,
+                                                                        required: true
+                                                                    },
+                                                                    {
+                                                                        view: 'text',
+                                                                        id: 'organizationOkved',
+                                                                        name: 'organizationOkved',
+                                                                        label: 'Основной вид осуществляемой деятельности (отрасль)',
+                                                                        labelPosition: 'top',
+                                                                        placeholder: '01.11',
+                                                                        required: true,
+                                                                        hidden: true,
+                                                                        on: {
+                                                                            onKeyPress(code, event) {
+                                                                                if (code === 32) {
+                                                                                    return false;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        view: 'textarea',
+                                                                        id: 'organizationOkvedAdd',
+                                                                        name: 'organizationOkvedAdd',
+                                                                        label: 'Дополнительные виды осуществляемой деятельности',
+                                                                        height: 100,
+                                                                        labelPosition: 'top',
+                                                                        placeholder: '01.13\n01.13.1',
+                                                                        hidden: true,
+                                                                        on: {
+                                                                            onKeyPress(code, event) {
+                                                                                if (code === 32) {
+                                                                                    this.setValue(this.getValue() + '\n')
+                                                                                    return false;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        view: 'textarea',
+                                                                        id: 'organizationAddressJur',
+                                                                        name: 'organizationAddressJur',
+                                                                        label: 'Юридический адрес',
+                                                                        labelPosition: 'top',
+                                                                        height: 80,
+                                                                        hidden: true,
+                                                                        required: true
+                                                                    },
+                                                                    {
+                                                                        view: 'text',
+                                                                        id: 'organizationEmail',
+                                                                        name: 'organizationEmail',
+                                                                        label: 'Адрес электронной почты',
+                                                                        labelPosition: 'top',
+                                                                        validate: webix.rules.isEmail,
+                                                                        required: true
+                                                                    },
+                                                                    {
+                                                                        view: 'text',
+                                                                        name: 'organizationPhone',
+                                                                        label: 'Телефон',
+                                                                        labelPosition: 'top',
+                                                                        hidden: true,
+                                                                        required: true
+                                                                    },
+                                                                    {
+                                                                        view: 'text',
+                                                                        id: 'password',
+                                                                        name: 'password',
+                                                                        type: 'password',
+                                                                        label: 'Пароль',
+                                                                        labelPosition: 'top',
+                                                                        required: true,
+                                                                        attributes: {autocomplete: 'new-password'},
+                                                                    },
+                                                                    {
+                                                                        view: 'template',
+                                                                        type: 'clean',
+                                                                        autoheight: true,
+                                                                        css: { 'color': 'red' },
+                                                                        template: 'После регистрации, на указанный адрес электронной почты, будет отправлено письмо со ссылкой на активацию учётной записи.'
+                                                                    }
+                                                                ]
+                                                            },
+                                                            {
+                                                                cols: [
+                                                                    {
+                                                                        view: 'button',
+                                                                        css: 'webix_primary',
+                                                                        value: 'Назад',
+                                                                        click: back
+                                                                    },
+                                                                    {
+                                                                        id: 'send_btn',
+                                                                        view: 'button',
+                                                                        css: 'webix_primary',
+                                                                        value: 'Зарегистрироваться',
+                                                                        align: 'center',
+                                                                        click: function () {
+                                                                            this.disable();
 
-                                                        if (params.organizationPhone.length > 100) {
-                                                            webix.message('Превышена длина номера телефона', 'error');
-                                                            return false;
-                                                        }
+                                                                            if ($$('form').validate()) {
 
-                                                        webix.ajax()
-                                                            .headers({'Content-type': 'application/json'})
-                                                            .post('/registration', JSON.stringify(params)
-                                                            ).then(function (data) {
-                                                            const text = data.text();
-                                                            if (text === 'Ок') {
-                                                                window.location = '/login';
-                                                            } else {
-                                                                webix.message(text, 'error')
+                                                                                let params = $$('form').getValues();
+
+                                                                                if (params.organizationShortName.length > 255) {
+                                                                                    webix.message('Превышена длина краткого наименования', 'error')
+                                                                                    return false
+                                                                                }
+
+                                                                                params.organizationInn = params.organizationInn.trim();
+                                                                                params.organizationOgrn = params.organizationOgrn.trim();
+
+                                                                                if (params.organizationInn.length > 12) {
+                                                                                    webix.message('Превышена длина ИНН', 'error');
+                                                                                    return false;
+                                                                                }
+
+                                                                                if (params.organizationOgrn.length > 15) {
+                                                                                    webix.message('Превышена длина ОГРН', 'error');
+                                                                                    return false;
+                                                                                }
+
+                                                                                if (params.organizationAddressJur.length > 255) {
+                                                                                    webix.message('Превышена длина юридического адреса', 'error')
+                                                                                    return false
+                                                                                }
+
+                                                                                if (params.organizationEmail.length > 100) {
+                                                                                    webix.message('Превышена длина электронной почты', 'error');
+                                                                                    return false;
+                                                                                } else {
+                                                                                    let bad_val = params.organizationEmail.indexOf("*") > -1
+                                                                                        || params.organizationEmail.indexOf("+") > -1
+                                                                                        || params.organizationEmail.indexOf('"') > -1;
+                                                                                    if (bad_val == true) {
+                                                                                        webix.message('Недопустимые символы в адресе электронной почты', 'error');
+                                                                                        return false;
+                                                                                    }
+                                                                                }
+
+                                                                                if (params.organizationPhone.length > 100) {
+                                                                                    webix.message('Превышена длина номера телефона', 'error');
+                                                                                    return false;
+                                                                                }
+
+                                                                                webix.ajax()
+                                                                                    .headers({'Content-type': 'application/json'})
+                                                                                    .post('/registration', JSON.stringify(params)
+                                                                                    ).then(function (data) {
+                                                                                    const text = data.text();
+                                                                                    if (text === 'Ок') {
+                                                                                        window.location = '/login';
+                                                                                    } else {
+                                                                                        webix.message(text, 'error')
+                                                                                    }
+                                                                                })
+                                                                            } else {
+                                                                                webix.message('Не заполнены обязательные поля', 'error')
+                                                                            }
+
+                                                                            this.enable();
+                                                                        }
+                                                                    }
+                                                                ]
                                                             }
-                                                        })
-                                                    } else {
-                                                        webix.message('Не заполнены обязательные поля', 'error')
+                                                        ]
                                                     }
-
-                                                    this.enable();
-                                                }
-                                            }
+                                                ]
+                                            },
+                                            {}
                                         ]
-                                    }
+                                    },
                                 ]
                             }
-                        ]
-                    }
-                ]
+                        },
+                    ]
+                }
             },
+            {}
+
         ]
     })
 
