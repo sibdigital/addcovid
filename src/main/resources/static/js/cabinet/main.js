@@ -96,7 +96,113 @@ function setRequestsBadge(){
 }
 
 webix.ready(function () {
-    let layout = webix.ui({
+    let layout;
+    if(document.body.clientWidth < 760)
+    {
+        layout = webix.ui({
+        cols: [
+            {
+                rows: [
+                    {
+                        view: 'toolbar',
+                        id: 'toolbar',
+                        // padding: 5,
+                        height: 45,
+                        elements: [
+                            {
+                                align: 'left',
+                                cols: [
+                                    {
+                                        view: 'label',
+                                        width: 40,
+                                        template: "<img height='40px' width='40px' src = \"favicon.ico\">",
+                                    },
+                                    {
+                                        view: 'label',
+                                        label: `<span style="font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
+                                    },
+                                    {
+                                        view: 'template',
+                                        width: 50,
+                                        borderless: true,
+                                        template: "<div id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\" " +
+                                            "style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> ",
+                                    },
+                                ]
+                            },
+                        ]
+                    },
+                      {
+                        view: 'menu',
+                        id: 'menu',
+                        css: 'my_menubar',
+                        //collapsed: true,
+                        data: [
+                            {id: "CommonInfo", value: 'Общая информация', },
+                            {id: "Employees", value: 'Сотрудники',},
+                            {
+                                value: "<span class='mdi mdi-dots-horizontal'></span>",
+                                submenu: [
+                                    {id: "Documents", icon: "mdi mdi-cloud-upload-outline", value: 'Документы'},
+                                    {id: "Address", icon: "mdi mdi-home-city-outline", value: 'Фактические адреса'},
+                                    {id: "Prescript", icon: "mdi mdi-text-box-check-outline", value: 'Предписания'},
+                                    {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
+                                    {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
+                                    {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Контакты'},
+                                    {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
+                                ]
+                            }
+
+                        ],
+                        type: {
+                            css: 'my_menubar_item',
+                            height: 44
+                        },
+                        on: {
+                            onMenuItemClick: function (id) {
+                                let view;
+
+                                if (id == 'CommonInfo'){
+                                    view = commonInfo;
+                                }else if (id == 'Requests'){
+                                    view = requests;
+                                }else if (id == 'Employees'){
+                                    view = employees;
+                                }else if (id == 'Settings'){
+                                    view = settings;
+                                }else if (id == 'Documents'){
+                                    view = documents;
+                                }else if (id == 'Address'){
+                                    view = address;
+                                }else if (id == 'Prescript'){
+                                    view = prescript;
+                                }else if (id == 'News'){
+                                    view = news;
+                                }else if (id == 'Contacts'){
+                                    view = contacts;
+                                }
+                                if (view != null) {
+                                    webix.ui({
+                                        id: 'content',
+                                        rows: [
+                                            view
+                                        ]
+                                    }, $$('content'));
+                                }
+                            }
+                        }
+                    },
+                    {
+                        id: 'content'
+                    }
+                ],
+            }
+        ]
+    })
+    }
+    else{
+
+        layout = webix.ui({
         cols: [
             {
                 width: 230,
@@ -182,18 +288,6 @@ webix.ready(function () {
                         // padding: 5,
                         height: 45,
                         elements: [
-                            // {
-                            //     view: 'button',
-                            //     type: 'icon',
-                            //     icon: 'wxi-dots',
-                            //     // css: 'webix_primary',
-                            //     width: 37,
-                            //     click: function () {
-                            //         if ($$('menu').config.hidden)
-                            //             $$('menu').show();
-                            //         else $$('menu').hide();
-                            //     }
-                            // },
                             {
                                 align: 'left',
                                 cols: [
@@ -233,6 +327,7 @@ webix.ready(function () {
         ]
     })
 
+    }
     webix.event(window, "resize", function (event) {
         layout.define("width", document.body.clientWidth);
         layout.resize();

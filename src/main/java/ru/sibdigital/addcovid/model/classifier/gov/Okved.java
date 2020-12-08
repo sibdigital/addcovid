@@ -1,7 +1,9 @@
-package ru.sibdigital.addcovid.model;
+package ru.sibdigital.addcovid.model.classifier.gov;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -9,45 +11,28 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "okved", schema = "public")
-@TypeDef(name = "Ltree", typeClass = Ltree.class)
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
 public class Okved {
+
+    private UUID id;
+    private String classCode;
+    private String subclassCode;
+    private String groupCode;
+    private String subgroupCode;
+    private String kindCode;
+    private Short typeCode;
+    private String path;
+    private Short status;
+    private String kindName;
+    private String description;
+    private String version;
+    private Long idSerial;
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-    @Basic
-    @Column(name = "class_code")
-    private String classCode;
-    @Basic
-    @Column(name = "subclass_code")
-    private String subclassCode;
-    @Basic
-    @Column(name = "group_code")
-    private String groupCode;
-    @Basic
-    @Column(name = "subgroup_code")
-    private String subgroupCode;
-    @Basic
-    @Column(name = "kind_code")
-    private String kindCode;
-    @Basic
-    @Column(name = "type_code")
-    private Short typeCode;
-    @Basic
-    @Column(name = "path", columnDefinition = "ltree")
-    @Type(type = "Ltree")
-    private String path;
-    @Basic
-    @Column(name = "status")
-    private Short status;
-    @Basic
-    @Column(name = "kind_name")
-    private String kindName;
-    @Basic
-    @Column(name = "description")
-    private String description;
-
     public UUID getId() {
         return id;
     }
@@ -56,6 +41,8 @@ public class Okved {
         this.id = id;
     }
 
+    @Basic
+    @Column(name = "class_code")
     public String getClassCode() {
         return classCode;
     }
@@ -64,6 +51,8 @@ public class Okved {
         this.classCode = classCode;
     }
 
+    @Basic
+    @Column(name = "subclass_code")
     public String getSubclassCode() {
         return subclassCode;
     }
@@ -72,6 +61,8 @@ public class Okved {
         this.subclassCode = subclassCode;
     }
 
+    @Basic
+    @Column(name = "group_code")
     public String getGroupCode() {
         return groupCode;
     }
@@ -80,6 +71,8 @@ public class Okved {
         this.groupCode = groupCode;
     }
 
+    @Basic
+    @Column(name = "subgroup_code")
     public String getSubgroupCode() {
         return subgroupCode;
     }
@@ -88,6 +81,8 @@ public class Okved {
         this.subgroupCode = subgroupCode;
     }
 
+    @Basic
+    @Column(name = "kind_code")
     public String getKindCode() {
         return kindCode;
     }
@@ -96,6 +91,8 @@ public class Okved {
         this.kindCode = kindCode;
     }
 
+    @Basic
+    @Column(name = "type_code")
     public Short getTypeCode() {
         return typeCode;
     }
@@ -104,6 +101,9 @@ public class Okved {
         this.typeCode = typeCode;
     }
 
+    @Basic
+    @Column(name = "path", columnDefinition = "ltree")
+    @Type(type = "ru.sibdigital.addcovid.model.Ltree")
     public String getPath() {
         return path;
     }
@@ -112,6 +112,8 @@ public class Okved {
         this.path = path;
     }
 
+    @Basic
+    @Column(name = "status")
     public Short getStatus() {
         return status;
     }
@@ -120,6 +122,8 @@ public class Okved {
         this.status = status;
     }
 
+    @Basic
+    @Column(name = "kind_name")
     public String getKindName() {
         return kindName;
     }
@@ -128,12 +132,24 @@ public class Okved {
         this.kindName = kindName;
     }
 
+    @Basic
+    @Column(name = "description")
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Basic
+    @Column(name = "version")
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     @Override
@@ -150,11 +166,23 @@ public class Okved {
                 Objects.equals(path, okved.path) &&
                 Objects.equals(status, okved.status) &&
                 Objects.equals(kindName, okved.kindName) &&
-                Objects.equals(description, okved.description);
+                Objects.equals(description, okved.description) &&
+                Objects.equals(version, okved.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(classCode, subclassCode, groupCode, subgroupCode, kindCode, typeCode, path, status, kindName, description);
+        return Objects.hash(classCode, subclassCode, groupCode, subgroupCode, kindCode, typeCode, path, status, kindName, description, version);
+    }
+
+    @Column(name = "id_serial")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_okved_key")
+    @SequenceGenerator(name="seq_okved_key", sequenceName = "seq_okved_key", allocationSize=1)
+    public Long getIdSerial() {
+        return idSerial;
+    }
+
+    public void setIdSerial(Long idSerial) {
+        this.idSerial = idSerial;
     }
 }

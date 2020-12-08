@@ -42,6 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/upload", "/uploadpart", "/upload/protocol", "/download/*").permitAll() // TODO удалить, когда доступ нужно будет закрыть
                 .antMatchers("/login").permitAll()
                 .antMatchers("/favicon.ico","/logo.png").permitAll()
+                .antMatchers("/egrul", "/egrip").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -52,6 +53,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .deleteCookies("JSESSIONID");
+                .deleteCookies("JSESSIONID")
+                .and()
+                .sessionManagement()
+                .invalidSessionUrl("/login");
     }
 }

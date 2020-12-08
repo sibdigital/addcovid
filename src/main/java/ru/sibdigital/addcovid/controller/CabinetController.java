@@ -16,6 +16,7 @@ import ru.sibdigital.addcovid.dto.OrganizationContactDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.dto.PrincipalDto;
 import ru.sibdigital.addcovid.model.*;
+import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.RequestService;
 

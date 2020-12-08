@@ -83,7 +83,6 @@ const commonInfo = {
                                             view: 'list',
                                             layout: 'x',
                                             css:{'white-space':'normal !important;'},
-                                            scroll: false,
                                             height: 50,
                                             template: '#kindCode# - #kindName#',
                                             url: 'reg_organization_okved', //<span class="mdi mdi-close"></span>
