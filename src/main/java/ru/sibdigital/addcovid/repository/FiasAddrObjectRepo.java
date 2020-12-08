@@ -3,6 +3,7 @@ package ru.sibdigital.addcovid.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.sibdigital.addcovid.model.DocAddressFact;
 import ru.sibdigital.addcovid.model.FIASAddrObject;
@@ -38,16 +39,21 @@ public interface FiasAddrObjectRepo extends JpaRepository<FIASAddrObject, Long> 
             " order by fao.name")
     List<Map<String, Object>> findCities();
 
-    @Query(nativeQuery = true, value = "with sdr as (\n" +
-            "    select fao.objectid\n" +
-            "    from fias.adm_hierarchy_item as fao\n" +
-            "    where fao.parentobjid = :regionObjectId\n" +
+    @Query(nativeQuery = true, value = "with sd as (\n" +
+            "    select objectid\n" +
+            "    from fias.addr_object as fao\n" +
+            "    where fao.objectguid = :regionGuid\n" +
+            "),\n" +
+            "cit as (\n" +
+            "    select fahi.objectid\n" +
+            "    from fias.adm_hierarchy_item as fahi\n" +
+            "             inner join sd\n" +
+            "                        on (sd.objectid) = (fahi.parentobjid)\n" +
             ")\n" +
-            "select fao.id, fao.objectguid, fao.name as value\n" +
-            "from fias.addr_object as fao\n" +
-            "    inner join sdr\n" +
-            "        on (fao.objectid) = (sdr.objectid)")
-    List<Map<String, Object>> findCities(Long regionObjectId);
+            "select fao.id, fao.objectid, fao.name as value\n" +
+            "from fias.addr_object as fao inner join cit\n" +
+            "on (fao.objectid) = (cit.objectid)")
+    List<Map<String, Object>> findCities(@Param("regionGuid") String regionGuid);
 
     @Query(nativeQuery = true, value = "select * " +
             " from fias.addr_object where level = '5' and name = :name")

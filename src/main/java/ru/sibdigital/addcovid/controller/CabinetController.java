@@ -365,14 +365,14 @@ public class CabinetController {
 
     @GetMapping("/cities")
     public @ResponseBody List<Map<String, Object>> getCities(
-            @RequestParam(value = "objectid", required = false) String regionCode
+            @RequestParam(value = "objectid", required = false) String regionGuid
     ) {
         List<Map<String, Object>> result = null;
-        if (regionCode == null) {
+        if (regionGuid == null) {
             result = fiasAddrObjectRepo.findCities();
         } else {
 
-            result = fiasAddrObjectRepo.findCities(Long.parseLong(regionCode));
+            result = fiasAddrObjectRepo.findCities(regionGuid);
         }
 
         return result;
