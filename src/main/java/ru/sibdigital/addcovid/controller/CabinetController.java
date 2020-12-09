@@ -363,16 +363,30 @@ public class CabinetController {
         return result;
     }
 
-    @GetMapping("/cities")
-    public @ResponseBody List<Map<String, Object>> getCities(
-            @RequestParam(value = "objectid", required = false) String regionGuid
+    @GetMapping("/raions")
+    public @ResponseBody List<Map<String, Object>> getRaions(
+            @RequestParam(value = "objectid", required = false) Long objectId
     ) {
         List<Map<String, Object>> result = null;
-        if (regionGuid == null) {
-            result = fiasAddrObjectRepo.findCities();
-        } else {
+        if (objectId != null) {
+            result = fiasAddrObjectRepo.findRaions(objectId);
+            Map<String, Object> notSelect = new HashMap<>();
+            notSelect.put("value", (Object) "<Не выбрано>");
+            notSelect.put("typename", (Object) "");
+            result.add(0, notSelect);
+        }
 
-            result = fiasAddrObjectRepo.findCities(regionGuid);
+        return result;
+    }
+
+
+    @GetMapping("/cities")
+    public @ResponseBody List<Map<String, Object>> getCities(
+            @RequestParam(value = "objectid", required = false) Long objectId
+    ) {
+        List<Map<String, Object>> result = null;
+        if (objectId != null) {
+            result = fiasAddrObjectRepo.findCities(objectId);
         }
 
         return result;

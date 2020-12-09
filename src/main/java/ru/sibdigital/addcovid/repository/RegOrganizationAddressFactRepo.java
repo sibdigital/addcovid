@@ -24,14 +24,22 @@ public interface RegOrganizationAddressFactRepo extends JpaRepository<RegOrganiz
 
     @Modifying
     @Transactional
-    @Query(nativeQuery = true, value = "insert into reg_organization_address_fact (id_organization, id_request, is_deleted, time_create, fias_objectguid, fias_region_objectguid, fias_raion_objectguid, full_address, is_hand)\n" +
-            "VALUES (:id_organization, null, false, default, :fias_objectguid, :fias_region_objectguid, :fias_raion_objectguid, :full_address, false)")
+    @Query(nativeQuery = true, value = "insert into reg_organization_address_fact (id_organization, id_request, is_deleted, time_create, fias_region_objectid, fias_raion_objectid, fias_city_objectid,\n" +
+            "                                           fias_street_objectid, fias_house_objectid, \n" +
+            "                                           street_hand, house_hand, apartment_hand,\n" +
+            "                                           full_address, is_hand)\n" +
+            "            VALUES (:id_organization, null, false, default, :fias_region_objectid, :fias_raion_objectid, :fias_city_objectid, :fias_street_objectid, :fias_house_objectid, :street_hand, :house_hand, :apartment_hand, :full_address, false)")
     public void insertOrg(
             @Param("id_organization") Integer id_organization,
-            //Long id_request,
-            String fias_objectguid,
-            String fias_region_objectguid,
-            String fias_raion_objectguid,
+            Long fias_region_objectid,
+            Long fias_raion_objectid,
+            Long fias_city_objectid,
+            Long fias_street_objectid,
+            Long fias_house_objectid,
+            //Long fias_objectid,
+            String street_hand,
+            String house_hand,
+            String apartment_hand,
             String full_address
     );
 
