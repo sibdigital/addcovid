@@ -23,10 +23,16 @@ public class RegOrganizationAddressFact {
     private Integer organizationId;
     private boolean isDeleted = false;
     private Timestamp timeCreate;
-    private String fiasObjectGuid;
-    private String fiasRegionGuid;
-    private String fiasRaionGuid;
+    private Long fiasRegionObjectId;
+    private Long fiasRaionObjectId;
+    private Long fiasCityObjectId;
+    private Long fiasStreetObjectId;
+    private Long fiasHouseObjectId;
+    private Long fiasObjectId;
     private String fullAddress;
+    private String streetHand;
+    private String houseHand;
+    private String apartmentHand;
     private boolean isHand = false;
 
     @JoinColumn(name="id_request", referencedColumnName = "id", nullable = true)
@@ -63,33 +69,63 @@ public class RegOrganizationAddressFact {
     }
 
     @Basic
-    @Column(name = "fias_objectguid")
-    public String getFiasObjectGuid() {
-        return fiasObjectGuid;
+    @Column(name = "fias_objectid")
+    public Long getFiasObjectId() {
+        return fiasObjectId;
     }
 
-    public void setFiasObjectGuid(String fiasObjectGuid) {
-        this.fiasObjectGuid = fiasObjectGuid;
-    }
-
-    @Basic
-    @Column(name = "fias_region_objectguid")
-    public String getFiasRegionGuid() {
-        return fiasRegionGuid;
-    }
-
-    public void setFiasRegionGuid(String fiasRegionGuid) {
-        this.fiasRegionGuid = fiasRegionGuid;
+    public void setFiasObjectId(Long fiasObjectGuid) {
+        this.fiasObjectId = fiasObjectGuid;
     }
 
     @Basic
-    @Column(name = "fias_raion_objectguid")
-    public String getFiasRaionGuid() {
-        return fiasRaionGuid;
+    @Column(name = "fias_region_objectid")
+    public Long getFiasRegionObjectId() {
+        return fiasRegionObjectId;
     }
 
-    public void setFiasRaionGuid(String fiasRaionGuid) {
-        this.fiasRaionGuid = fiasRaionGuid;
+    public void setFiasRegionObjectId(Long fiasRegionObjectId) {
+        this.fiasRegionObjectId = fiasRegionObjectId;
+    }
+
+    @Basic
+    @Column(name = "fias_raion_objectid")
+    public Long getFiasRaionObjectId() {
+        return fiasRaionObjectId;
+    }
+
+    public void setFiasRaionObjectId(Long fiasRaionObjectId) {
+        this.fiasRaionObjectId = fiasRaionObjectId;
+    }
+
+    @Basic
+    @Column(name = "fias_city_objectid")
+    public Long getFiasCityObjectId() {
+        return fiasCityObjectId;
+    }
+
+    public void setFiasCityObjectId(Long fiasCityObjectId) {
+        this.fiasCityObjectId = fiasCityObjectId;
+    }
+
+    @Basic
+    @Column(name = "fias_street_objectid")
+    public Long getFiasStreetObjectId() {
+        return fiasStreetObjectId;
+    }
+
+    public void setFiasStreetObjectId(Long fiasStreetObjectId) {
+        this.fiasStreetObjectId = fiasStreetObjectId;
+    }
+
+    @Basic
+    @Column(name = "fias_house_objectid")
+    public Long getFiasHouseObjectId() {
+        return fiasHouseObjectId;
+    }
+
+    public void setFiasHouseObjectId(Long fiasHouseObjectId) {
+        this.fiasHouseObjectId = fiasHouseObjectId;
     }
 
     @Basic
@@ -110,6 +146,36 @@ public class RegOrganizationAddressFact {
 
     public void setHand(boolean hand) {
         isHand = hand;
+    }
+
+    @Basic
+    @Column(name = "street_hand")
+    public String getStreetHand() {
+        return streetHand;
+    }
+
+    public void setStreetHand(String streetHand) {
+        this.streetHand = streetHand;
+    }
+
+    @Basic
+    @Column(name = "house_hand")
+    public String getHouseHand() {
+        return houseHand;
+    }
+
+    public void setHouseHand(String houseHand) {
+        this.houseHand = houseHand;
+    }
+
+    @Basic
+    @Column(name = "apartment_hand")
+    public String getApartmentHand() {
+        return apartmentHand;
+    }
+
+    public void setApartmentHand(String apartmentHand) {
+        this.apartmentHand = apartmentHand;
     }
 
     @Basic
@@ -141,15 +207,19 @@ public class RegOrganizationAddressFact {
                 Objects.equals(docRequestAddressFact.getId(), that.docRequestAddressFact.getId()) &&
                 Objects.equals(timeCreate, that.timeCreate) &&
                 Objects.equals(isDeleted, that.isDeleted) &&
-                Objects.equals(fiasObjectGuid, that.fiasObjectGuid) &&
-                Objects.equals(fiasRaionGuid, that.fiasRaionGuid) &&
-                Objects.equals(fiasRegionGuid, that.fiasRegionGuid);
-
+                Objects.equals(fiasRegionObjectId, that.fiasRegionObjectId) &&
+                Objects.equals(fiasRaionObjectId, that.fiasRaionObjectId) &&
+                Objects.equals(fiasCityObjectId, that.fiasCityObjectId) &&
+                Objects.equals(fiasStreetObjectId, that.fiasStreetObjectId) &&
+                Objects.equals(fiasObjectId, that.fiasObjectId) &&
+                Objects.equals(houseHand, that.houseHand) &&
+                Objects.equals(streetHand, that.streetHand) &&
+                Objects.equals(apartmentHand, that.apartmentHand);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, isDeleted, isHand, timeCreate, fiasObjectGuid, fiasRegionGuid, fiasRaionGuid, fullAddress);
+        return Objects.hash(id, isDeleted, isHand, timeCreate, fiasRegionObjectId, fiasRaionObjectId, fiasCityObjectId, fiasStreetObjectId, fiasObjectId, houseHand, streetHand, apartmentHand);
     }
 
 

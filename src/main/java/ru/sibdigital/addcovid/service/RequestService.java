@@ -548,13 +548,31 @@ public class RequestService {
                 .docRequestAddressFact(null)
                 .isDeleted(false)
                 .timeCreate(new Timestamp(System.currentTimeMillis()))
-                .fiasObjectGuid(regOrganizationAddressFactToSave.getFiasObjectGuid())
-                .fiasRegionGuid(regOrganizationAddressFactToSave.getFiasRegionGuid())
-                .fiasRaionGuid(regOrganizationAddressFactToSave.getFiasRaionGuid())
+                .fiasRegionObjectId(regOrganizationAddressFactToSave.getFiasRegionObjectId())
+                .fiasRaionObjectId(regOrganizationAddressFactToSave.getFiasRaionObjectId())
+                .fiasCityObjectId(regOrganizationAddressFactToSave.getFiasCityObjectId())
+                .fiasStreetObjectId(regOrganizationAddressFactToSave.getFiasStreetObjectId())
+                .fiasHouseObjectId(regOrganizationAddressFactToSave.getFiasHouseObjectId())
                 .fullAddress(regOrganizationAddressFactToSave.getFullAddress())
                 .isHand(false)
+                .streetHand("")
+                .houseHand("")
+                .apartmentHand("")
                 .build();
-        regOrganizationAddressFactRepo.insertOrg(regOrgAddrSave.getOrganizationId(), regOrgAddrSave.getFiasObjectGuid(), regOrgAddrSave.getFiasRegionGuid(), regOrgAddrSave.getFiasRaionGuid(), regOrgAddrSave.getFullAddress());
+        //regOrganizationAddressFactRepo.save(regOrgAddrSave);
+        regOrganizationAddressFactRepo.insertOrg(
+                regOrgAddrSave.getOrganizationId(),
+                regOrgAddrSave.getFiasRegionObjectId(),
+                regOrgAddrSave.getFiasRaionObjectId(),
+                regOrgAddrSave.getFiasCityObjectId(),
+                regOrgAddrSave.getFiasStreetObjectId(),
+                regOrgAddrSave.getFiasHouseObjectId(),
+                //regOrgAddrSave.getFiasObjectId(),
+                regOrgAddrSave.getStreetHand(),
+                regOrgAddrSave.getHouseHand(),
+                regOrgAddrSave.getApartmentHand(),
+                regOrgAddrSave.getFullAddress()
+        );
         return regOrgAddrSave;
     }
 
