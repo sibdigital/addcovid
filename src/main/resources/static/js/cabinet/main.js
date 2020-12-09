@@ -78,7 +78,7 @@ function showDropDownMenu(span){
     if(span.offsetWidth < 100){
         UsercontextMenu.config.width = 190; UsercontextMenu.resize();
     }else{
-        UsercontextMenu.config.width = span.offsetWidth+80; UsercontextMenu.resize();
+        UsercontextMenu.config.width = span.offsetWidth+85; UsercontextMenu.resize();
     }
     let toolBarHeight = $$('toolbar').config.height - 5;
     UsercontextMenu.show({
@@ -205,20 +205,17 @@ webix.ready(function () {
         layout = webix.ui({
         cols: [
             {
-                width: 230,
+                width: 220,
                 id: 'menuRow',
                 rows: [
                     {
                         view: 'label',
-                        id: 'labelLK',
                         css: {
                             'background-color': '#565B67 !important',
                             'color': '#FFFFFF'
                         },
-                        align: 'center',
                         height: 46,
-                        label: `<div style="color: white; font-size: 18px; font-family: Roboto, 
-                                sans-serif; padding: 0 12px 0 10px;">Личный кабинет</div>`,
+                        label: `<img height='36px' width='36px' style="padding: 0 0 2px 2px" src = \"favicon.ico\"><span style="color: white; font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
                     },
                     {
                         view: 'menu',
@@ -244,11 +241,16 @@ webix.ready(function () {
                         on: {
                             onMenuItemClick: function (id) {
                                 let view;
-
+                                let itemValue;
+                                let requestsBadge = "";
                                 if (id == 'CommonInfo'){
                                     view = commonInfo;
                                 }else if (id == 'Requests'){
                                     view = requests;
+                                    let checkReqBadge =  this.getMenuItem(id).badge
+                                    if(checkReqBadge != null){
+                                        requestsBadge = "(" + checkReqBadge + ")";
+                                    }
                                 }else if (id == 'Employees'){
                                     view = employees;
                                 }else if (id == 'Settings'){
@@ -273,7 +275,15 @@ webix.ready(function () {
                                             view
                                         ]
                                     }, $$('content'));
+                                itemValue = this.getMenuItem(id).value
+                                $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" +itemValue + " " + requestsBadge + "</span>")
                                 }
+
+                                // webix.ajax("/check_session").then(function (data){
+                                //     if(data.text() == "Expired"){
+                                //         //webix.send("/logout")
+                                //     }
+                                // })
                             }
                         }
                     },
@@ -288,26 +298,13 @@ webix.ready(function () {
                         // padding: 5,
                         height: 45,
                         elements: [
+
                             {
+                                view: 'label',
+                                id: 'labelLK',
                                 align: 'left',
-                                cols: [
-                                    {
-                                        view: 'label',
-                                        width: 40,
-                                        template: "<img height='40px' width='40px' src = \"favicon.ico\">",
-                                        click: () => {
-                                            webix.html.addCss($$("menuRow").$view, "animated swing")
-                                            let menuSide = $$('menuRow');
-                                            if (menuSide.config.hidden) {
-                                                menuSide.show()
-                                            } else menuSide.hide();
-                                        }
-                                    },
-                                    {
-                                        view: 'label',
-                                        label: `<span style="font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
-                                    },
-                                ]
+                                css: {"padding-left":"5px"},
+                                label: 'Личный кабинет',
                             },
                             {
                                 view: 'template',

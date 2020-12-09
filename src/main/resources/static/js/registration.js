@@ -1,7 +1,6 @@
 let regLayout = webix.ui({
-    container: 'app',
     height: windowHeight,
-    css: {margin: 'auto'},
+    css: {"background-color":"#ccd7e6"},
     rows: [
         {
             gravity: 0.9,
@@ -22,7 +21,7 @@ let regLayout = webix.ui({
                                     padding: {
                                         top: 55, bottom: 25
                                     },
-                                    width: 350,
+                                    width: 400,
                                     css: {
                                         "background": "#475466 !important" //#2b334a
                                     },
@@ -48,16 +47,18 @@ let regLayout = webix.ui({
                                         },
                                         {
                                             view: "label",
+                                            id: "step",
                                             label: `<span style="font-size: 1rem; color: #fff6f6">Шаг 1</span>`,
                                             height: 50,
                                             align: "center"
                                         },
                                         {
-                                            view: "template",
-                                            css:{"background-color":"#475466", "text-align":"center"},
+                                            view: "label",
+                                            id: "description",
+                                            css:{"background-color":"#475466", "text-align":"center", "padding-left":"2px","padding-right":"2px"},
                                             borderless: true,
                                             template: `<span style="font-size: 0.8rem; color: #fff6f6">На шаге 1 Вам необходимо ввести ИНН Вашей организации. ИНН будет сверен с ЕГРЮЛ и ЕГРИП.</span>`,
-                                            height: 50,
+                                            height: 70,
                                             align: "center"
                                         },
                                     ]
@@ -70,8 +71,16 @@ let regLayout = webix.ui({
                                     width: 350,
                                     minWidth: 250,
                                     complexData: true,
+                                    rules:{
+                                      "passwordConfirm":function (value){
+                                          return value === $$("password").getValue()
+                                      }
+                                    },
                                     elements: [
                                         {},
+                                        {
+                                            id: "firstRow", rows:[]
+                                        },
                                         {
                                             view: 'multiview',
                                             id: 'wizard',
@@ -79,8 +88,10 @@ let regLayout = webix.ui({
                                                 {
                                                     rows: [
                                                         {
-                                                            view:"label",
-                                                            label:`<span style="font-size: 1.1rem; color: #6e6e6e">Введите ИНН Вашей организации</span>`
+                                                            view:"template",
+                                                            autoheight: true,
+                                                            borderless: true,
+                                                            template:`<span style="padding-left: 0; font-size: 1.1rem; font-weight: 500; color: #6e6e6e">Введите ИНН Вашей организации</span>`
                                                         },
                                                         {
                                                             view: 'text',
@@ -292,26 +303,31 @@ let regLayout = webix.ui({
                                                                     attributes: {autocomplete: 'new-password'},
                                                                 },
                                                                 {
-                                                                    view: 'template',
-                                                                    type: 'clean',
-                                                                    autoheight: true,
-                                                                    css: { 'color': 'red' },
-                                                                    template: 'После регистрации, на указанный адрес электронной почты, будет отправлено письмо со ссылкой на активацию учётной записи.'
-                                                                }
+                                                                    view: 'text',
+                                                                    id: 'passwordConfirm',
+                                                                    name: 'passwordConfirm',
+                                                                    type: 'password',
+                                                                    label: 'Пароль',
+                                                                    labelPosition: 'top',
+                                                                    required: true,
+                                                                    attributes: {autocomplete: 'new-password'},
+                                                                    invalidMessage: "Пароли не совпадают"
+                                                                },
                                                             ]
                                                         },
                                                         {
                                                             cols: [
                                                                 {
                                                                     view: 'button',
-                                                                    css: 'webix_primary',
+                                                                    css: 'myClass',
                                                                     value: 'Назад',
+                                                                    gravity: 0.5,
                                                                     click: back
                                                                 },
                                                                 {
                                                                     id: 'send_btn',
                                                                     view: 'button',
-                                                                    css: 'webix_primary',
+                                                                    css: 'myClass',
                                                                     value: 'Зарегистрироваться',
                                                                     align: 'center',
                                                                     click: function () {
@@ -489,18 +505,31 @@ function loadData(type, inn) {
 
 function back() {
     $$("wizard").back();
+    $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 1</span>`)
+    $$("description").setValue(`<span style="font-size: 0.8rem; color: #fff6f6">На шаге 1 Вам необходимо ввести ИНН Вашей организации. ИНН будет сверен с ЕГРЮЛ и ЕГРИП.</span>`)
 }
 
 function next(page) {
     $$("wizard").getChildViews()[page].show();
+    $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 2</span>`)
+    $$("description").setValue(`<span style="font-size: 0.8rem; color: #fff6f6">На шаге 2 Вам необходимо ввести Адрес электронной почты Вашей организации и пароль. После регистрации, на указанный адрес электронной почты, будет отправлено письмо со ссылкой на активацию учётной записи.</span>`)
 }
 
 webix.ready(function() {
+    let clientScreenWidth = document.body.clientWidth;
+    if (clientScreenWidth < 760) {
+        $$("leftLayout").hide();
+        $$("form").config.width = clientScreenWidth - 40;
+        $$("firstRow").addView($$("logo"),0);
+        // $$("firstRow").addView($$("step"),-1);
+        // $$("firstRow").addView($$("description"),-1);
+        $$("form").adjust();
+        $$("form").resize();
+    }
     //if (EGRUL_ADDRESS) {
         webix.extend($$('searchInn'), webix.ProgressBar);
         $$('egrul_search').show();
     //}
-
     if (document.body.clientWidth < 480){
         regLayout.config.width = document.body.clientWidth; regLayout.resize();
         $$("organizationName").config.label = "Наим. орг./ФИО ИП"; $$("organizationName").refresh();
