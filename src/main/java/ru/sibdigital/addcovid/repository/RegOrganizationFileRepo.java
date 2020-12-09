@@ -16,4 +16,9 @@ public interface RegOrganizationFileRepo extends JpaRepository<RegOrganizationFi
             "from RegOrganizationFile rof " +
             "where rof.clsOrganizationByIdOrganization = :organization and rof.deleted = false")
     List<RegOrganizationFile> findRegOrganizationFileByOrganization(ClsOrganization organization);
+
+    @Query("select rof " +
+            "from RegOrganizationFile rof " +
+            "where rof.clsOrganizationByIdOrganization = :organization and rof.deleted = false and rof.hash = :hash")
+    List<RegOrganizationFile> findRegOrganizationFileByOrganizationAndHash(ClsOrganization organization, String hash);
 }
