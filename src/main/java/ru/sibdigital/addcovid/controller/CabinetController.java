@@ -16,6 +16,7 @@ import ru.sibdigital.addcovid.dto.OrganizationContactDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.dto.PrincipalDto;
 import ru.sibdigital.addcovid.model.*;
+import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.RequestService;
 
@@ -454,9 +455,9 @@ public class CabinetController {
             if (postFormDto.getIsAgree() == false) {
                 errors += "Необходимо подтвердить согласие работников на обработку персональных данных\n";
             }
-            if (postFormDto.getIsProtect() == false) {
-                errors += "Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия\n";
-            }
+//            if (postFormDto.getIsProtect() == false) {
+//                errors += "Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия\n";
+//            }
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
             errors += "Неправильно заполнены необходимые поля\n";

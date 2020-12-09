@@ -271,7 +271,7 @@ function showRequestWizard(data) {
                                                                     required: true,
                                                                     on: {
                                                                         onChange(newv, oldv) {
-                                                                            if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1) {
+                                                                            if ($$('isAgree').getValue() == 1) {
                                                                                 $$('send_btn').enable();
                                                                             } else {
                                                                                 $$('send_btn').disable();
@@ -282,41 +282,8 @@ function showRequestWizard(data) {
                                                             ]
                                                         },
                                                         {
-                                                            view: 'template',
-                                                            id: 'prescription',
-                                                            height: 550,
-                                                            readonly: true,
-                                                            scroll: true,
-                                                            template: ''
-                                                        },
-                                                        {
-                                                            rows:
-                                                                [
-                                                                    {
-                                                                        view: 'template',
-                                                                        borderless: true,
-                                                                        css: 'personalTemplateStyle',
-                                                                        template: 'Подтверждаю обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия <span style = "color: red">*</span>',
-                                                                        autoheight: true
-                                                                    },
-                                                                    {
-                                                                        view: 'checkbox',
-                                                                        name: 'isProtect',
-                                                                        id: 'isProtect',
-                                                                        labelPosition: 'top',
-                                                                        invalidMessage: 'Поле не может быть пустым',
-                                                                        required: true,
-                                                                        on: {
-                                                                            onChange(newv, oldv) {
-                                                                                if ($$('isAgree').getValue() == 1 && $$('isProtect').getValue() == 1) {
-                                                                                    $$('send_btn').enable();
-                                                                                } else {
-                                                                                    $$('send_btn').disable();
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                ]
+                                                            id: 'prescriptions',
+                                                            rows: []
                                                         },
                                                         {
                                                             view: 'template',
@@ -365,10 +332,6 @@ function showRequestWizard(data) {
 
                                                                             if (params.isAgree != 1) {
                                                                                 webix.message('Необходимо подтвердить согласие работников на обработку персональных данных', 'error')
-                                                                                return false
-                                                                            }
-                                                                            if (params.isProtect != 1) {
-                                                                                webix.message('Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия', 'error')
                                                                                 return false
                                                                             }
 
@@ -439,8 +402,21 @@ function showRequestWizard(data) {
 
         let typeRequest = data.json();
 
-        $$('prescription').setHTML(typeRequest.prescription);
         $$('consent').setHTML(typeRequest.consent);
+
+        if (typeRequest.regTypeRequestPrescriptions && typeRequest.regTypeRequestPrescriptions.length > 0) {
+            typeRequest.regTypeRequestPrescriptions.forEach(prescription => {
+                console.log(prescription)
+                $$('prescriptions').addView({
+                    view: 'template',
+                    id: 'prescription' + prescription.id,
+                    height: 550,
+                    readonly: true,
+                    scroll: true,
+                    template: prescription.content
+                });
+            })
+        }
 
         if (typeRequest.settings) {
             const settings = JSON.parse(typeRequest.settings, function (key, value) {

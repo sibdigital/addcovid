@@ -3,15 +3,17 @@ const contacts = {
     scroll: 'xy',
     body: {
         type: 'space',
+        id: 'contactsMainLayout',
         rows: [
             {
                 type: 'wide',
+                responsive: 'contactsMainLayout',
                 cols: [
                     {
                         view: "dataview",
                         id: "contact_grid",
+                        minWidth: 320,
                         css: 'contacts',
-                        scroll: false,
                         select: 1,
                         url: "org_contacts",
                         xCount: 3,
@@ -41,6 +43,7 @@ const contacts = {
                         gravity: 0.4,
                         view: 'form',
                         id: 'contact_form',
+                        minWidth: 200,
                         complexData: true,
                         rules: {
                             "contactPerson": webix.rules.isNotEmpty,

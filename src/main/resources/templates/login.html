@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="/libs/webix.min.css" type="text/css">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/cabinet/cabinet.css}">
     <script src="/libs/webix.min.js" type="text/javascript"></script>
     <title th:utext="${application_name}"></title>
 
@@ -21,8 +23,6 @@
     if (window.location.pathname + window.location.search === "/login?error=true") {
         webix.message("Введен неверный логин или пароль", "error")
     }
-
-    webix.html.addStyle(".myClass .webix_button{  background: #475466; color: #FFFFFF;} .myClass .webix_button:hover {background-color: #586980;} .myClass .webix_button:focus {background-color: #586980;}");
 
     webix.ui(
         {

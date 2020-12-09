@@ -17,8 +17,8 @@ import ru.sibdigital.addcovid.service.RequestService;
 @Controller
 public class RegistrationController {
 
-    @Value("${egrul.address}")
-    private String egrulAddress;
+//    @Value("${egrul.address}")
+//    private String egrulAddress;
 
     @Autowired
     private RequestService requestService;
@@ -32,9 +32,9 @@ public class RegistrationController {
     @GetMapping("/registration")
     public String registration(Model model) {
         model.addAttribute("application_name", applicationConstants.getApplicationName());
-        if (egrulAddress != null && !egrulAddress.isBlank()) {
-            model.addAttribute("egrul_address", egrulAddress);
-        }
+//        if (egrulAddress != null && !egrulAddress.isBlank()) {
+//            model.addAttribute("egrul_address", egrulAddress);
+//        }
         return "registration";
     }
 

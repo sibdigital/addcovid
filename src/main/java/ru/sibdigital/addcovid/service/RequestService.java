@@ -14,7 +14,9 @@ import ru.sibdigital.addcovid.dto.OrganizationContactDto;
 import ru.sibdigital.addcovid.dto.OrganizationDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.*;
+import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 import ru.sibdigital.addcovid.repository.*;
+import ru.sibdigital.addcovid.repository.classifier.gov.OkvedRepo;
 import ru.sibdigital.addcovid.utils.PasswordGenerator;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
