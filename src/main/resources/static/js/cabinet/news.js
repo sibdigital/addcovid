@@ -4,48 +4,16 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
     "a{\n" +
     "\n" +
     "   text-decoration: none;\n" +
-    "   color: #222;" +
+    "   color: #000000;" +
     "   }" +
     "a:hover{\n" +
     "\n" +
-    // "   cursor: pointer;\n" +
     "   color: #0056b3; \n" +
     "   }" +
     ".item{\n" +
     "\n" +
     "    margin:10px 5px;\n" +
     "    padding:10px 10px;\n" +
-    "  }" +
-    ".item_wrap{\n" +
-    "\n" +
-    "    min-height: 50px;\n" +
-    "    position: relative;\n" +
-    "    padding: 0 25px;\n" +
-    "  }" +
-    ".l-col-center{\n" +
-    "\n" +
-    "    max-width: 680px;\n" +
-    "    margin: 0 auto;\n" +
-    "  }" +
-    ".item_bottom{\n" +
-    "\n" +
-    "    position: absolute;\n" +
-    "    bottom: -5px;\n" +
-    "    left: 25px;\n" +
-    "    right: 25px;\n" +
-    "    font-size: 0;\n" +
-    "    white-space: nowrap;\n" +
-    "  }" +
-    ".item_category{\n" +
-    "\n" +
-    "    font-size: 10px;\n" +
-    "    line-height: 18px;\n" +
-    "    color: #999;\n" +
-    "    white-space: normal;\n" +
-    "  }" +
-    ".item_link{\n" +
-    "\n" +
-    "    display: block;\n" +
     "  }" +
     ".item_title{\n" +
     "\n" +
@@ -69,20 +37,9 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
     "    margin:10px 5px;\n" +
     "    padding:10px;\n" +
     "  }" +
-    ".custom_item{\n" +
+    ".class_border{\n" +
     "\n" +
-    // "    border:1px solid #DADEE0;\n" +
-    "    white-space: normal;\n" +
-    "    margin:10px 5px;\n" +
-    "    margin:10px 5px;\n" +
-    "    padding:10px;\n" +
-    "  }" +
-    ".old_custom_item{\n" +
-    "\n" +
-    // "    border:1px solid #DADEE0;\n" +
-    "    margin:10px 5px;\n" +
-    "    margin:10px 5px;\n" +
-    "    padding:10px;\n" +
+    "    border:1px solid #c3c5c9;\n" +
     "  }");
 
 var newsfeed_url = 'newsfeed'
@@ -169,17 +126,20 @@ const news = {
 
                             // htmlcode = htmlcode + "<div style='text-align:right;'>Дата публикации: " + startTimeString + "</div></div>"
 
-                            return "<span class = 'item_big_title'>" +
-                                    "<a href = \"news\\" + obj.id + "\" style='text-decoration: none; color: #000000'>" +
-                                        obj.heading +
-                                    "</a>" +
-                                    "</span>"+
-                                    "<div class='item'>" +
-                                        obj.message +
-                                    "</div>"+
-                                    "<span class = 'item_label'>" +
-                                    "Дата публикации: "+ startTimeString +
-                                    "</span>"
+                            return "<div class = 'class_border'>" +
+                                    "<span class = 'item_big_title'>" +
+                                            "<a href = \"news\\" + obj.id + "\" style='text-decoration: none;'>" +
+                                                obj.heading +
+                                            "</a>" +
+                                            "</span>"+
+                                            "<div class='item'>" +
+                                                obj.message +
+                                            "</div>"+
+                                            "<span class = 'item_label'>" +
+                                            "Дата публикации: "+ startTimeString +
+                                            "</span>" +
+                                    "</div>"
+
                         },
                         xCount: 1,
                         type: {
@@ -212,7 +172,7 @@ const news = {
                                     let startTimeString = dd+ "." + mm + "." + startTime.getFullYear()
 
                                     return "<span class = 'item_title'>" +
-                                                "<a href = \"news\\" + obj.id + "\" style='text-decoration: none; color: #000000'>" +
+                                                "<a href = \"news\\" + obj.id + "\" style='text-decoration: none;'>" +
                                                     obj.heading +
                                                 "</a>" +
                                             "</span>"+
