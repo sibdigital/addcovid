@@ -20,16 +20,10 @@ const requests = {
                         columns: [
                             {
                                 id: "typeRequest",
-                                header: "Тип заявки",
+                                header: "Предписание",
                                 template: "#typeRequest.activityKind#",
                                 minWidth: 350,
                                 fillspace: true
-                            },
-                            {
-                                id: "time_Create",
-                                header: "Дата подачи",
-                                adjust: true,
-                                format: dateFormat,
                             },
                             {
                                 id: "status",
@@ -38,9 +32,12 @@ const requests = {
                                 adjust: true,
                                 width: 300
                             },
-                            {id: "personSlrySaveCnt", header: "Числ. с сохр. зп", minWidth: 160, fillspace: true},
-                            {id: "personOfficeCnt", header: "Числ. работающих", minWidth: 160, fillspace: true},
-                            {id: "personRemoteCnt", header: "Числе. удал. режим", minWidth: 160, fillspace: true},
+                            {
+                                id: "time_Create",
+                                header: "Дата подачи",
+                                adjust: true,
+                                format: dateFormat,
+                            },
                         ],
                         scheme: {
                             $init: function (obj) {
@@ -417,7 +414,7 @@ function showRequestWizard(data) {
 
     webix.ajax('cls_type_request/' + data.typeRequest.id).then(function (data) {
 
-        let typeRequest = data.json();
+        const typeRequest = data.json();
 
         $$('consent').setHTML(typeRequest.consent);
 
@@ -1469,16 +1466,6 @@ function showRequestViewForm(data) {
                             complexData: true,
                             data: data,
                             elements: [
-                                {
-                                    view: 'text',
-                                    id: 'activityKind',
-                                    autoheight: true,
-                                    // align: 'center',
-                                    label: 'Тип заявки',
-                                    labelPosition: 'top',
-                                    name: 'typeRequest.activityKind',
-                                    readonly: true
-                                },
                                 view_section('Рассмотрение заявки'),
                                 {
                                     view: 'checkbox',
@@ -1486,13 +1473,6 @@ function showRequestViewForm(data) {
                                     labelPosition: 'top',
                                     readonly: true,
                                     labelRight: 'Подтверждено согласие работников на обработку персональных данных',
-                                },
-                                {
-                                    view: 'checkbox',
-                                    name: 'protect',
-                                    labelPosition: 'top',
-                                    readonly: true,
-                                    labelRight: 'Подтверждено обязательное выполнение требований по защите от COVID-19',
                                 },
                                 {
                                     view: 'text',
@@ -1508,134 +1488,33 @@ function showRequestViewForm(data) {
                                     name: 'rejectComment',
                                     label: 'Обоснование принятия или отказа',
                                     labelPosition: 'top',
+                                    hidden: true,
                                     height: 100
                                 },
-                                view_section('Обоснование заявки'),
+                                view_section('Информация о предписании'),
                                 {
-                                    rows: [
-                                        {
-                                            view: 'textarea',
-                                            height: 150,
-                                            label: 'Обоснование заявки',
-                                            name: 'reqBasis',
-                                            readonly: true,
-                                            labelPosition: 'top'
-                                        },
-                                        {
-                                            cols: [
-                                                {
-                                                    id: 'filename_label',
-                                                    view: "label",
-                                                    label: 'Вложенный файл:',
-                                                    width: 150
-                                                },
-                                                {
-                                                    paddingLeft: 10,
-                                                    view: 'list',
-                                                    //height: 100,
-                                                    autoheight: true,
-                                                    select: false,
-                                                    template: '#value#',
-                                                    label: '',
-                                                    name: 'attachmentFilename',
-                                                    borderless: true,
-                                                    data: [],
-                                                    id: 'filename'
-                                                }
-                                            ]
-                                        },
-                                    ]
-                                },
-                                view_section('Адресная информация'),
-                                {
-                                    view: 'datatable',
-                                    name: 'addressFact',
-                                    label: '',
+                                    view: 'text',
+                                    id: 'activityKind',
+                                    autoheight: true,
+                                    // align: 'center',
+                                    label: 'Наименование предписания',
                                     labelPosition: 'top',
-                                    height: 200,
-                                    select: 'row',
-                                    editable: true,
-                                    id: 'addr_table',
-                                    resizeColumn: true,
-                                    readonly: true,
-                                    // resizeRow:true,
-                                    fixedRowHeight: false,
-                                    rowLineHeight: 25,
-                                    rowHeight: 25,
-                                    //autowidth:true,
-                                    columns: [
-                                        {
-                                            id: 'addressFact',
-                                            header: 'Фактический адрес осуществления деятельности',
-                                            fillspace: 5
-                                        },
-                                        {
-                                            id: 'personOfficeFactCnt',
-                                            header: 'Числ. работающих',
-                                            fillspace: 1
-                                        }
-                                    ],
-                                    url: 'doc_address_fact/' + data.id
+                                    name: 'typeRequest.activityKind',
+                                    readonly: true
                                 },
-                                view_section('Данные о численности работников'),
                                 {
-                                    type: 'space',
-                                    rows: [
-                                        // {
-                                        //     view: 'text',
-                                        //     name: 'personSlrySaveCnt',
-                                        //     label: 'Суммарная численность работников, в отношении которых установлен режим работы нерабочего дня с сохранением заработной платы',
-                                        //     labelPosition: 'top',
-                                        //     validate: function (val) {
-                                        //         return !isNaN(val * 1);
-                                        //     },
-                                        //     invalidMessage: 'Поле не может быть пустым',
-                                        //     readonly: true
-                                        // },
-                                        {
-                                            view: 'text',
-                                            name: 'personRemoteCnt',
-                                            label: 'Суммарная численность работников, подлежащих переводу на дистанционный режим работы',
-                                            readonly: true,
-                                            labelPosition: 'top'
-                                        },
-                                        {
-                                            view: 'text',
-                                            name: 'personOfficeCnt',
-                                            label: 'Суммарная численность работников, не подлежащих переводу на дистанционный режим работы (посещающие рабочие места)',
-                                            labelPosition: 'top',
-                                            readonly: true
-                                        },
-                                    ]
+                                    view: 'text',
+                                    id: 'restrictionType',
+                                    autoheight: true,
+                                    // align: 'center',
+                                    label: 'Тип ограничения',
+                                    labelPosition: 'top',
+                                    readonly: true
                                 },
-                                view_section('Данные о работниках, чья деятельность предусматривает выход на работу'),
                                 {
-                                    id: 'person_table',
-                                    view: 'datatable',
-                                    height: 600,
-                                    name: 'persons',
-                                    select: 'row',
-                                    resizeColumn: true,
-                                    readonly: true,
-                                    columns: [
-                                        {
-                                            id: 'lastname',
-                                            header: 'Фамилия',
-                                            adjust: true,
-                                            sort: 'string',
-                                            fillspace: true
-                                        },
-                                        {
-                                            id: 'firstname',
-                                            header: 'Имя',
-                                            adjust: true,
-                                            sort: 'string',
-                                            fillspace: true
-                                        },
-                                        {id: 'patronymic', header: 'Отчество', adjust: true, sort: 'string'},
-                                    ],
-                                    url: '/doc_persons/' + data.id
-                                }
+                                    id: 'prescriptions',
+                                    rows: []
+                                },
                             ]
                         }
                     ]
@@ -1644,31 +1523,79 @@ function showRequestViewForm(data) {
         ]
     }, $$('content'));
 
-    let paths = data.attachmentPath.split(',')
+    const typeRequest = data.typeRequest;
 
-    let fileList = []
-    paths.forEach((path, index) => {
-        let filename = path.split('\\').pop().split('/').pop()
-        if (filename != '' &&
-            ((filename.toUpperCase().indexOf('.PDF') != -1) ||
-                (filename.toUpperCase().indexOf('.ZIP') != -1)
-            )) {
-            filename = '<a href="' + LINK_PREFIX + filename + LINK_SUFFIX + '" target="_blank">'
-                + filename + '</a>'
-            fileList.push({id: index, value: filename})
-        }
-    })
-    if (fileList.length > 0) {
-        $$('filename').parse(fileList)
-    } else {
-        $$('filename_label').hide()
-        $$('filename').hide()
+    if (typeRequest.regTypeRequestRestrictionTypes && typeRequest.regTypeRequestRestrictionTypes.length > 0) {
+        $$('restrictionType').setValue(typeRequest.regTypeRequestRestrictionTypes[0].regTypeRequestRestrictionTypeId.clsRestrictionType.name);
     }
 
-    if (data.statusReview === 0) {
-        $$('reject_comment').hide()
-    } else if (data.statusReview === 1) {
-        $$('reject_comment').hide()
+    if (typeRequest.regTypeRequestPrescriptions && typeRequest.regTypeRequestPrescriptions.length > 0) {
+        typeRequest.regTypeRequestPrescriptions.forEach((prescription, index) => {
+            const files = [];
+            if (prescription.regTypeRequestPrescriptionFiles && prescription.regTypeRequestPrescriptionFiles.length > 0) {
+                prescription.regTypeRequestPrescriptionFiles.forEach((file) => {
+                    const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
+                        + file.originalFileName + '</a>'
+                    files.push({id: file.id, value: filename})
+                })
+            }
+            let consentPrescriptionChecked = false;
+            if (data.additionalAttributes && data.additionalAttributes.consentPrescriptions) {
+                consentPrescriptionChecked = data.additionalAttributes.consentPrescriptions.find(c => c.id == prescription.id).isAgree;
+            }
+            $$('prescriptions').addView({
+                rows: [
+                    {
+                        cols: [
+                            {
+                                view: 'label',
+                                label: 'Предписание ' + (index + 1),
+                                align: 'center'
+                            },
+                        ]
+                    },
+                    {
+                        view: 'template',
+                        height: 550,
+                        readonly: true,
+                        scroll: true,
+                        template: prescription.content
+                    },
+                    {
+                        view: 'list',
+                        autoheight: true,
+                        template: '#value#',
+                        data: files,
+                    },
+                    {
+                        view: 'checkbox',
+                        name: 'agree',
+                        labelPosition: 'top',
+                        readonly: true,
+                        labelRight: 'Подтверждено обязательное выполнение предписания',
+                        value: consentPrescriptionChecked
+                    },
+                ]
+            });
+        })
+    }
+
+    if (typeRequest.settings) {
+        const settings = JSON.parse(typeRequest.settings, function (key, value) {
+            if (value === 'webix.rules.isChecked') {
+                return webix.rules.isChecked;
+            }
+            return value;
+        });
+        if (settings.fields) {
+            settings.fields.forEach(field => {
+                $$('form').addView(field.ui, field.pos);
+            })
+        }
+    }
+
+    if (data.statusReview === 1 || data.statusReview === 2) {
+        $$('reject_comment').show();
     }
 }
 
