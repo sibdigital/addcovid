@@ -1,20 +1,20 @@
 webix.i18n.setLocale("ru-RU");
 
 webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
-    "a[href]{\n" +
-    "\n" +
-    "   cursor: pointer;\n" +
-    "   outline: 0;" +
-    "   }" +
     "a{\n" +
     "\n" +
     "   text-decoration: none;\n" +
     "   color: #222;" +
     "   }" +
+    "a:hover{\n" +
+    "\n" +
+    // "   cursor: pointer;\n" +
+    "   color: #0056b3; \n" +
+    "   }" +
     ".item{\n" +
     "\n" +
-    "    padding:20px 0 25px;\n" +
-    "    border-bottom: 1px solid #ddd;\n" +
+    "    margin:10px 5px;\n" +
+    "    padding:10px 10px;\n" +
     "  }" +
     ".item_wrap{\n" +
     "\n" +
@@ -51,8 +51,23 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
     "\n" +
     "    font:bold 14px/16px GraphikCy-Semibold;\n" +
     "    display: block;\n" +
-    // "    margin:10px 5px;\n" +
-    // "    padding:10px;\n" +
+    "    margin:10px 5px;\n" +
+    "    padding:10px;\n" +
+    "  }" +
+    ".item_big_title{\n" +
+    "\n" +
+    "    font:bold 24px/26px GraphikCy-Semibold;\n" +
+    "    display: block;\n" +
+    "    margin:10px 5px;\n" +
+    "    padding:10px;\n" +
+    "  }" +
+    ".item_label{\n" +
+    "\n" +
+    "    font:bold 12px/14px GraphikCy-Semibold;\n" +
+    "    text-align:right;\n" +
+    "    display: block;\n" +
+    "    margin:10px 5px;\n" +
+    "    padding:10px;\n" +
     "  }" +
     ".custom_item{\n" +
     "\n" +
@@ -125,124 +140,102 @@ webix.proxy.idata = {
     }
 };
 
-const newsArchive = {
-    view: 'scrollview',
-    scroll: 'xy',
-    id: 'newsArchiveId',
-    body: {
-        rows: [
-            {
-                view: "toolbar",
-                id: "newsToolbar",
-                cols: [
-                    {},
-                    {
-                        view: "button",
-                        type: "icon",
-                        icon: "mdi mdi-undo",
-                        label: "Назад к новостям",
-                        align: "right",
-                        maxWidth: 200,
-                        click: function () {
-                            webix.ui(news, $$('newsArchiveId'));
-                        },
-                    },
-                ]
-            },
-            {
-                view: "dataview",
-                id: "newsDataview",
-                margin: 20, paddingX: 10,
-                scroll: 'y',
-                template: function (obj) {
-                    var htmlcode = ""
-                    if (Date.parse(obj.endTime) < Date.now())
-                        htmlcode = htmlcode + "<div item_id='id' class='old_custom_item'>"
-                    else
-                        htmlcode = htmlcode + "<div item_id='id' class='custom_item'>"
-                    htmlcode = htmlcode + "<h3 style=\"color: #2e6c80;\"><a href = \"news\\" + obj.id + "\">" + obj.heading + "</a></h3>" + obj.message
-                    let startTime = new Date(Date.parse(obj.startTime))
-                    let startTimeString = startTime.getDay() + "." + startTime.getMonth() + "." + startTime.getFullYear()
-                    htmlcode = htmlcode + "<div style='text-align:right;'>Дата публикации: " + startTimeString + "</div></div>"
-
-                    return htmlcode
-                },
-                xCount: 1,
-                type: {
-                    // Если height поставить auto,
-                    // то скроллинг с динамической загрузкой новостей не будет работать
-                    height: 200,
-                    width: "auto",
-                    float: "right"
-                },
-                datafetch: 10,
-                url: 'idata->' + news_archive_url,
-            },
-        ],
-    }
-};
 
 const news = {
     view: 'scrollview',
     scroll: 'xy',
-    id: 'newsId',
     body: {
+        type: 'space',
+        id: 'contactsMainLayout',
         rows: [
             {
-                view: "toolbar",
-                id: "newsToolbar",
+                type: 'wide',
+                responsive: 'contactsMainLayout',
                 cols: [
-                    {},
                     {
-                        view: "button",
-                        type: "icon",
-                        icon: "mdi mdi-newspaper",
-                        label: "Архив новостей",
-                        align: "right",
-                        maxWidth: 150,
-                        click: function () {
-                            webix.ui(newsArchive, $$('newsId'));
+                        view: "dataview",
+                        id: "newsDataview",
+                        margin: 20, paddingX: 10,
+                        scroll: 'y',
+                        template: function (obj) {
+                            // var htmlcode = "<div>" + "<h3 style=\"color: #2e6c80;\"><a href = \"news\\" + obj.id + "\">" + obj.heading + "</a></h3>" + obj.message
+
+                            let startTime = new Date(Date.parse(obj.startTime))
+                            var dd = startTime.getDate();
+                            if (dd < 10) dd = '0' + dd;
+                            var mm = startTime.getMonth() + 1; // месяц 1-12
+                            if (mm < 10) mm = '0' + mm;
+                            let startTimeString = dd+ "." + mm + "." + startTime.getFullYear()
+
+                            // htmlcode = htmlcode + "<div style='text-align:right;'>Дата публикации: " + startTimeString + "</div></div>"
+
+                            return "<span class = 'item_big_title'>" +
+                                    "<a href = \"news\\" + obj.id + "\" style='text-decoration: none; color: #000000'>" +
+                                        obj.heading +
+                                    "</a>" +
+                                    "</span>"+
+                                    "<div class='item'>" +
+                                        obj.message +
+                                    "</div>"+
+                                    "<span class = 'item_label'>" +
+                                    "Дата публикации: "+ startTimeString +
+                                    "</span>"
                         },
+                        xCount: 1,
+                        type: {
+                            height: "auto",
+                            width: "auto",
+                            float: "right"
+                        },
+                        url: newsfeed_url,
+                    },
+                    {   gravity: 0.3,
+                        rows:
+                        [
+                            {
+                                view: 'template',
+                                type: 'section',
+                                template: 'Архив новостей'
+                            },
+                            {
+                                view: "dataview",
+                                id: "newsDataview",
+                                margin: 20, paddingX: 10,
+                                scroll: 'y',
+                                template: function (obj) {
+
+                                    let startTime = new Date(Date.parse(obj.startTime))
+                                    var dd = startTime.getDate();
+                                    if (dd < 10) dd = '0' + dd;
+                                    var mm = startTime.getMonth() + 1; // месяц 1-12
+                                    if (mm < 10) mm = '0' + mm;
+                                    let startTimeString = dd+ "." + mm + "." + startTime.getFullYear()
+
+                                    return "<span class = 'item_title'>" +
+                                                "<a href = \"news\\" + obj.id + "\" style='text-decoration: none; color: #000000'>" +
+                                                    obj.heading +
+                                                "</a>" +
+                                            "</span>"+
+                                            "<span class = 'item_label'>" +
+                                                "Дата публикации: "+ startTimeString +
+                                            "</span>"
+                                },
+                                xCount: 1,
+                                type: {
+                                    // Если height поставить auto,
+                                    // то скроллинг с динамической загрузкой новостей не будет работать
+                                    height: 100,
+                                    width: "auto",
+                                    float: "right"
+                                },
+                                datafetch: 10,
+                                url: 'idata->' + news_archive_url,
+                            },
+                        ]
                     }
+
                 ]
-            },
-            {
-                view: "dataview",
-                id: "newsDataview",
-                margin: 20, paddingX: 10,
-                scroll: 'y',
-                template: function (obj) {
-                    var heading = "<span class = 'item_title rm-cm-item-text'> <a href = \"news\\" + obj.id + "\" style='text-decoration: none; color: #000000'>" + obj.heading + "</a></span>"
-
-                    // htmlcode = htmlcode + "<h3><a href = \"news\\" + obj.id + "\" style='text-decoration: none; color: #000000'>" + obj.heading + "</a></h3>" + obj.message
-                    let startTime = new Date(Date.parse(obj.startTime))
-                    let startTimeString = startTime.getDay() + "." + startTime.getMonth() + "." + startTime.getFullYear()
-                    var publicationDate = "Дата публикации: " + startTimeString
-
-                    var htmlcode =
-                        "<div class='item'>" +
-                            "<div class='item_wrap'>" +
-                                "<div class='item_bottom'>" +
-                                    "<span class='item_category'>" + publicationDate +
-                                    "</span>" +
-                                "</div>" +
-                                "<a href = \"news\\" + obj.id + "\" class='item-link'>"+
-                                    "<span class='item_title'>" + obj.heading+
-                                    "</span>" +
-                                "</a>" +
-                            "</div>" +
-                        "</div>"
-
-                    return htmlcode
-                },
-                xCount: 1,
-                type: {
-                    height: "auto",
-                    width: "auto",
-                    float: "right"
-                },
-                url: newsfeed_url,
-            },
-        ],
+            }
+        ]
     }
-};
+}
