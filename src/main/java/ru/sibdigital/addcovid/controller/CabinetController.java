@@ -526,19 +526,56 @@ public class CabinetController {
         return result;
     }
 
-    @GetMapping("/cities")
-    public @ResponseBody List<Map<String, Object>> getCities(
-            @RequestParam(value = "objectid", required = false) String regionCode
+    @GetMapping("/raions")
+    public @ResponseBody List<Map<String, Object>> getRaions(
+            @RequestParam(value = "objectid", required = false) Long objectId
     ) {
         List<Map<String, Object>> result = null;
-        if (regionCode == null) {
-            result = fiasAddrObjectRepo.findCities();
-        } else {
-
-            result = fiasAddrObjectRepo.findCities(Long.parseLong(regionCode));
+        if (objectId != null) {
+            result = fiasAddrObjectRepo.findRaions(objectId);
+            Map<String, Object> notSelect = new HashMap<>();
+            notSelect.put("value", (Object) "<Не выбрано>");
+            notSelect.put("typename", (Object) "");
+            result.add(0, notSelect);
         }
 
         return result;
     }
 
+
+    @GetMapping("/cities")
+    public @ResponseBody List<Map<String, Object>> getCities(
+            @RequestParam(value = "objectid", required = false) Long objectId
+    ) {
+        List<Map<String, Object>> result = null;
+        if (objectId != null) {
+            result = fiasAddrObjectRepo.findCities(objectId);
+        }
+
+        return result;
+    }
+
+    @GetMapping("/streets")
+    public @ResponseBody List<Map<String, Object>> getStreets(
+            @RequestParam(value = "objectid", required = false) Long raionObjectId
+    ) {
+        List<Map<String, Object>> result = null;
+        if (raionObjectId != null) {
+            result = fiasAddrObjectRepo.findStreetsByRaionOrCity(raionObjectId);
+        }
+
+        return result;
+    }
+
+    @GetMapping("/house")
+    public @ResponseBody List<Map<String, Object>> getHome(
+            @RequestParam(value = "objectid", required = false) Long streetObjectId
+    ) {
+        List<Map<String, Object>> result = null;
+        if (streetObjectId != null) {
+            result = fiasAddrObjectRepo.findHouseByStreet(streetObjectId);
+        }
+
+        return result;
+    }
 }
