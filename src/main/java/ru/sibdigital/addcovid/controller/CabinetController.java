@@ -342,7 +342,7 @@ public class CabinetController {
     }
 
     @GetMapping("/newsfeed")
-    public @ResponseBody Map<String, Object> getNewsList(HttpSession session, @RequestParam(value = "start", required = false) Integer start,
+    public @ResponseBody Map<String, Object> getNewsfeed(HttpSession session, @RequestParam(value = "start", required = false) Integer start,
                                                            @RequestParam(value = "count", required = false) Integer count) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
@@ -352,7 +352,26 @@ public class CabinetController {
         int page = start == null ? 0 : start / 10;
         int size = count == null ? 10 : count;
         Map<String, Object> result = new HashMap<>();
-        Page<ClsNews> templates = requestService.findClsNewsByOrganization_Id(id, page, size);
+        Page<ClsNews> templates = requestService.findNewsfeedByOrganization_Id(id, page, size);
+
+        result.put("data", templates.getContent());
+        result.put("pos", (long) page * size);
+        result.put("total_count", templates.getTotalElements());
+        return result;
+    }
+
+    @GetMapping("/news_archive")
+    public @ResponseBody Map<String, Object> getNewsArchive(HttpSession session, @RequestParam(value = "start", required = false) Integer start,
+                                                         @RequestParam(value = "count", required = false) Integer count) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+
+        int page = start == null ? 0 : start / 10;
+        int size = count == null ? 10 : count;
+        Map<String, Object> result = new HashMap<>();
+        Page<ClsNews> templates = requestService.findNewsArchiveByOrganization_Id(id, page, size);
 
         result.put("data", templates.getContent());
         result.put("pos", (long) page * size);

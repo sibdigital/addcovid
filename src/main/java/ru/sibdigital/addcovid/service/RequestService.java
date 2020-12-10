@@ -744,8 +744,19 @@ public class RequestService {
         return message;
     }
 
-    public Page<ClsNews> findClsNewsByOrganization_Id(Long id, int page, int size) {
-        List<ClsNews> newsList = clsNewsRepo.getNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
+    public Page<ClsNews> findNewsfeedByOrganization_Id(Long id, int page, int size) {
+        List<ClsNews> newsList = clsNewsRepo.getCurrentNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
+
+        Pageable pageable = PageRequest.of(page, size);
+        long start = pageable.getOffset();
+        long end = (start + pageable.getPageSize()) > newsList.size() ? newsList.size() : (start + pageable.getPageSize());
+
+        Page<ClsNews> pages = new PageImpl<ClsNews>(newsList.subList((int) start, (int) end), pageable, newsList.size());
+        return pages;
+    }
+
+    public Page<ClsNews> findNewsArchiveByOrganization_Id(Long id, int page, int size) {
+        List<ClsNews> newsList = clsNewsRepo.getNewsArchiveByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
 
         Pageable pageable = PageRequest.of(page, size);
         long start = pageable.getOffset();
