@@ -1,6 +1,59 @@
 webix.i18n.setLocale("ru-RU");
 
 webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
+    "a[href]{\n" +
+    "\n" +
+    "   cursor: pointer;\n" +
+    "   outline: 0;" +
+    "   }" +
+    "a{\n" +
+    "\n" +
+    "   text-decoration: none;\n" +
+    "   color: #222;" +
+    "   }" +
+    ".item{\n" +
+    "\n" +
+    "    padding:20px 0 25px;\n" +
+    "    border-bottom: 1px solid #ddd;\n" +
+    "  }" +
+    ".item_wrap{\n" +
+    "\n" +
+    "    min-height: 50px;\n" +
+    "    position: relative;\n" +
+    "    padding: 0 25px;\n" +
+    "  }" +
+    ".l-col-center{\n" +
+    "\n" +
+    "    max-width: 680px;\n" +
+    "    margin: 0 auto;\n" +
+    "  }" +
+    ".item_bottom{\n" +
+    "\n" +
+    "    position: absolute;\n" +
+    "    bottom: -5px;\n" +
+    "    left: 25px;\n" +
+    "    right: 25px;\n" +
+    "    font-size: 0;\n" +
+    "    white-space: nowrap;\n" +
+    "  }" +
+    ".item_category{\n" +
+    "\n" +
+    "    font-size: 10px;\n" +
+    "    line-height: 18px;\n" +
+    "    color: #999;\n" +
+    "    white-space: normal;\n" +
+    "  }" +
+    ".item_link{\n" +
+    "\n" +
+    "    display: block;\n" +
+    "  }" +
+    ".item_title{\n" +
+    "\n" +
+    "    font:bold 14px/16px GraphikCy-Semibold;\n" +
+    "    display: block;\n" +
+    // "    margin:10px 5px;\n" +
+    // "    padding:10px;\n" +
+    "  }" +
     ".custom_item{\n" +
     "\n" +
     // "    border:1px solid #DADEE0;\n" +
@@ -159,28 +212,36 @@ const news = {
                 margin: 20, paddingX: 10,
                 scroll: 'y',
                 template: function (obj) {
-                    var htmlcode = ""
-                    if (Date.parse(obj.endTime) < Date.now())
-                        htmlcode = htmlcode + "<div item_id='id' class='old_custom_item'>"
-                    else
-                        htmlcode = htmlcode + "<div item_id='id' class='custom_item'>"
-                    htmlcode = htmlcode + "<h3 style=\"color: #2e6c80;\"><a href = \"news\\" + obj.id + "\">" + obj.heading + "</a></h3>" + obj.message
+                    var heading = "<span class = 'item_title rm-cm-item-text'> <a href = \"news\\" + obj.id + "\" style='text-decoration: none; color: #000000'>" + obj.heading + "</a></span>"
+
+                    // htmlcode = htmlcode + "<h3><a href = \"news\\" + obj.id + "\" style='text-decoration: none; color: #000000'>" + obj.heading + "</a></h3>" + obj.message
                     let startTime = new Date(Date.parse(obj.startTime))
                     let startTimeString = startTime.getDay() + "." + startTime.getMonth() + "." + startTime.getFullYear()
-                    htmlcode = htmlcode + "<div style='text-align:right;'>Дата публикации: " + startTimeString + "</div></div>"
+                    var publicationDate = "Дата публикации: " + startTimeString
+
+                    var htmlcode =
+                        "<div class='item'>" +
+                            "<div class='item_wrap'>" +
+                                "<div class='item_bottom'>" +
+                                    "<span class='item_category'>" + publicationDate +
+                                    "</span>" +
+                                "</div>" +
+                                "<a href = \"news\\" + obj.id + "\" class='item-link'>"+
+                                    "<span class='item_title'>" + obj.heading+
+                                    "</span>" +
+                                "</a>" +
+                            "</div>" +
+                        "</div>"
 
                     return htmlcode
                 },
                 xCount: 1,
                 type: {
-                    // Если height поставить auto,
-                    // то скроллинг с динамической загрузкой новостей не будет работать
-                    height: 200,
+                    height: "auto",
                     width: "auto",
                     float: "right"
                 },
-                datafetch: 10,
-                url: 'idata->' + newsfeed_url,
+                url: newsfeed_url,
             },
         ],
     }
