@@ -70,6 +70,9 @@ public class CabinetController {
     @Autowired
     private FiasAddrObjectRepo fiasAddrObjectRepo;
 
+    @Autowired
+    private ClsTypeRequestRepo clsTypeRequestRepo;
+
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -148,6 +151,16 @@ public class CabinetController {
             return "Пароль обновлен";
         }
         return "Пароль не обновлен";
+    }
+
+    @GetMapping("/prescriptions")
+    public @ResponseBody List<ClsTypeRequest> getPrescriptions(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        List<ClsTypeRequest> prescriptions = clsTypeRequestRepo.getPrescriptionsByOrganizationId(id);
+        return prescriptions;
     }
 
     @PostMapping("/cabinet/typed_form")
