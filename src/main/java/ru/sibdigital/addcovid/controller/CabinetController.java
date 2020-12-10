@@ -2,6 +2,7 @@ package ru.sibdigital.addcovid.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -341,14 +342,32 @@ public class CabinetController {
     }
 
     @GetMapping("/newsfeed")
-    public @ResponseBody List<ClsNews> getNewsList(HttpSession session) {
+    public @ResponseBody Map<String, Object> getNewsList(HttpSession session, @RequestParam(value = "start", required = false) Integer start,
+                                                           @RequestParam(value = "count", required = false) Integer count) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
         }
-        List<ClsNews> newsList = clsNewsRepo.getNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
-        return newsList;
+
+        int page = start == null ? 0 : start / 10;
+        int size = count == null ? 10 : count;
+        Map<String, Object> result = new HashMap<>();
+        Page<ClsNews> templates = requestService.findClsNewsByOrganization_Id(id, page, size);
+
+        result.put("data", templates.getContent());
+        result.put("pos", (long) page * size);
+        result.put("total_count", templates.getTotalElements());
+        return result;
     }
+
+//    public @ResponseBody List<ClsNews> getNewsList(HttpSession session) {
+//        Long id = (Long) session.getAttribute("id_organization");
+//        if (id == null) {
+//            return null;
+//        }
+//        List<ClsNews> newsList = clsNewsRepo.getNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
+//        return newsList;
+//    }
 
     @GetMapping("/news/{id_news}")
     public @ResponseBody String getNewsById(@PathVariable("id_news") Long id_news){
