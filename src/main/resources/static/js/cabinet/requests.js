@@ -271,7 +271,7 @@ function showRequestWizard(data) {
                                                                     required: true,
                                                                     on: {
                                                                         onChange(newv, oldv) {
-                                                                            if ($$('isAgree').getValue() == 1) {
+                                                                            if (allChecked()) {
                                                                                 $$('send_btn').enable();
                                                                             } else {
                                                                                 $$('send_btn').disable();
@@ -334,6 +334,23 @@ function showRequestWizard(data) {
                                                                                 webix.message('Необходимо подтвердить согласие работников на обработку персональных данных', 'error')
                                                                                 return false
                                                                             }
+
+                                                                            const additionalAttributes = {};
+
+                                                                            const countPrescriptions = $$('prescriptions').getChildViews().length;
+                                                                            if (countPrescriptions > 0) {
+                                                                                let consentPrescriptions = [];
+                                                                                for (let num = 0; num < countPrescriptions; num++) {
+                                                                                    const id = $$('prescription_id' + num).getValue();
+                                                                                    consentPrescriptions.push({
+                                                                                        id,
+                                                                                        isAgree: $$('consentPrescription' + num).getValue()
+                                                                                    });
+                                                                                }
+                                                                                additionalAttributes.consentPrescriptions = consentPrescriptions;
+                                                                            }
+
+                                                                            params.additionalAttributes = additionalAttributes;
 
                                                                             $$('newRequestForm').showProgress({
                                                                                 type: 'icon',
@@ -405,15 +422,68 @@ function showRequestWizard(data) {
         $$('consent').setHTML(typeRequest.consent);
 
         if (typeRequest.regTypeRequestPrescriptions && typeRequest.regTypeRequestPrescriptions.length > 0) {
-            typeRequest.regTypeRequestPrescriptions.forEach(prescription => {
-                console.log(prescription)
+            typeRequest.regTypeRequestPrescriptions.forEach((prescription, index) => {
+                const files = [];
+                if (prescription.regTypeRequestPrescriptionFiles && prescription.regTypeRequestPrescriptionFiles.length > 0) {
+                    prescription.regTypeRequestPrescriptionFiles.forEach((file) => {
+                        const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
+                                + file.originalFileName + '</a>'
+                        files.push({id: file.id, value: filename})
+                    })
+                }
                 $$('prescriptions').addView({
-                    view: 'template',
-                    id: 'prescription' + prescription.id,
-                    height: 550,
-                    readonly: true,
-                    scroll: true,
-                    template: prescription.content
+                    rows: [
+                        {
+                            view: 'text',
+                            id: 'prescription_id' + index,
+                            value: prescription.id,
+                            hidden: true
+                        },
+                        {
+                            cols: [
+                                {
+                                    view: 'label',
+                                    label: 'Предписание ' + (index + 1),
+                                    align: 'center'
+                                },
+                            ]
+                        },
+                        {
+                            view: 'template',
+                            height: 550,
+                            readonly: true,
+                            scroll: true,
+                            template: prescription.content
+                        },
+                        {
+                            view: 'list',
+                            autoheight: true,
+                            template: '#value#',
+                            data: files,
+                        },
+                        {
+                            view: 'template',
+                            borderless: true,
+                            css: 'personalTemplateStyle',
+                            template: 'Подтверждаю обязательное выполнение предписания <span style = "color: red">*</span>',
+                            autoheight: true
+                        },
+                        {
+                            view: 'checkbox',
+                            id: 'consentPrescription' + index,
+                            labelPosition: 'top',
+                            required: true,
+                            on: {
+                                onChange(newv, oldv) {
+                                    if (allChecked()) {
+                                        $$('send_btn').enable();
+                                    } else {
+                                        $$('send_btn').disable();
+                                    }
+                                }
+                            }
+                        },
+                    ]
                 });
             })
         }
@@ -434,6 +504,21 @@ function showRequestWizard(data) {
 
         webix.extend($$('newRequestForm'), webix.ProgressBar);
     });
+}
+
+function allChecked() {
+    if ($$('isAgree').getValue() !== 1) {
+        return false;
+    }
+    const countPrescriptions = $$('prescriptions').getChildViews().length;
+    if (countPrescriptions > 0) {
+        for (let num = 0; num < countPrescriptions; num++) {
+            if ($$('consentPrescription' + num).getValue() !== 1) {
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 function back() {
