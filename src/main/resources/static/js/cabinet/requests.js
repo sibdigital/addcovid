@@ -238,7 +238,7 @@ function showRequestWizard(data) {
                                         },
                                         {
                                             rows: [
-                                                { type: 'header', template: 'Шаг 4. Ознакомьтесь с предписаниями' },
+                                                { type: 'header', template: 'Шаг 4. Ознакомьтесь с информацией' },
                                                 {
                                                     type: 'form',
                                                     rows: [
@@ -277,6 +277,26 @@ function showRequestWizard(data) {
                                                                     }
                                                                 },
                                                             ]
+                                                        },
+                                                        view_section('Информация о предписании'),
+                                                        {
+                                                            view: 'text',
+                                                            id: 'activityKind',
+                                                            autoheight: true,
+                                                            // align: 'center',
+                                                            label: 'Наименование предписания',
+                                                            labelPosition: 'top',
+                                                            name: 'activityKind',
+                                                            readonly: true
+                                                        },
+                                                        {
+                                                            view: 'text',
+                                                            id: 'restrictionType',
+                                                            autoheight: true,
+                                                            // align: 'center',
+                                                            label: 'Тип ограничения',
+                                                            labelPosition: 'top',
+                                                            readonly: true
                                                         },
                                                         {
                                                             id: 'prescriptions',
@@ -416,7 +436,11 @@ function showRequestWizard(data) {
 
         const typeRequest = data.json();
 
-        $$('consent').setHTML(typeRequest.consent);
+        $$('activityKind').setValue(typeRequest.activityKind);
+
+        if (typeRequest.regTypeRequestRestrictionTypes && typeRequest.regTypeRequestRestrictionTypes.length > 0) {
+            $$('restrictionType').setValue(typeRequest.regTypeRequestRestrictionTypes[0].regTypeRequestRestrictionTypeId.clsRestrictionType.name);
+        }
 
         if (typeRequest.regTypeRequestPrescriptions && typeRequest.regTypeRequestPrescriptions.length > 0) {
             typeRequest.regTypeRequestPrescriptions.forEach((prescription, index) => {
@@ -484,6 +508,8 @@ function showRequestWizard(data) {
                 });
             })
         }
+
+        $$('consent').setHTML(typeRequest.consent);
 
         if (typeRequest.settings) {
             const settings = JSON.parse(typeRequest.settings, function (key, value) {
