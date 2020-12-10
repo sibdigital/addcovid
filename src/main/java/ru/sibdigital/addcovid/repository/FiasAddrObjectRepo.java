@@ -24,6 +24,11 @@ public interface FiasAddrObjectRepo extends JpaRepository<FIASAddrObject, Long> 
             " from fias.addr_object where level = :level")
     List<Map<String, Object>> findByL(String level);
 
+    @Query(nativeQuery = true, value = "select id, objectid, name as value, typename, level \n" +
+            "from fias.addr_object \n" +
+            "where objectid = :objectId")
+    Map<String, Object> findByObjectId(@Param("objectId") Long objectId);
+
     @Query(nativeQuery = true, value = "select fao.id, fao.objectid, fao.name as value, fao.typename \n" +
             " from fias.addr_object as fao\n" +
             " where level='1'" +
@@ -70,6 +75,11 @@ public interface FiasAddrObjectRepo extends JpaRepository<FIASAddrObject, Long> 
             " where fao.level='4' or fao.level='5' or fao.level='6' " +
             " order by fao.name")
     List<Map<String, Object>> findCities(@Param("regionGuid") Long regionObjectId);
+
+    @Query(nativeQuery = true, value = "select id, objectid, name as value, typename, level \n" +
+            "from fias.addr_object \n" +
+            "where objectid = :objectId")
+    Map<String, Object> findCityByObjectId(@Param("objectId") Long objectId);
 
     @Query(nativeQuery = true, value = "with sd as (\n" +
             "    select objectid\n" +

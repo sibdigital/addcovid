@@ -543,9 +543,9 @@ public class RequestService {
                 .fiasHouseObjectId(regOrganizationAddressFactToSave.getFiasHouseObjectId())
                 .fullAddress(regOrganizationAddressFactToSave.getFullAddress())
                 .isHand(false)
-                .streetHand("")
-                .houseHand("")
-                .apartmentHand("")
+                .streetHand(regOrganizationAddressFactToSave.getStreetHand())
+                .houseHand(regOrganizationAddressFactToSave.getHouseHand())
+                .apartmentHand(regOrganizationAddressFactToSave.getApartmentHand())
                 .build();
         //regOrganizationAddressFactRepo.save(regOrgAddrSave);
         regOrganizationAddressFactRepo.insertOrg(

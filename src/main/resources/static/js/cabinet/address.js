@@ -1,3 +1,20 @@
+const setObject = async (url, id, idView) => {
+    webix.ajax()
+        .headers({'Content-type': 'application/json'})
+        .get(url + id)
+        .then(function (data) {
+            if (data !== null) {
+                console.log(data.json());
+                $$(idView).setValue(data.json);
+                // const streetId = $$(suggest_id).getItemId(streetLabel.slice(streetLabel.lastIndexOf(' ') + 1));
+                // console.log(streetId);
+                // const street = $$(suggest_id).getList().getItem(streetId).objectid || streetLabel;
+            }
+        });
+    return null;
+}
+
+
 const address = {
     view: 'scrollview',
     scroll: 'xy',
@@ -21,45 +38,80 @@ const address = {
                             template: "<div class='overall'><div>#full_address#</div></div>",
                         },
                         on: {
-                            onItemDblClick: function (id) {
+                            // onItemDblClick: function (id) {
+                            //     let item = this.getItem(id);
+                            //     console.log(item);
+                            //     console.log($$('regions').getList());
+                            //     const region = $$('regions').getList().find((reg) => {
+                            //         console.log('reg', reg);
+                            //         return reg.objectid === item.fias_region_objectid;
+                            //     } );
+                            //     console.log(region);
+                            //     $$('regions').setValue(region[0]);
+                            //
+                            //     const listRaions = $$('raions').getList().find((rai) => {
+                            //         console.log('rai', rai);
+                            //         return rai.objectid === item.fias_raion_objectid;
+                            //     });
+                            //     console.log(listRaions);
+                            //     const listRaions2 = Object.values(listRaions);
+                            //     console.log(listRaions2);
+                            //     console.log(typeof listRaions);
+                            //     for (const [key, value] of Object.entries(listRaions)) {
+                            //         console.log(`${key}: ${value}`);
+                            //     }
+                            //
+                            //     const dtr = getObject('raion?objectid', fias_raion_objectid);
+                            //
+                            //
+                            //
+                            //
+                            //     console.log($$('cities').getList());
+                            //     const city = $$('cities').getList().find((city) => city.objectid === item.fias_city_objectid);
+                            //     console.log(city);
+                            //     if (city.length > 0) {
+                            //         $$('cities').setValue(city[0]);
+                            //     }
+                            //
+                            //     $$('fiasObjectGuid').setValue('');
+                            //     const url = 'streets?objectid=' + item.fias_street_objectid;
+                            //     const suggest_id = $$('fiasObjectGuid').config.suggest;
+                            //     const list = $$(suggest_id).getList();
+                            //     list.clearAll();
+                            //     webix.ajax()
+                            //         .headers({'Content-type': 'application/json'})
+                            //         .get(url)
+                            //         .then(function (data) {
+                            //             console.log(data);
+                            //             if (data !== null) {
+                            //                 list.parse(data);
+                            //                 // const streetId = $$(suggest_id).getItemId(streetLabel.slice(streetLabel.lastIndexOf(' ') + 1));
+                            //                 // console.log(streetId);
+                            //                 // const street = $$(suggest_id).getList().getItem(streetId).objectid || streetLabel;
+                            //             }
+                            //         });
+                            //     $$('house').setValue(item.house_hand);
+                            //     $$('office').setValue(item.apartment_hand);
+                            // }
+
+                            onItemDblClick: async function (id) {
                                 let item = this.getItem(id);
                                 console.log(item);
-                                console.log($$('regions').getList());
                                 const region = $$('regions').getList().find((reg) => reg.objectid === item.fias_region_objectid);
                                 console.log(region);
                                 $$('regions').setValue(region[0]);
 
-                                console.log($$('raions').getList());
-                                const raion = $$('raions').getList().find((raion) => raion.objectid === item.fias_raion_objectid);
-                                console.log(raion);
-                                if (raion.length > 0) {
-                                    $$('raions').setValue(raion[0]);
+                                await setObject('raion?objectid=', item.fias_raion_objectid, 'raions');
+                                await setObject('city?objectid=', item.fias_city_objectid, 'cities');
+                                if (item.fias_street_objectid !== 0) {
+                                    await setObject('street?objectid=', item.fias_street_objectid, 'fiasStreetObjectId');
+                                } else {
+                                    $$('fiasStreetObjectId').setValue(item.street_hand);
                                 }
 
-                                console.log($$('cities').getList());
-                                const city = $$('cities').getList().find((city) => city.objectid === item.fias_city_objectid);
-                                console.log(city);
-                                if (city.length > 0) {
-                                    $$('cities').setValue(city[0]);
-                                }
-
-                                $$('fiasObjectGuid').setValue('');
-                                const url = 'streets?objectid=' + item.fias_street_objectid;
-                                const suggest_id = $$('fiasObjectGuid').config.suggest;
-                                const list = $$(suggest_id).getList();
-                                list.clearAll();
-                                webix.ajax()
-                                    .headers({'Content-type': 'application/json'})
-                                    .get(url)
-                                    .then(function (data) {
-                                        console.log(data);
-                                        if (data !== null) {
-                                            list.parse(data);
-                                            // const streetId = $$(suggest_id).getItemId(streetLabel.slice(streetLabel.lastIndexOf(' ') + 1));
-                                            // console.log(streetId);
-                                            // const street = $$(suggest_id).getList().getItem(streetId).objectid || streetLabel;
-                                        }
-                                    });
+                                // $$('raions').setValue(raion);
+                                // $$('cities').setValue(city);
+                                // $$('fiasStreetObjectId').setValue(street);
                                 $$('house').setValue(item.house_hand);
                                 $$('office').setValue(item.apartment_hand);
                             }
@@ -96,15 +148,9 @@ const address = {
                                         dynamic: true,
                                         datafetch: 20,
                                         url: 'regions',
-                                        template: '#typename#'.toLowerCase() === 'респ' ? '#typename#. #value#' : '#value# #typename#',
-
-                                        // template: (item) => {
-                                        //     //return item.value
-                                        //     // const filter = this.getFilterFunction();
-                                        //     // console.log(filter);
-                                        //     //data.filter(obj => console.log(obj));
-                                        //     return item.typename.toLowerCase() === 'респ' ? '#typename#. #value#' : '#value# #typename#';
-                                        // },
+                                        template: (item) => {
+                                            return item.typename.toLowerCase() === 'респ' ? item.typename + '. ' + item.value : item.value + ' ' + item.typename;
+                                        },
                                         ready: function () {
                                         }
                                     }
@@ -112,14 +158,20 @@ const address = {
                                 on : {
                                     onChange: (newval, oldval) => {
                                         try {
+                                            console.log('OHMAKI');
                                             const indexRegion = $$('regions').getValue();
                                             console.log(indexRegion);
+                                            if (!indexRegion) return;
 
                                             const region = $$('regions').getList().getItem(indexRegion);
                                             console.log(region);
 
                                             if (region) {
                                                 let url = 'raions?objectid=' + region.objectid;
+
+                                                const suggest_id = $$('fiasObjectGuid').config.suggest;
+                                                $$(suggest_id).getList().clearAll();
+
                                                 $$('raions').setValue('');
                                                 $$('raions').getList().clearAll();
                                                 $$('raions').getList().load(url);
@@ -129,8 +181,6 @@ const address = {
                                                 $$('cities').getList().clearAll();
                                                 $$('cities').getList().load(url);
 
-                                                const suggest_id = $$('fiasObjectGuid').config.suggest;
-                                                $$(suggest_id).getList().clearAll();
                                             }
                                         } catch (e) {
                                             console.log(e);
@@ -176,6 +226,7 @@ const address = {
                                         try {
                                             const indexRaion = $$('raions').getValue();
                                             console.log(indexRaion);
+                                            if (!indexRaion) return;
 
                                             const raion = $$('raions').getList().getItem(indexRaion);
                                             console.log(raion);
@@ -188,15 +239,17 @@ const address = {
 
                                             if (raion) {
                                                 const url = 'cities?objectid=' + raion.objectid;
+
+                                                const suggest_id = $$('fiasObjectGuid').config.suggest;
+                                                $$(suggest_id).getList().clearAll();
+
                                                 $$('cities').setValue('');
                                                 $$('cities').getList().clearAll();
                                                 $$('cities').getList().load(url);
 
-                                                const suggest_id = $$('fiasObjectGuid').config.suggest;
-                                                $$(suggest_id).getList().clearAll();
                                             }
                                         } catch(e) {
-                                            err.log(e);
+                                            console.log(e);
                                         }
                                     }
                                 }
@@ -227,6 +280,7 @@ const address = {
                                         try {
                                             const indexCity = $$('cities').getValue();
                                             console.log(indexCity);
+                                            if (!indexCity) return;
 
                                             const city = $$('cities').getList().getItem(indexCity);
                                             console.log(city);
@@ -323,6 +377,13 @@ const address = {
                                         label: "<span class='mdi mdi-minus-circle' style='padding-right: 5px'></span><span class='text'>Удалить</span>",
                                         hotkey: 'delete',
                                         click: () => deleteAddress()
+                                    },
+                                    {
+                                        view: 'button',
+                                        id: 'clearFormButton',
+                                        css: 'webix_primary',
+                                        label: "<span class='mdi mdi-minus-circle' style='padding-right: 5px'></span><span class='text'>Очистить данные</span>",
+                                        click: () => clearDataFromForm()
                                     }
                                 ]
                             },
@@ -358,9 +419,9 @@ function addAddress() {
         const indexRaion = $$('raions').getValue();
         const raion = $$('raions').getList().getItem(indexRaion);
         console.log(raion);
-        const raionLabel = raion ? (raion.value + '. ' + raion.typename) : null;
+        const raionLabel = raion ? (raion.value + ' ' + raion.typename) : null;
 
-        params.fiasRaionObjectId = raion?.objectid ?? region.objectid;
+        params.fiasRaionObjectId = raion?.objectid ?? 0;
 
         const indexCity = $$('cities').getValue();
         const city = $$('cities').getList().getItem(indexCity);
@@ -373,10 +434,15 @@ function addAddress() {
         //streetLabel = streetLabel.slice(streetLabel.lastIndexOf(' ') + 1);
         const streetId = $$(suggest_id).getItemId(streetLabel.slice(streetLabel.lastIndexOf(' ') + 1));
         console.log(streetId);
-        const street = $$(suggest_id).getList().getItem(streetId).objectid || streetLabel;
+        const street = streetId !== undefined ? $$(suggest_id).getList().getItem(streetId).objectid : null;
         console.log(street);
 
-        params.fiasStreetObjectId = street;
+        if (street) {
+            params.fiasStreetObjectId = street;
+        } else {
+            params.fiasStreetObjectId = 0;
+            params.streetHand = streetLabel;
+        }
         // console.log(streetId);
         // console.log(street);
         // const streetLabel = street !== inpStreet ? street.typename + '. ' + street.value : inpStreet;
@@ -395,8 +461,8 @@ function addAddress() {
         } else {
             params.fullAddress = [regionLabel, cityLabel, streetLabel, house, office].join(', ');
         }
-        params.apartment_hand = office;
-        params.house_hand = house;
+        params.houseHand = house;
+        params.apartmentHand = office;
 
         console.log(params);
 
@@ -415,8 +481,8 @@ function addAddress() {
                     webix.message("Не удалось добавить адрес", 'error');
                 }
             });
-        form.clear()
-        form.clearValidation()
+        form.clear();
+        form.clearValidation();
     }
 };
 
@@ -436,3 +502,8 @@ function deleteAddress() {
         });
 }
 
+function clearDataFromForm() {
+    const form = $$('contact_form');
+    form.clear();
+    form.clearValidation();
+}
