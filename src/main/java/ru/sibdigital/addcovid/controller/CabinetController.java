@@ -21,10 +21,11 @@ import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.RequestService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.Console;
+
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -371,18 +372,20 @@ public class CabinetController {
     }
 
 
-    @GetMapping("/news/{id_news}")
-    public @ResponseBody String getNewsById(@PathVariable("id_news") Long id_news){
-        ClsNews clsNews = clsNewsRepo.findById(id_news).orElse(null);
-        if (clsNews != null) {
-            SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-            String startTimeString = format.format(clsNews.getStartTime());
-            String newsString = "<div><h3 style=\"color: #2e6c80;\">" + clsNews.getHeading()  + "</h3>" + clsNews.getMessage() + "</div>"+
-                    "<div style='text-align:right;'>Дата публикации: " + startTimeString+ "</div></div>";
-            return newsString;
-        }
-        else
-            return "";
+    @GetMapping("/news")
+    public String getNewsById( @RequestParam("hash_id") String hash_id, Model model){
+        model.addAttribute("hash_id", hash_id);
+        model.addAttribute("link_prefix", applicationConstants.getLinkPrefix());
+        model.addAttribute("link_suffix", applicationConstants.getLinkSuffix());
+        model.addAttribute("application_name", applicationConstants.getApplicationName());
+        return "news_form";
+    }
+
+    @GetMapping("/news/{hash_id}")
+    public @ResponseBody ClsNews getNewsById(@PathVariable("hash_id") String hash_id, HttpServletRequest request){
+        ClsNews clsNews = clsNewsRepo.findByHashId(hash_id);
+        requestService.saveLinkClicks(request, clsNews);
+        return clsNews;
     }
 
     @GetMapping("/my_mailing_list")

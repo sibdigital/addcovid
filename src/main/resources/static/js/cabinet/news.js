@@ -115,8 +115,6 @@ const news = {
                         margin: 20, paddingX: 10,
                         scroll: 'y',
                         template: function (obj) {
-                            // var htmlcode = "<div>" + "<h3 style=\"color: #2e6c80;\"><a href = \"news\\" + obj.id + "\">" + obj.heading + "</a></h3>" + obj.message
-
                             let startTime = new Date(Date.parse(obj.startTime))
                             var dd = startTime.getDate();
                             if (dd < 10) dd = '0' + dd;
@@ -124,11 +122,9 @@ const news = {
                             if (mm < 10) mm = '0' + mm;
                             let startTimeString = dd+ "." + mm + "." + startTime.getFullYear()
 
-                            // htmlcode = htmlcode + "<div style='text-align:right;'>Дата публикации: " + startTimeString + "</div></div>"
-
                             return "<div class = 'class_border'>" +
                                     "<span class = 'item_big_title'>" +
-                                            "<a href = \"news\\" + obj.id + "\" style='text-decoration: none;'>" +
+                                            "<a href = \"news?hash_id=" + obj.hashId + "\" style='text-decoration: none;'>" +
                                                 obj.heading +
                                             "</a>" +
                                             "</span>"+
@@ -172,7 +168,7 @@ const news = {
                                     let startTimeString = dd+ "." + mm + "." + startTime.getFullYear()
 
                                     return "<span class = 'item_title'>" +
-                                                "<a href = \"news\\" + obj.id + "\" style='text-decoration: none;'>" +
+                                                "<a href = \"news?hash_id=" + obj.hashId + "\" style='text-decoration: none;'>" +
                                                     obj.heading +
                                                 "</a>" +
                                             "</span>"+
