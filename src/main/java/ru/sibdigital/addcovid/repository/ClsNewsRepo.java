@@ -82,4 +82,6 @@ public interface ClsNewsRepo extends JpaRepository<ClsNews, Long> {
                     "WHERE end_time < :current_time\n" +
                     "ORDER BY start_time DESC")
     List<ClsNews> getNewsArchiveByOrganization_Id(Long id_organization, Timestamp current_time);
+
+    ClsNews findByHashId(String hashId);
 }

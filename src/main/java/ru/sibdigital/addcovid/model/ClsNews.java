@@ -24,6 +24,7 @@ public class ClsNews {
     private String message;
     private Date startTime;
     private Date endTime;
+    private String hashId;
 
     public Long getId() {
         return id;
@@ -75,6 +76,16 @@ public class ClsNews {
         this.endTime = endTime;
     }
 
+    @Basic
+    @Column(name = "hash_id")
+    public String getHashId() {
+        return hashId;
+    }
+
+    public void setHashId(String hashId) {
+        this.hashId = hashId;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -85,12 +96,13 @@ public class ClsNews {
                 Objects.equals(heading, that.heading) &&
                 Objects.equals(message, that.message) &&
                 Objects.equals(startTime, that.startTime) &&
-                Objects.equals(endTime, that.endTime);
+                Objects.equals(endTime, that.endTime) &&
+                Objects.equals(hashId, that.hashId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, heading, message, startTime, endTime);
+        return Objects.hash(id, heading, message, startTime, endTime, hashId);
     }
 
 }
