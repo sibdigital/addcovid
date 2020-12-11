@@ -19,6 +19,7 @@ import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.RequestService;
+import ru.sibdigital.addcovid.service.SettingServiceImpl;
 
 import javax.servlet.http.HttpSession;
 import java.io.Console;
@@ -69,6 +70,9 @@ public class CabinetController {
 
     @Autowired
     private FiasAddrObjectRepo fiasAddrObjectRepo;
+
+    @Autowired
+    private SettingServiceImpl settingServiceImpl;
 
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
@@ -132,6 +136,16 @@ public class CabinetController {
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         List<DocRequest> requests = docRequestRepo.getAllByInn(organization.getInn()).orElse(null);
         return requests;
+    }
+
+    @GetMapping("/count_confirmed_requests")
+    public @ResponseBody List<Integer> getAllConfirmedRequest(HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        if(id == null){
+            return null;
+        }
+        List<Integer> confirmedRequestStatus = docRequestRepo.getAllRequestWithConfirmedStatus(id).orElse(null);
+        return confirmedRequestStatus;
     }
 
     @PostMapping("/save_pass")
@@ -558,5 +572,12 @@ public class CabinetController {
         }
 
         return result;
+    }
+
+    @PostMapping("/requests_status_style")
+    public @ResponseBody String getRequestsStatusStyle(@RequestBody String key){
+        String optimalKey = key.substring(1, key.length() -1);
+        String style = settingServiceImpl.getRequestsStatusStyle(optimalKey);
+        return style;
     }
 }
