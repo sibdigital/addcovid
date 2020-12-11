@@ -97,6 +97,11 @@ webix.proxy.idata = {
     }
 };
 
+var options = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+};
 
 const news = {
     view: 'scrollview',
@@ -115,12 +120,8 @@ const news = {
                         margin: 20, paddingX: 10,
                         scroll: 'y',
                         template: function (obj) {
-                            let startTime = new Date(Date.parse(obj.startTime))
-                            var dd = startTime.getDate();
-                            if (dd < 10) dd = '0' + dd;
-                            var mm = startTime.getMonth() + 1; // месяц 1-12
-                            if (mm < 10) mm = '0' + mm;
-                            let startTimeString = dd+ "." + mm + "." + startTime.getFullYear()
+                            var startTime =obj.startTime ? new Date(obj.startTime) : "";
+                            let startTimeString = startTime.toLocaleString("ru", options)
 
                             return "<div class = 'class_border'>" +
                                     "<span class = 'item_big_title'>" +
@@ -159,13 +160,8 @@ const news = {
                                 margin: 20, paddingX: 10,
                                 scroll: 'y',
                                 template: function (obj) {
-
-                                    let startTime = new Date(Date.parse(obj.startTime))
-                                    var dd = startTime.getDate();
-                                    if (dd < 10) dd = '0' + dd;
-                                    var mm = startTime.getMonth() + 1; // месяц 1-12
-                                    if (mm < 10) mm = '0' + mm;
-                                    let startTimeString = dd+ "." + mm + "." + startTime.getFullYear()
+                                    var startTime =obj.startTime ? new Date(obj.startTime) : "";
+                                    let startTimeString = startTime.toLocaleString("ru", options)
 
                                     return "<span class = 'item_title'>" +
                                                 "<a href = \"news?hash_id=" + obj.hashId + "\" style='text-decoration: none;'>" +

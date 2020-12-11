@@ -41,18 +41,18 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
     "\n" +
     "    border:1px solid #c3c5c9;\n" +
     "  }");
-
+var options = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+};
 webix.ready(function() {
     webix.ui({
         view:'template',
         template: function (obj) {
             if (obj.hashId != null) {
-                let startTime = new Date(Date.parse(obj.startTime))
-                var dd = startTime.getDate();
-                if (dd < 10) dd = '0' + dd;
-                var mm = startTime.getMonth() + 1; // месяц 1-12
-                if (mm < 10) mm = '0' + mm;
-                let startTimeString = dd + "." + mm + "." + startTime.getFullYear()
+                var startTime =obj.startTime ? new Date(obj.startTime) : "";
+                let startTimeString = startTime.toLocaleString("ru", options)
                 return "<div>" +
                     "<span class = 'item_big_title'>" +
                     "<a href = \"news?hash_id=" + obj.hashId + "\" style='text-decoration: none;'>" +
