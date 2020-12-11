@@ -71,6 +71,12 @@ public class CabinetController {
     @Autowired
     private FiasAddrObjectRepo fiasAddrObjectRepo;
 
+    @Autowired
+    private ClsTypeRequestRepo clsTypeRequestRepo;
+
+    @Autowired
+    private SettingServiceImpl settingServiceImpl;
+
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
