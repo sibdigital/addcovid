@@ -523,6 +523,14 @@ public class CabinetController {
         return result;
     }
 
+    @GetMapping("/raion")
+    public @ResponseBody Map<String, Object> getRaionIdByObjectId(@RequestParam(value = "objectid", required = true) Long objectId) {
+        Map<String, Object> result = null;
+        if (objectId != null) {
+            result = fiasAddrObjectRepo.findByObjectId(objectId);
+        }
+        return result;
+    }
 
     @GetMapping("/cities")
     public @ResponseBody List<Map<String, Object>> getCities(
@@ -536,6 +544,15 @@ public class CabinetController {
         return result;
     }
 
+    @GetMapping("/city")
+    public @ResponseBody Map<String, Object> getCityByObjectId(@RequestParam(value = "objectid", required = true) Long objectId) {
+        Map<String, Object> id = null;
+        if (objectId != null) {
+            id = fiasAddrObjectRepo.findByObjectId(objectId);
+        }
+        return id;
+    }
+
     @GetMapping("/streets")
     public @ResponseBody List<Map<String, Object>> getStreets(
             @RequestParam(value = "objectid", required = false) Long raionObjectId
@@ -546,6 +563,15 @@ public class CabinetController {
         }
 
         return result;
+    }
+
+    @GetMapping("/street")
+    public @ResponseBody Map<String, Object> getStreetByObjectId(@RequestParam(value = "objectid", required = true) Long objectId) {
+        Map<String, Object> id = null;
+        if (objectId != null) {
+            id = fiasAddrObjectRepo.findByObjectId(objectId);
+        }
+        return id;
     }
 
     @GetMapping("/house")
