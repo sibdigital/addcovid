@@ -311,7 +311,7 @@ const address = {
                                 view: 'text',
                                 id: 'fiasObjectGuid',
                                 name: 'fiasStreetObjectId',
-                                label: 'Адрес',
+                                label: 'Улица',
                                 labelPosition: 'top',
                                 invalidMessage: "Адрес не может быть пустым",
                                 suggest: {
@@ -421,7 +421,7 @@ function addAddress() {
         console.log(raion);
         const raionLabel = raion ? (raion.value + ' ' + raion.typename) : null;
 
-        params.fiasRaionObjectId = raion?.objectid ?? 0;
+        params.fiasRaionObjectId = raion.objectid || 0;
 
         const indexCity = $$('cities').getValue();
         const city = $$('cities').getList().getItem(indexCity);
