@@ -5,13 +5,41 @@ const prescript = {
         type: 'space',
         rows: [
             {
-                view: 'form',
-                id: 'form',
-                complexData: true,
-                elements: [
+                view: 'datatable',
+                id: "prescriptions_table",
+                minWidth: 220,
+                select: "row",
+                navigation: true,
+                resizeColumn: true,
+                datafetch: 25,
+                columns: [
+                    {header: "Наименование предписания", template: "#activityKind#", minWidth: 130, fillspace: true},
+                    {id: 'time_Publication', header: "Дата публикации", adjust: true, format: dateFormat},
                 ],
-                //url: 'documents'
+                scheme: {
+                    $init: function (obj) {
+                        obj.time_Publication = obj.timePublication.replace("T", " ")
+                    },
+                },
+                on: {
+                    onBeforeLoad: function () {
+                        this.showOverlay("Загружаю...");
+                    },
+                    onAfterLoad: function () {
+                        this.hideOverlay();
+                        if (!this.count()) {
+                            this.showOverlay("Отсутствуют данные")
+                        }
+                    },
+                    onLoadError: function () {
+                        this.hideOverlay();
+                    },
+                    onItemClick: function (id) {
+                        showRequestCreateForm(id, 3)
+                    },
+                },
+                url: 'prescriptions'
             }
-        ],
+        ]
     }
 }
