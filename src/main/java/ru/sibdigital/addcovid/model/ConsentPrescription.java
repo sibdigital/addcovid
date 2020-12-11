@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class AdditionalAttributes {
+public class ConsentPrescription {
 
-    private String isCheckingAgree;
-    private ConsentPrescription[] consentPrescriptions;
+    private String id;
+    private String isAgree;
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,6 +89,9 @@ public class RequestService {
 
     @Autowired
     private RegOrganizationAddressFactRepo regOrganizationAddressFactRepo;
+
+    @Autowired
+    private ClsNewsRepo clsNewsRepo;
 
     @Value("${upload.path:/uploads}")
     String uploadingDir;
@@ -702,7 +706,28 @@ public class RequestService {
      */
     @Transactional
     public DocRequest saveNewRequest(PostFormDto postForm) {
-        DocRequest docRequest = docRequestRepo.findById(postForm.getRequestId()).orElse(null);
+        DocRequest docRequest;
+
+        if (postForm.getRequestId() != null) {
+            docRequest = docRequestRepo.findById(postForm.getRequestId()).orElse(null);
+        } else {
+            ClsOrganization organization = clsOrganizationRepo.findById(postForm.getOrganizationId()).orElse(null);
+
+            ClsTypeRequest prescription = clsTypeRequestRepo.findById(postForm.getTypeRequestId()).orElse(null);
+
+            docRequest = DocRequest.builder()
+                    .organization(organization)
+                    .department(prescription.getDepartment())
+                    .personOfficeCnt(0L)
+                    .personRemoteCnt(0L)
+                    .personSlrySaveCnt(0L)
+                    .statusReview(ReviewStatuses.NEW.getValue())
+                    .statusImport(0)
+                    .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
+                    .typeRequest(prescription)
+                    .build();
+        }
+
         docRequest.setAgree(postForm.getIsAgree());
         docRequest.setProtect(postForm.getIsProtect());
         docRequest.setAdditionalAttributes(postForm.getAdditionalAttributes());
@@ -738,6 +763,28 @@ public class RequestService {
             message = "Не удалось активировать учётную запись!";
         }
         return message;
+    }
+
+    public Page<ClsNews> findNewsfeedByOrganization_Id(Long id, int page, int size) {
+        List<ClsNews> newsList = clsNewsRepo.getCurrentNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
+
+        Pageable pageable = PageRequest.of(page, size);
+        long start = pageable.getOffset();
+        long end = (start + pageable.getPageSize()) > newsList.size() ? newsList.size() : (start + pageable.getPageSize());
+
+        Page<ClsNews> pages = new PageImpl<ClsNews>(newsList.subList((int) start, (int) end), pageable, newsList.size());
+        return pages;
+    }
+
+    public Page<ClsNews> findNewsArchiveByOrganization_Id(Long id, int page, int size) {
+        List<ClsNews> newsList = clsNewsRepo.getNewsArchiveByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
+
+        Pageable pageable = PageRequest.of(page, size);
+        long start = pageable.getOffset();
+        long end = (start + pageable.getPageSize()) > newsList.size() ? newsList.size() : (start + pageable.getPageSize());
+
+        Page<ClsNews> pages = new PageImpl<ClsNews>(newsList.subList((int) start, (int) end), pageable, newsList.size());
+        return pages;
     }
 
 }

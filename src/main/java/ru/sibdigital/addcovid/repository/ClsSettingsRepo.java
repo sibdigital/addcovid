@@ -15,4 +15,7 @@ public interface ClsSettingsRepo extends JpaRepository<ClsSettings, Long> {
 
     @Query(value = "select s from ClsSettings s where s.key = :key and s.status = 1")
     Optional<ClsSettings> getActualByKey(String key);
+
+    @Query(value = "select s.value from ClsSettings s where s.key =:key")
+    String getRequestsStatusStyle(String key);
 }
