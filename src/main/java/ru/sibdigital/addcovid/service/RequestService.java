@@ -706,7 +706,28 @@ public class RequestService {
      */
     @Transactional
     public DocRequest saveNewRequest(PostFormDto postForm) {
-        DocRequest docRequest = docRequestRepo.findById(postForm.getRequestId()).orElse(null);
+        DocRequest docRequest;
+
+        if (postForm.getRequestId() != null) {
+            docRequest = docRequestRepo.findById(postForm.getRequestId()).orElse(null);
+        } else {
+            ClsOrganization organization = clsOrganizationRepo.findById(postForm.getOrganizationId()).orElse(null);
+
+            ClsTypeRequest prescription = clsTypeRequestRepo.findById(postForm.getTypeRequestId()).orElse(null);
+
+            docRequest = DocRequest.builder()
+                    .organization(organization)
+                    .department(prescription.getDepartment())
+                    .personOfficeCnt(0L)
+                    .personRemoteCnt(0L)
+                    .personSlrySaveCnt(0L)
+                    .statusReview(ReviewStatuses.NEW.getValue())
+                    .statusImport(0)
+                    .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
+                    .typeRequest(prescription)
+                    .build();
+        }
+
         docRequest.setAgree(postForm.getIsAgree());
         docRequest.setProtect(postForm.getIsProtect());
         docRequest.setAdditionalAttributes(postForm.getAdditionalAttributes());

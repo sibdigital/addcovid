@@ -1,8 +1,10 @@
 let regLayout = webix.ui({
     height: windowHeight,
     css: {"background-color":"#ccd7e6"},
+    id: 'mainLayout',
     rows: [
         {
+            id: 'topSpacer',
             gravity: 0.9,
         },
         {
@@ -35,12 +37,14 @@ let regLayout = webix.ui({
                                         },
                                         {
                                             view: "label",
+                                            id: "titleReg",
                                             label: `<span style="font-size: 1.5rem; color: #ccd7e6">Регистрация на портале</span>`,
                                             height: 50,
                                             align: "center"
                                         },
                                         {
                                             view: "label",
+                                            id: "appNameReg",
                                             label: `<span style="font-size: 1.2rem; color: #ccd7e6">"${APPLICATION_NAME}"</span>`,
                                             height: 50,
                                             align: "center"
@@ -58,7 +62,7 @@ let regLayout = webix.ui({
                                             css:{"background-color":"#475466", "text-align":"center", "padding-left":"2px","padding-right":"2px"},
                                             borderless: true,
                                             template: `<span style="font-size: 0.8rem; color: #fff6f6">На шаге 1 Вам необходимо ввести ИНН Вашей организации. ИНН будет сверен с ЕГРЮЛ и ЕГРИП.</span>`,
-                                            height: 70,
+                                            height: 50,
                                             align: "center"
                                         },
                                     ]
@@ -88,10 +92,9 @@ let regLayout = webix.ui({
                                                 {
                                                     rows: [
                                                         {
-                                                            view:"template",
-                                                            autoheight: true,
-                                                            borderless: true,
-                                                            template:`<span style="padding-left: 0; font-size: 1.1rem; font-weight: 500; color: #6e6e6e">Введите ИНН Вашей организации</span>`
+                                                            view:"label",
+                                                            height: 20,
+                                                            label:`<span style="font-size: 1rem; color: #6e6e6e">Введите ИНН вашей организации</span>`
                                                         },
                                                         {
                                                             view: 'text',
@@ -307,7 +310,7 @@ let regLayout = webix.ui({
                                                                     id: 'passwordConfirm',
                                                                     name: 'passwordConfirm',
                                                                     type: 'password',
-                                                                    label: 'Пароль',
+                                                                    label: 'Подтверждение пароля',
                                                                     labelPosition: 'top',
                                                                     required: true,
                                                                     attributes: {autocomplete: 'new-password'},
@@ -504,31 +507,54 @@ function loadData(type, inn) {
 }
 
 function back() {
+    if (document.body.clientWidth < 480) {
+        $$('topSpacer').config.gravity = 0.9;
+        $$('topSpacer').resize()
+        $$("description").config.height = 50;
+        $$("description").resize()
+    }else if(document.body.clientWidth > 480){
+        $$("description").config.height = 35;
+        $$("description").resize()
+    }
     $$("wizard").back();
     $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 1</span>`)
     $$("description").setValue(`<span style="font-size: 0.8rem; color: #fff6f6">На шаге 1 Вам необходимо ввести ИНН Вашей организации. ИНН будет сверен с ЕГРЮЛ и ЕГРИП.</span>`)
+
 }
 
 function next(page) {
+    if (document.body.clientWidth < 480) {
+        $$('topSpacer').config.gravity = 0.5;
+        $$('topSpacer').resize()
+        $$("description").config.height = 95;
+        $$("description").resize()
+    }else if(document.body.clientWidth > 480){
+        $$("description").config.height = 60;
+        $$("description").resize()
+    }
     $$("wizard").getChildViews()[page].show();
     $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 2</span>`)
     $$("description").setValue(`<span style="font-size: 0.8rem; color: #fff6f6">На шаге 2 Вам необходимо ввести Адрес электронной почты Вашей организации и пароль. После регистрации, на указанный адрес электронной почты, будет отправлено письмо со ссылкой на активацию учётной записи.</span>`)
+
 }
 
 webix.ready(function() {
     let clientScreenWidth = document.body.clientWidth;
     if (clientScreenWidth < 760) {
         $$("leftLayout").hide();
-        $$("form").config.width = clientScreenWidth - 40;
-        $$("firstRow").addView($$("logo"),0);
-        // $$("firstRow").addView($$("step"),-1);
-        // $$("firstRow").addView($$("description"),-1);
+        $$("form").config.width = document.body.clientWidth-40;
+        $$("titleReg").setValue(`<span style="font-size: 1.5rem; color: #475466">Регистрация на портале</span>`)
+        $$("appNameReg").setValue(`<span style="font-size: 1.2rem; color: #475466">"${APPLICATION_NAME}"</span>`)
+        $$("description").setValue(`<span style="font-size: 0.8rem; color: #475466">На шаге 1 Вам необходимо ввести ИНН Вашей организации. ИНН будет сверен с ЕГРЮЛ и ЕГРИП.</span>`)
+        $$("firstRow").addView($$("titleReg"),-1);
+        $$("firstRow").addView($$("appNameReg"),-1);
+        $$("firstRow").addView($$("description"),-1);
         $$("form").adjust();
         $$("form").resize();
     }
     //if (EGRUL_ADDRESS) {
-        webix.extend($$('searchInn'), webix.ProgressBar);
-        $$('egrul_search').show();
+       webix.extend($$('searchInn'), webix.ProgressBar);
+       $$('egrul_search').show();
     //}
     if (document.body.clientWidth < 480){
         regLayout.config.width = document.body.clientWidth; regLayout.resize();

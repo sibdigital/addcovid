@@ -87,7 +87,7 @@ function showDropDownMenu(span){
 }
 
 function setRequestsBadge(){
-    webix.ajax("org_requests").then(function(data){
+    webix.ajax("count_confirmed_requests").then(function(data){
         let requestsCount = data.json().length;
         let request = $$('menu').getItem("Requests");
         request.badge = requestsCount;
