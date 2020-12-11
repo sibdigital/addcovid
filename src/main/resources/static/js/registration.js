@@ -526,10 +526,7 @@ webix.ready(function() {
         $$("form").adjust();
         $$("form").resize();
     }
-    //if (EGRUL_ADDRESS) {
-        webix.extend($$('searchInn'), webix.ProgressBar);
-        $$('egrul_search').show();
-    //}
+    webix.extend($$('searchInn'), webix.ProgressBar);
     if (document.body.clientWidth < 480){
         regLayout.config.width = document.body.clientWidth; regLayout.resize();
         $$("organizationName").config.label = "Наим. орг./ФИО ИП"; $$("organizationName").refresh();

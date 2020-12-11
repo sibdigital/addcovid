@@ -2,16 +2,15 @@ package ru.sibdigital.addcovid.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.dto.OrganizationDto;
 import ru.sibdigital.addcovid.model.ClsOrganization;
-import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
 import ru.sibdigital.addcovid.service.EmailService;
 import ru.sibdigital.addcovid.service.RequestService;
+import ru.sibdigital.addcovid.service.SettingService;
 
 @Slf4j
 @Controller
@@ -28,6 +27,9 @@ public class RegistrationController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private SettingService settingService;
 
     @GetMapping("/registration")
     public String registration(Model model) {
@@ -56,7 +58,9 @@ public class RegistrationController {
             }
             clsOrganization = requestService.saveClsOrganization(organizationDto);
             // отправим письмо со ссылкой на активацию
-            String text = "Для активации учетной записи пройдите по ссылке "; // TODO добавить ссылку
+            String activateUrl = settingService.findActualByKey("activationUrl", "");
+            activateUrl += "/activate?inn=" + clsOrganization.getInn() + "&code=" + clsOrganization.getHashCode();
+            String text = "Для активации учетной записи пройдите по ссылке <a href=\"" + activateUrl + "\">Активация учетной записи</a>";
             emailService.sendSimpleMessage(clsOrganization.getEmail(), applicationConstants.getApplicationName(), text);
             return "Ок";
         } catch (Exception e) {
