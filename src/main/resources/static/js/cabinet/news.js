@@ -125,7 +125,7 @@ const news = {
 
                             return "<div class = 'class_border'>" +
                                     "<span class = 'item_big_title'>" +
-                                            "<a href = \"news?hash_id=" + obj.hashId + "\" style='text-decoration: none;'>" +
+                                            "<a href = \"news?hash_id=" + obj.hashId + "\"'>" +
                                                 obj.heading +
                                             "</a>" +
                                             "</span>"+
@@ -164,7 +164,7 @@ const news = {
                                     let startTimeString = startTime.toLocaleString("ru", options)
 
                                     return "<span class = 'item_title'>" +
-                                                "<a href = \"news?hash_id=" + obj.hashId + "\" style='text-decoration: none;'>" +
+                                                "<a href = \"news?hash_id=" + obj.hashId + "\"'>" +
                                                     obj.heading +
                                                 "</a>" +
                                             "</span>"+

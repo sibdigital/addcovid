@@ -55,7 +55,7 @@ webix.ready(function() {
                 let startTimeString = startTime.toLocaleString("ru", options)
                 return "<div>" +
                     "<span class = 'item_big_title'>" +
-                    "<a href = \"news?hash_id=" + obj.hashId + "\" style='text-decoration: none;'>" +
+                    "<a href = \"news?hash_id=" + obj.hashId + "\"'>" +
                     obj.heading +
                     "</a>" +
                     "</span>" +
