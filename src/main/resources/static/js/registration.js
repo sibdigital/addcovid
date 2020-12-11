@@ -92,10 +92,9 @@ let regLayout = webix.ui({
                                                 {
                                                     rows: [
                                                         {
-                                                            view:"template",
-                                                            autoheight: true,
-                                                            borderless: true,
-                                                            template:`<span style="padding-left: 0; font-size: 1.1rem; font-weight: 500; color: #6e6e6e">Введите ИНН Вашей организации</span>`
+                                                            view:"label",
+                                                            height: 20,
+                                                            label:`<span style="font-size: 1rem; color: #6e6e6e">Введите ИНН вашей организации</span>`
                                                         },
                                                         {
                                                             view: 'text',
