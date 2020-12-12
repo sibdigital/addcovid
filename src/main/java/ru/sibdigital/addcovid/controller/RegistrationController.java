@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,6 +31,8 @@ public class RegistrationController {
 
     @Autowired
     private SettingService settingService;
+
+    private static ObjectMapper mapper = new ObjectMapper();
 
     @GetMapping("/registration")
     public String registration(Model model) {

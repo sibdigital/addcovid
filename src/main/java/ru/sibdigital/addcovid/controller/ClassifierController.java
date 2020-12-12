@@ -44,10 +44,13 @@ public class ClassifierController {
         RegEgrip egrip = egrulService.getEgrip(inn);
         if (egrip != null) {
             try {
-                response.setData(mapper.readValue(egrip.getData(), EGRIP.СвИП.class));
+                response.build(mapper.readValue(egrip.getData(), EGRIP.СвИП.class));
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }else{
+            response.setPossiblySelfEmployed(true);
+            response.setMessage("Если вы являетесь самозанятым, заполните информацию о себе");
         }
         return response;
     }

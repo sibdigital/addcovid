@@ -61,7 +61,12 @@ let regLayout = webix.ui({
                                             id: "description",
                                             css:{"background-color":"#475466", "text-align":"center", "padding-left":"2px","padding-right":"2px"},
                                             borderless: true,
-                                            template: `<span style="font-size: 0.8rem; color: #fff6f6">На шаге 1 Вам необходимо ввести ИНН Вашей организации. ИНН будет сверен с ЕГРЮЛ и ЕГРИП.</span>`,
+                                            template: `<span style="font-size: 0.8rem; color: #fff6f6">
+                                                           Вам необходимо ввести ИНН Вашей организации или ИП. ИНН будет проверен по ЕГРЮЛ и ЕГРИП. 
+                                                           Для регистрации необходимо, чтобы Ваша организаци или ИП были зарегистрированы в ЕРЮЛ или ЕГРИП.
+                                                           Если вы открылись недавно, проверка может показать отсутствие сведений. 
+                                                           В таком случае рекомендуется начать регистрацию повторно через несколько рабочих дней.
+                                                           Если вы являетесь самозанятым, то вам необходимо будет самостоятельно заполнить данные о себе</span>`,
                                             height: 50,
                                             align: "center"
                                         },
@@ -191,37 +196,29 @@ let regLayout = webix.ui({
                                                                     view: 'text',
                                                                     id: 'organizationName',
                                                                     name: 'organizationName',
-                                                                    label: 'Наименование организации/ИП',
+                                                                    label: 'Наименование организации',
                                                                     labelPosition: 'top',
                                                                     readonly: true,
+                                                                    hidden: true,
                                                                     required: true
                                                                 },
                                                                 {
                                                                     view: 'text',
                                                                     id: 'organizationShortName',
                                                                     name: 'organizationShortName',
-                                                                    label: 'Краткое наименование организации',
+                                                                    label: 'Наименование организации',
                                                                     labelPosition: 'top',
-                                                                    hidden: true,
+                                                                    readonly: true,
                                                                     required: true
                                                                 },
                                                                 {
                                                                     view: 'checkbox',
+                                                                    id: 'isSelfEmployed',
                                                                     name: 'isSelfEmployed',
                                                                     labelPosition: 'top',
                                                                     minWidth: 90,
                                                                     label: 'Самозанятый',
                                                                     hidden: true,
-                                                                    on: {
-                                                                        onChange(newv, oldv) {
-                                                                            if (newv === 1) {
-                                                                                $$('organizationOgrn').setValue('');
-                                                                                $$('organizationOgrn').disable();
-                                                                            } else {
-                                                                                $$('organizationOgrn').enable();
-                                                                            }
-                                                                        }
-                                                                    }
                                                                 },
                                                                 {
                                                                     view: 'text',
@@ -230,51 +227,6 @@ let regLayout = webix.ui({
                                                                     label: 'ОГРН',
                                                                     validate: webix.rules.isNumber,
                                                                     labelPosition: 'top',
-                                                                    hidden: true,
-                                                                    required: true
-                                                                },
-                                                                {
-                                                                    view: 'text',
-                                                                    id: 'organizationOkved',
-                                                                    name: 'organizationOkved',
-                                                                    label: 'Основной вид осуществляемой деятельности (отрасль)',
-                                                                    labelPosition: 'top',
-                                                                    placeholder: '01.11',
-                                                                    required: true,
-                                                                    hidden: true,
-                                                                    on: {
-                                                                        onKeyPress(code, event) {
-                                                                            if (code === 32) {
-                                                                                return false;
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                },
-                                                                {
-                                                                    view: 'textarea',
-                                                                    id: 'organizationOkvedAdd',
-                                                                    name: 'organizationOkvedAdd',
-                                                                    label: 'Дополнительные виды осуществляемой деятельности',
-                                                                    height: 100,
-                                                                    labelPosition: 'top',
-                                                                    placeholder: '01.13\n01.13.1',
-                                                                    hidden: true,
-                                                                    on: {
-                                                                        onKeyPress(code, event) {
-                                                                            if (code === 32) {
-                                                                                this.setValue(this.getValue() + '\n')
-                                                                                return false;
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                },
-                                                                {
-                                                                    view: 'textarea',
-                                                                    id: 'organizationAddressJur',
-                                                                    name: 'organizationAddressJur',
-                                                                    label: 'Юридический адрес',
-                                                                    labelPosition: 'top',
-                                                                    height: 80,
                                                                     hidden: true,
                                                                     required: true
                                                                 },
@@ -292,7 +244,6 @@ let regLayout = webix.ui({
                                                                     name: 'organizationPhone',
                                                                     label: 'Телефон',
                                                                     labelPosition: 'top',
-                                                                    hidden: true,
                                                                     required: true
                                                                 },
                                                                 {
@@ -339,29 +290,8 @@ let regLayout = webix.ui({
                                                                         if ($$('form').validate()) {
 
                                                                             let params = $$('form').getValues();
-
-                                                                            if (params.organizationShortName.length > 255) {
-                                                                                webix.message('Превышена длина краткого наименования', 'error')
-                                                                                return false
-                                                                            }
-
                                                                             params.organizationInn = params.organizationInn.trim();
                                                                             params.organizationOgrn = params.organizationOgrn.trim();
-
-                                                                            if (params.organizationInn.length > 12) {
-                                                                                webix.message('Превышена длина ИНН', 'error');
-                                                                                return false;
-                                                                            }
-
-                                                                            if (params.organizationOgrn.length > 15) {
-                                                                                webix.message('Превышена длина ОГРН', 'error');
-                                                                                return false;
-                                                                            }
-
-                                                                            if (params.organizationAddressJur.length > 255) {
-                                                                                webix.message('Превышена длина юридического адреса', 'error')
-                                                                                return false
-                                                                            }
 
                                                                             if (params.organizationEmail.length > 100) {
                                                                                 webix.message('Превышена длина электронной почты', 'error');
@@ -422,79 +352,42 @@ let regLayout = webix.ui({
 function loadData(type, inn) {
     webix.ajax('/' + type + '?inn=' + inn).then(function (data) {
         const response = data.json();
-        if (!response.data) {
-            webix.message('Данные не найдены', 'error');
+        if (!response.data && response.possiblySelfEmployed == false) {
+            webix.message('Введеный ИНН не найден в ЕГРИП и ЕГРЮЛ. Проверьте введенные данные. Возможно, вы ввели неправильный ИНН.', 'error');
             $$('searchInn').hideProgress();
         } else {
             if (type === 'egrul') {
                 const result = response.data;
-                //let egrulOkvedAdd = [];
-                //let okvedAdd = '';
-                // if (result.свОКВЭД.свОКВЭДДоп) {
-                //     result.свОКВЭД.свОКВЭДДоп.forEach(function (elem) {
-                //         okvedAdd += elem.кодОКВЭД + ' ' + elem.наимОКВЭД + '\n';
-                //         egrulOkvedAdd.push(elem.кодОКВЭД);
-                //     })
-                // }
-                //let jurAddress = '';
-                // if (result.свАдресЮЛ) {
-                //     jurAddress += result.свАдресЮЛ.адресРФ.индекс
-                //     jurAddress += ', ' + result.свАдресЮЛ.адресРФ.регион.наимРегион;
-                //     jurAddress += result.свАдресЮЛ.адресРФ.район.наимРайон ? ', ' + result.свАдресЮЛ.адресРФ.район.наимРайон : '';
-                //     jurAddress += result.свАдресЮЛ.адресРФ.город.наимГород ? ', ' + result.свАдресЮЛ.адресРФ.город.наимГород : '';
-                //     jurAddress += result.свАдресЮЛ.адресРФ.населПункт.наимНаселПункт ? ', ' + result.свАдресЮЛ.адресРФ.населПункт.наимНаселПункт : '';
-                //     jurAddress += result.свАдресЮЛ.адресРФ.улица.наимУлица ? ', ' + result.свАдресЮЛ.адресРФ.улица.наимУлица : '';
-                //     jurAddress += result.свАдресЮЛ.адресРФ.дом ? ', ' + result.свАдресЮЛ.адресРФ.дом : '';
-                //     jurAddress += result.свАдресЮЛ.адресРФ.корпус ? ', ' + result.свАдресЮЛ.адресРФ.корпус : '';
-                //     jurAddress += result.свАдресЮЛ.адресРФ.квартира ? ', ' + result.свАдресЮЛ.адресРФ.квартира : '';
-                // }
                 $$('form').setValues({
                     searchInn: inn,
                     organizationName: result.name,
-                    organizationShortName: result.shortName,
+                    organizationShortName: (result.shortName ? result.shortName : result.name),
                     organizationInn: result.inn,
                     organizationOgrn: result.ogrn,
-                    organizationEmail: result.email,
-                    //organizationOkved: result.свОКВЭД.свОКВЭДОсн.кодОКВЭД + ' ' + result.свОКВЭД.свОКВЭДОсн.наимОКВЭД,
-                    //egrulOkved: result.свОКВЭД.свОКВЭДОсн.кодОКВЭД,
-                    //organizationOkvedAdd: okvedAdd,
-                    //egrulOkvedAdd: egrulOkvedAdd,
-                    //organizationAddressJur: jurAddress
+                    organizationEmail: result.email
                 })
             } else {
                 const result = response.data;
-                let name = result.наимВидИП;
-                name += result.свФЛ.фиорус.фамилия ? ' ' + result.свФЛ.фиорус.фамилия : '';
-                name += result.свФЛ.фиорус.имя ? ' ' + result.свФЛ.фиорус.имя : '';
-                name += result.свФЛ.фиорус.отчество ? ' ' + result.свФЛ.фиорус.отчество : '';
-                let egrulOkvedAdd = [];
-                let okvedAdd = '';
-                // if (result.свОКВЭД.свОКВЭДДоп) {
-                //     result.свОКВЭД.свОКВЭДДоп.forEach(function (elem) {
-                //         okvedAdd += elem.кодОКВЭД + ' ' + elem.наимОКВЭД + '\n';
-                //         egrulOkvedAdd.push(elem.кодОКВЭД);
-                //     })
-                // }
-                // let jurAddress = '';
-                // if (result.свАдрМЖ) {
-                //     jurAddress += result.свАдрМЖ.адресРФ.регион.наимРегион;
-                //     jurAddress += result.свАдрМЖ.адресРФ.район.наимРайон ? ', ' + result.свАдрМЖ.адресРФ.район.наимРайон : '';
-                //     jurAddress += result.свАдрМЖ.адресРФ.город.наимГород ? ', ' + result.свАдрМЖ.адресРФ.город.наимГород : '';
-                //     jurAddress += result.свАдрМЖ.адресРФ.населПункт.наимНаселПункт ? ', ' + result.свАдрМЖ.адресРФ.населПункт.наимНаселПункт : '';
-                // }
-                $$('form').setValues({
-                    searchInn: inn,
-                    organizationName: name,
-                    organizationShortName: name,
-                    organizationInn: result.иннфл,
-                    organizationOgrn: result.огрнип,
-                    organizationEmail: result.свАдрЭлПочты.email,
-                    organizationOkved: result.свОКВЭД.свОКВЭДОсн.кодОКВЭД + ' ' + result.свОКВЭД.свОКВЭДОсн.наимОКВЭД,
-                    //egrulOkved: result.свОКВЭД.свОКВЭДОсн.кодОКВЭД,
-                    organizationOkvedAdd: okvedAdd,
-                    //egrulOkvedAdd: egrulOkvedAdd,
-                    organizationAddressJur: jurAddress
-                })
+                if (response.possiblySelfEmployed == false){
+                    $$('organizationShortName').config.label = 'ФИО ИП';
+                    $$('form').setValues({
+                        searchInn: inn,
+                        organizationName: result.name,
+                        organizationShortName: result.name,
+                        organizationInn: result.inn,
+                        organizationEmail: result.email
+                    })
+                }else{
+                    $$('organizationShortName').config.label = 'ФИО cамозанятого';
+                    $$('organizationShortName').config.readonly = false;
+                    $$('form').setValues({
+                        searchInn: inn,
+                        isSelfEmployed: true,
+                        organizationInn: inn
+                    })
+
+                }
+
             }
 
             $$('searchInn').hideProgress();
@@ -557,7 +450,6 @@ webix.ready(function() {
         regLayout.config.width = document.body.clientWidth; regLayout.resize();
         $$("organizationName").config.label = "Наим. орг./ФИО ИП"; $$("organizationName").refresh();
         $$("organizationShortName").config.label = "Краткое наим. огр."; $$("organizationShortName").refresh();
-        $$("organizationOkved").config.label = "Осн. вид деятельности"; $$("organizationOkved").refresh();
-        $$("organizationOkvedAdd").config.label = "Доп. виды деятельности"; $$("organizationOkvedAdd").refresh();
+
     }
 })
