@@ -192,17 +192,6 @@
             $$("logo").resize();
             $$("description").resize();
         }
-        //if (EGRUL_ADDRESS) {
-           webix.extend($$('searchInn'), webix.ProgressBar);
-           $$('egrul_search').show();
-        //}
-        if (document.body.clientWidth < 480){
-            regLayout.config.width = document.body.clientWidth; regLayout.resize();
-            $$("organizationName").config.label = "Наим. орг./ФИО ИП"; $$("organizationName").refresh();
-            $$("organizationShortName").config.label = "Краткое наим. огр."; $$("organizationShortName").refresh();
-            $$("organizationOkved").config.label = "Осн. вид деятельности"; $$("organizationOkved").refresh();
-            $$("organizationOkvedAdd").config.label = "Доп. виды деятельности"; $$("organizationOkvedAdd").refresh();
-        }
     })
 </script>
 </body>
