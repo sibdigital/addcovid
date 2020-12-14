@@ -317,7 +317,9 @@ const requestWizard = {
                                                 css: 'webix_primary',
                                                 maxWidth: 301,
                                                 value: 'Продолжить',
-                                                click: next
+                                                click: function () {
+                                                    next(1);
+                                                }
                                             }
                                         ]
                                     }
@@ -342,7 +344,13 @@ const requestWizard = {
                                                 css: 'webix_primary',
                                                 maxWidth: 301,
                                                 value: 'Продолжить',
-                                                click: next
+                                                click: function () {
+                                                    if ($$('employees_table').count() == 0) {
+                                                        webix.message('Добавьте сотрудников', 'error');
+                                                    } else {
+                                                        next(2);
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
@@ -367,7 +375,13 @@ const requestWizard = {
                                                 css: 'webix_primary',
                                                 maxWidth: 301,
                                                 value: 'Продолжить',
-                                                click: next
+                                                click: function () {
+                                                    if ($$('address_fact_grid').count() == 0) {
+                                                        webix.message('Добавьте фактические адреса', 'error');
+                                                    } else {
+                                                        next(3);
+                                                    }
+                                                }
                                             }
                                         ]
                                     }
@@ -588,13 +602,8 @@ function back() {
     $$("wizard").back();
 }
 
-function next() {
-    const parentCell = this.getParentView().getParentView();
-    const index = $$("wizard").index(parentCell);
-    const next = $$("wizard").getChildViews()[index + 1]
-    if (next) {
-        next.show();
-    }
+function next(page) {
+    $$("wizard").getChildViews()[page].show();
 }
 
 function showRequestCreateForm(idTypeRequest, page) {
