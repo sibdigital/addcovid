@@ -24,4 +24,8 @@ public class SettingServiceImpl implements SettingService {
         String ret = settings != null ? settings.getStringValue() : defaultValue;
         return ret;
     }
+
+    public String getRequestsStatusStyle(String key){
+        return clsSettingsRepo.getRequestsStatusStyle(key);
+    }
 }

@@ -1,5 +1,7 @@
 package ru.sibdigital.addcovid.model;
 
+import ru.sibdigital.addcovid.model.classifier.gov.Okved;
+
 import javax.persistence.Embeddable;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;

@@ -2,6 +2,7 @@ package ru.sibdigital.addcovid.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -10,15 +11,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
+import ru.sibdigital.addcovid.dto.ClsMailingListDto;
 import ru.sibdigital.addcovid.dto.EmployeeDto;
 import ru.sibdigital.addcovid.dto.OrganizationContactDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.dto.PrincipalDto;
 import ru.sibdigital.addcovid.model.*;
+import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.RequestService;
+import ru.sibdigital.addcovid.service.SettingServiceImpl;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import java.sql.Timestamp;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,6 +56,15 @@ public class CabinetController {
     private DocEmployeeRepo docEmployeeRepo;
 
     @Autowired
+    private ClsNewsRepo clsNewsRepo;
+
+    @Autowired
+    private ClsMailingListRepo clsMailingListRepo;
+
+    @Autowired
+    private RegMailingListFollowerRepo regMailingListFollowerRepo;
+
+    @Autowired
     private DocAddressFactRepo docAddressFactRepo;
 
     @Autowired
@@ -55,6 +72,12 @@ public class CabinetController {
 
     @Autowired
     private FiasAddrObjectRepo fiasAddrObjectRepo;
+
+    @Autowired
+    private ClsTypeRequestRepo clsTypeRequestRepo;
+
+    @Autowired
+    private SettingServiceImpl settingServiceImpl;
 
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
@@ -120,6 +143,16 @@ public class CabinetController {
         return requests;
     }
 
+    @GetMapping("/count_confirmed_requests")
+    public @ResponseBody List<Integer> getAllConfirmedRequest(HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        if(id == null){
+            return null;
+        }
+        List<Integer> confirmedRequestStatus = docRequestRepo.getAllRequestWithConfirmedStatus(id).orElse(null);
+        return confirmedRequestStatus;
+    }
+
     @PostMapping("/save_pass")
     public @ResponseBody String savePassword(@RequestBody PrincipalDto principalDto, HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
@@ -134,6 +167,16 @@ public class CabinetController {
             return "Пароль обновлен";
         }
         return "Пароль не обновлен";
+    }
+
+    @GetMapping("/prescriptions")
+    public @ResponseBody List<ClsTypeRequest> getPrescriptions(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        List<ClsTypeRequest> prescriptions = clsTypeRequestRepo.getPrescriptionsByOrganizationId(id);
+        return prescriptions;
     }
 
     @PostMapping("/cabinet/typed_form")
@@ -326,6 +369,158 @@ public class CabinetController {
         return employeeDto;
     }
 
+    @GetMapping("/newsfeed")
+    public @ResponseBody List<ClsNews> getNewsList(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        List<ClsNews> newsList = clsNewsRepo.getCurrentNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
+        return newsList;
+    }
+
+    @GetMapping("/news_archive")
+    public @ResponseBody Map<String, Object> getNewsArchive(HttpSession session, @RequestParam(value = "start", required = false) Integer start,
+                                                         @RequestParam(value = "count", required = false) Integer count) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+
+        int page = start == null ? 0 : start / 10;
+        int size = count == null ? 10 : count;
+        Map<String, Object> result = new HashMap<>();
+        Page<ClsNews> templates = requestService.findNewsArchiveByOrganization_Id(id, page, size);
+
+        result.put("data", templates.getContent());
+        result.put("pos", (long) page * size);
+        result.put("total_count", templates.getTotalElements());
+        return result;
+    }
+
+
+    @GetMapping("/news")
+    public String getNewsById( @RequestParam("hash_id") String hash_id, Model model){
+        model.addAttribute("hash_id", hash_id);
+        model.addAttribute("link_prefix", applicationConstants.getLinkPrefix());
+        model.addAttribute("link_suffix", applicationConstants.getLinkSuffix());
+        model.addAttribute("application_name", applicationConstants.getApplicationName());
+        return "news_form";
+    }
+
+    @GetMapping("/news/{hash_id}")
+    public @ResponseBody ClsNews getNewsById(@PathVariable("hash_id") String hash_id, HttpServletRequest request){
+        ClsNews clsNews = clsNewsRepo.findByHashId(hash_id);
+        requestService.saveLinkClicks(request, clsNews);
+        return clsNews;
+    }
+
+    @GetMapping("/my_mailing_list")
+    public @ResponseBody List<ClsMailingList> getMyMailingList(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        if (organization != null && organization.getPrincipal() != null) {
+            ClsPrincipal principal = organization.getPrincipal();
+            List<ClsMailingList> mailingList = clsMailingListRepo.findMyMailingList(principal.getId());
+            return mailingList;
+        }
+        else {
+            return null;
+        }
+    }
+
+    @GetMapping("/available_not_mine_mailing_list")
+    public @ResponseBody List<ClsMailingList> getAvailableMailingList(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        if (organization != null && organization.getPrincipal() != null) {
+            ClsPrincipal principal = organization.getPrincipal();
+            List<ClsMailingList> mailingList = clsMailingListRepo.findAvailableMailingListNotMine(principal.getId());
+            return mailingList;
+        }
+        else {
+            return null;
+        }
+    }
+
+    @PostMapping("/saveMailing")
+    public @ResponseBody
+    String saveMailing(@RequestBody List<ClsMailingListDto> clsMailingListDtos, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        if (organization != null && organization.getPrincipal() != null) {
+            ClsPrincipal principal = organization.getPrincipal();
+            for (ClsMailingListDto clsMailingListDto : clsMailingListDtos) {
+                try {
+                    requestService.saveMailing(clsMailingListDto, principal);
+                }
+                catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    return null;
+                }
+            }
+        }
+        return "Рассылки сохранены";
+    }
+
+
+    @PostMapping("/deactivateMailing")
+    public @ResponseBody
+    String deactivateMailing(@RequestBody List<ClsMailingListDto> clsMailingListDtos, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        if (organization != null && organization.getPrincipal() != null) {
+            ClsPrincipal principal = organization.getPrincipal();
+            for (ClsMailingListDto clsMailingListDto : clsMailingListDtos) {
+                try {
+                    requestService.deactivateMailing(clsMailingListDto, principal);
+                }
+                catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    return "Не получилось деактивировать рассылку: " + clsMailingListDto.getName();
+                }
+            }
+        }
+        return "Рассылки деактивированы";
+    }
+
+    @PostMapping("/cabinet/new_request")
+    public @ResponseBody String postNewRequest(@RequestBody PostFormDto postFormDto) {
+        try {
+            String errors = validateNewRequest(postFormDto);
+            if (errors.isEmpty()) {
+                requestService.saveNewRequest(postFormDto);
+                return "Заявка принята. Ожидайте ответ на электронную почту.";
+            } else {
+                return errors;
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "Невозможно подать заявку";
+        }
+    }
+
+    private String validateNewRequest(PostFormDto postFormDto) {
+        String errors = "";
+        try {
+            if (postFormDto.getIsAgree() == false) {
+                errors += "Необходимо подтвердить согласие работников на обработку персональных данных\n";
+            }
+//            if (postFormDto.getIsProtect() == false) {
+//                errors += "Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия\n";
+//            }
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            errors += "Неправильно заполнены необходимые поля\n";
+        }
+
+        if (!errors.isEmpty()) {
+            errors = "ЗАЯВКА НЕ ВНЕСЕНА. ОБНАРУЖЕНЫ ОШИБКИ ЗАПОЛНЕНИЯ: " + errors;
+        }
+
+        return errors;
+    }
+
     @GetMapping("/address_facts")
     public @ResponseBody  List<Map<String, Object>> getAddressFactsList(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
@@ -440,5 +635,12 @@ public class CabinetController {
         }
 
         return result;
+    }
+
+    @PostMapping("/requests_status_style")
+    public @ResponseBody String getRequestsStatusStyle(@RequestBody String key){
+        String optimalKey = key.substring(1, key.length() -1);
+        String style = settingServiceImpl.getRequestsStatusStyle(optimalKey);
+        return style;
     }
 }

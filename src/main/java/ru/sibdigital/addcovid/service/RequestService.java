@@ -4,19 +4,24 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.dto.ClsMailingListDto;
 import ru.sibdigital.addcovid.dto.EmployeeDto;
 import ru.sibdigital.addcovid.dto.OrganizationContactDto;
 import ru.sibdigital.addcovid.dto.OrganizationDto;
 import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.model.*;
+import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 import ru.sibdigital.addcovid.repository.*;
+import ru.sibdigital.addcovid.repository.classifier.gov.OkvedRepo;
 import ru.sibdigital.addcovid.utils.PasswordGenerator;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,7 +83,19 @@ public class RequestService {
     private DocEmployeeRepo docEmployeeRepo;
 
     @Autowired
+    private RegMailingListFollowerRepo regMailingListFollowerRepo;
+
+    @Autowired
+    private ClsMailingListRepo clsMailingListRepo;
+
+    @Autowired
     private RegOrganizationAddressFactRepo regOrganizationAddressFactRepo;
+
+    @Autowired
+    private ClsNewsRepo clsNewsRepo;
+
+    @Autowired
+    private RegNewsLinkClicksRepo regNewsLinkClicksRepo;
 
     @Value("${upload.path:/uploads}")
     String uploadingDir;
@@ -430,6 +447,8 @@ public class RequestService {
             typeOrganization = OrganizationTypes.SELF_EMPLOYED.getValue();
         }
 
+        String code = SHA256Generator.generate(organizationDto.getOrganizationInn(), organizationDto.getOrganizationName());
+
         ClsOrganization clsOrganization = ClsOrganization.builder()
                 .name(organizationDto.getOrganizationName())
                 .shortName(organizationDto.getOrganizationShortName())
@@ -443,6 +462,9 @@ public class RequestService {
                 .statusImport(0)
                 .idTypeOrganization(typeOrganization)
                 .principal(clsPrincipal)
+                .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
+                .isActivated(false)
+                .hashCode(code)
                 .build();
 
         clsOrganizationRepo.save(clsOrganization);
@@ -641,9 +663,151 @@ public class RequestService {
 
     }
 
+    @Transactional
+    public void saveMailing(ClsMailingListDto clsMailingListDto, ClsPrincipal principal){
+        Long id_clsMailingList = clsMailingListDto.getId();
+        ClsMailingList clsMailingList = clsMailingListRepo.findById(id_clsMailingList).orElse(null);
+        RegMailingListFollower regMailingListFollower = regMailingListFollowerRepo.findByPrincipalAndMailingList(principal, clsMailingList);
+        if (regMailingListFollower == null) {
+            regMailingListFollower = new RegMailingListFollower();
+            regMailingListFollower.setPrincipal(principal);
+            regMailingListFollower.setMailingList(clsMailingList);
+            regMailingListFollower.setActivationDate(new Timestamp(new Date().getTime()));
+            regMailingListFollowerRepo.save(regMailingListFollower);
+        }
+        else {
+            // Если был деактивирован
+            if (regMailingListFollower.getDectivationDate() != null) {
+                regMailingListFollower.setDectivationDate(null);
+                regMailingListFollower.setActivationDate(new Timestamp(new Date().getTime()));
+                regMailingListFollowerRepo.save(regMailingListFollower);
+            }
+        }
+    }
+
+    @Transactional
+    public void deactivateMailing(ClsMailingListDto clsMailingListDto, ClsPrincipal principal){
+        Long id_clsMailingList = clsMailingListDto.getId();
+        ClsMailingList clsMailingList = clsMailingListRepo.findById(id_clsMailingList).orElse(null);
+        RegMailingListFollower regMailingListFollower = regMailingListFollowerRepo.findByPrincipalAndMailingList(principal, clsMailingList);
+        if (regMailingListFollower != null) {
+            if (regMailingListFollower.getDectivationDate() == null) {
+                regMailingListFollower.setDectivationDate(new Timestamp(new Date().getTime()));
+                regMailingListFollowerRepo.save(regMailingListFollower);
+            }
+        }
+    }
+
     public List<ClsOrganizationContact> getAllClsOrganizationContactByOrganizationId(Long id){
         return clsOrganizationContactRepo.findAllByOrganization(id).orElse(null);
     }
 
+    /**
+     * Метод предназначен для сохранения заявки по предписанию
+     *
+     * @param postForm
+     * @return
+     */
+    @Transactional
+    public DocRequest saveNewRequest(PostFormDto postForm) {
+        DocRequest docRequest;
+
+        if (postForm.getRequestId() != null) {
+            docRequest = docRequestRepo.findById(postForm.getRequestId()).orElse(null);
+        } else {
+            ClsOrganization organization = clsOrganizationRepo.findById(postForm.getOrganizationId()).orElse(null);
+
+            ClsTypeRequest prescription = clsTypeRequestRepo.findById(postForm.getTypeRequestId()).orElse(null);
+
+            docRequest = DocRequest.builder()
+                    .organization(organization)
+                    .department(prescription.getDepartment())
+                    .personOfficeCnt(0L)
+                    .personRemoteCnt(0L)
+                    .personSlrySaveCnt(0L)
+                    .statusReview(ReviewStatuses.NEW.getValue())
+                    .statusImport(0)
+                    .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
+                    .typeRequest(prescription)
+                    .build();
+        }
+
+        docRequest.setAgree(postForm.getIsAgree());
+        docRequest.setProtect(postForm.getIsProtect());
+        docRequest.setAdditionalAttributes(postForm.getAdditionalAttributes());
+        docRequest.setStatusReview(ReviewStatuses.OPENED.getValue());
+
+        docRequestRepo.save(docRequest);
+
+        return docRequest;
+    }
+
+    public String activateOrganization(String inn, String code) {
+        String message = "";
+        try {
+            ClsOrganization clsOrganization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
+            if (clsOrganization != null) {
+                if (clsOrganization.getHashCode().equals(code)) {
+                    if (!clsOrganization.getActivated().booleanValue()) {
+                        clsOrganization.setActivated(true);
+                        clsOrganization.setHashCode(SHA256Generator.generate(clsOrganization.getInn(), clsOrganization.getName(), clsOrganization.getEmail()));
+                        clsOrganizationRepo.save(clsOrganization);
+                        message = "Учётная запись успешно активирована.";
+                    } else {
+                        message = "Активация не требуется.";
+                    }
+                } else {
+                    message = "Неверный код! Активация не выполнена.";
+                }
+            } else {
+                message = "Учетная запись не найдена!";
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            message = "Не удалось активировать учётную запись!";
+        }
+        return message;
+    }
+
+    public Page<ClsNews> findNewsArchiveByOrganization_Id(Long id, int page, int size) {
+        List<ClsNews> newsList = clsNewsRepo.getNewsArchiveByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
+
+        Pageable pageable = PageRequest.of(page, size);
+        long start = pageable.getOffset();
+        long end = (start + pageable.getPageSize()) > newsList.size() ? newsList.size() : (start + pageable.getPageSize());
+
+        Page<ClsNews> pages = new PageImpl<ClsNews>(newsList.subList((int) start, (int) end), pageable, newsList.size());
+        return pages;
+    }
+
+    public void saveLinkClicks(HttpServletRequest request, ClsNews clsNews) {
+        try {
+            String ip = getClientIp(request);
+            RegNewsLinkClicks rnlc =  RegNewsLinkClicks.builder()
+                    .news(clsNews)
+                    .ip(ip)
+                    .time(new Timestamp(System.currentTimeMillis()))
+                    .build();
+            regNewsLinkClicksRepo.save(rnlc);
+        }
+        catch (Exception e) {
+            log.error(String.format("Переход по новости id =%s не сохранен", ((clsNews!=null)?clsNews.getId():"null")));
+        }
+
+    }
+
+    private static String getClientIp(HttpServletRequest request) {
+
+        String remoteAddr = "";
+
+        if (request != null) {
+            remoteAddr = request.getHeader("X-FORWARDED-FOR");
+            if (remoteAddr == null || "".equals(remoteAddr)) {
+                remoteAddr = request.getRemoteAddr();
+            }
+        }
+
+        return remoteAddr;
+    }
 
 }

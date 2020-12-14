@@ -33,9 +33,12 @@ public class ClsOrganization {
     private String phone;
     private Integer statusImport;
     private Timestamp timeImport;
+    private String hashCode;
     private Integer idTypeRequest;
     private Integer idTypeOrganization;
     private Integer typeTaxReporting;
+    private Timestamp timeCreate;
+    private Boolean isActivated;
 
     @OneToOne
     @JoinColumn(name = "id_principal", referencedColumnName = "id")
@@ -159,6 +162,17 @@ public class ClsOrganization {
         this.timeImport = timeImport;
     }
 
+    @JsonIgnore
+    @Basic
+    @Column(name = "hash_code", nullable = true)
+    public String getHashCode() {
+        return hashCode;
+    }
+
+    public void setHashCode(String hashCode) {
+        this.hashCode = hashCode;
+    }
+
     @Basic
     @Column(name = "id_type_request", nullable = true)
     public Integer getIdTypeRequest() {
@@ -187,6 +201,26 @@ public class ClsOrganization {
 
     public void setTypeTaxReporting(Integer typeTaxReporting) {
         this.typeTaxReporting = typeTaxReporting;
+    }
+
+    @Basic
+    @Column(name = "time_create")
+    public Timestamp getTimeCreate() {
+        return timeCreate;
+    }
+
+    public void setTimeCreate(Timestamp timeCreate) {
+        this.timeCreate = timeCreate;
+    }
+
+    @Basic
+    @Column(name = "is_activated")
+    public Boolean getActivated() {
+        return isActivated;
+    }
+
+    public void setActivated(Boolean activated) {
+        isActivated = activated;
     }
 
     @JsonIgnore

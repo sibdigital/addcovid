@@ -36,12 +36,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/libs/**", "/css/**").permitAll()
                 .antMatchers("/js/**").permitAll() // TODO удалить, когда доступ нужно будет закрыть
-                .antMatchers("/", "/registration", "/recovery").permitAll()
-                .antMatchers("/form", "/barber", "/typed_form", "/personal_form", "/dacha", "/actualize_form").permitAll() // TODO удалить, когда доступ нужно будет закрыть
+                .antMatchers("/", "/checkInn", "/registration", "/activate", "/recovery").permitAll()
+                .antMatchers("/form", "/barber", "/typed_form", "/personal_form", "/dacha", "/actualize_form", "/news_form").permitAll() // TODO удалить, когда доступ нужно будет закрыть
                 .antMatchers("/cls_type_requests", "/cls_type_request/*", "/cls_departments", "/cls_districts", "/actualized_doc_requests", "/doc_requests/*", "/doc_persons/*", "/doc_address_fact/*" ).permitAll() // TODO удалить, когда доступ нужно будет закрыть
                 .antMatchers("/upload", "/uploadpart", "/upload/protocol", "/download/*").permitAll() // TODO удалить, когда доступ нужно будет закрыть
                 .antMatchers("/login").permitAll()
                 .antMatchers("/favicon.ico","/logo.png").permitAll()
+                .antMatchers("/egrul", "/egrip").permitAll()
+                .antMatchers("/news*", "/news/*").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -52,6 +54,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .deleteCookies("JSESSIONID");
+                .deleteCookies("JSESSIONID")
+                .and()
+                .sessionManagement()
+                .invalidSessionUrl("/login");
     }
 }

@@ -13,8 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostFormDto {
+    private Long requestId;
     private Long organizationId;
-    
+    private Long typeRequestId;
+
     private Long departmentId;
     private Long districtId;
 

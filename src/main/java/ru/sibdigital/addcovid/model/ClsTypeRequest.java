@@ -5,7 +5,10 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cls_type_request", schema = "public")
@@ -25,10 +28,19 @@ public class ClsTypeRequest {
     private int statusVisible;
     private int sortWeight;
     private String consent;
+    private int statusPublication;
+    private Timestamp timePublication;
 
     @OneToOne
     @JoinColumn(name = "id_department", referencedColumnName = "id")
     private ClsDepartment department;
+
+    @OneToMany(mappedBy = "regTypeRequestRestrictionTypeId.clsTypeRequest")
+    private Set<RegTypeRequestRestrictionType> regTypeRequestRestrictionTypes;
+
+    @OrderBy("num asc")
+    @OneToMany(targetEntity = RegTypeRequestPrescription.class, mappedBy = "typeRequest", fetch = FetchType.LAZY)
+    private List<RegTypeRequestPrescription> regTypeRequestPrescriptions;
 
     public Long getId() {
         return id;
@@ -124,6 +136,52 @@ public class ClsTypeRequest {
 
     public void setConsent(String consent) {
         this.consent = consent;
+    }
+
+    @Basic
+    @Column(name = "status_publication")
+    public int getStatusPublication() {
+        return statusPublication;
+    }
+
+    public void setStatusPublication(int statusPublication) {
+        this.statusPublication = statusPublication;
+    }
+
+    public String getStatusPublicationName(){
+        String result  = "";
+        if (this.statusPublication == PublicationStatuses.NOT_PUBLISHED.getValue()) {
+            result = "Не опубликовано";
+        } else if (this.statusPublication == PublicationStatuses.PUBLISHED.getValue()) {
+            result = "Опубликовано";
+        }
+        return result;
+    }
+
+    @Basic
+    @Column(name = "time_publication")
+    public Timestamp getTimePublication() {
+        return timePublication;
+    }
+
+    public void setTimePublication(Timestamp timePublication) {
+        this.timePublication = timePublication;
+    }
+
+    public Set<RegTypeRequestRestrictionType> getRegTypeRequestRestrictionTypes() {
+        return regTypeRequestRestrictionTypes;
+    }
+
+    public void setRegTypeRequestRestrictionTypes(Set<RegTypeRequestRestrictionType> regTypeRequestRestrictionTypes) {
+        this.regTypeRequestRestrictionTypes = regTypeRequestRestrictionTypes;
+    }
+
+    public List<RegTypeRequestPrescription> getRegTypeRequestPrescriptions() {
+        return regTypeRequestPrescriptions;
+    }
+
+    public void setRegTypeRequestPrescriptions(List<RegTypeRequestPrescription> regTypeRequestPrescriptions) {
+        this.regTypeRequestPrescriptions = regTypeRequestPrescriptions;
     }
 
     @Override
