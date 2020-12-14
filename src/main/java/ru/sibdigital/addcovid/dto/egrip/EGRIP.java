@@ -2276,7 +2276,7 @@ public class EGRIP {
             protected ГРНИПДатаТип грнипДата;
             @XmlElement(name = "\u0413\u0420\u041d\u0418\u041f\u0414\u0430\u0442\u0430\u0418\u0441\u043f\u0440")
             protected ГРНИПДатаТип грнипДатаИспр;
-            @XmlAttribute(name = "E-mail", required = true)
+            @XmlAttribute(name = "eMail", required = true)
             protected String eMail;
 
             /**

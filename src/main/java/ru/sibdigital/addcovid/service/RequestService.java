@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import ru.sibdigital.addcovid.repository.classifier.gov.OkvedRepo;
 import ru.sibdigital.addcovid.utils.PasswordGenerator;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
@@ -88,6 +90,12 @@ public class RequestService {
 
     @Autowired
     private RegOrganizationAddressFactRepo regOrganizationAddressFactRepo;
+
+    @Autowired
+    private ClsNewsRepo clsNewsRepo;
+
+    @Autowired
+    private RegNewsLinkClicksRepo regNewsLinkClicksRepo;
 
     @Value("${upload.path:/uploads}")
     String uploadingDir;
@@ -557,9 +565,9 @@ public class RequestService {
                 .fiasHouseObjectId(regOrganizationAddressFactToSave.getFiasHouseObjectId())
                 .fullAddress(regOrganizationAddressFactToSave.getFullAddress())
                 .isHand(false)
-                .streetHand("")
-                .houseHand("")
-                .apartmentHand("")
+                .streetHand(regOrganizationAddressFactToSave.getStreetHand())
+                .houseHand(regOrganizationAddressFactToSave.getHouseHand())
+                .apartmentHand(regOrganizationAddressFactToSave.getApartmentHand())
                 .build();
         //regOrganizationAddressFactRepo.save(regOrgAddrSave);
         regOrganizationAddressFactRepo.insertOrg(
@@ -759,6 +767,47 @@ public class RequestService {
             message = "Не удалось активировать учётную запись!";
         }
         return message;
+    }
+
+    public Page<ClsNews> findNewsArchiveByOrganization_Id(Long id, int page, int size) {
+        List<ClsNews> newsList = clsNewsRepo.getNewsArchiveByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
+
+        Pageable pageable = PageRequest.of(page, size);
+        long start = pageable.getOffset();
+        long end = (start + pageable.getPageSize()) > newsList.size() ? newsList.size() : (start + pageable.getPageSize());
+
+        Page<ClsNews> pages = new PageImpl<ClsNews>(newsList.subList((int) start, (int) end), pageable, newsList.size());
+        return pages;
+    }
+
+    public void saveLinkClicks(HttpServletRequest request, ClsNews clsNews) {
+        try {
+            String ip = getClientIp(request);
+            RegNewsLinkClicks rnlc =  RegNewsLinkClicks.builder()
+                    .news(clsNews)
+                    .ip(ip)
+                    .time(new Timestamp(System.currentTimeMillis()))
+                    .build();
+            regNewsLinkClicksRepo.save(rnlc);
+        }
+        catch (Exception e) {
+            log.error(String.format("Переход по новости id =%s не сохранен", ((clsNews!=null)?clsNews.getId():"null")));
+        }
+
+    }
+
+    private static String getClientIp(HttpServletRequest request) {
+
+        String remoteAddr = "";
+
+        if (request != null) {
+            remoteAddr = request.getHeader("X-FORWARDED-FOR");
+            if (remoteAddr == null || "".equals(remoteAddr)) {
+                remoteAddr = request.getRemoteAddr();
+            }
+        }
+
+        return remoteAddr;
     }
 
 }

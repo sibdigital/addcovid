@@ -110,18 +110,23 @@ const requests = {
                                     webix.ajax('/prescriptions').then(function (data) {
                                         let typeRequests = data.json();
 
-                                        let vtxt = '<br/>' + `<a href="/upload">Общие основания (более 100 сотрудников)</a><br/><br/>`;
+                                        // let vtxt = '<br/>' + `<a href="/upload">Общие основания (более 100 сотрудников)</a><br/><br/>`;
+                                        let vtxt = '<br/>';
 
-                                        for (let j = 0; j < typeRequests.length; j++) {
-                                            if (typeRequests[j].id == 100) {
-                                                continue;
-                                            }
-                                            if (typeRequests[j].statusRegistration == 1 && typeRequests[j].statusVisible == 1) {
+                                        if (typeRequests.length > 0) {
+                                            for (let j = 0; j < typeRequests.length; j++) {
+                                                if (typeRequests[j].id == 100) {
+                                                    continue;
+                                                }
+                                                // if (typeRequests[j].statusRegistration == 1 && typeRequests[j].statusVisible == 1) {
                                                 let labl = typeRequests[j].activityKind;//.replace(new RegExp(' ', 'g'), '&nbsp');
                                                 let vdid = typeRequests[j].id;
                                                 let reqv = 'typed_form?request_type=' + vdid;
                                                 vtxt += `<a href="#${reqv}" onclick="showRequestCreateForm(${vdid})">` + labl + '</a><br/><br/>';
+                                                // }
                                             }
+                                        } else {
+                                            vtxt += 'Отсутствуют предписания.</br></br>';
                                         }
 
                                         const v = {
@@ -583,13 +588,17 @@ function next() {
     }
 }
 
-function showRequestCreateForm(idTypeRequest) {
+function showRequestCreateForm(idTypeRequest, page) {
     webix.ui({
         id: 'content',
         rows: [
             requestWizard
         ]
     }, $$('content'))
+
+    if (page) {
+        $$("wizard").getChildViews()[page].show();
+    }
 
     ID_TYPE_REQUEST = idTypeRequest;
 

@@ -2,6 +2,7 @@ package ru.sibdigital.addcovid.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -21,10 +22,11 @@ import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.RequestService;
 import ru.sibdigital.addcovid.service.SettingServiceImpl;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.Console;
+
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -373,22 +375,44 @@ public class CabinetController {
         if (id == null) {
             return null;
         }
-        List<ClsNews> newsList = clsNewsRepo.getNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
+        List<ClsNews> newsList = clsNewsRepo.getCurrentNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
         return newsList;
     }
 
-    @GetMapping("/news/{id_news}")
-    public @ResponseBody String getNewsById(@PathVariable("id_news") Long id_news){
-        ClsNews clsNews = clsNewsRepo.findById(id_news).orElse(null);
-        if (clsNews != null) {
-            SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-            String startTimeString = format.format(clsNews.getStartTime());
-            String newsString = "<div><h3 style=\"color: #2e6c80;\">" + clsNews.getHeading()  + "</h3>" + clsNews.getMessage() + "</div>"+
-                    "<div style='text-align:right;'>Дата публикации: " + startTimeString+ "</div></div>";
-            return newsString;
+    @GetMapping("/news_archive")
+    public @ResponseBody Map<String, Object> getNewsArchive(HttpSession session, @RequestParam(value = "start", required = false) Integer start,
+                                                         @RequestParam(value = "count", required = false) Integer count) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
         }
-        else
-            return "";
+
+        int page = start == null ? 0 : start / 10;
+        int size = count == null ? 10 : count;
+        Map<String, Object> result = new HashMap<>();
+        Page<ClsNews> templates = requestService.findNewsArchiveByOrganization_Id(id, page, size);
+
+        result.put("data", templates.getContent());
+        result.put("pos", (long) page * size);
+        result.put("total_count", templates.getTotalElements());
+        return result;
+    }
+
+
+    @GetMapping("/news")
+    public String getNewsById( @RequestParam("hash_id") String hash_id, Model model){
+        model.addAttribute("hash_id", hash_id);
+        model.addAttribute("link_prefix", applicationConstants.getLinkPrefix());
+        model.addAttribute("link_suffix", applicationConstants.getLinkSuffix());
+        model.addAttribute("application_name", applicationConstants.getApplicationName());
+        return "news_form";
+    }
+
+    @GetMapping("/news/{hash_id}")
+    public @ResponseBody ClsNews getNewsById(@PathVariable("hash_id") String hash_id, HttpServletRequest request){
+        ClsNews clsNews = clsNewsRepo.findByHashId(hash_id);
+        requestService.saveLinkClicks(request, clsNews);
+        return clsNews;
     }
 
     @GetMapping("/my_mailing_list")
@@ -550,6 +574,14 @@ public class CabinetController {
         return result;
     }
 
+    @GetMapping("/raion")
+    public @ResponseBody Map<String, Object> getRaionIdByObjectId(@RequestParam(value = "objectid", required = true) Long objectId) {
+        Map<String, Object> result = null;
+        if (objectId != null) {
+            result = fiasAddrObjectRepo.findByObjectId(objectId);
+        }
+        return result;
+    }
 
     @GetMapping("/cities")
     public @ResponseBody List<Map<String, Object>> getCities(
@@ -563,6 +595,15 @@ public class CabinetController {
         return result;
     }
 
+    @GetMapping("/city")
+    public @ResponseBody Map<String, Object> getCityByObjectId(@RequestParam(value = "objectid", required = true) Long objectId) {
+        Map<String, Object> id = null;
+        if (objectId != null) {
+            id = fiasAddrObjectRepo.findByObjectId(objectId);
+        }
+        return id;
+    }
+
     @GetMapping("/streets")
     public @ResponseBody List<Map<String, Object>> getStreets(
             @RequestParam(value = "objectid", required = false) Long raionObjectId
@@ -573,6 +614,15 @@ public class CabinetController {
         }
 
         return result;
+    }
+
+    @GetMapping("/street")
+    public @ResponseBody Map<String, Object> getStreetByObjectId(@RequestParam(value = "objectid", required = true) Long objectId) {
+        Map<String, Object> id = null;
+        if (objectId != null) {
+            id = fiasAddrObjectRepo.findByObjectId(objectId);
+        }
+        return id;
     }
 
     @GetMapping("/house")
