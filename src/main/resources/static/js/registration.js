@@ -333,7 +333,7 @@ let regLayout = webix.ui({
                                                                                 if (text === 'Ок') {
                                                                                     next(2, $$('organizationEmail').getValue());
                                                                                 } else if (text === 'Не удалось отправить письмо') {
-                                                                                    webix.message('Не удалось отправить ссылку для активации на указанный адрес электронной почты', 'error'
+                                                                                    webix.message('Не удалось отправить ссылку для активации на указанный адрес электронной почты', 'error');
                                                                                 } else {
                                                                                     webix.message(text, 'error')
                                                                                 }
