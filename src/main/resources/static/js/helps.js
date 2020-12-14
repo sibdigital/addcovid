@@ -232,22 +232,20 @@ webix.ready(function () {
         //width: document.body.clientWidth - 230,
         cols: [
             {
-                width: 230,
+                width: 220,
                 height: document.body.clientHeight,
                 id: 'menuRow',
                 rows: [
                     {
                         view: 'label',
-                        id: 'labelLK',
                         css: {
                             'background-color': '#565B67 !important',
                             'color': '#FFFFFF'
                         },
-                        align: 'center',
                         height: 46,
-                        label: `<div style="color: white; font-size: 18px; font-family: Roboto, 
-                                sans-serif; padding: 0 12px 0 10px;">Раздел помощи</div>`,
+                        label: `<img height='36px' width='36px' style="padding: 0 0 2px 2px" src = \"favicon.ico\"><span style="color: white; font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
                     },
+
                     {
                         view: 'menu',
                         id: 'menu',
@@ -270,6 +268,7 @@ webix.ready(function () {
                                     .then((data) => {
                                         if (data.json() !== null) {
                                             console.log(data.json());
+                                            $$("labelLK").setValue("Раздел помощи > " + "<span style='color: #1ca1c1'>" + data.json().name + "</span>")
                                             webix.ui({
                                                 id: 'content',
                                                 rows: [
@@ -287,24 +286,20 @@ webix.ready(function () {
                 rows: [{
                     view: 'toolbar',
                     //autowidth: true,
-                    width: document.body.clientWidth - 232,
+                    width: document.body.clientWidth - 222,
                     height: 45,
                     id: 't1',
                     rows: [
                         {
                             responsive: 't1',
-                            css: 'webix_dark',
                             cols: [
                                 {
                                     view: 'label',
-                                    width: 40,
-                                    template: "<img height='40px' width='40px' src = \"favicon.ico\">",
-                                },
-                                {
-                                    view: 'label',
-                                    width: 300,
-                                    label: `<span style="font-size: 1.0rem">${APPLICATION_NAME}</span>`,
-                                    //tooltip: 'Заявка на оказание парикмахерских услуг'
+                                    id: 'labelLK',
+                                    align: 'left',
+                                    css: {"padding-left":"5px"},
+                                    height: 46,
+                                    label: `Раздел помощи`,
                                 }
                             ]
                         }]
@@ -316,7 +311,7 @@ webix.ready(function () {
     });
 
     webix.event(window, "resize", function (event) {
-        layout.define("width", document.body.clientWidth - 230);
+        layout.define("width", document.body.clientWidth - 220);
         layout.resize();
     });
 });
