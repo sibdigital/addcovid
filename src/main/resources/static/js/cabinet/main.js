@@ -49,17 +49,17 @@ let UsercontextMenu = webix.ui({
     on: {
         onMenuItemClick: function (id) {
             let view;
-            if (id == 'CommonInfo'){
+            if (id === 'CommonInfo') {
                 view = commonInfo;
-            }else if (id == 'Contacts'){
+            } else if (id === 'Contacts') {
                 view = contacts;
-            }else if (id == 'Mailing'){
+            } else if (id === 'Mailing') {
                 view = mailing;
-            }else if (id == 'Help'){
+            } else if (id === 'Help') {
+                window.open('helps', '_blank');
+            } else if (id === 'Settings') {
                 view = settings;
-            }else if (id == 'Settings'){
-                view = settings;
-            }else if (id == 'Exit'){
+            } else if (id === 'Exit') {
                 webix.send("/logout");
             }
             if (view != null) {
@@ -130,6 +130,7 @@ webix.ready(function () {
                             {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
                             {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Контакты'},
                             {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
+                            //{id: "Help", icon: 'mdi mdi-help', value: 'Помощь'},
                         ],
                         type: {
                             css: 'my_menubar_item',
@@ -138,26 +139,44 @@ webix.ready(function () {
                         on: {
                             onMenuItemClick: function (id) {
                                 let view;
+                                let helpUrl = 'help?id=1';
 
-                                if (id == 'CommonInfo'){
+                                if (id === 'CommonInfo') {
                                     view = commonInfo;
-                                }else if (id == 'Requests'){
+                                    helpUrl = 'help?key=CommonInfo';
+                                } else if (id === 'Requests') {
                                     view = requests;
-                                }else if (id == 'Employees'){
+                                    //helpUrl = 'help?id=5';
+                                    helpUrl = 'help?key=Requests';
+                                } else if (id === 'Employees') {
                                     view = employees;
-                                }else if (id == 'Settings'){
+                                    helpUrl = 'help?key=Employees';
+                                } else if (id === 'Settings') {
                                     view = settings;
-                                }else if (id == 'Documents'){
+                                    helpUrl = 'help?key=Settings';
+                                } else if (id === 'Documents') {
                                     view = documents;
-                                }else if (id == 'Address'){
+                                    helpUrl = 'help?key=Documents';
+                                } else if (id === 'Address') {
                                     view = address;
-                                }else if (id == 'Prescript'){
+                                    helpUrl = 'help?key=Address';
+                                    //helpUrl = 'help?id=18';
+                                } else if (id === 'Prescript') {
                                     view = prescript;
-                                }else if (id == 'News'){
+                                    //helpUrl = 'help?id=6';
+                                    helpUrl = 'help?key=Prescript';
+                                } else if (id === 'News') {
                                     view = news;
-                                }else if (id == 'Contacts'){
+                                    helpUrl = 'help?key=News';
+                                    //helpUrl = 'help?id=15';
+                                } else if (id === 'Contacts') {
                                     view = contacts;
+                                    helpUrl = 'help?key=Contacts';
                                 }
+
+                                // $$('labelHelpHref').config.label = `<span style="font-size: 16px; font-family: Roboto, sans-serif;"><a target=\'_blank\' href=${helpUrl}>Помощь</a></span>`;
+                                // $$("labelHelpHref").refresh();
+
                                 if (view != null) {
                                     webix.ui({
                                         id: 'content',
@@ -210,7 +229,13 @@ webix.ready(function () {
                                     {
                                         view: 'label',
                                         label: `<span style="font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
-                                    },
+                                    }
+                                    // ,
+                                    // {
+                                    //     id: 'labelHelpHref',
+                                    //     view: 'label',
+                                    //     label: '<span style="font-size: 16px; font-family: Roboto, sans-serif;"><a target=\'_blank\' href=\'helps\'>Помощь</a></span>'
+                                    // },
                                 ]
                             },
                             {
