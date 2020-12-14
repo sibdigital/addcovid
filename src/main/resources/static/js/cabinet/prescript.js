@@ -18,7 +18,9 @@ const prescript = {
                 ],
                 scheme: {
                     $init: function (obj) {
-                        obj.time_Publication = obj.timePublication.replace("T", " ")
+                        if (obj.statusPublication == 1) {
+                            obj.time_Publication = obj.timePublication ? obj.timePublication.replace("T", " ") : "";
+                        }
                     },
                 },
                 on: {
