@@ -95,8 +95,23 @@ function setRequestsBadge(){
     });
 }
 
+function getRequestStyles(){
+    webix.ajax('/requests_status_style')
+        .then(function (data) {
+            let styleBody = Object.values(data.json())
+            let styleClassName = Object.keys(data.json())
+            for(let i in styleClassName){
+                let style = '.' + styleClassName[i] + ' {' +
+                    'background-color: ' + styleBody[i]['background-color'] +
+                    '}'
+                webix.html.addStyle(style)
+            }
+        })
+}
+
 webix.ready(function () {
     let layout;
+    getRequestStyles()
     if(document.body.clientWidth < 760)
     {
         layout = webix.ui({

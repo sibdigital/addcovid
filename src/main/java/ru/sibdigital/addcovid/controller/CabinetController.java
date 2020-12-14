@@ -144,12 +144,12 @@ public class CabinetController {
     }
 
     @GetMapping("/count_confirmed_requests")
-    public @ResponseBody List<Integer> getAllConfirmedRequest(HttpSession session){
+    public @ResponseBody List<DocRequest> getAllConfirmedRequest(HttpSession session){
         Long id = (Long) session.getAttribute("id_organization");
         if(id == null){
             return null;
         }
-        List<Integer> confirmedRequestStatus = docRequestRepo.getAllRequestWithConfirmedStatus(id).orElse(null);
+        List<DocRequest> confirmedRequestStatus = docRequestRepo.getAllRequestWithConfirmedStatus(id).orElse(null);
         return confirmedRequestStatus;
     }
 
@@ -637,10 +637,9 @@ public class CabinetController {
         return result;
     }
 
-    @PostMapping("/requests_status_style")
-    public @ResponseBody String getRequestsStatusStyle(@RequestBody String key){
-        String optimalKey = key.substring(1, key.length() -1);
-        String style = settingServiceImpl.getRequestsStatusStyle(optimalKey);
-        return style;
+    @GetMapping("/requests_status_style")
+    public @ResponseBody String getRequestsStatusStyle(){
+        ClsSettings settings = settingServiceImpl.getRequestsStatusStyle();
+        return settings.getValue();
     }
 }

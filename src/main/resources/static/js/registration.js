@@ -1,3 +1,15 @@
+let descrStep1 = '<span style=" height: auto; font-size: 0.8rem; color: #fff6f6">' +
+    'Вам необходимо ввести ИНН Вашей организации или ИП. ИНН будет проверен по ЕГРЮЛ и ЕГРИП.' +
+    'Для регистрации необходимо, чтобы Ваша организация или ИП были зарегистрированы в ЕГРЮЛ или ЕГРИП.' +
+    'Если вы открылись недавно, проверка может показать отсутствие сведений.' +
+    'В таком случае рекомендуется начать регистрацию повторно через несколько рабочих дней.' +
+    'Если вы являетесь самозанятым, то вам необходимо будет самостоятельно заполнить данные о себе</span>'
+
+let descrStep2 = '<span style="font-size: 0.8rem; color: #fff6f6">' +
+    'Вам необходимо ввести Адрес электронной почты Вашей организации и пароль. ' +
+    'После регистрации, на указанный адрес электронной почты, будет отправлено письмо' +
+    'со ссылкой на активацию учётной записи.</span>'
+
 let regLayout = webix.ui({
     height: windowHeight,
     css: {"background-color":"#ccd7e6"},
@@ -57,18 +69,12 @@ let regLayout = webix.ui({
                                             align: "center"
                                         },
                                         {
-                                            view: "label",
+                                            view: "template",
                                             id: "description",
                                             css:{"background-color":"#475466", "text-align":"center", "padding-left":"2px","padding-right":"2px"},
                                             borderless: true,
-                                            template: `<span style="font-size: 0.8rem; color: #fff6f6">
-                                                           Вам необходимо ввести ИНН Вашей организации или ИП. ИНН будет проверен по ЕГРЮЛ и ЕГРИП. 
-                                                           Для регистрации необходимо, чтобы Ваша организаци или ИП были зарегистрированы в ЕРЮЛ или ЕГРИП.
-                                                           Если вы открылись недавно, проверка может показать отсутствие сведений. 
-                                                           В таком случае рекомендуется начать регистрацию повторно через несколько рабочих дней.
-                                                           Если вы являетесь самозанятым, то вам необходимо будет самостоятельно заполнить данные о себе</span>`,
-                                            height: 50,
-                                            align: "center"
+                                            autoheight: true,
+                                            template: descrStep1
                                         },
                                     ]
 
@@ -81,9 +87,20 @@ let regLayout = webix.ui({
                                     minWidth: 250,
                                     complexData: true,
                                     rules:{
-                                      "passwordConfirm":function (value){
-                                          return value === $$("password").getValue()
-                                      }
+                                        "password": (value) => {
+                                            if(value.length < 8){
+                                                $$("password").config.invalidMessage = "Длина пароля должна превышать 7 символов";
+                                                return false
+                                            }else if(!(/[0-9]/.test(value) && /[a-z]/i.test(value))){
+                                                $$("password").config.invalidMessage = "Пароль должен содержать буквы и цифры";
+                                                return false
+                                            }else{
+                                                return true
+                                            }
+                                        },
+                                        "passwordConfirm":function (value){
+                                            return value === $$("password").getValue()
+                                        }
                                     },
                                     elements: [
                                         {},
@@ -97,16 +114,12 @@ let regLayout = webix.ui({
                                                 {
                                                     rows: [
                                                         {
-                                                            view:"label",
-                                                            height: 20,
-                                                            label:`<span style="font-size: 1rem; color: #6e6e6e">Введите ИНН вашей организации</span>`
-                                                        },
-                                                        {
                                                             view: 'text',
                                                             name: 'searchInn',
                                                             id: 'searchInn',
                                                             minWidth: 250,
-                                                            // label: 'ИНН',
+                                                            labelPosition: 'top',
+                                                            label: 'Введите ИНН вашей организации',
                                                             placeholder: 'ИНН',
                                                         },
                                                         {height: 10},
@@ -203,7 +216,8 @@ let regLayout = webix.ui({
                                                                     required: true
                                                                 },
                                                                 {
-                                                                    view: 'text',
+                                                                    view: 'textarea',
+                                                                    height: 75,
                                                                     id: 'organizationShortName',
                                                                     name: 'organizationShortName',
                                                                     label: 'Наименование организации',
@@ -317,7 +331,7 @@ let regLayout = webix.ui({
                                                                                 ).then(function (data) {
                                                                                 const text = data.text();
                                                                                 if (text === 'Ок') {
-                                                                                    window.location = '/login';
+                                                                                    next(2, $$('organizationEmail').getValue())
                                                                                 } else {
                                                                                     webix.message(text, 'error')
                                                                                 }
@@ -330,6 +344,28 @@ let regLayout = webix.ui({
                                                                     }
                                                                 }
                                                             ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    rows:[
+                                                        {
+                                                            view: 'text',
+                                                            id: 'orgEmailAddress',
+                                                            name: 'orgEmailAddress',
+                                                            minWidth: 250,
+                                                            label: 'Ваш адрес электронной почты',
+                                                            labelPosition: 'top',
+                                                            readonly: true,
+                                                        },
+                                                        {
+                                                            view: 'button',
+                                                            css: 'myClass',
+                                                            value: 'Авторизоваться',
+                                                            gravity: 0.5,
+                                                            click: () => {
+                                                                window.location.href = "/login"
+                                                            }
                                                         }
                                                     ]
                                                 }
@@ -403,32 +439,34 @@ function back() {
     if (document.body.clientWidth < 480) {
         $$('topSpacer').config.gravity = 0.9;
         $$('topSpacer').resize()
-        $$("description").config.height = 50;
-        $$("description").resize()
-    }else if(document.body.clientWidth > 480){
-        $$("description").config.height = 35;
-        $$("description").resize()
     }
     $$("wizard").back();
     $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 1</span>`)
-    $$("description").setValue(`<span style="font-size: 0.8rem; color: #fff6f6">На шаге 1 Вам необходимо ввести ИНН Вашей организации. ИНН будет сверен с ЕГРЮЛ и ЕГРИП.</span>`)
+    $$("description").setHTML(descrStep1)
 
 }
 
-function next(page) {
-    if (document.body.clientWidth < 480) {
-        $$('topSpacer').config.gravity = 0.5;
-        $$('topSpacer').resize()
-        $$("description").config.height = 95;
-        $$("description").resize()
-    }else if(document.body.clientWidth > 480){
-        $$("description").config.height = 60;
-        $$("description").resize()
+function next(page, mail) {
+    if(page === 1){
+        if (document.body.clientWidth < 480) {
+            $$('topSpacer').config.gravity = 0;$$('topSpacer').resize()
+            $$("titleReg").config.height = 31; $$("titleReg").resize();
+            $$("appNameReg").config.height =  27; $$("appNameReg").resize();
+        }
+
+        $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 2</span>`)
+        $$("description").setHTML(descrStep2)
+    }else{
+        if (document.body.clientWidth < 480) {
+            $$('topSpacer').config.gravity = 0.9;$$('topSpacer').resize()
+            $$("titleReg").config.height = 50; $$("titleReg").resize();
+            $$("appNameReg").config.height =  50; $$("appNameReg").resize();
+        }
+        $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 3</span>`)
+        $$("description").setHTML('<span style="font-size: 0.8rem; color: #fff6f6">Необходимо активировать учетную запись. На Ваш почтовый ящик \"' + mail + '\" было оправлено письмо с подтверждением</span>')
+        $$("orgEmailAddress").setValue(mail)
     }
     $$("wizard").getChildViews()[page].show();
-    $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 2</span>`)
-    $$("description").setValue(`<span style="font-size: 0.8rem; color: #fff6f6">На шаге 2 Вам необходимо ввести Адрес электронной почты Вашей организации и пароль. После регистрации, на указанный адрес электронной почты, будет отправлено письмо со ссылкой на активацию учётной записи.</span>`)
-
 }
 
 webix.ready(function() {
@@ -438,7 +476,6 @@ webix.ready(function() {
         $$("form").config.width = document.body.clientWidth-40;
         $$("titleReg").setValue(`<span style="font-size: 1.5rem; color: #475466">Регистрация на портале</span>`)
         $$("appNameReg").setValue(`<span style="font-size: 1.2rem; color: #475466">"${APPLICATION_NAME}"</span>`)
-        $$("description").setValue(`<span style="font-size: 0.8rem; color: #475466">На шаге 1 Вам необходимо ввести ИНН Вашей организации. ИНН будет сверен с ЕГРЮЛ и ЕГРИП.</span>`)
         $$("firstRow").addView($$("titleReg"),-1);
         $$("firstRow").addView($$("appNameReg"),-1);
         $$("firstRow").addView($$("description"),-1);

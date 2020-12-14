@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.sibdigital.addcovid.model.ClsSettings;
 import ru.sibdigital.addcovid.repository.ClsSettingsRepo;
 
+
 @Service
 public class SettingServiceImpl implements SettingService {
 
@@ -25,7 +26,7 @@ public class SettingServiceImpl implements SettingService {
         return ret;
     }
 
-    public String getRequestsStatusStyle(String key){
-        return clsSettingsRepo.getRequestsStatusStyle(key);
+    public ClsSettings getRequestsStatusStyle(){
+        return clsSettingsRepo.getRequestsStatusStyle().orElse(null);
     }
 }
