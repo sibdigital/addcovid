@@ -20,6 +20,7 @@ public class OrganizationDto {
     private String organizationAddressJur;
     private String organizationEmail;
     private String organizationPhone;
+    private Integer organizationType;
     private Boolean isSelfEmployed;
 
     private String password;

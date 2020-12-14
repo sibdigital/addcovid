@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.model;
 
+import lombok.Builder;
 import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 
 import javax.persistence.Embeddable;
@@ -9,6 +10,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
+@Builder(toBuilder = true)
 public class RegOrganizationOkvedId implements Serializable {
 
     @ManyToOne

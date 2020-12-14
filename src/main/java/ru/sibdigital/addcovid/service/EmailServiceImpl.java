@@ -38,6 +38,15 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     public void sendSimpleMessage(String to, String subject, String text) {
+        sendMessage(to, subject, text);
+    }
+
+    public boolean sendSimpleMessageNoAsync(String to, String subject, String text) {
+        return sendMessage(to, subject, text);
+    }
+
+    private boolean sendMessage(String to, String subject, String text) {
+        boolean emailSent = false;
         Short sendStatus = MailingStatuses.EMAIL_SENT.value();
         RegMailingHistory history = new RegMailingHistory();
         history.setTimeSend(new Timestamp(System.currentTimeMillis()));
@@ -46,7 +55,7 @@ public class EmailServiceImpl implements EmailService {
 
             MimeMessage message = prepareMimeMessage(to, subject, text);
             javaMailSender.send(message);
-            history.setStatus(sendStatus);
+            emailSent = true;
         } catch (AddressException e) {
             log.error(e.getMessage());
             sendStatus = MailingStatuses.INVALID_ADDRESS.value();
@@ -59,7 +68,9 @@ public class EmailServiceImpl implements EmailService {
             log.error(e.getMessage());
             sendStatus = MailingStatuses.EMAIL_NOT_SENT.value();
         }
+        history.setStatus(sendStatus);
         regMailingHistoryRepo.save(history);
+        return emailSent;
     }
 
     private MimeMessage prepareMimeMessage(String email, String subject, String text) throws MessagingException {

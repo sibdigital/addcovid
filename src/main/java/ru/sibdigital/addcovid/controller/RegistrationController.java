@@ -44,7 +44,7 @@ public class RegistrationController {
     }
 
     @GetMapping("/checkInn")
-    public @ResponseBody String registration(@RequestParam(value = "inn") String inn) {
+    public @ResponseBody String checkInn(@RequestParam(value = "inn") String inn) {
         ClsOrganization clsOrganization = requestService.findOrganizationByInn(inn);
         if (clsOrganization != null) {
             return "Данный ИНН уже зарегистрирован в системе";
@@ -64,7 +64,10 @@ public class RegistrationController {
             String activateUrl = settingService.findActualByKey("activationUrl", "");
             activateUrl += "/activate?inn=" + clsOrganization.getInn() + "&code=" + clsOrganization.getHashCode();
             String text = "Для активации учетной записи пройдите по ссылке <a href=\"" + activateUrl + "\">Активация учетной записи</a>";
-            emailService.sendSimpleMessage(clsOrganization.getEmail(), applicationConstants.getApplicationName(), text);
+            boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(), applicationConstants.getApplicationName(), text);
+            if (!emailSent) {
+                return "Не удалось отправить письмо";
+            }
             return "Ок";
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -91,7 +94,10 @@ public class RegistrationController {
         ClsOrganization clsOrganization = requestService.findOrganizationByInn(inn);
         if (clsOrganization != null) {
             String newPassword = requestService.changeOrganizationPassword(inn);
-            emailService.sendSimpleMessage(clsOrganization.getEmail(), applicationConstants.getApplicationName(), "Ваш новый пароль от личного кабинета: " + newPassword);
+            boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(), applicationConstants.getApplicationName(), "Ваш новый пароль от личного кабинета: " + newPassword);
+            if (!emailSent) {
+                return "Не удалось отправить письмо";
+            }
             return "Ок";
         }
         return "ИНН не найден";

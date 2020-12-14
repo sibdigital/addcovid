@@ -285,7 +285,7 @@ let regLayout = webix.ui({
                                                                     value: 'Зарегистрироваться',
                                                                     align: 'center',
                                                                     click: function () {
-                                                                        this.disable();
+                                                                        $$('send_btn').disable();
 
                                                                         if ($$('form').validate()) {
 
@@ -318,15 +318,17 @@ let regLayout = webix.ui({
                                                                                 const text = data.text();
                                                                                 if (text === 'Ок') {
                                                                                     window.location = '/login';
+                                                                                } else if (text === 'Не удалось отправить письмо') {
+                                                                                    webix.message('Не удалось отправить ссылку для активации на указанный адрес электронной почты', 'error')
                                                                                 } else {
                                                                                     webix.message(text, 'error')
                                                                                 }
+                                                                                $$('send_btn').enable();
                                                                             })
                                                                         } else {
                                                                             webix.message('Не заполнены обязательные поля', 'error')
+                                                                            $$('send_btn').enable();
                                                                         }
-
-                                                                        this.enable();
                                                                     }
                                                                 }
                                                             ]
@@ -359,6 +361,7 @@ function loadData(type, inn) {
             if (type === 'egrul') {
                 const result = response.data;
                 $$('form').setValues({
+                    organizationType: '1',
                     searchInn: inn,
                     organizationName: result.name,
                     organizationShortName: (result.shortName ? result.shortName : result.name),
@@ -371,6 +374,7 @@ function loadData(type, inn) {
                 if (response.possiblySelfEmployed == false){
                     $$('organizationShortName').config.label = 'ФИО ИП';
                     $$('form').setValues({
+                        organizationType: '2',
                         searchInn: inn,
                         organizationName: result.name,
                         organizationShortName: result.name,
@@ -381,6 +385,7 @@ function loadData(type, inn) {
                     $$('organizationShortName').config.label = 'ФИО cамозанятого';
                     $$('organizationShortName').config.readonly = false;
                     $$('form').setValues({
+                        organizationType: '3',
                         searchInn: inn,
                         isSelfEmployed: true,
                         organizationInn: inn

@@ -7,6 +7,7 @@ import ru.sibdigital.addcovid.model.Jsonb;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "reg_egrip", schema = "public")
@@ -32,8 +33,8 @@ public class RegEgrip {
     @Column(name = "id_migration")
     private Long idMigration;
 
-//    @OneToMany(mappedBy = "regEgripOkvedId.regEgrip")
-//    private Set<RegEgripOkved> regEgripOkveds;
+    @OneToMany(mappedBy = "regEgrip")
+    private Set<RegEgripOkved> regEgripOkveds;
 
     public Long getId() {
         return id;
@@ -67,14 +68,13 @@ public class RegEgrip {
         this.data = data;
     }
 
+    public Set<RegEgripOkved> getRegEgripOkveds() {
+        return regEgripOkveds;
+    }
 
-//    public Set<RegEgripOkved> getRegEgripOkveds() {
-//        return regEgripOkveds;
-//    }
-//
-//    public void setRegEgripOkveds(Set<RegEgripOkved> regEgripOkveds) {
-//        this.regEgripOkveds = regEgripOkveds;
-//    }
+    public void setRegEgripOkveds(Set<RegEgripOkved> regEgripOkveds) {
+        this.regEgripOkveds = regEgripOkveds;
+    }
 
     public Long getIdMigration() {
         return idMigration;

@@ -4,20 +4,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import ru.sibdigital.addcovid.dto.ClsMailingListDto;
-import ru.sibdigital.addcovid.dto.EmployeeDto;
-import ru.sibdigital.addcovid.dto.OrganizationContactDto;
-import ru.sibdigital.addcovid.dto.OrganizationDto;
-import ru.sibdigital.addcovid.dto.PostFormDto;
+import ru.sibdigital.addcovid.dto.*;
 import ru.sibdigital.addcovid.model.*;
-import ru.sibdigital.addcovid.model.classifier.gov.Okved;
+import ru.sibdigital.addcovid.model.classifier.gov.*;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.repository.classifier.gov.OkvedRepo;
+import ru.sibdigital.addcovid.repository.classifier.gov.RegEgripRepo;
+import ru.sibdigital.addcovid.repository.classifier.gov.RegEgrulRepo;
 import ru.sibdigital.addcovid.utils.PasswordGenerator;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
@@ -96,6 +97,12 @@ public class RequestService {
 
     @Autowired
     private RegNewsLinkClicksRepo regNewsLinkClicksRepo;
+
+    @Autowired
+    private RegEgripRepo regEgripRepo;
+
+    @Autowired
+    private RegEgrulRepo regEgrulRepo;
 
     @Value("${upload.path:/uploads}")
     String uploadingDir;
@@ -442,12 +449,9 @@ public class RequestService {
 
         clsPrincipalRepo.save(clsPrincipal);
 
-        int typeOrganization = OrganizationTypes.JURIDICAL.getValue();
-        if (organizationDto.getIsSelfEmployed() != null && organizationDto.getIsSelfEmployed()) {
-            typeOrganization = OrganizationTypes.SELF_EMPLOYED.getValue();
-        }
+        int typeOrganization = organizationDto.getOrganizationType();
 
-        String code = SHA256Generator.generate(organizationDto.getOrganizationInn(), organizationDto.getOrganizationName());
+        String code = SHA256Generator.generate(organizationDto.getOrganizationInn(), organizationDto.getOrganizationName(), String.valueOf(System.currentTimeMillis()));
 
         ClsOrganization clsOrganization = ClsOrganization.builder()
                 .name(organizationDto.getOrganizationName())
@@ -469,23 +473,54 @@ public class RequestService {
 
         clsOrganizationRepo.save(clsOrganization);
 
-        if (organizationDto.getEgrulOkved() != null && !organizationDto.getEgrulOkved().isBlank()) {
-            Set<RegOrganizationOkved> regOrganizationOkveds = new HashSet<>();
-            Okved okved = okvedRepo.findByKindCode(organizationDto.getEgrulOkved());
-            if (okved != null) {
-                RegOrganizationOkvedId regOrganizationOkvedId = new RegOrganizationOkvedId(clsOrganization, okved);
-                regOrganizationOkveds.add(new RegOrganizationOkved(regOrganizationOkvedId, true));
+        if (organizationDto.getOrganizationPhone() != null && !organizationDto.getOrganizationPhone().isBlank()) {
+            ClsOrganizationContact clsOrganizationContact = ClsOrganizationContact.builder()
+                    .organization(clsOrganization)
+                    .type(1)
+                    .contactValue(organizationDto.getOrganizationPhone())
+                    .contactPerson("")
+                    .build();
+            clsOrganizationContactRepo.save(clsOrganizationContact);
+        }
+
+        if (organizationDto.getOrganizationEmail() != null && !organizationDto.getOrganizationEmail().isBlank()) {
+            ClsOrganizationContact clsOrganizationContact = ClsOrganizationContact.builder()
+                    .organization(clsOrganization)
+                    .type(2)
+                    .contactValue(organizationDto.getOrganizationEmail())
+                    .contactPerson("")
+                    .build();
+            clsOrganizationContactRepo.save(clsOrganizationContact);
+        }
+
+        if (typeOrganization == OrganizationTypes.JURIDICAL.getValue()) {
+            RegEgrul regEgrul = regEgrulRepo.findByInn(clsOrganization.getInn());
+            for (RegEgrulOkved regEgrulOkved: regEgrul.getRegEgrulOkveds()) {
+                Okved okved = okvedRepo.findOkvedByIdSerial(regEgrulOkved.getIdOkved());
+                RegOrganizationOkvedId regOrganizationOkvedId = RegOrganizationOkvedId.builder()
+                        .clsOrganization(clsOrganization)
+                        .okved(okved)
+                        .build();
+                RegOrganizationOkved regOrganizationOkved = RegOrganizationOkved.builder()
+                        .regOrganizationOkvedId(regOrganizationOkvedId)
+                        .isMain(regEgrulOkved.getMain())
+                        .build();
+                regOrganizationOkvedRepo.save(regOrganizationOkved);
             }
-            if (organizationDto.getEgrulOkvedAdd() != null && organizationDto.getEgrulOkvedAdd().length > 0) {
-                for (int i = 0; i < organizationDto.getEgrulOkvedAdd().length; i++) {
-                    okved = okvedRepo.findByKindCode(organizationDto.getEgrulOkvedAdd()[i]);
-                    if (okved != null) {
-                        RegOrganizationOkvedId regOrganizationOkvedId = new RegOrganizationOkvedId(clsOrganization, okved);
-                        regOrganizationOkveds.add(new RegOrganizationOkved(regOrganizationOkvedId, false));
-                    }
-                }
+        } else if (typeOrganization == OrganizationTypes.PHYSICAL.getValue()) {
+            RegEgrip regEgrip = regEgripRepo.findByInn(clsOrganization.getInn());
+            for (RegEgripOkved regEgripOkved: regEgrip.getRegEgripOkveds()) {
+                Okved okved = okvedRepo.findOkvedByIdSerial(regEgripOkved.getIdOkved());
+                RegOrganizationOkvedId regOrganizationOkvedId = RegOrganizationOkvedId.builder()
+                        .clsOrganization(clsOrganization)
+                        .okved(okved)
+                        .build();
+                RegOrganizationOkved regOrganizationOkved = RegOrganizationOkved.builder()
+                        .regOrganizationOkvedId(regOrganizationOkvedId)
+                        .isMain(regEgripOkved.getMain())
+                        .build();
+                regOrganizationOkvedRepo.save(regOrganizationOkved);
             }
-            regOrganizationOkvedRepo.saveAll(regOrganizationOkveds);
         }
 
         return clsOrganization;
@@ -745,19 +780,14 @@ public class RequestService {
     public String activateOrganization(String inn, String code) {
         String message = "";
         try {
-            ClsOrganization clsOrganization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
+            ClsOrganization clsOrganization = clsOrganizationRepo.findByInnAndHashCode(inn, code);
             if (clsOrganization != null) {
-                if (clsOrganization.getHashCode().equals(code)) {
-                    if (!clsOrganization.getActivated().booleanValue()) {
-                        clsOrganization.setActivated(true);
-                        clsOrganization.setHashCode(SHA256Generator.generate(clsOrganization.getInn(), clsOrganization.getName(), clsOrganization.getEmail()));
-                        clsOrganizationRepo.save(clsOrganization);
-                        message = "Учётная запись успешно активирована.";
-                    } else {
-                        message = "Активация не требуется.";
-                    }
+                if (!clsOrganization.getActivated().booleanValue()) {
+                    clsOrganization.setActivated(true);
+                    clsOrganizationRepo.save(clsOrganization);
+                    message = "Учётная запись успешно активирована.";
                 } else {
-                    message = "Неверный код! Активация не выполнена.";
+                    message = "Активация не требуется.";
                 }
             } else {
                 message = "Учетная запись не найдена!";

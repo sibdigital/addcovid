@@ -62,6 +62,8 @@ public interface OkvedRepo extends JpaRepository<Okved, Integer>, JpaSpecificati
 
     Okved findOkvedById(@Param("id") UUID id);
 
+    Okved findOkvedByIdSerial(@Param("idSerial") Long id);
+
     @Query(nativeQuery = true, value = "select * from okved where kind_code = :kind_code and version = :version")
     Okved findByKindCodeAndVersion(String kind_code, String version);
 

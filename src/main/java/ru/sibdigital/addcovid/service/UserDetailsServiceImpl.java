@@ -5,7 +5,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.sibdigital.addcovid.model.ClsOrganization;
@@ -26,7 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         ClsOrganization organization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
 
         User.UserBuilder builder = null;
-        if (organization != null && organization.getActivated().booleanValue()) {
+        if (organization != null) {
             ClsPrincipal principal = organization.getPrincipal();
             if (principal != null) {
                 builder = User.withUsername(inn);
