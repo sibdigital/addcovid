@@ -22,8 +22,8 @@ public interface ClsTypeRequestRepo extends CrudRepository<ClsTypeRequest, Long>
      * @return
      */
     @Query(nativeQuery = true, value = "" +
-            "with org_okveds as (select id_okved from reg_organization_okved where id_organization = 18894), \n" +
-            "     org_prescriptions as (select id_type_request from doc_request dr where dr.id_organization = 18894) \n" +
+            "with org_okveds as (select id_okved from reg_organization_okved where id_organization = :orgId), \n" +
+            "     org_prescriptions as (select id_type_request from doc_request dr where dr.id_organization = :orgId) \n" +
             "select * \n" +
             "from ( \n" +
             "         select ctr.*, ctr.id in (select id_type_request from org_prescriptions) as is_exist \n" +
