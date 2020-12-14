@@ -41,24 +41,15 @@ const requests = {
                         scheme: {
                             $init: function (obj) {
                                 obj.time_Create = obj.timeCreate.replace("T", " ") //dateUtil.toDateFormat(obj.timeCreate);
-                                let reqStatus = obj.statusReviewName
-                                let key = null;
-                                if(reqStatus == "На рассмотрении"){
-                                    key = "requestStatusReview0";
-                                }else if(reqStatus == "Одобрена"){
-                                    key = "requestStatusReview1"
-                                }else if(reqStatus == "Отклонена"){
-                                    key = "requestStatusReview2"
+                                let requestStatus = obj.statusReviewName;
+                                if(requestStatus == "На рассмотрении"){
+                                    obj.$css = 'oncheck';
+                                }else if(requestStatus == "Одобрена"){
+                                    obj.$css = 'confirmed';
+                                }else if(requestStatus == "Отклонена"){
+                                    obj.$css = 'cancelled';
                                 }
-                                if(key != null) {
-                                    webix.ajax()
-                                        .headers({'Content-type': 'application/json'})
-                                        .post('/requests_status_style', JSON.stringify(key))
-                                        .then(function (data) {
-                                            obj.$css = data.json()
-                                            $$('requests_table').refresh()
-                                        })
-                                }
+                                $$('requests_table').refresh()
                             }
                         },
                         on: {

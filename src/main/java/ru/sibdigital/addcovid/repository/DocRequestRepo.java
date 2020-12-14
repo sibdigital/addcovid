@@ -102,6 +102,6 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
     @Query("SELECT dr FROM DocRequest dr WHERE dr.organization.id = :id ORDER BY dr.timeCreate")
     Optional<List<DocRequest>> findOneByOrganizationId(Long id);
 
-    @Query("SELECT dr.statusReview FROM DocRequest dr WHERE dr.organization.id =:idOrganization and dr.statusReview = 1")
-    Optional<List<Integer>> getAllRequestWithConfirmedStatus (Long idOrganization);
+    @Query("SELECT dr FROM DocRequest dr WHERE dr.organization.id =:idOrganization and dr.typeRequest.id = 100")
+    Optional<List<DocRequest>> getAllRequestWithConfirmedStatus (Long idOrganization);
 }
