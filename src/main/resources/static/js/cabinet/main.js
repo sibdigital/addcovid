@@ -116,6 +116,7 @@ let consentPersonalDataModal = webix.ui({
     maxWidth: 550,
     position: "center",
     // modal: true,
+    move: false,
     close: false,
     head: "Согласие на обработку персональных данных",
     body: {
@@ -150,8 +151,12 @@ let consentPersonalDataModal = webix.ui({
                             } else {
                                 webix.ajax().get('/saveConsentPersonalData').then(function (data) {
                                     if (data.text() === 'Согласие сохранено') {
+                                        if (document.body.clientWidth < 760) {
+                                            layout = webix.ui(smallMainForm)
+                                        } else {
+                                            layout = webix.ui(bigMainForm);
+                                        }
                                         consentPersonalDataModal.hide();
-                                        $$('mainFormId').enable();
                                     }
                                     else {
                                         webix.message(data.text(), 'error');
@@ -169,14 +174,18 @@ let consentPersonalDataModal = webix.ui({
 
 function checkConsentPersonalDataProc(){
     var xhr = webix.ajax().sync().get('/check_consent');
-    if (xhr.responseText === 'false') {
-        $$('mainFormId').disable();
-        consentPersonalDataModal.show();
+    var jsonResponse = JSON.parse(xhr.responseText);
+
+    if (jsonResponse.isAgreed != null) {
+        return jsonResponse.isAgreed;
+    }
+    else {
+        return false;
     }
 }
 
-let mainForm = {
-    id: 'mainFormId',
+let bigMainForm = {
+    id: 'bigMainFormId',
     cols: [
         {
             width: 220,
@@ -298,131 +307,137 @@ let mainForm = {
     ]
 }
 
-webix.ready(function () {
-    let layout;
-    getRequestStyles()
-      if (document.body.clientWidth < 760) {
-        layout = webix.ui({
-            cols: [
+let smallMainForm = {
+    id: 'smallMainFormId',
+    cols: [
+        {
+            rows: [
                 {
-                    rows: [
+                    view: 'toolbar',
+                    id: 'toolbar',
+                    // padding: 5,
+                    height: 45,
+                    elements: [
                         {
-                            view: 'toolbar',
-                            id: 'toolbar',
-                            // padding: 5,
-                            height: 45,
-                            elements: [
+                            align: 'left',
+                            cols: [
                                 {
-                                    align: 'left',
-                                    cols: [
-                                        {
-                                            view: 'label',
-                                            width: 40,
-                                            template: "<img height='40px' width='40px' src = \"favicon.ico\">",
-                                        },
-                                        {
-                                            view: 'label',
-                                            label: `<span style="font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
-                                        },
-                                        {
-                                            view: 'template',
-                                            width: 50,
-                                            borderless: true,
-                                            template: "<div id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\" " +
-                                                "style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> ",
-                                        },
-                                    ]
+                                    view: 'label',
+                                    width: 40,
+                                    template: "<img height='40px' width='40px' src = \"favicon.ico\">",
+                                },
+                                {
+                                    view: 'label',
+                                    label: `<span style="font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
+                                },
+                                {
+                                    view: 'template',
+                                    width: 50,
+                                    borderless: true,
+                                    template: "<div id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\" " +
+                                        "style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> ",
                                 },
                             ]
                         },
+                    ]
+                },
+                {
+                    view: 'menu',
+                    id: 'menu',
+                    css: 'my_menubar',
+                    //collapsed: true,
+                    data: [
+                        {id: "CommonInfo", value: 'Общая информация',},
+                        {id: "Employees", value: 'Сотрудники',},
                         {
-                            view: 'menu',
-                            id: 'menu',
-                            css: 'my_menubar',
-                            //collapsed: true,
-                            data: [
-                                {id: "CommonInfo", value: 'Общая информация',},
-                                {id: "Employees", value: 'Сотрудники',},
+                            value: "<span class='mdi mdi-dots-horizontal'></span>",
+                            submenu: [
+                                {id: "Documents", icon: "mdi mdi-cloud-upload-outline", value: 'Документы'},
                                 {
-                                    value: "<span class='mdi mdi-dots-horizontal'></span>",
-                                    submenu: [
-                                        {id: "Documents", icon: "mdi mdi-cloud-upload-outline", value: 'Документы'},
-                                        {
-                                            id: "Address",
-                                            icon: "mdi mdi-home-city-outline",
-                                            value: 'Фактические адреса'
-                                        },
-                                        {
-                                            id: "Prescript",
-                                            icon: "mdi mdi-text-box-check-outline",
-                                            value: 'Предписания'
-                                        },
-                                        {
-                                            id: "Requests",
-                                            icon: "wxi-file",
-                                            value: 'Заявки',
-                                            badge: setRequestsBadge()
-                                        },
-                                        {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
-                                        {
-                                            id: "Contacts",
-                                            icon: "mdi mdi-book-open-blank-variant",
-                                            value: 'Контакты'
-                                        },
-                                        {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
-                                    ]
-                                }
-
-                            ],
-                            type: {
-                                css: 'my_menubar_item',
-                                height: 44
-                            },
-                            on: {
-                                onMenuItemClick: function (id) {
-                                    let view;
-
-                                    if (id == 'CommonInfo') {
-                                        view = commonInfo;
-                                    } else if (id == 'Requests') {
-                                        view = requests;
-                                    } else if (id == 'Employees') {
-                                        view = employees;
-                                    } else if (id == 'Settings') {
-                                        view = settings;
-                                    } else if (id == 'Documents') {
-                                        view = documents;
-                                    } else if (id == 'Address') {
-                                        view = address;
-                                    } else if (id == 'Prescript') {
-                                        view = prescript;
-                                    } else if (id == 'News') {
-                                        view = news;
-                                    } else if (id == 'Contacts') {
-                                        view = contacts;
-                                    }
-                                    if (view != null) {
-                                        webix.ui({
-                                            id: 'content',
-                                            rows: [
-                                                view
-                                            ]
-                                        }, $$('content'));
-                                    }
-                                }
-                            }
-                        },
-                        {
-                            id: 'content'
+                                    id: "Address",
+                                    icon: "mdi mdi-home-city-outline",
+                                    value: 'Фактические адреса'
+                                },
+                                {
+                                    id: "Prescript",
+                                    icon: "mdi mdi-text-box-check-outline",
+                                    value: 'Предписания'
+                                },
+                                {
+                                    id: "Requests",
+                                    icon: "wxi-file",
+                                    value: 'Заявки',
+                                    badge: setRequestsBadge()
+                                },
+                                {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
+                                {
+                                    id: "Contacts",
+                                    icon: "mdi mdi-book-open-blank-variant",
+                                    value: 'Контакты'
+                                },
+                                {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
+                            ]
                         }
+
                     ],
+                    type: {
+                        css: 'my_menubar_item',
+                        height: 44
+                    },
+                    on: {
+                        onMenuItemClick: function (id) {
+                            let view;
+
+                            if (id == 'CommonInfo') {
+                                view = commonInfo;
+                            } else if (id == 'Requests') {
+                                view = requests;
+                            } else if (id == 'Employees') {
+                                view = employees;
+                            } else if (id == 'Settings') {
+                                view = settings;
+                            } else if (id == 'Documents') {
+                                view = documents;
+                            } else if (id == 'Address') {
+                                view = address;
+                            } else if (id == 'Prescript') {
+                                view = prescript;
+                            } else if (id == 'News') {
+                                view = news;
+                            } else if (id == 'Contacts') {
+                                view = contacts;
+                            }
+                            if (view != null) {
+                                webix.ui({
+                                    id: 'content',
+                                    rows: [
+                                        view
+                                    ]
+                                }, $$('content'));
+                            }
+                        }
+                    }
+                },
+                {
+                    id: 'content'
                 }
-            ]
-        })
-    } else {
+            ],
+        }
+    ]
+}
 
-        layout = webix.ui(mainForm)
-
+webix.ready(function () {
+    let layout;
+    getRequestStyles();
+    var checkfrm = checkConsentPersonalDataProc();
+    if (checkfrm) {
+        if (document.body.clientWidth < 760) {
+            layout = webix.ui(smallMainForm)
+        } else {
+            layout = webix.ui(bigMainForm);
+        }
+    }else{
+        consentPersonalDataModal.show();
     }
     webix.event(window, "resize", function (event) {
         layout.define("width", document.body.clientWidth);
@@ -452,6 +467,4 @@ webix.ready(function () {
         }
 
     })
-
-    checkConsentPersonalDataProc()
 })

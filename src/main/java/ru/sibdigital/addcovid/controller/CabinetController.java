@@ -93,14 +93,18 @@ public class CabinetController {
     }
 
     @GetMapping("/check_consent")
-    public @ResponseBody Boolean checkConsent(HttpSession session) {
+    public @ResponseBody Map<String, Object> checkConsent(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
-            return true;
+            return null;
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
-        boolean consentDataProcessing = ((organization.getConsentDataProcessing() == null) ? false : organization.getConsentDataProcessing());
-        return consentDataProcessing;
+        boolean isAgreed = ((organization.getConsentDataProcessing() == null) ? false : organization.getConsentDataProcessing());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("isAgreed", isAgreed);
+
+        return map;
     }
 
     @GetMapping("/getConsentPersonalData")
