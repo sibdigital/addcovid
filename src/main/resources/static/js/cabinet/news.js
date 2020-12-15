@@ -135,6 +135,7 @@ const news = {
                         template: function (obj) {
                             let obj_news = obj['news']
                             let news_files = obj['newsFiles']
+                            let news_dir = obj['newsDirectory']
                             let startTime =obj_news.startTime ? new Date(obj_news.startTime) : "";
                             let startTimeString = startTime.toLocaleString("ru", options)
 
@@ -148,7 +149,8 @@ const news = {
                                                 obj_news.message +
                                             "</div>";
                             for (var i in news_files) {
-                                htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + news_files[i].attachmentPath + "'download=''><i class='mdi mdi-download'></i>"
+                                let newsFilePath = news_dir + "/" + news_files[i].fileName + news_files[i].fileExtension
+                                htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + newsFilePath + "' download=''><i class='mdi mdi-download'></i>"
                                             + news_files[i].originalFileName + "</a></div>"
                             }
 

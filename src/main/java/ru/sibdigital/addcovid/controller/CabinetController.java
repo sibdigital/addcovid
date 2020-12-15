@@ -387,6 +387,7 @@ public class CabinetController {
 
             map.put("news", news);
             map.put("newsFiles", newsFiles);
+            map.put("newsDirectory", applicationConstants.getNewsUploadPath());
             mapList.add(map);
         }
 
@@ -431,6 +432,7 @@ public class CabinetController {
 
         map.put("news", news);
         map.put("newsFiles", newsFiles);
+        map.put("newsDirectory", applicationConstants.getNewsUploadPath());
 
         requestService.saveLinkClicks(request, news);
         return map;

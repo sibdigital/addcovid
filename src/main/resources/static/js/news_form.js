@@ -66,6 +66,7 @@ webix.ready(function() {
         template: function (obj) {
             let obj_news = obj['news']
             let news_files = obj['newsFiles']
+            let news_dir = obj['newsDirectory']
             if (obj_news.hashId != null) {
 
                 var startTime =obj_news.startTime ? new Date(obj_news.startTime) : "";
@@ -81,7 +82,8 @@ webix.ready(function() {
                     "</div>";
 
                 for (var i in news_files) {
-                    htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + news_files[i].attachmentPath + "'download=''><i class='mdi mdi-download'></i>"
+                    let newsFilePath = news_dir + "/" + news_files[i].fileName + news_files[i].fileExtension
+                    htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + newsFilePath + "'download=''><i class='mdi mdi-download'></i>"
                         + news_files[i].originalFileName + "</a></div>"
                 }
                 return htmlcode +  "<span class = 'item_label'>" +
