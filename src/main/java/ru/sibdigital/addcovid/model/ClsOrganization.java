@@ -37,6 +37,7 @@ public class ClsOrganization {
     private Integer idTypeRequest;
     private Integer idTypeOrganization;
     private Integer typeTaxReporting;
+    private Boolean isDeleted;
     private Timestamp timeCreate;
     private Boolean isActivated;
 
@@ -201,6 +202,16 @@ public class ClsOrganization {
 
     public void setTypeTaxReporting(Integer typeTaxReporting) {
         this.typeTaxReporting = typeTaxReporting;
+    }
+
+    @Basic
+    @Column(name = "is_deleted")
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 
     @Basic

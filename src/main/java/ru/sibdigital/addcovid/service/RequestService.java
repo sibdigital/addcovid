@@ -467,6 +467,7 @@ public class RequestService {
                 .idTypeOrganization(typeOrganization)
                 .principal(clsPrincipal)
                 .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
+                .isDeleted(false)
                 .isActivated(false)
                 .hashCode(code)
                 .build();
