@@ -133,64 +133,78 @@ const address = {
                         elements: [
                             { gravity: 0.5 },
                             {
-                                view: "combo",
-                                id: "regions",
-                                name: "fiasRegionObjectId",
-                                label: 'Регион',
-                                value: 'Респ. Бурятия',
-                                labelPosition: 'top',
-                                invalidMessage: 'Регион не может быть пустым',
-                                options: {
-                                    keyPressTimeout: 250,
-                                    filter: (obj, filter) => {
-                                        return obj.typename.toLowerCase().indexOf(filter.toLowerCase()) !== -1 || obj.value.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
-                                    },
-                                    body: {
-                                        dynamic: true,
-                                        datafetch: 20,
-                                        url: 'regions',
-                                        template: (item) => {
-                                            return item.typename.toLowerCase() === 'респ' ? item.typename + '. ' + item.value : item.value + ' ' + item.typename;
-                                        },
-                                        ready: function () {
-                                            console.log('ready function');
-                                            $$('regions').setValue(60635); //60635 = Респ. Бурятия
-                                        }
-                                    }
-                                },
-                                on : {
-                                    onChange: (newval, oldval) => {
-                                        try {
-                                            console.log('onChange');
-                                            const indexRegion = $$('regions').getValue();
-                                            console.log(indexRegion);
-                                            if (!indexRegion) return;
-
-                                            const region = $$('regions').getList().getItem(indexRegion);
-                                            console.log(region);
-
-                                            if (region) {
-                                                let url = 'raions?objectid=' + region.objectid;
-
-                                                const suggest_id = $$('fiasObjectGuid').config.suggest;
-                                                $$(suggest_id).getList().clearAll();
-
-                                                $$('raions').setValue('');
-                                                $$('raions').getList().clearAll();
-                                                $$('raions').getList().load(url);
-
-                                                // url = 'cities?objectid=' + region.objectid;
-                                                // $$('cities').setValue('');
-                                                // $$('cities').getList().clearAll();
-                                                // $$('cities').getList().load(url);
-
+                                cols: [
+                                    {
+                                        view: "combo",
+                                        id: "regions",
+                                        name: "fiasRegionObjectId",
+                                        label: 'Регион',
+                                        value: 'Респ. Бурятия',
+                                        labelPosition: 'top',
+                                        invalidMessage: 'Регион не может быть пустым',
+                                        options: {
+                                            keyPressTimeout: 250,
+                                            filter: (obj, filter) => {
+                                                return obj.typename.toLowerCase().indexOf(filter.toLowerCase()) !== -1 || obj.value.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+                                            },
+                                            body: {
+                                                dynamic: true,
+                                                datafetch: 20,
+                                                url: 'regions',
+                                                template: (item) => {
+                                                    return item.typename.toLowerCase() === 'респ' ? item.typename + '. ' + item.value : item.value + ' ' + item.typename;
+                                                },
+                                                ready: function () {
+                                                    console.log('ready function');
+                                                    $$('regions').setValue(60635); //60635 = Респ. Бурятия
+                                                }
                                             }
-                                        } catch (e) {
-                                            console.log(e);
+                                        },
+                                        on : {
+                                            onChange: (newval, oldval) => {
+                                                try {
+                                                    console.log('onChange');
+                                                    const indexRegion = $$('regions').getValue();
+                                                    console.log(indexRegion);
+                                                    if (!indexRegion) return;
+
+                                                    const region = $$('regions').getList().getItem(indexRegion);
+                                                    console.log(region);
+
+                                                    if (region) {
+                                                        let url = 'raions?objectid=' + region.objectid;
+
+                                                        const suggest_id = $$('fiasObjectGuid').config.suggest;
+                                                        $$(suggest_id).getList().clearAll();
+
+                                                        $$('raions').setValue('');
+                                                        $$('raions').getList().clearAll();
+                                                        $$('raions').getList().load(url);
+
+                                                        // url = 'cities?objectid=' + region.objectid;
+                                                        // $$('cities').setValue('');
+                                                        // $$('cities').getList().clearAll();
+                                                        // $$('cities').getList().load(url);
+
+                                                    }
+                                                } catch (e) {
+                                                    console.log(e);
+                                                }
+                                            }
+                                        },
+                                    },
+                                    {
+                                        view: 'button',
+                                        autowidth: true,
+                                        autoheight: true,
+                                        label: '<span class=\'mdi mdi-minus-circle\' style=\'padding-right: 5px\'></span>',
+                                        click: () => {
+                                            $$('regions').setValue('');
                                         }
                                     }
-                                },
+                                ]
                             },
+
                             {
                                 view: "combo",
                                 id: "raions",
@@ -235,6 +249,10 @@ const address = {
 
                                             if (raion.level === '4' || raion.level === '5' || raion.level === '6') {
                                                 $$('cities').disable();
+
+                                                $$('cities').setValue('');
+                                                $$('cities').getList().clearAll();
+                                                $$('cities').getList().load('cities?objectid=' + raion.objectid);
 
                                                 const url = 'streets?objectid=' + raion.objectid;
                                                 $$('fiasObjectGuid').setValue('');
@@ -405,7 +423,7 @@ const address = {
                                         view: 'button',
                                         id: 'clearFormButton',
                                         css: 'webix_primary',
-                                        label: "<span class='mdi mdi-minus-circle' style='padding-right: 5px'></span><span class='text'>Очистить данные</span>",
+                                        label: "<span class='mdi mdi-minus-circle' style='padding-right: 5px'></span><span class='text'>Очистить</span>",
                                         click: () => clearDataFromForm()
                                     }
                                 ]
