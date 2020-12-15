@@ -423,7 +423,7 @@ public class CabinetController {
         return "news_form";
     }
 
-    @GetMapping("/news/{hash_id}")
+    @GetMapping("/newsform/{hash_id}")
     public @ResponseBody Map<String, Object> getNewsDataById(@PathVariable("hash_id") String hash_id, HttpServletRequest request){
         Map<String, Object> map = new HashMap<>();
 

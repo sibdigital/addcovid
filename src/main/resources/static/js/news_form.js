@@ -63,6 +63,7 @@ var options = {
 webix.ready(function() {
     webix.ui({
         view:'template',
+        scroll: 'xy',
         template: function (obj) {
             let obj_news = obj['news']
             let news_files = obj['newsFiles']
@@ -96,7 +97,7 @@ webix.ready(function() {
             }
 
         },
-        url: '../news/' + HASH_ID,
+        url: '../newsform/' + HASH_ID,
     },)
 
 })
