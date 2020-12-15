@@ -18,4 +18,7 @@ public interface ClsSettingsRepo extends JpaRepository<ClsSettings, Long> {
 
     @Query(value = "select s from ClsSettings s where s.key = 'requestsStyles' ")
     Optional<ClsSettings> getRequestsStatusStyle();
+
+    @Query(value = "select s from ClsSettings s where s.key = 'consentPersonalData' ")
+    Optional<ClsSettings> getConsentPersonalData();
 }

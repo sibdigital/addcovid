@@ -92,6 +92,35 @@ public class CabinetController {
         return "cabinet/main";
     }
 
+    @GetMapping("/check_consent")
+    public @ResponseBody Boolean checkConsent(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return true;
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        boolean consentDataProcessing = ((organization.getConsentDataProcessing() == null) ? false : organization.getConsentDataProcessing());
+        return consentDataProcessing;
+    }
+
+    @GetMapping("/getConsentPersonalData")
+    public @ResponseBody String getConsentPersonalData() {
+        ClsSettings settings = settingServiceImpl.getConsentPersonalData();
+        return settings.getStringValue();
+    }
+
+    @GetMapping("/saveConsentPersonalData")
+    public @ResponseBody String saveConsentPersonalData(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return "Не удалось сохранить согласие";
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        organization.setConsentDataProcessing(true);
+        clsOrganizationRepo.save(organization);
+        return "Согласие сохранено";
+    }
+
     @GetMapping("/organization")
     public @ResponseBody ClsOrganization getOrganization(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");

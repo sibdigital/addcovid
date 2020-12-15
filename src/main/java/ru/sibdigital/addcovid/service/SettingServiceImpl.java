@@ -29,4 +29,8 @@ public class SettingServiceImpl implements SettingService {
     public ClsSettings getRequestsStatusStyle(){
         return clsSettingsRepo.getRequestsStatusStyle().orElse(null);
     }
+
+    public ClsSettings getConsentPersonalData(){
+        return clsSettingsRepo.getConsentPersonalData().orElse(null);
+    }
 }

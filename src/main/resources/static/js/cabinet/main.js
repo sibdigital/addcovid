@@ -109,11 +109,199 @@ function getRequestStyles(){
         })
 }
 
+let consentPersonalDataModal = webix.ui({
+    view: "window",
+    id: "consentPersonalDataModalId",
+    minWidth: 200,
+    maxWidth: 550,
+    position: "center",
+    // modal: true,
+    close: false,
+    head: "Согласие на обработку персональных данных",
+    body: {
+        view: 'form',
+        rows: [
+            {
+                view: 'template',
+                height: 550,
+                readonly: true,
+                scroll: true,
+                src: 'getConsentPersonalData'
+            },
+            {
+                view: 'checkbox',
+                id: 'isAgreed',
+                name: 'agree',
+                labelPosition: 'top',
+                labelRight: 'Согласен на обработку персональных данных',
+                value: false
+            },
+            {
+                cols: [
+                    {},
+                    {
+                        view: 'button',
+                        css: 'webix_primary',
+                        value: 'Подтвердить',
+                        align: 'right',
+                        click: function () {
+                            if ($$('isAgreed').getValue() == 0) {
+                                webix.send("/logout");
+                            } else {
+                                webix.ajax().get('/saveConsentPersonalData').then(function (data) {
+                                    if (data.text() === 'Согласие сохранено') {
+                                        consentPersonalDataModal.hide();
+                                        $$('mainFormId').enable();
+                                    }
+                                    else {
+                                        webix.message(data.text(), 'error');
+                                    }
+                                })
+                            }
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+
+});
+
+function checkConsentPersonalDataProc(){
+    var xhr = webix.ajax().sync().get('/check_consent');
+    if (xhr.responseText === 'false') {
+        $$('mainFormId').disable();
+        consentPersonalDataModal.show();
+    }
+}
+
+let mainForm = {
+    id: 'mainFormId',
+    cols: [
+        {
+            width: 220,
+            id: 'menuRow',
+            rows: [
+                {
+                    view: 'label',
+                    css: {
+                        'background-color': '#565B67 !important',
+                        'color': '#FFFFFF'
+                    },
+                    height: 46,
+                    label: `<img height='36px' width='36px' style="padding: 0 0 2px 2px" src = \"favicon.ico\"><span style="color: white; font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
+                },
+                {
+                    view: 'menu',
+                    id: 'menu',
+                    css: 'my_menubar',
+                    //collapsed: true,
+                    layout: 'y',
+                    data: [
+                        {id: "CommonInfo", icon: "mdi mdi-information", value: 'Общая информация'},
+                        {id: "Employees", icon: "mdi mdi-account-group", value: 'Сотрудники'},
+                        {id: "Documents", icon: "mdi mdi-cloud-upload-outline", value: 'Документы'},
+                        {id: "Address", icon: "mdi mdi-home-city-outline", value: 'Фактические адреса'},
+                        {id: "Prescript", icon: "mdi mdi-text-box-check-outline", value: 'Предписания'},
+                        {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
+                        {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
+                        {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Контакты'},
+                        {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
+                    ],
+                    type: {
+                        css: 'my_menubar_item',
+                        height: 44
+                    },
+                    on: {
+                        onMenuItemClick: function (id) {
+                            let view;
+                            let itemValue;
+                            let requestsBadge = "";
+                            if (id == 'CommonInfo') {
+                                view = commonInfo;
+                            } else if (id == 'Requests') {
+                                view = requests;
+                                let checkReqBadge = this.getMenuItem(id).badge
+                                if (checkReqBadge != null) {
+                                    requestsBadge = "(" + checkReqBadge + ")";
+                                }
+                            } else if (id == 'Employees') {
+                                view = employees;
+                            } else if (id == 'Settings') {
+                                view = settings;
+                            } else if (id == 'Documents') {
+                                view = documents;
+                            } else if (id == 'Address') {
+                                view = address;
+                            } else if (id == 'Prescript') {
+                                view = prescript;
+                            } else if (id == 'News') {
+                                view = news;
+                            } else if (id == 'Contacts') {
+                                view = contacts;
+                            } else if (id == 'Mailing') {
+                                view = mailing;
+                            }
+                            if (view != null) {
+                                webix.ui({
+                                    id: 'content',
+                                    rows: [
+                                        view
+                                    ]
+                                }, $$('content'));
+                                itemValue = this.getMenuItem(id).value
+                                $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + itemValue + " " + requestsBadge + "</span>")
+                            }
+
+                            // webix.ajax("/check_session").then(function (data){
+                            //     if(data.text() == "Expired"){
+                            //         //webix.send("/logout")
+                            //     }
+                            // })
+                        }
+                    }
+                },
+            ]
+        },
+        {
+            rows: [
+
+                {
+                    view: 'toolbar',
+                    id: 'toolbar',
+                    // padding: 5,
+                    height: 45,
+                    elements: [
+
+                        {
+                            view: 'label',
+                            id: 'labelLK',
+                            align: 'left',
+                            css: {"padding-left": "5px"},
+                            label: 'Личный кабинет',
+                        },
+                        {
+                            view: 'template',
+                            borderless: true,
+                            template: "<div style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> " +
+                                "<span id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\"" +
+                                "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
+                            url: 'organization',
+                        },
+                    ]
+                },
+                {
+                    id: 'content'
+                }
+            ],
+        }
+    ]
+}
+
 webix.ready(function () {
     let layout;
     getRequestStyles()
-    if(document.body.clientWidth < 760)
-    {
+      if (document.body.clientWidth < 760) {
         layout = webix.ui({
             cols: [
                 {
@@ -153,17 +341,34 @@ webix.ready(function () {
                             css: 'my_menubar',
                             //collapsed: true,
                             data: [
-                                {id: "CommonInfo", value: 'Общая информация', },
+                                {id: "CommonInfo", value: 'Общая информация',},
                                 {id: "Employees", value: 'Сотрудники',},
                                 {
                                     value: "<span class='mdi mdi-dots-horizontal'></span>",
                                     submenu: [
                                         {id: "Documents", icon: "mdi mdi-cloud-upload-outline", value: 'Документы'},
-                                        {id: "Address", icon: "mdi mdi-home-city-outline", value: 'Фактические адреса'},
-                                        {id: "Prescript", icon: "mdi mdi-text-box-check-outline", value: 'Предписания'},
-                                        {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
-                                    {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
-                                        {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Контакты'},
+                                        {
+                                            id: "Address",
+                                            icon: "mdi mdi-home-city-outline",
+                                            value: 'Фактические адреса'
+                                        },
+                                        {
+                                            id: "Prescript",
+                                            icon: "mdi mdi-text-box-check-outline",
+                                            value: 'Предписания'
+                                        },
+                                        {
+                                            id: "Requests",
+                                            icon: "wxi-file",
+                                            value: 'Заявки',
+                                            badge: setRequestsBadge()
+                                        },
+                                        {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
+                                        {
+                                            id: "Contacts",
+                                            icon: "mdi mdi-book-open-blank-variant",
+                                            value: 'Контакты'
+                                        },
                                         {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
                                     ]
                                 }
@@ -177,23 +382,23 @@ webix.ready(function () {
                                 onMenuItemClick: function (id) {
                                     let view;
 
-                                    if (id == 'CommonInfo'){
+                                    if (id == 'CommonInfo') {
                                         view = commonInfo;
-                                    }else if (id == 'Requests'){
+                                    } else if (id == 'Requests') {
                                         view = requests;
-                                    }else if (id == 'Employees'){
+                                    } else if (id == 'Employees') {
                                         view = employees;
-                                    }else if (id == 'Settings'){
+                                    } else if (id == 'Settings') {
                                         view = settings;
-                                    }else if (id == 'Documents'){
+                                    } else if (id == 'Documents') {
                                         view = documents;
-                                    }else if (id == 'Address'){
+                                    } else if (id == 'Address') {
                                         view = address;
-                                    }else if (id == 'Prescript'){
+                                    } else if (id == 'Prescript') {
                                         view = prescript;
-                                    }else if (id == 'News'){
+                                    } else if (id == 'News') {
                                         view = news;
-                                    }else if (id == 'Contacts'){
+                                    } else if (id == 'Contacts') {
                                         view = contacts;
                                     }
                                     if (view != null) {
@@ -214,130 +419,9 @@ webix.ready(function () {
                 }
             ]
         })
-    }
-    else{
+    } else {
 
-        layout = webix.ui({
-            cols: [
-                {
-                    width: 220,
-                    id: 'menuRow',
-                    rows: [
-                        {
-                            view: 'label',
-                            css: {
-                                'background-color': '#565B67 !important',
-                                'color': '#FFFFFF'
-                            },
-                            height: 46,
-                            label: `<img height='36px' width='36px' style="padding: 0 0 2px 2px" src = \"favicon.ico\"><span style="color: white; font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
-                        },
-                        {
-                            view: 'menu',
-                            id: 'menu',
-                            css: 'my_menubar',
-                            //collapsed: true,
-                            layout: 'y',
-                            data: [
-                                {id: "CommonInfo", icon: "mdi mdi-information", value: 'Общая информация'},
-                                {id: "Employees", icon: "mdi mdi-account-group", value: 'Сотрудники'},
-                                {id: "Documents", icon: "mdi mdi-cloud-upload-outline", value: 'Документы'},
-                                {id: "Address", icon: "mdi mdi-home-city-outline", value: 'Фактические адреса'},
-                                {id: "Prescript", icon: "mdi mdi-text-box-check-outline", value: 'Предписания'},
-                                {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
-                                {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
-                                {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Контакты'},
-                                {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
-                            ],
-                            type: {
-                                css: 'my_menubar_item',
-                                height: 44
-                            },
-                            on: {
-                                onMenuItemClick: function (id) {
-                                    let view;
-                                    let itemValue;
-                                    let requestsBadge = "";
-                                    if (id == 'CommonInfo'){
-                                        view = commonInfo;
-                                    }else if (id == 'Requests'){
-                                        view = requests;
-                                        let checkReqBadge =  this.getMenuItem(id).badge
-                                        if(checkReqBadge != null){
-                                            requestsBadge = "(" + checkReqBadge + ")";
-                                        }
-                                    }else if (id == 'Employees'){
-                                        view = employees;
-                                    }else if (id == 'Settings'){
-                                        view = settings;
-                                    }else if (id == 'Documents'){
-                                        view = documents;
-                                    }else if (id == 'Address'){
-                                        view = address;
-                                    }else if (id == 'Prescript'){
-                                        view = prescript;
-                                    }else if (id == 'News'){
-                                        view = news;
-                                    }else if (id == 'Contacts'){
-                                        view = contacts;
-                                    }else if (id == 'Mailing'){
-                                        view = mailing;
-                                    }
-                                    if (view != null) {
-                                        webix.ui({
-                                            id: 'content',
-                                            rows: [
-                                                view
-                                            ]
-                                        }, $$('content'));
-                                        itemValue = this.getMenuItem(id).value
-                                        $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" +itemValue + " " + requestsBadge + "</span>")
-                                    }
-
-                                    // webix.ajax("/check_session").then(function (data){
-                                    //     if(data.text() == "Expired"){
-                                    //         //webix.send("/logout")
-                                    //     }
-                                    // })
-                                }
-                            }
-                        },
-                    ]
-                },
-                {
-                    rows: [
-
-                        {
-                            view: 'toolbar',
-                            id: 'toolbar',
-                            // padding: 5,
-                            height: 45,
-                            elements: [
-
-                                {
-                                    view: 'label',
-                                    id: 'labelLK',
-                                    align: 'left',
-                                    css: {"padding-left":"5px"},
-                                    label: 'Личный кабинет',
-                                },
-                                {
-                                    view: 'template',
-                                    borderless: true,
-                                    template: "<div style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> " +
-                                        "<span id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\"" +
-                                        "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
-                                    url: 'organization',
-                                },
-                            ]
-                        },
-                        {
-                            id: 'content'
-                        }
-                    ],
-                }
-            ]
-        })
+        layout = webix.ui(mainForm)
 
     }
     webix.event(window, "resize", function (event) {
@@ -352,7 +436,7 @@ webix.ready(function () {
 
             adaptiveEmployees()
 
-        }else if (id === "inn"){
+        } else if (id === "inn") {
 
             adaptiveCommonInfo()
 
@@ -361,7 +445,7 @@ webix.ready(function () {
         let contentChild = $$('content').getChildViews()[0]
         let contentChildName = contentChild.config.name
 
-        if(id === "addAddressInfo"  && contentChildName === 'showRequestCreateForm'){
+        if (id === "addAddressInfo" && contentChildName === 'showRequestCreateForm') {
 
             adaptiveRequests()
 
@@ -369,4 +453,5 @@ webix.ready(function () {
 
     })
 
+    checkConsentPersonalDataProc()
 })
