@@ -423,10 +423,17 @@ public class CabinetController {
     }
 
     @GetMapping("/news/{hash_id}")
-    public @ResponseBody ClsNews getNewsById(@PathVariable("hash_id") String hash_id, HttpServletRequest request){
-        ClsNews clsNews = clsNewsRepo.findByHashId(hash_id);
-        requestService.saveLinkClicks(request, clsNews);
-        return clsNews;
+    public @ResponseBody Map<String, Object> getNewsDataById(@PathVariable("hash_id") String hash_id, HttpServletRequest request){
+        Map<String, Object> map = new HashMap<>();
+
+        ClsNews news = clsNewsRepo.findByHashId(hash_id);
+        List<RegNewsFile> newsFiles = regNewsFileRepo.findAllByNews(news);
+
+        map.put("news", news);
+        map.put("newsFiles", newsFiles);
+
+        requestService.saveLinkClicks(request, news);
+        return map;
     }
 
     @GetMapping("/my_mailing_list")

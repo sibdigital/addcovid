@@ -10,6 +10,15 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
     "\n" +
     "   color: #0056b3; \n" +
     "   }" +
+    "a.link{\n" +
+    "\n" +
+    "   text-decoration: none;\n" +
+    "   color: #005cbf;" +
+    "   }" +
+    "a.link:hover{\n" +
+    "\n" +
+    "   color: #e83e8c; \n" +
+    "   }" +
     ".item{\n" +
     "\n" +
     "    margin:10px 5px;\n" +
@@ -139,7 +148,7 @@ const news = {
                                                 obj_news.message +
                                             "</div>";
                             for (var i in news_files) {
-                                htmlcode = htmlcode + "<div class='item_link'><a href='" + news_files[i].attachmentPath + "'download=''><i class='mdi mdi-download'></i>"
+                                htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + news_files[i].attachmentPath + "'download=''><i class='mdi mdi-download'></i>"
                                             + news_files[i].originalFileName + "</a></div>"
                             }
 

@@ -10,10 +10,24 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
     "\n" +
     "   color: #0056b3; \n" +
     "   }" +
+    "a.link{\n" +
+    "\n" +
+    "   text-decoration: none;\n" +
+    "   color: #005cbf;" +
+    "   }" +
+    "a.link:hover{\n" +
+    "\n" +
+    "   color: #e83e8c; \n" +
+    "   }" +
     ".item{\n" +
     "\n" +
     "    margin:10px 5px;\n" +
     "    padding:10px 10px;\n" +
+    "  }" +
+    ".item_link{\n" +
+    "\n" +
+    "    margin:0px 15px;\n" +
+    // "    color: #005cbf; \n" +
     "  }" +
     ".item_title{\n" +
     "\n" +
@@ -50,19 +64,27 @@ webix.ready(function() {
     webix.ui({
         view:'template',
         template: function (obj) {
-            if (obj.hashId != null) {
-                var startTime =obj.startTime ? new Date(obj.startTime) : "";
+            let obj_news = obj['news']
+            let news_files = obj['newsFiles']
+            if (obj_news.hashId != null) {
+
+                var startTime =obj_news.startTime ? new Date(obj_news.startTime) : "";
                 let startTimeString = startTime.toLocaleString("ru", options)
-                return "<div>" +
+                let htmlcode =  "<div>" +
                     "<span class = 'item_big_title'>" +
-                    "<a href = \"news?hash_id=" + obj.hashId + "\"'>" +
-                    obj.heading +
+                    "<a href = \"news?hash_id=" + obj_news.hashId + "\"'>" +
+                    obj_news.heading +
                     "</a>" +
                     "</span>" +
                     "<div class='item'>" +
-                    obj.message +
-                    "</div>" +
-                    "<span class = 'item_label'>" +
+                    obj_news.message +
+                    "</div>";
+
+                for (var i in news_files) {
+                    htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + news_files[i].attachmentPath + "'download=''><i class='mdi mdi-download'></i>"
+                        + news_files[i].originalFileName + "</a></div>"
+                }
+                return htmlcode +  "<span class = 'item_label'>" +
                     "Дата публикации: " + startTimeString +
                     "</span>" +
                     "</div>"
