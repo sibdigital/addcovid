@@ -49,8 +49,9 @@ public interface FiasAddrObjectRepo extends JpaRepository<FIASAddrObject, Long> 
             "select fao.id, fao.objectid, fao.name as value, fao.typename, fao.level \n" +
             " from fias.addr_object as fao inner join cit\n" +
             " on (fao.objectid) = (cit.objectid) " +
-            " where fao.level='2' or fao.level='3' " +
-            " order by fao.name")
+            " where fao.level='2' or fao.level='3' or level='4' or level='5' or level='6'" +
+            " order by fao.level DESC, fao.name " +
+            " ")
     List<Map<String, Object>> findRaions(@Param("regionGuid") Long regionObjectId);
 
     @Query(nativeQuery = true, value = "select fao.id, fao.objectid, fao.name as value, fao.typename " +

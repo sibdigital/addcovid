@@ -124,10 +124,10 @@ const address = {
                         complexData: true,
                         rules: {
                             "fiasRegionObjectId": webix.rules.isNotEmpty,
-                            //"fiasRaionGuid": webix.rules.isNotEmpty,
+                            "fiasRaionGuid": webix.rules.isNotEmpty,
                             "fiasStreetObjectId": webix.rules.isNotEmpty,
-                            "fiasCityObjectId": webix.rules.isNotEmpty,
-                            "house_hand": webix.rules.isNumber,
+                            //"fiasCityObjectId": webix.rules.isNotEmpty,
+                            "house_hand": webix.rules.isNotEmpty,
                             "apartment_hand": webix.rules.isNotEmpty
                         },
                         elements: [
@@ -137,6 +137,7 @@ const address = {
                                 id: "regions",
                                 name: "fiasRegionObjectId",
                                 label: 'Регион',
+                                value: 'Респ. Бурятия',
                                 labelPosition: 'top',
                                 invalidMessage: 'Регион не может быть пустым',
                                 options: {
@@ -152,13 +153,15 @@ const address = {
                                             return item.typename.toLowerCase() === 'респ' ? item.typename + '. ' + item.value : item.value + ' ' + item.typename;
                                         },
                                         ready: function () {
+                                            console.log('ready function');
+                                            $$('regions').setValue(60635); //60635 = Респ. Бурятия
                                         }
                                     }
                                 },
                                 on : {
                                     onChange: (newval, oldval) => {
                                         try {
-                                            console.log('OHMAKI');
+                                            console.log('onChange');
                                             const indexRegion = $$('regions').getValue();
                                             console.log(indexRegion);
                                             if (!indexRegion) return;
@@ -176,10 +179,10 @@ const address = {
                                                 $$('raions').getList().clearAll();
                                                 $$('raions').getList().load(url);
 
-                                                url = 'cities?objectid=' + region.objectid;
-                                                $$('cities').setValue('');
-                                                $$('cities').getList().clearAll();
-                                                $$('cities').getList().load(url);
+                                                // url = 'cities?objectid=' + region.objectid;
+                                                // $$('cities').setValue('');
+                                                // $$('cities').getList().clearAll();
+                                                // $$('cities').getList().load(url);
 
                                             }
                                         } catch (e) {
@@ -211,12 +214,11 @@ const address = {
                                         // },
                                         dynamic: true,
                                         datafetch: 20,
-                                        template: '#value# #typename#',
+                                        //template: '#value# #typename#',
                                         //url: 'cities',
-                                        // template: (item) => {
-                                        //     return item.value;
-                                        //     //return item.typename.toLowerCase() === 'г' ? item.typename + '. ' + item.value : item.value + ' ' + item.typename;
-                                        // },
+                                        template: (item) => {
+                                            return item.typename.toLowerCase() === 'г' ? item.typename + '. ' + item.value : item.value + ' ' + item.typename;
+                                        },
                                         ready: function () {
                                         }
                                     }
@@ -230,6 +232,29 @@ const address = {
 
                                             const raion = $$('raions').getList().getItem(indexRaion);
                                             console.log(raion);
+
+                                            if (raion.level === '4' || raion.level === '5' || raion.level === '6') {
+                                                $$('cities').disable();
+
+                                                const url = 'streets?objectid=' + raion.objectid;
+                                                $$('fiasObjectGuid').setValue('');
+                                                const suggest_id = $$('fiasObjectGuid').config.suggest;
+                                                const list = $$(suggest_id).getList();
+                                                list.clearAll();
+                                                webix.ajax()
+                                                    .headers({'Content-type': 'application/json'})
+                                                    .get(url)
+                                                    .then(function (data) {
+                                                        console.log(data);
+                                                        if (data !== null) {
+                                                            list.parse(data);
+                                                        }
+                                                    });
+
+                                                return;
+                                            } else {
+                                                $$('cities').enable();
+                                            }
 
                                             if (raion.value === '<Не выбрано>') {
                                                 const indexRegion = $$('regions').getValue();
@@ -324,9 +349,7 @@ const address = {
                                         datafetch: 15,
                                         // template: '#typename#' + '#typename#'.includes('.') ? '. ' : ' ' + '#value#',
                                         template: (item) => {
-                                            console.log(item);
                                             const isDot = item.typename.includes('.');
-                                            console.log(isDot);
                                             return item.typename + (isDot ? ' ' : '. ') + item.value;
                                         },
                                     }
@@ -408,7 +431,11 @@ function addAddress() {
     const params = form.getValues();
     console.log(params);
 
-    if (form.validate()) {
+    const customValidate = () => {
+        return params.fiasRaionObjectId !== '' && params.fiasRegionObjectId !== '' && params.apartmentHand !== '' && params.houseHand !== '' && params.fiasStreetObjectId !== '';
+    };
+
+    if (customValidate) {
         const indexRegion = $$('regions').getValue();
         const region = $$('regions').getList().getItem(indexRegion);
         console.log(region);
@@ -419,15 +446,15 @@ function addAddress() {
         const indexRaion = $$('raions').getValue();
         const raion = $$('raions').getList().getItem(indexRaion);
         console.log(raion);
-        const raionLabel = raion ? (raion.value + ' ' + raion.typename) : null;
+        const raionLabel = raion ? (raion.typename.toLowerCase() === 'г' ? raion.typename + '. ' + raion.value : raion.value + ' ' + raion.typename) : null;
 
-        params.fiasRaionObjectId = raion.objectid || 0;
+        params.fiasRaionObjectId = raion ? raion.objectid : 0;
 
         const indexCity = $$('cities').getValue();
         const city = $$('cities').getList().getItem(indexCity);
-        const cityLabel = city.typename + '. ' + city.value;
+        const cityLabel = city ? (city.typename + '. ' + city.value) : null;
 
-        params.fiasCityObjectId = city.objectid;
+        params.fiasCityObjectId = city ? city.objectid : 0;
 
         const suggest_id = $$('fiasObjectGuid').config.suggest;
         const streetLabel = $$('fiasObjectGuid').getValue();
@@ -456,10 +483,10 @@ function addAddress() {
         params.fiasHouseObjectId = 0;
 
         params.fiasObjectId = 0;
-        if (raionLabel) {
+        if (cityLabel) {
             params.fullAddress = [regionLabel, raionLabel, cityLabel, streetLabel, house, office].join(', ');
         } else {
-            params.fullAddress = [regionLabel, cityLabel, streetLabel, house, office].join(', ');
+            params.fullAddress = [regionLabel, raionLabel, streetLabel, house, office].join(', ');
         }
         params.houseHand = house;
         params.apartmentHand = office;
@@ -483,6 +510,10 @@ function addAddress() {
             });
         form.clear();
         form.clearValidation();
+        $$('cities').enable();
+    }
+    else {
+        console.log(form.validate());
     }
 };
 
