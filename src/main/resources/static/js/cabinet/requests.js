@@ -268,6 +268,18 @@ function showRequestWizard(data) {
     });
 }
 
+function attachFile(id){
+    let originalFileName = $$("docs_grid").getItem(id).originalFileName
+    if($$("docs_grid").isSelected(id)){
+        $$("choosedFiles").remove(id)
+    }else{
+        $$("choosedFiles").add({
+            id: id,
+            title: originalFileName,
+        },id)
+    }
+}
+
 const requestWizard = {
     view: 'scrollview',
     scroll: 'xy',
@@ -311,6 +323,11 @@ const requestWizard = {
                                                 minWidth: 320,
                                                 select:true,
                                                 multiselect:"touch",
+                                                on:{
+                                                    "onItemClick":function (obj){
+                                                        attachFile(obj)
+                                                    }
+                                                },
                                                 template: function (obj) {
                                                     let docImg;
                                                     let downloadTime = obj.timeCreate.substr(11, 8) + ', ' + obj.timeCreate.substr(0, 10)
@@ -319,7 +336,7 @@ const requestWizard = {
                                                     } else {
                                                         docImg = "pdf.png"
                                                     }
-                                                    return "<div id='2' class='overallRequestNew'>" +
+                                                    return "<div id='2' class='overallRequestNew' >" +
                                                                 "<div>" +
                                                                     "<img style='position: absolute' src = " + docImg + "> " +
                                                                     "<div class='doc_title'>" + obj.originalFileName.slice(0, -4) + "</div>" +
@@ -396,23 +413,23 @@ const requestWizard = {
                                                             {}
                                                         ]
                                                     },
-                                                     {
-                                                        view: "button",
-                                                        css: 'webix_primary',
-                                                        value: 'Приложить файлы',
-                                                        click: function (){
-                                                            $$("choosedFiles").clearAll()
-                                                            let params = $$('docs_grid').getSelectedItem(true) //Массив всех выбранных объектов
-                                                            for(let i in params){
-                                                                $$("choosedFiles").add({
-                                                                    id: params[i].id,
-                                                                    title: params[i].originalFileName,
-                                                                },0)
-                                                            }
-                                                            $$("labelFiles").setValue("*Список прикрепленных к заявке файлов ("+params.length+")")
-                                                            $$("labelFiles").refresh()
-                                                        }
-                                                    },
+                                                    //  {
+                                                    //     view: "button",
+                                                    //     css: 'webix_primary',
+                                                    //     value: 'Приложить файлы',
+                                                    //     click: function (){
+                                                    //         $$("choosedFiles").clearAll()
+                                                    //         let params = $$('docs_grid').getSelectedItem(true) //Массив всех выбранных объектов
+                                                    //         for(let i in params){
+                                                    //             $$("choosedFiles").add({
+                                                    //                 id: params[i].id,
+                                                    //                 title: params[i].originalFileName,
+                                                    //             },0)
+                                                    //         }
+                                                    //         $$("labelFiles").setValue("*Список прикрепленных к заявке файлов ("+params.length+")")
+                                                    //         $$("labelFiles").refresh()
+                                                    //     }
+                                                    // },
                                                     {
                                                         view: "label",
                                                         id: "labelFiles",
