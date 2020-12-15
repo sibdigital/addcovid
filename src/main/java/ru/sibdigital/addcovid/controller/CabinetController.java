@@ -79,6 +79,9 @@ public class CabinetController {
     @Autowired
     private SettingServiceImpl settingServiceImpl;
 
+    @Autowired
+    private RegNewsFileRepo regNewsFileRepo;
+
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -370,13 +373,24 @@ public class CabinetController {
     }
 
     @GetMapping("/newsfeed")
-    public @ResponseBody List<ClsNews> getNewsList(HttpSession session) {
+    public @ResponseBody List<Map<String, Object>> getNewsList(HttpSession session) {
+        List<Map<String, Object>> mapList = new ArrayList<>();
+
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
         }
         List<ClsNews> newsList = clsNewsRepo.getCurrentNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
-        return newsList;
+        for (ClsNews news : newsList) {
+            Map<String, Object> map = new HashMap<>();
+            List<RegNewsFile> newsFiles = regNewsFileRepo.findAllByNews(news);
+
+            map.put("news", news);
+            map.put("newsFiles", newsFiles);
+            mapList.add(map);
+        }
+
+        return mapList;
     }
 
     @GetMapping("/news_archive")

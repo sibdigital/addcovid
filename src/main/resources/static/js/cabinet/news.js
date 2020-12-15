@@ -15,6 +15,10 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
     "    margin:10px 5px;\n" +
     "    padding:10px 10px;\n" +
     "  }" +
+    ".item_link{\n" +
+    "\n" +
+    "    margin:0px 15px;\n" +
+    "  }" +
     ".item_title{\n" +
     "\n" +
     "    font:bold 14px/16px GraphikCy-Semibold;\n" +
@@ -120,18 +124,26 @@ const news = {
                         margin: 20, paddingX: 10,
                         scroll: 'y',
                         template: function (obj) {
-                            var startTime =obj.startTime ? new Date(obj.startTime) : "";
+                            let obj_news = obj['news']
+                            let news_files = obj['newsFiles']
+                            let startTime =obj_news.startTime ? new Date(obj_news.startTime) : "";
                             let startTimeString = startTime.toLocaleString("ru", options)
 
-                            return "<div class = 'class_border'>" +
+                            let htmlcode =  "<div class = 'class_border'>" +
                                     "<span class = 'item_big_title'>" +
-                                            "<a href = \"news?hash_id=" + obj.hashId + "\"'>" +
-                                                obj.heading +
+                                            "<a href = \"news?hash_id=" + obj_news.hashId + "\"'>" +
+                                                obj_news.heading +
                                             "</a>" +
                                             "</span>"+
                                             "<div class='item'>" +
-                                                obj.message +
-                                            "</div>"+
+                                                obj_news.message +
+                                            "</div>";
+                            for (var i in news_files) {
+                                htmlcode = htmlcode + "<div class='item_link'><a href='" + news_files[i].attachmentPath + "'download=''><i class='mdi mdi-download'></i>"
+                                            + news_files[i].originalFileName + "</a></div>"
+                            }
+
+                            return htmlcode +
                                             "<span class = 'item_label'>" +
                                             "Дата публикации: "+ startTimeString +
                                             "</span>" +
