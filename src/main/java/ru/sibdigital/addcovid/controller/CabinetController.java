@@ -11,11 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
-import ru.sibdigital.addcovid.dto.ClsMailingListDto;
-import ru.sibdigital.addcovid.dto.EmployeeDto;
-import ru.sibdigital.addcovid.dto.OrganizationContactDto;
-import ru.sibdigital.addcovid.dto.PostFormDto;
-import ru.sibdigital.addcovid.dto.PrincipalDto;
+import ru.sibdigital.addcovid.dto.*;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 import ru.sibdigital.addcovid.repository.*;
@@ -74,7 +70,7 @@ public class CabinetController {
     private FiasAddrObjectRepo fiasAddrObjectRepo;
 
     @Autowired
-    private ClsTypeRequestRepo clsTypeRequestRepo;
+    private ClsPrescriptionRepo clsPrescriptionRepo;
 
     @Autowired
     private SettingServiceImpl settingServiceImpl;
@@ -170,13 +166,33 @@ public class CabinetController {
     }
 
     @GetMapping("/prescriptions")
-    public @ResponseBody List<ClsTypeRequest> getPrescriptions(HttpSession session) {
+    public @ResponseBody List<ClsPrescriptionDto> getPrescriptions(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
         }
-        List<ClsTypeRequest> prescriptions = clsTypeRequestRepo.getPrescriptionsByOrganizationId(id);
+        List<ClsPrescriptionDto> prescriptions = requestService.getClsPrescriptionsByOrganizationId(id);
         return prescriptions;
+    }
+
+    @GetMapping("/prescription")
+    public @ResponseBody ClsPrescription getClsPrescription(@RequestParam Long id) {
+        return requestService.getClsPrescriptionById(id);
+    }
+
+    @PostMapping("/cabinet/organization_prescription")
+    public @ResponseBody String postOrganizationPrescriptionForm(@RequestBody OrganizationPrescriptionDto dto, HttpSession session) {
+        try {
+            Long id = (Long) session.getAttribute("id_organization");
+            if (id == null) {
+                return null;
+            }
+            RegOrganizationPrescription organizationPrescription = requestService.addOrganizationPrescription(id, dto);
+            return "Предписание сохранено";
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "Не удалось сохранить предписание";
+        }
     }
 
     @PostMapping("/cabinet/typed_form")

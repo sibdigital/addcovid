@@ -4,33 +4,36 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
-@Table(name = "reg_type_request_prescription", schema = "public")
+@Table(name = "reg_prescription_text", schema = "public")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class RegTypeRequestPrescription {
+public class RegPrescriptionText {
 
     @Id
     @Column(name = "id", nullable = false)
-    @SequenceGenerator(name = "REG_TYPE_REQUEST_PRESCRIPTION_SEQ_GEN", sequenceName = "reg_type_request_prescription_id_seq", allocationSize = 1, schema = "public")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REG_TYPE_REQUEST_PRESCRIPTION_SEQ_GEN")
+    @SequenceGenerator(name = "REG_PRESCRIPTION_TEXT_SEQ_GEN", sequenceName = "reg_prescription_text_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REG_PRESCRIPTION_TEXT_SEQ_GEN")
     private Long id;
     private Short num;
     private String content;
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "id_type_request", nullable = false)
-    private ClsTypeRequest typeRequest;
+    @JoinColumn(name = "id_prescription", nullable = false)
+    private ClsPrescription prescription;
 
-    @OneToMany(targetEntity = RegTypeRequestPrescriptionFile.class, mappedBy="typeRequestPrescription", fetch = FetchType.LAZY)
-    private List<RegTypeRequestPrescriptionFile> regTypeRequestPrescriptionFiles;
+    @Where(clause = "not is_deleted")
+    @OrderBy("id asc")
+    @OneToMany(mappedBy="prescriptionText")
+    private List<RegPrescriptionTextFile> prescriptionTextFiles;
 
     public Long getId() {
         return id;
@@ -60,27 +63,27 @@ public class RegTypeRequestPrescription {
         this.content = content;
     }
 
-    public ClsTypeRequest getTypeRequest() {
-        return typeRequest;
+    public ClsPrescription getPrescription() {
+        return prescription;
     }
 
-    public void setTypeRequest(ClsTypeRequest typeRequest) {
-        this.typeRequest = typeRequest;
+    public void setPrescription(ClsPrescription prescription) {
+        this.prescription = prescription;
     }
 
-    public List<RegTypeRequestPrescriptionFile> getRegTypeRequestPrescriptionFiles() {
-        return regTypeRequestPrescriptionFiles;
+    public List<RegPrescriptionTextFile> getPrescriptionTextFiles() {
+        return prescriptionTextFiles;
     }
 
-    public void setRegTypeRequestPrescriptionFiles(List<RegTypeRequestPrescriptionFile> regTypeRequestPrescriptionFiles) {
-        this.regTypeRequestPrescriptionFiles = regTypeRequestPrescriptionFiles;
+    public void setPrescriptionTextFiles(List<RegPrescriptionTextFile> prescriptionTextFiles) {
+        this.prescriptionTextFiles = prescriptionTextFiles;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RegTypeRequestPrescription that = (RegTypeRequestPrescription) o;
+        RegPrescriptionText that = (RegPrescriptionText) o;
         return Objects.equals(id, that.id) && Objects.equals(num, that.num) && Objects.equals(content, that.content);
     }
 

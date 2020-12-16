@@ -104,6 +104,15 @@ public class RequestService {
     @Autowired
     private RegEgrulRepo regEgrulRepo;
 
+    @Autowired
+    private DocRequestPrsRepo docRequestPrsRepo;
+
+    @Autowired
+    private ClsPrescriptionRepo clsPrescriptionRepo;
+
+    @Autowired
+    private RegOrganizationPrescriptionRepo regOrganizationPrescriptionRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
@@ -841,4 +850,37 @@ public class RequestService {
         return remoteAddr;
     }
 
+    public List<ClsPrescriptionDto> getClsPrescriptionsByOrganizationId(Long id) {
+        List<DocRequestPrs> requests = docRequestPrsRepo.getActualizedRequestsByOrganizationId(id);
+        Set<Long> typeRequestIds = requests.stream().map(request -> request.getTypeRequest().getId()).collect(Collectors.toSet());
+        List<ClsPrescription> newPrescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestIds(typeRequestIds, id);
+        List<ClsPrescriptionDto> newDtos = newPrescriptions.stream().map(prescription ->
+                new ClsPrescriptionDto(prescription.getId(), prescription.getName(), prescription.getTypeRequest().getActivityKind(), prescription.getTimePublication(), false))
+                .collect(Collectors.toList());
+        // предписания, с которыми организация ознакомлена
+        List<ClsPrescription> orgPrescriptions = clsPrescriptionRepo.getPrescriptionsByOrganizationId(id);
+        List<ClsPrescriptionDto> orgDtos = orgPrescriptions.stream().map(prescription ->
+                new ClsPrescriptionDto(prescription.getId(), prescription.getName(), prescription.getTypeRequest().getActivityKind(), prescription.getTimePublication(), true))
+                .collect(Collectors.toList());
+        newDtos.addAll(orgDtos);
+        return newDtos;
+    }
+
+    public ClsPrescription getClsPrescriptionById(Long id) {
+        return clsPrescriptionRepo.findById(id).orElse(null);
+    }
+
+    public RegOrganizationPrescription addOrganizationPrescription(Long id, OrganizationPrescriptionDto dto) {
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        ClsPrescription prescription = clsPrescriptionRepo.findById(dto.getPrescriptionId()).orElse(null);
+
+        RegOrganizationPrescription organizationPrescription = RegOrganizationPrescription.builder()
+                .organization(organization)
+                .prescription(prescription)
+                .additionalAttributes(dto.getAdditionalAttributes())
+                .build();
+        regOrganizationPrescriptionRepo.save(organizationPrescription);
+
+        return organizationPrescription;
+    }
 }

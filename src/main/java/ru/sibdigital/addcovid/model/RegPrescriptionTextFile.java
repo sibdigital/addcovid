@@ -10,17 +10,17 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
-@Table(name = "reg_type_request_prescription_file", schema = "public")
+@Table(name = "reg_prescription_text_file", schema = "public")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class RegTypeRequestPrescriptionFile {
+public class RegPrescriptionTextFile {
 
     @Id
     @Column(name = "id", nullable = false)
-    @SequenceGenerator(name = "REG_TYPE_REQUEST_PRESCRIPTION_FILE_SEQ_GEN", sequenceName = "reg_type_request_prescription_file_id_seq", allocationSize = 1, schema = "public")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REG_TYPE_REQUEST_PRESCRIPTION_FILE_SEQ_GEN")
-    private Integer id;
+    @SequenceGenerator(name = "REG_PRESCRIPTION_TEXT_FILE_SEQ_GEN", sequenceName = "reg_prescription_text_file_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REG_PRESCRIPTION_TEXT_FILE_SEQ_GEN")
+    private Long id;
     private Boolean isDeleted;
     private Timestamp timeCreate;
     private String attachmentPath;
@@ -32,14 +32,14 @@ public class RegTypeRequestPrescriptionFile {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "id_type_request_prescription", nullable = false)
-    private RegTypeRequestPrescription typeRequestPrescription;
+    @JoinColumn(name = "id_prescription_text", nullable = false)
+    private RegPrescriptionText prescriptionText;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -123,19 +123,19 @@ public class RegTypeRequestPrescriptionFile {
         this.fileSize = fileSize;
     }
 
-    public RegTypeRequestPrescription getTypeRequestPrescription() {
-        return typeRequestPrescription;
+    public RegPrescriptionText getPrescriptionText() {
+        return prescriptionText;
     }
 
-    public void setTypeRequestPrescription(RegTypeRequestPrescription typeRequestPrescription) {
-        this.typeRequestPrescription = typeRequestPrescription;
+    public void setPrescriptionText(RegPrescriptionText prescriptionText) {
+        this.prescriptionText = prescriptionText;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RegTypeRequestPrescriptionFile that = (RegTypeRequestPrescriptionFile) o;
+        RegPrescriptionTextFile that = (RegPrescriptionTextFile) o;
         return Objects.equals(id, that.id) && Objects.equals(isDeleted, that.isDeleted) && Objects.equals(timeCreate, that.timeCreate) && Objects.equals(attachmentPath, that.attachmentPath) && Objects.equals(fileName, that.fileName) && Objects.equals(originalFileName, that.originalFileName) && Objects.equals(fileExtension, that.fileExtension) && Objects.equals(hash, that.hash) && Objects.equals(fileSize, that.fileSize);
     }
 

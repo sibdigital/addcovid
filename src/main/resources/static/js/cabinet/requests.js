@@ -20,22 +20,22 @@ const requests = {
                         columns: [
                             {
                                 id: "typeRequest",
-                                header: "Предписание",
+                                header: "Тип заявки",
                                 template: "#typeRequest.activityKind#",
                                 minWidth: 350,
                                 fillspace: true
-                            },
-                            {
-                                id: "statusReviewName",
-                                header: "Статус",
-                                adjust: true,
-                                width: 300
                             },
                             {
                                 id: "time_Create",
                                 header: "Дата подачи",
                                 adjust: true,
                                 format: dateFormat,
+                            },
+                            {
+                                id: "statusReviewName",
+                                header: "Статус",
+                                adjust: true,
+                                width: 300
                             },
                         ],
                         scheme: {
@@ -107,7 +107,7 @@ const requests = {
                                 value: 'Подать заявку',
                                 click: function () {
 
-                                    webix.ajax('/prescriptions').then(function (data) {
+                                    webix.ajax('/cls_type_requests').then(function (data) {
                                         let typeRequests = data.json();
 
                                         // let vtxt = '<br/>' + `<a href="/upload">Общие основания (более 100 сотрудников)</a><br/><br/>`;
@@ -118,15 +118,15 @@ const requests = {
                                                 if (typeRequests[j].id == 100) {
                                                     continue;
                                                 }
-                                                // if (typeRequests[j].statusRegistration == 1 && typeRequests[j].statusVisible == 1) {
-                                                let labl = typeRequests[j].activityKind;//.replace(new RegExp(' ', 'g'), '&nbsp');
-                                                let vdid = typeRequests[j].id;
-                                                let reqv = 'typed_form?request_type=' + vdid;
-                                                vtxt += `<a href="#${reqv}" onclick="showRequestCreateForm(${vdid})">` + labl + '</a><br/><br/>';
-                                                // }
+                                                if (typeRequests[j].statusRegistration == 1 && typeRequests[j].statusVisible == 1) {
+                                                    let labl = typeRequests[j].activityKind;//.replace(new RegExp(' ', 'g'), '&nbsp');
+                                                    let vdid = typeRequests[j].id;
+                                                    let reqv = 'typed_form?request_type=' + vdid;
+                                                    vtxt += `<a href="#${reqv}" onclick="showRequestCreateForm(${vdid})">` + labl + '</a><br/><br/>';
+                                                }
                                             }
                                         } else {
-                                            vtxt += 'Отсутствуют предписания.</br></br>';
+                                            vtxt += 'Отсутствуют типы заявок.</br></br>';
                                         }
 
                                         const v = {
@@ -702,6 +702,7 @@ const requestWizard = {
         ]
     }
 }
+
 function allChecked() {
     if ($$('isAgree').getValue() !== 1) {
         return false;
@@ -854,14 +855,53 @@ function showRequestViewForm(data) {
                             complexData: true,
                             data: data,
                             elements: [
-                                view_section('Рассмотрение заявки'),
                                 {
-                                    view: 'checkbox',
-                                    name: 'agree',
+                                    view: 'text',
+                                    id: 'activityKind',
+                                    autoheight: true,
+                                    // align: 'center',
+                                    label: 'Тип заявки',
                                     labelPosition: 'top',
-                                    readonly: true,
-                                    labelRight: 'Подтверждено согласие работников на обработку персональных данных',
+                                    name: 'typeRequest.activityKind',
+                                    readonly: true
                                 },
+                                view_section('Обоснование'),
+                                {
+                                    rows: [
+                                        {
+                                            view: 'textarea',
+                                            height: 150,
+                                            label: 'Обоснование заявки',
+                                            name: 'reqBasis',
+                                            readonly: true,
+                                            labelPosition: 'top'
+                                        },
+                                        {
+                                            cols: [
+                                                {
+                                                    id: 'filename_label',
+                                                    view: "label",
+                                                    label: 'Вложенный файл:',
+                                                    width: 150
+                                                },
+                                                {
+                                                    paddingLeft: 10,
+                                                    view: 'list',
+                                                    //height: 100,
+                                                    autoheight: true,
+                                                    select: false,
+                                                    template: '#value#',
+                                                    label: '',
+                                                    name: 'attachmentFilename',
+                                                    borderless: true,
+                                                    data: [],
+                                                    id: 'filename'
+                                                }
+                                            ]
+                                        },
+                                    ]
+                                },
+                                view_section('Информация о рассмотрении'),
                                 {
                                     view: 'text',
                                     name: 'statusReviewName',
@@ -879,30 +919,6 @@ function showRequestViewForm(data) {
                                     hidden: true,
                                     height: 100
                                 },
-                                view_section('Информация о предписании'),
-                                {
-                                    view: 'text',
-                                    id: 'activityKind',
-                                    autoheight: true,
-                                    // align: 'center',
-                                    label: 'Наименование предписания',
-                                    labelPosition: 'top',
-                                    name: 'typeRequest.activityKind',
-                                    readonly: true
-                                },
-                                {
-                                    view: 'text',
-                                    id: 'restrictionType',
-                                    autoheight: true,
-                                    // align: 'center',
-                                    label: 'Тип ограничения',
-                                    labelPosition: 'top',
-                                    readonly: true
-                                },
-                                {
-                                    id: 'prescriptions',
-                                    rows: []
-                                },
                             ]
                         }
                     ]
@@ -913,59 +929,29 @@ function showRequestViewForm(data) {
 
     const typeRequest = data.typeRequest;
 
-    if (typeRequest.regTypeRequestRestrictionTypes && typeRequest.regTypeRequestRestrictionTypes.length > 0) {
-        $$('restrictionType').setValue(typeRequest.regTypeRequestRestrictionTypes[0].regTypeRequestRestrictionTypeId.clsRestrictionType.name);
-    }
+    // if (typeRequest.regTypeRequestRestrictionTypes && typeRequest.regTypeRequestRestrictionTypes.length > 0) {
+    //     $$('restrictionType').setValue(typeRequest.regTypeRequestRestrictionTypes[0].regTypeRequestRestrictionTypeId.clsRestrictionType.name);
+    // }
 
-    if (typeRequest.regTypeRequestPrescriptions && typeRequest.regTypeRequestPrescriptions.length > 0) {
-        typeRequest.regTypeRequestPrescriptions.forEach((prescription, index) => {
-            const files = [];
-            if (prescription.regTypeRequestPrescriptionFiles && prescription.regTypeRequestPrescriptionFiles.length > 0) {
-                prescription.regTypeRequestPrescriptionFiles.forEach((file) => {
-                    const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
-                        + file.originalFileName + '</a>'
-                    files.push({id: file.id, value: filename})
-                })
-            }
-            let consentPrescriptionChecked = false;
-            if (data.additionalAttributes && data.additionalAttributes.consentPrescriptions) {
-                consentPrescriptionChecked = data.additionalAttributes.consentPrescriptions.find(c => c.id == prescription.id).isAgree;
-            }
-            $$('prescriptions').addView({
-                rows: [
-                    {
-                        cols: [
-                            {
-                                view: 'label',
-                                label: 'Предписание ' + (index + 1),
-                                align: 'center'
-                            },
-                        ]
-                    },
-                    {
-                        view: 'template',
-                        height: 550,
-                        readonly: true,
-                        scroll: true,
-                        template: prescription.content
-                    },
-                    {
-                        view: 'list',
-                        autoheight: true,
-                        template: '#value#',
-                        data: files,
-                    },
-                    {
-                        view: 'checkbox',
-                        name: 'agree',
-                        labelPosition: 'top',
-                        readonly: true,
-                        labelRight: 'Подтверждено обязательное выполнение предписания',
-                        value: consentPrescriptionChecked
-                    },
-                ]
-            });
-        })
+    let paths = data.attachmentPath.split(',')
+
+    let fileList = []
+    paths.forEach((path, index) => {
+        let filename = path.split('\\').pop().split('/').pop()
+        if (filename != '' &&
+            ((filename.toUpperCase().indexOf('.PDF') != -1) ||
+                (filename.toUpperCase().indexOf('.ZIP') != -1)
+            )) {
+            filename = '<a href="' + LINK_PREFIX + filename + LINK_SUFFIX + '" target="_blank">'
+                + filename + '</a>'
+            fileList.push({id: index, value: filename})
+        }
+    })
+    if (fileList.length > 0) {
+        $$('filename').parse(fileList)
+    } else {
+        $$('filename_label').hide()
+        $$('filename').hide()
     }
 
     if (typeRequest.settings) {

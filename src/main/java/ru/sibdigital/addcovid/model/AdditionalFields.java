@@ -5,11 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class AdditionalAttributes {
+public class AdditionalFields {
 
-    private ConsentPrescription[] consentPrescriptions;
+    private UUID[] okvedIds;
+    private Long[] organizationIds;
 }
