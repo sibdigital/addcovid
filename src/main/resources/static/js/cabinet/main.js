@@ -447,7 +447,7 @@ webix.ready(function () {
     //responsive events
     webix.attachEvent("onResponsiveHide", function (id) {
 
-        if (id === "employees_table") {
+        if (id === "employees_table" || id === "personOfficeCnt") {
 
             adaptiveEmployees()
 
