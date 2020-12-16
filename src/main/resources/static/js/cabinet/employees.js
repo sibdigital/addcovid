@@ -222,15 +222,7 @@ const employees = {
                                   labelWidth: 220,
                                   maxWidth: 370,
                                   gravity:1.5,
-                                  on: {
-                                      onKeyPress: function(code, e) {
-                                          var validation = !e.key.match(new RegExp(/[0-9]/gi));
-                                          if (validation) {
-                                              e.preventDefault();
-                                          }
-                                      }
-                                  }
-
+                                  validate:"isNumber", validateEvent:"key"
                               },
                               {
                                   view: 'text',
@@ -241,18 +233,12 @@ const employees = {
                                   labelWidth: 100,
                                   maxWidth: 250,
                                   gravity:1,
-                                  on: {
-                                      onKeyPress: function(code, e) {
-                                          var validation = !e.key.match(new RegExp(/[0-9]/gi));
-                                          if (validation) {
-                                              e.preventDefault();
-                                          }
-                                      }
-                                  }
+                                  validate:"isNumber", validateEvent:"key"
                               },
                               {
                                   view: 'icon',
                                   id: 'cntEdit',
+                                  tooltip: 'Редактировать кол-во',
                                   icon:'mdi mdi-pencil',
                                   click:  function() {
                                       $$('personOfficeCnt').config.readonly = false;
@@ -265,47 +251,43 @@ const employees = {
                               },
                               {
                                   view: 'button',
-                                  id: 'btnEdit',
-                                  css: 'webix_primary',
-                                  value: "Редактировать кол-во",
-                                  hidden: true,
-                                  maxWidth: 200,
-                                  click:  function() {
-                                      $$('personOfficeCnt').config.readonly = false;
-                                      $$('personRemoteCnt').config.readonly = false;
-                                      $$('personOfficeCnt').refresh();
-                                      $$('personRemoteCnt').refresh();
-                                      $$('cntSaveBtn').show();
-                                      $$('btnEdit').hide();
-                                  }
-                              },
-                              {
-                                  view: 'button',
                                   id: 'cntSaveBtn',
                                   value: "Сохранить изменения",
                                   css: 'webix_primary',
                                   hidden: true,
                                   maxWidth: 200,
                                   click:  function() {
-                                      let params = {'personOfficeCnt': $$('personOfficeCnt').getValue(),
-                                          'personRemoteCnt': $$('personRemoteCnt').getValue()};
-                                      webix.ajax().get('/save_person_count', params).then(function (data) {
-                                          if (data.text() === 'Изменения сохранены') {
-                                              $$('personOfficeCnt').config.readonly = true;
-                                              $$('personRemoteCnt').config.readonly = true;
-                                              $$('personOfficeCnt').refresh();
-                                              $$('personRemoteCnt').refresh();
-                                              $$('cntSaveBtn').hide();
-                                              if ($$('cntFormId').config.hidden) {
-                                                  $$('btnEdit').show();
-                                              } else {
-                                                  $$('cntEdit').show();
+                                      webix.confirm('Вы действительно хотите сохранить кол-во?')
+                                          .then(
+                                              function () {
+                                                  if (webix.rules.isNumber($$('personOfficeCnt').getValue()) && webix.rules.isNumber($$('personRemoteCnt').getValue())) {
+                                                      let params = {
+                                                          'personOfficeCnt': $$('personOfficeCnt').getValue(),
+                                                          'personRemoteCnt': $$('personRemoteCnt').getValue()
+                                                      };
+                                                      webix.ajax().get('/save_person_count', params).then(function (data) {
+                                                          if (data.text() === 'Изменения сохранены') {
+                                                              $$('personOfficeCnt').config.readonly = true;
+                                                              $$('personRemoteCnt').config.readonly = true;
+                                                              $$('personOfficeCnt').refresh();
+                                                              $$('personRemoteCnt').refresh();
+                                                              if ($$('cntFormId').config.hidden) {
+                                                                  // $$('btnEdit').show();
+                                                              } else {
+                                                                  $$('cntEdit').show();
+                                                                  $$('cntSaveBtn').hide();
+                                                              }
+                                                          } else {
+                                                              webix.message(data.text(), 'error');
+                                                          }
+                                                      })
+                                                  }
+                                                  else {
+                                                      webix.message('Не сохранено. Введены не числа', 'error')
+                                                  }
                                               }
-                                          }
-                                          else {
-                                              webix.message(data.text(), 'error');
-                                          }
-                                      })
+                                          )
+
                                   }
                               },
                             ],
@@ -613,9 +595,9 @@ function adaptiveEmployees(){
 
     $$("cntIn").addView($$('personOfficeCnt'), 0);
     $$("cntIn").addView($$('personRemoteCnt'), 1);
-    $$("cntIn").addView($$('btnEdit'), 2);
-    $$("cntIn").addView($$('cntSaveBtn'), 3);
+    $$('personOfficeCnt').config.readonly = false;
+    $$('personRemoteCnt').config.readonly = false;
+    $$("cntIn").addView($$('cntSaveBtn'), 2);
     $$('cntFormId').hide();
-    $$('btnEdit').show();
-
+    $$('cntSaveBtn').show();
 }
