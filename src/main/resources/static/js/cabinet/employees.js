@@ -163,6 +163,12 @@ const employees = {
         type: 'space',
         rows: [
             {
+                id: 'cntIn',
+                rows: [
+
+                ],
+            },
+            {
                 cols:
                     [
                         {
@@ -202,31 +208,46 @@ const employees = {
                         {gravity: 0.02},
                         {
                             view: 'form',
+                            id: 'cntFormId',
+                            responsive:'cntIn',
                             type: 'clean',
-                            css: {"background": "transparent"},
-                            elements: [
+                            rows: [
+                                {
+                                    view: 'label',
+                                    id: 'labelCntId',
+                                    label: 'Кол-во сотрудников ',
+                                    align: 'left',
+                                    hidden: true,
+                                },
                                 {
                                   cols: [
-                                      {},
+                                      {
+                                          view: 'label',
+                                          id: 'personOfficeCntLbl',
+                                          label: 'Кол-во сотрудников в офисе:',
+                                          align: 'right'
+                                      },
                                       {
                                           view: 'text',
                                           name: 'personOfficeCnt',
                                           id: 'personOfficeCnt',
-                                          label: 'Кол-во сотрудников в офисе:',
+                                          // label: '',
                                           readonly: true,
-                                          labelWidth: 220,
+                                          align: 'right',
                                           maxWidth: 320,
-                                          // inputWidth: 50,
                                       },
                                       {gravity: 0.02},
+                                      {
+                                          view: 'label',
+                                          label: 'на удаленке:',
+                                          align: 'right',
+                                      },
                                       {
                                           view: 'text',
                                           name: 'personRemoteCnt',
                                           id: 'personRemoteCnt',
-                                          label: 'на удаленке:',
+                                          align: 'right',
                                           readonly: true,
-                                          labelWidth: 100,
-                                          // inputWidth: 50,
                                           maxWidth: 200,
                                       },
                                       {
@@ -267,9 +288,8 @@ const employees = {
                                               })
                                           }
                                       },
-                                  ]
+                                  ],
                                 },
-
                             ],
                             url: '/person_count'
                         },
@@ -536,7 +556,7 @@ const employees = {
             {
                 id: 'btnsIn',
                 rows:[]
-            }
+            },
         ]
     }
 }
@@ -573,4 +593,7 @@ function adaptiveEmployees(){
     $$('Pager').config.group = 2;
     $$("pagerIn").addView($$('Pager'),0)
 
+    $$("cntIn").addView($$('cntFormId'), 0);
+    $$('labelCntId').show();
+    $$('personOfficeCntLbl').setValue(' в офисе:')
 }
