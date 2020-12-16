@@ -60,44 +60,46 @@ var options = {
     month: 'numeric',
     day: 'numeric',
 };
+
+const news_form = {
+    view:'template',
+    scroll: 'xy',
+    template: function (obj) {
+        let obj_news = obj['news']
+        let news_files = obj['newsFiles']
+        let news_dir = obj['newsDirectory']
+        if (obj_news.hashId != null) {
+
+            var startTime =obj_news.startTime ? new Date(obj_news.startTime) : "";
+            let startTimeString = startTime.toLocaleString("ru", options)
+            let htmlcode =  "<div>" +
+                "<span class = 'item_big_title'>" +
+                "<a href = \"news?hash_id=" + obj_news.hashId + "\"'>" +
+                obj_news.heading +
+                "</a>" +
+                "</span>" +
+                "<div class='item'>" +
+                obj_news.message +
+                "</div>";
+
+            for (var i in news_files) {
+                let newsFilePath = news_dir + "/" + news_files[i].fileName + news_files[i].fileExtension
+                htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + newsFilePath + "'download=''><i class='mdi mdi-download'></i>"
+                    + news_files[i].originalFileName + "</a></div>"
+            }
+            return htmlcode +  "<span class = 'item_label'>" +
+                "Дата публикации: " + startTimeString +
+                "</span>" +
+                "</div>"
+        }
+        else {
+            return ""
+        }
+
+    },
+    url: '../newsform/' + HASH_ID,
+}
+
 webix.ready(function() {
-    webix.ui({
-        view:'template',
-        scroll: 'xy',
-        template: function (obj) {
-            let obj_news = obj['news']
-            let news_files = obj['newsFiles']
-            let news_dir = obj['newsDirectory']
-            if (obj_news.hashId != null) {
-
-                var startTime =obj_news.startTime ? new Date(obj_news.startTime) : "";
-                let startTimeString = startTime.toLocaleString("ru", options)
-                let htmlcode =  "<div>" +
-                    "<span class = 'item_big_title'>" +
-                    "<a href = \"news?hash_id=" + obj_news.hashId + "\"'>" +
-                    obj_news.heading +
-                    "</a>" +
-                    "</span>" +
-                    "<div class='item'>" +
-                    obj_news.message +
-                    "</div>";
-
-                for (var i in news_files) {
-                    let newsFilePath = news_dir + "/" + news_files[i].fileName + news_files[i].fileExtension
-                    htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + newsFilePath + "'download=''><i class='mdi mdi-download'></i>"
-                        + news_files[i].originalFileName + "</a></div>"
-                }
-                return htmlcode +  "<span class = 'item_label'>" +
-                    "Дата публикации: " + startTimeString +
-                    "</span>" +
-                    "</div>"
-            }
-            else {
-                return ""
-            }
-
-        },
-        url: '../newsform/' + HASH_ID,
-    },)
-
+    webix.ui(news_form)
 })
