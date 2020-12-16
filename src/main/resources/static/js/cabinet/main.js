@@ -29,7 +29,7 @@ webix.html.addStyle(
 );
 
 webix.attachEvent("onFocusChange", function (to, from) {
-    if (from && from.getTopParentView().config.view == "window" && !to) {
+    if (from && from.getTopParentView().config.view === "window" && !to) {
         from.getTopParentView().hide();
     }
 })

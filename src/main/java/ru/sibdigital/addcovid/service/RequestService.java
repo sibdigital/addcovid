@@ -608,19 +608,36 @@ public class RequestService {
                 .apartmentHand(regOrganizationAddressFactToSave.getApartmentHand())
                 .build();
         //regOrganizationAddressFactRepo.save(regOrgAddrSave);
-        regOrganizationAddressFactRepo.insertOrg(
-                regOrgAddrSave.getOrganizationId(),
-                regOrgAddrSave.getFiasRegionObjectId(),
-                regOrgAddrSave.getFiasRaionObjectId(),
-                regOrgAddrSave.getFiasCityObjectId(),
-                regOrgAddrSave.getFiasStreetObjectId(),
-                regOrgAddrSave.getFiasHouseObjectId(),
-                //regOrgAddrSave.getFiasObjectId(),
-                regOrgAddrSave.getStreetHand(),
-                regOrgAddrSave.getHouseHand(),
-                regOrgAddrSave.getApartmentHand(),
-                regOrgAddrSave.getFullAddress()
-        );
+        if (regOrganizationAddressFactToSave.getId() == null) {
+            regOrganizationAddressFactRepo.insertOrg(
+                    regOrgAddrSave.getOrganizationId(),
+                    regOrgAddrSave.getFiasRegionObjectId(),
+                    regOrgAddrSave.getFiasRaionObjectId(),
+                    regOrgAddrSave.getFiasCityObjectId(),
+                    regOrgAddrSave.getFiasStreetObjectId(),
+                    regOrgAddrSave.getFiasHouseObjectId(),
+                    //regOrgAddrSave.getFiasObjectId(),
+                    regOrgAddrSave.getStreetHand(),
+                    regOrgAddrSave.getHouseHand(),
+                    regOrgAddrSave.getApartmentHand(),
+                    regOrgAddrSave.getFullAddress()
+            );
+        } else {
+            regOrganizationAddressFactRepo.updateOrg(
+                    regOrganizationAddressFactToSave.getId(),
+                    regOrgAddrSave.getOrganizationId(),
+                    regOrgAddrSave.getFiasRegionObjectId(),
+                    regOrgAddrSave.getFiasRaionObjectId(),
+                    regOrgAddrSave.getFiasCityObjectId(),
+                    regOrgAddrSave.getFiasStreetObjectId(),
+                    regOrgAddrSave.getFiasHouseObjectId(),
+                    //regOrgAddrSave.getFiasObjectId(),
+                    regOrgAddrSave.getStreetHand(),
+                    regOrgAddrSave.getHouseHand(),
+                    regOrgAddrSave.getApartmentHand(),
+                    regOrgAddrSave.getFullAddress()
+            );
+        }
         return regOrgAddrSave;
     }
 

@@ -26,7 +26,11 @@ public class HelpController {
     private ApplicationConstants applicationConstants;
 
     @GetMapping("helps")
-    public String helps(HttpSession session, Model model) {
+    public String helps(@RequestParam(value = "key", required = false) String key, Model model) {
+        if (key != null) {
+            RegHelp regHelp = regHelpRepo.findByKey(key).orElse(null);
+            model.addAttribute("help_data", regHelp);
+        }
         List<RegHelp> regHelps = regHelpRepo.findAll(Sort.by(Sort.Direction.ASC, "name"));
         model.addAttribute("help_list", regHelps);
         model.addAttribute("application_name", applicationConstants.getApplicationName());
