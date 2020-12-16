@@ -198,7 +198,81 @@ const employees = {
                             click: function (){
                                 filterText();
                             }
-                        }
+                        },
+                        {gravity: 0.02},
+                        {
+                            view: 'form',
+                            type: 'clean',
+                            css: {"background": "transparent"},
+                            elements: [
+                                {
+                                  cols: [
+                                      {},
+                                      {
+                                          view: 'text',
+                                          name: 'personOfficeCnt',
+                                          id: 'personOfficeCnt',
+                                          label: 'Кол-во сотрудников в офисе:',
+                                          readonly: true,
+                                          labelWidth: 220,
+                                          maxWidth: 320,
+                                          // inputWidth: 50,
+                                      },
+                                      {gravity: 0.02},
+                                      {
+                                          view: 'text',
+                                          name: 'personRemoteCnt',
+                                          id: 'personRemoteCnt',
+                                          label: 'на удаленке:',
+                                          readonly: true,
+                                          labelWidth: 100,
+                                          // inputWidth: 50,
+                                          maxWidth: 200,
+                                      },
+                                      {
+                                          view: 'icon',
+                                          id: 'cntEdit',
+                                          icon:'mdi mdi-pencil',
+                                          click:  function() {
+                                              $$('personOfficeCnt').config.readonly = false;
+                                              $$('personRemoteCnt').config.readonly = false;
+                                              $$('personOfficeCnt').refresh();
+                                              $$('personRemoteCnt').refresh();
+                                              $$('cntSaveBtn').show();
+                                              $$('cntEdit').hide();
+                                          }
+                                      },
+                                      {
+                                          view: 'button',
+                                          id: 'cntSaveBtn',
+                                          value: "Сохранить изменения",
+                                          css: 'webix_primary',
+                                          hidden: true,
+                                          maxWidth: 200,
+                                          click:  function() {
+                                              let params = {'personOfficeCnt': $$('personOfficeCnt').getValue(),
+                                                  'personRemoteCnt': $$('personRemoteCnt').getValue()};
+                                              webix.ajax().get('/save_person_count', params).then(function (data) {
+                                                  if (data.text() === 'Изменения сохранены') {
+                                                      $$('personOfficeCnt').config.readonly = true;
+                                                      $$('personRemoteCnt').config.readonly = true;
+                                                      $$('personOfficeCnt').refresh();
+                                                      $$('personRemoteCnt').refresh();
+                                                      $$('cntSaveBtn').hide();
+                                                      $$('cntEdit').show();
+                                                  }
+                                                  else {
+                                                      webix.message(data.text(), 'error');
+                                                  }
+                                              })
+                                          }
+                                      },
+                                  ]
+                                },
+
+                            ],
+                            url: '/person_count'
+                        },
                     ]
             },
             {

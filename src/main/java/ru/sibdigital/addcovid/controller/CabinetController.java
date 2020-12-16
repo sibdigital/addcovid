@@ -82,6 +82,9 @@ public class CabinetController {
     @Autowired
     private RegNewsFileRepo regNewsFileRepo;
 
+    @Autowired
+    private RegPersonCountRepo regPersonCountRepo;
+
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -697,5 +700,34 @@ public class CabinetController {
     public @ResponseBody String getRequestsStatusStyle(){
         ClsSettings settings = settingServiceImpl.getRequestsStatusStyle();
         return settings.getValue();
+    }
+
+
+    @GetMapping("/person_count")
+    public @ResponseBody RegPersonCount savePersonCount(HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        RegPersonCount rpc = regPersonCountRepo.getLastPersonCntByOrganization_Id(id);
+        return rpc;
+    }
+
+    @GetMapping("/save_person_count")
+    public @ResponseBody String savePersonCount(@RequestParam(value = "personOfficeCnt") Integer personOfficeCnt,
+                                                        @RequestParam(value = "personRemoteCnt") Integer personRemoteCnt,
+                                                        HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        try {
+            requestService.saveRegPersonCount(organization, personOfficeCnt, personRemoteCnt);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "Не удалось внести изменения";
+        }
+        return "Изменения сохранены";
     }
 }

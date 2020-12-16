@@ -104,6 +104,9 @@ public class RequestService {
     @Autowired
     private RegEgrulRepo regEgrulRepo;
 
+    @Autowired
+    private RegPersonCountRepo regPersonCountRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
@@ -838,6 +841,19 @@ public class RequestService {
         }
 
         return remoteAddr;
+    }
+
+    public void saveRegPersonCount(ClsOrganization organization,
+                                             Integer personOfficeCnt,
+                                             Integer personRemoteCnt) {
+        RegPersonCount rpc = RegPersonCount.builder()
+                .organization(organization)
+                .timeEdit(new Timestamp(System.currentTimeMillis()))
+                .personOfficeCnt(personOfficeCnt)
+                .personRemoteCnt(personRemoteCnt)
+                .build();
+
+        regPersonCountRepo.save(rpc);
     }
 
 }
