@@ -25,14 +25,14 @@ const documents = {
                                 docImg = "pdf.png"
                             }
                             return "<div id='2' class='overall'>" +
-                            "<div>" +
-                            "<img style='position: absolute' src = "+docImg+"> " +
-                            "<div class='doc_title'>"+obj.originalFileName.slice(0, -4)+"</div>" +
-                            "<div id='del_button' style='position: absolute;top: 0; right: 5px;' ondblclick='del_file()' class='mdi mdi-close-thick'></div>" +
-                            "<div class='doc_time_create'>"+downloadTime+"</div>" +
-                            "<div class='download_docs'><a style='text-decoration: none; color: #1ca1c1' href=/uploads/"+obj.fileName+obj.fileExtension+" download>Скачать файл</a></div>" +
-                            "</div>" +
-                            "</div>"
+                                        "<div>" +
+                                            "<img style='position: absolute' src = "+docImg+"> " +
+                                            "<div class='doc_title'>"+obj.originalFileName.slice(0, -4)+"</div>" +
+                                            "<div id='del_button' style='position: absolute;top: 0; right: 5px;' ondblclick='del_file()' class='mdi mdi-close-thick'></div>" +
+                                            "<div class='doc_time_create'>"+downloadTime+"</div>" +
+                                            "<div class='download_docs'><a style='text-decoration: none; color: #1ca1c1' href=/uploads/"+obj.fileName+obj.fileExtension+" download>Скачать файл</a></div>" +
+                                        "</div>" +
+                                    "</div>"
                         },
                         url: "org_files",
                         xCount: 2,
@@ -114,7 +114,7 @@ function del_file(){
     webix.confirm({
         title:"Подтверждение",
         type:"confirm-warning",
-        ok:"Yes", cancel:"No",
+        ok:"Да", cancel:"Нет",
         text:"Вы уверены что хотите удалить файл?"
     }).then(function(){
         webix.ajax()
