@@ -235,3 +235,25 @@ body {margin: 0}
 .myClass .webix_button:focus {
     background-color: #586980;
 }
+
+.contacts .webix_dataview_item.webix_selected .overallRequestNew{
+    background: #a7d9ff;
+}
+
+.overallRequestNew{
+    position: relative;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 8px;
+    height: 65px;
+    padding: 10px;
+    color: #303030;
+    text-shadow: 0 1px 0 #FFFFFF;
+    background-color: #654141;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0,#edeff4), color-stop(1, #e1e4ea));
+    background: -o-linear-gradient(top, #edeff4 0% , #e1e4ea 100%);
+    background: -ms-linear-gradient(top, #edeff4 0% , #e1e4ea 100%);
+    background: -moz-linear-gradient(top, #edeff4 0% , #e1e4ea 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0,#edeff4), color-stop(1, #e1e4ea));
+    box-shadow: 0 1px 1px #d4d7de;
+}
