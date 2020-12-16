@@ -216,7 +216,6 @@ webix.ready(function () {
         })
     }
     else{
-
         layout = webix.ui({
             cols: [
                 {
@@ -283,6 +282,8 @@ webix.ready(function () {
                                     }else if (id == 'Mailing'){
                                         view = mailing;
                                     }
+
+                                    this.select(id)
                                     if (view != null) {
                                         webix.ui({
                                             id: 'content',
