@@ -214,7 +214,7 @@ let bigMainForm = {
                         {id: "Prescript", icon: "mdi mdi-text-box-check-outline", value: 'Предписания'},
                         {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
                         {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
-                        {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Контакты'},
+                        {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Доп.контакты'},
                         {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
                     ],
                     type: {
@@ -226,6 +226,7 @@ let bigMainForm = {
                             let view;
                             let itemValue;
                             let requestsBadge = "";
+                            let helpUrl = 'helps?key=' + id;
                             if (id == 'CommonInfo') {
                                 view = commonInfo;
                             } else if (id == 'Requests') {
@@ -250,7 +251,10 @@ let bigMainForm = {
                                 view = contacts;
                             } else if (id == 'Mailing') {
                                 view = mailing;
-                            }this.select(id)
+                            }else {
+                                helpUrl = 'helps';
+                            }
+                            this.select(id)
                             if (view != null) {
                                 webix.ui({
                                     id: 'content',
@@ -259,7 +263,9 @@ let bigMainForm = {
                                     ]
                                 }, $$('content'));
                                 itemValue = this.getMenuItem(id).value
-                                $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + itemValue + " " + requestsBadge + "</span>")
+                                $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + itemValue + " " + requestsBadge + "</span>");
+                                $$("helpHrefId").setValue(`<div style='text-align: right'><a class='mdi mdi-help-circle' target='_blank' href=${helpUrl}></a></div>`);
+                                $$("helpHrefId").refresh();
                             }
 
                             // webix.ajax("/check_session").then(function (data){
@@ -290,12 +296,23 @@ let bigMainForm = {
                             label: 'Личный кабинет',
                         },
                         {
-                            view: 'template',
-                            borderless: true,
-                            template: "<div style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> " +
-                                "<span id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\"" +
-                                "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
-                            url: 'organization',
+                            cols: [{
+                                id: 'helpHrefId',
+                                view: 'label',
+                                borderless: true,
+
+                                label: "<div style='text-align: right'><a class='mdi mdi-help-circle' target=\'_blank\' href=\'helps\'></a></div>",
+                            },
+                                {
+                                    view: 'template',
+                                    borderless: true,
+                                    maxWidth: 128,
+                                    template: "<div style='text-align: left'>" +
+                                        "<img class='user_avatar' src = \"avatar.jpg\"> " +
+                                        "<span id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\"" +
+                                        "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
+                                    url: 'organization',
+                                }]
                         },
                     ]
                 },
@@ -373,7 +390,7 @@ let smallMainForm = {
                                 {
                                     id: "Contacts",
                                     icon: "mdi mdi-book-open-blank-variant",
-                                    value: 'Контакты'
+                                    value: 'Доп. контакты'
                                 },
                                 {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
                             ]
