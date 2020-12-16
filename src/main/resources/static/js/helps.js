@@ -316,6 +316,19 @@ webix.ready(function () {
     });
 });
 
+if (HELP_DATA && window.location.href.includes('?')) {
+    webix.ready(function () {
+        console.log(HELP_DATA);
+        $$("labelLK").setValue("Раздел помощи > " + "<span style='color: #1ca1c1'>" + HELP_DATA.name + "</span>")
+        webix.ui({
+            id: 'content',
+            rows: [
+                getHelpContent(HELP_DATA)
+            ]
+        }, $$('content'))
+    });
+}
+
 // webix.ready(function() {
 //     webix.ui({
 //         container: 'app',

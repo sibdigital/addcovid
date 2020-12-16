@@ -29,7 +29,7 @@ webix.html.addStyle(
 );
 
 webix.attachEvent("onFocusChange", function (to, from) {
-    if (from && from.getTopParentView().config.view == "window" && !to) {
+    if (from && from.getTopParentView().config.view === "window" && !to) {
         from.getTopParentView().hide();
     }
 })
@@ -177,23 +177,24 @@ webix.ready(function () {
                                 onMenuItemClick: function (id) {
                                     let view;
 
-                                    if (id == 'CommonInfo'){
+
+                                    if (id === 'CommonInfo'){
                                         view = commonInfo;
-                                    }else if (id == 'Requests'){
+                                    }else if (id === 'Requests'){
                                         view = requests;
-                                    }else if (id == 'Employees'){
+                                    }else if (id === 'Employees'){
                                         view = employees;
-                                    }else if (id == 'Settings'){
+                                    }else if (id === 'Settings'){
                                         view = settings;
-                                    }else if (id == 'Documents'){
+                                    }else if (id === 'Documents'){
                                         view = documents;
-                                    }else if (id == 'Address'){
+                                    }else if (id === 'Address'){
                                         view = address;
-                                    }else if (id == 'Prescript'){
+                                    }else if (id === 'Prescript'){
                                         view = prescript;
-                                    }else if (id == 'News'){
+                                    }else if (id === 'News'){
                                         view = news;
-                                    }else if (id == 'Contacts'){
+                                    }else if (id === 'Contacts'){
                                         view = contacts;
                                     }
                                     if (view != null) {
@@ -258,30 +259,33 @@ webix.ready(function () {
                                     let view;
                                     let itemValue;
                                     let requestsBadge = "";
-                                    if (id == 'CommonInfo'){
+                                    let helpUrl = 'helps?key=' + id;
+                                    if (id === 'CommonInfo'){
                                         view = commonInfo;
-                                    }else if (id == 'Requests'){
+                                    }else if (id === 'Requests'){
                                         view = requests;
                                         let checkReqBadge =  this.getMenuItem(id).badge
                                         if(checkReqBadge != null){
                                             requestsBadge = "(" + checkReqBadge + ")";
                                         }
-                                    }else if (id == 'Employees'){
+                                    }else if (id === 'Employees'){
                                         view = employees;
-                                    }else if (id == 'Settings'){
+                                    }else if (id === 'Settings'){
                                         view = settings;
-                                    }else if (id == 'Documents'){
+                                    }else if (id === 'Documents'){
                                         view = documents;
-                                    }else if (id == 'Address'){
+                                    }else if (id === 'Address'){
                                         view = address;
-                                    }else if (id == 'Prescript'){
+                                    }else if (id === 'Prescript'){
                                         view = prescript;
-                                    }else if (id == 'News'){
+                                    }else if (id === 'News'){
                                         view = news;
-                                    }else if (id == 'Contacts'){
+                                    }else if (id === 'Contacts'){
                                         view = contacts;
-                                    }else if (id == 'Mailing'){
+                                    }else if (id === 'Mailing'){
                                         view = mailing;
+                                    } else {
+                                        helpUrl = 'helps';
                                     }
                                     if (view != null) {
                                         webix.ui({
@@ -290,8 +294,12 @@ webix.ready(function () {
                                                 view
                                             ]
                                         }, $$('content'));
-                                        itemValue = this.getMenuItem(id).value
-                                        $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" +itemValue + " " + requestsBadge + "</span>")
+                                        itemValue = this.getMenuItem(id).value;
+                                        $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" +itemValue + " " + requestsBadge + "</span>");
+
+
+                                        $$("helpHrefId").setValue(`<div style='text-align: right'><a class='mdi mdi-help-circle' target='_blank' href=${helpUrl}></a></div>`);
+                                        $$("helpHrefId").refresh();
                                     }
 
                                     // webix.ajax("/check_session").then(function (data){
@@ -322,12 +330,23 @@ webix.ready(function () {
                                     label: 'Личный кабинет',
                                 },
                                 {
-                                    view: 'template',
-                                    borderless: true,
-                                    template: "<div style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> " +
-                                        "<span id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\"" +
-                                        "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
-                                    url: 'organization',
+                                    cols: [{
+                                        id: 'helpHrefId',
+                                        view: 'label',
+                                        borderless: true,
+
+                                        label: "<div style='text-align: right'><a class='mdi mdi-help-circle' target=\'_blank\' href=\'helps\'></a></div>",
+                                    },
+                                    {
+                                        view: 'template',
+                                        borderless: true,
+                                        maxWidth: 128,
+                                        template: "<div style='text-align: left'>" +
+                                            "<img class='user_avatar' src = \"avatar.jpg\"> " +
+                                            "<span id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\"" +
+                                            "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
+                                        url: 'organization',
+                                    }]
                                 },
                             ]
                         },
