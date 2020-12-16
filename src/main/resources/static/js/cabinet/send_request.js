@@ -205,7 +205,7 @@ const requestWizard = {
                                                                 id: 'upload',
                                                                 view: 'uploader',
                                                                 css: 'webix_secondary',
-                                                                value: 'Загрузить',
+                                                                value: 'Выбрать',
                                                                 autosend: false,
                                                                 upload: '/upload_files',
                                                                 required: true,
@@ -221,7 +221,7 @@ const requestWizard = {
                                                                 id: 'loadFileBtn',
                                                                 view: 'button',
                                                                 css: 'webix_primary',
-                                                                value: 'Импорт',
+                                                                value: 'Добавить',
                                                                 align: 'center',
                                                                 click: function () {
                                                                     $$('upload').send(function (response) {
@@ -252,7 +252,7 @@ const requestWizard = {
                                                     {
                                                         view: "label",
                                                         id: "labelFiles",
-                                                        label: "*Список прикрепленных к заявке файлов",
+                                                        label: "Приложенные к заявке файлы",
                                                     },
                                                     {
                                                         view: "list",
@@ -550,7 +550,7 @@ function attachFile(id){
             title: originalFileName,
         },id)
     }
-    $$("labelFiles").setValue("*Список прикрепленных к заявке файлов ("+$$('choosedFiles').count()+")")
+    $$("labelFiles").setValue("К заявке приложено "+$$('choosedFiles').count()+" файлов из " + $$("docs_grid").count())
 }
 
 function showRequestWizard(data) {
