@@ -1,5 +1,7 @@
 package ru.sibdigital.addcovid.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +15,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.dto.*;
+import ru.sibdigital.addcovid.dto.egrip.EGRIP;
+import ru.sibdigital.addcovid.dto.egrul.EGRUL;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.model.classifier.gov.*;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.repository.classifier.gov.OkvedRepo;
 import ru.sibdigital.addcovid.repository.classifier.gov.RegEgripRepo;
 import ru.sibdigital.addcovid.repository.classifier.gov.RegEgrulRepo;
+import ru.sibdigital.addcovid.utils.JuridicalUtils;
 import ru.sibdigital.addcovid.utils.PasswordGenerator;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
@@ -111,6 +116,8 @@ public class RequestService {
     String uploadingDir;
 
     private static final int BUFFER_SIZE = 4096;
+
+    private static ObjectMapper mapper = new ObjectMapper();
 
     @Transactional
     public DocRequest addNewRequest(PostFormDto postForm, int requestType) {
@@ -445,7 +452,8 @@ public class RequestService {
 
     @Transactional
     public ClsOrganization saveClsOrganization(OrganizationDto organizationDto) {
-
+        RegEgrul regEgrul = null;
+        RegEgrip regEgrip = null;
         ClsPrincipal clsPrincipal = ClsPrincipal.builder()
                 .password(passwordEncoder.encode(organizationDto.getPassword()))
                 .build();
@@ -456,12 +464,29 @@ public class RequestService {
 
         String code = SHA256Generator.generate(organizationDto.getOrganizationInn(), organizationDto.getOrganizationName(), String.valueOf(System.currentTimeMillis()));
 
+        String juradress = "";
+        try {
+            if (typeOrganization == OrganizationTypes.JURIDICAL.getValue()) {
+                regEgrul = regEgrulRepo.findByInn(organizationDto.getOrganizationInn());
+                final EGRUL.СвЮЛ svedul = mapper.readValue(regEgrul.getData(), EGRUL.СвЮЛ.class);
+                juradress = JuridicalUtils.constructJuridicalAdress(svedul);
+            } else if (typeOrganization == OrganizationTypes.PHYSICAL.getValue()) {
+                regEgrip = regEgripRepo.findByInn(organizationDto.getOrganizationInn());
+                final EGRIP.СвИП svip = mapper.readValue(regEgrip.getData(), EGRIP.СвИП.class);
+                juradress = JuridicalUtils.constructJuridicalAdress(svip);
+            }
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+        }catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
         ClsOrganization clsOrganization = ClsOrganization.builder()
                 .name(organizationDto.getOrganizationName())
                 .shortName(organizationDto.getOrganizationShortName())
                 .inn(organizationDto.getOrganizationInn())
                 .ogrn(organizationDto.getOrganizationOgrn())
-                .addressJur(organizationDto.getOrganizationAddressJur())
+                .addressJur(juradress)
                 .okvedAdd(organizationDto.getOrganizationOkvedAdd())
                 .okved(organizationDto.getOrganizationOkved())
                 .email(organizationDto.getOrganizationEmail())
@@ -497,7 +522,6 @@ public class RequestService {
         }
 
         if (typeOrganization == OrganizationTypes.JURIDICAL.getValue()) {
-            RegEgrul regEgrul = regEgrulRepo.findByInn(clsOrganization.getInn());
             for (RegEgrulOkved regEgrulOkved: regEgrul.getRegEgrulOkveds()) {
                 Okved okved = okvedRepo.findOkvedByIdSerial(regEgrulOkved.getIdOkved());
                 RegOrganizationOkvedId regOrganizationOkvedId = RegOrganizationOkvedId.builder()
@@ -511,7 +535,6 @@ public class RequestService {
                 regOrganizationOkvedRepo.save(regOrganizationOkved);
             }
         } else if (typeOrganization == OrganizationTypes.PHYSICAL.getValue()) {
-            RegEgrip regEgrip = regEgripRepo.findByInn(clsOrganization.getInn());
             for (RegEgripOkved regEgripOkved: regEgrip.getRegEgripOkveds()) {
                 Okved okved = okvedRepo.findOkvedByIdSerial(regEgripOkved.getIdOkved());
                 RegOrganizationOkvedId regOrganizationOkvedId = RegOrganizationOkvedId.builder()
