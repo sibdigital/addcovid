@@ -57,7 +57,8 @@ public class ApplicationConstants {
     @Value("${ref-agreement}")
     private String refAgreement;
 
-
+    @Value("${upload.news.path}")
+    private String newsUploadPath;
 
 
 

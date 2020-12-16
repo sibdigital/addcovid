@@ -19,7 +19,7 @@ public interface RegOrganizationAddressFactRepo extends JpaRepository<RegOrganiz
     @Query(nativeQuery = true, value = "select * from reg_organization_address_fact where id = :id")
     Optional<RegOrganizationAddressFact> findById(Long id);
 
-    @Query(nativeQuery = true, value = "select * from reg_organization_address_fact where id_organization = :id_organization")
+    @Query(nativeQuery = true, value = "select * from reg_organization_address_fact where id_organization = :id_organization order by time_create")
     List<Map<String, Object>> findByIdOrganization(@Param("id_organization") Integer id_organization);
 
     @Modifying
@@ -30,6 +30,29 @@ public interface RegOrganizationAddressFactRepo extends JpaRepository<RegOrganiz
             "                                           full_address, is_hand)\n" +
             "            VALUES (:id_organization, null, false, default, :fias_region_objectid, :fias_raion_objectid, :fias_city_objectid, :fias_street_objectid, :fias_house_objectid, :street_hand, :house_hand, :apartment_hand, :full_address, false)")
     public void insertOrg(
+            @Param("id_organization") Integer id_organization,
+            Long fias_region_objectid,
+            Long fias_raion_objectid,
+            Long fias_city_objectid,
+            Long fias_street_objectid,
+            Long fias_house_objectid,
+            //Long fias_objectid,
+            String street_hand,
+            String house_hand,
+            String apartment_hand,
+            String full_address
+    );
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "update reg_organization_address_fact\n" +
+            "set id_organization = :id_organization, fias_region_objectid = :fias_region_objectid, fias_raion_objectid = :fias_raion_objectid,\n" +
+            "    fias_city_objectid = :fias_city_objectid, fias_street_objectid = :fias_street_objectid, fias_house_objectid = :fias_house_objectid,\n" +
+            "    street_hand = :street_hand, house_hand = :house_hand, apartment_hand = :apartment_hand,\n" +
+            "    full_address = :full_address\n" +
+            "where id = :id")
+    public void updateOrg(
+            @Param("id") Long id,
             @Param("id_organization") Integer id_organization,
             Long fias_region_objectid,
             Long fias_raion_objectid,

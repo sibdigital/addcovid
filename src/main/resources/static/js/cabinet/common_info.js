@@ -21,6 +21,7 @@ const commonInfo = {
                                 label: 'Полное наименование организации/фамилия, имя, отчество индивидуального предпринимателя',
                                 labelPosition: 'top',
                                 invalidMessage: 'Поле не может быть пустым',
+                                readonly:true,
                                 required: true
                             },
                             {
@@ -30,6 +31,7 @@ const commonInfo = {
                                 label: 'Краткое наименование организации',
                                 labelPosition: 'top',
                                 invalidMessage: 'Поле не может быть пустым',
+                                readonly:true,
                                 required: true
                             },
                             {
@@ -51,6 +53,7 @@ const commonInfo = {
                                         },
                                         //attributes:{ type:"number" },
                                         invalidMessage: 'Поле не может быть пустым',
+                                        readonly:true,
                                         required: true
                                     },
                                     {
@@ -66,6 +69,7 @@ const commonInfo = {
                                         labelPosition: 'top',
                                         //validate:webix.rules.isNumber(),
                                         invalidMessage: 'Поле не может быть пустым',
+                                        readonly:true,
                                         required: true
                                     },
                                 ]
@@ -121,6 +125,7 @@ const commonInfo = {
                                 label: 'Юридический адрес',
                                 labelPosition: 'top',
                                 height: 80,
+                                readonly:true,
                                 required: true
                             },
                             {

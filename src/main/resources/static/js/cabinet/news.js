@@ -10,10 +10,23 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
     "\n" +
     "   color: #0056b3; \n" +
     "   }" +
+    "a.link{\n" +
+    "\n" +
+    "   text-decoration: none;\n" +
+    "   color: #005cbf;" +
+    "   }" +
+    "a.link:hover{\n" +
+    "\n" +
+    "   color: #e83e8c; \n" +
+    "   }" +
     ".item{\n" +
     "\n" +
     "    margin:10px 5px;\n" +
     "    padding:10px 10px;\n" +
+    "  }" +
+    ".item_link{\n" +
+    "\n" +
+    "    margin:0px 15px;\n" +
     "  }" +
     ".item_title{\n" +
     "\n" +
@@ -22,12 +35,28 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
     "    margin:10px 5px;\n" +
     "    padding:10px;\n" +
     "  }" +
+    ".item_title:hover{\n" +
+    "\n" +
+    "    font:bold 14px/16px GraphikCy-Semibold;\n" +
+    "    display: block;\n" +
+    "    margin:10px 5px;\n" +
+    "    padding:10px;\n" +
+    "    color: #0056b3; \n" +
+    "  }" +
     ".item_big_title{\n" +
     "\n" +
     "    font:bold 24px/26px GraphikCy-Semibold;\n" +
     "    display: block;\n" +
     "    margin:10px 5px;\n" +
     "    padding:10px;\n" +
+    "  }" +
+    ".item_big_title:hover{\n" +
+    "\n" +
+    "    font:bold 24px/26px GraphikCy-Semibold;\n" +
+    "    display: block;\n" +
+    "    margin:10px 5px;\n" +
+    "    padding:10px;\n" +
+    "    color: #0056b3; \n" +
     "  }" +
     ".item_label{\n" +
     "\n" +
@@ -39,7 +68,7 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
     "  }" +
     ".class_border{\n" +
     "\n" +
-    "    border:1px solid #c3c5c9;\n" +
+    "    border-bottom:1px solid #c3c5c9;\n" +
     "  }");
 
 var newsfeed_url = 'newsfeed'
@@ -103,91 +132,222 @@ var options = {
     day: 'numeric',
 };
 
-const news = {
+const archiveNews =  {
     view: 'scrollview',
+    id: 'archiveNewsId',
     scroll: 'xy',
     body: {
-        type: 'space',
-        id: 'contactsMainLayout',
         rows: [
             {
-                type: 'wide',
-                responsive: 'contactsMainLayout',
+                view: 'toolbar',
+                id: 'newsToolbar',
+                type: "space",
                 cols: [
                     {
-                        view: "dataview",
-                        id: "newsDataview",
-                        margin: 20, paddingX: 10,
-                        scroll: 'y',
-                        template: function (obj) {
-                            var startTime =obj.startTime ? new Date(obj.startTime) : "";
-                            let startTimeString = startTime.toLocaleString("ru", options)
-
-                            return "<div class = 'class_border'>" +
-                                    "<span class = 'item_big_title'>" +
-                                            "<a href = \"news?hash_id=" + obj.hashId + "\"'>" +
-                                                obj.heading +
-                                            "</a>" +
-                                            "</span>"+
-                                            "<div class='item'>" +
-                                                obj.message +
-                                            "</div>"+
-                                            "<span class = 'item_label'>" +
-                                            "Дата публикации: "+ startTimeString +
-                                            "</span>" +
-                                    "</div>"
-
-                        },
-                        xCount: 1,
-                        type: {
-                            height: "auto",
-                            width: "auto",
-                            float: "right"
-                        },
-                        url: newsfeed_url,
+                        view: 'button',
+                        id: 'archiveBtn',
+                        type:"icon",
+                        icon:"mdi mdi-menu-left",
+                        align: 'left',
+                        label: 'Новости',
+                        maxWidth: '150',
+                        click: function () {
+                            webix.ui(news, $$('archiveNewsId'));
+                        }
                     },
-                    {   gravity: 0.3,
-                        rows:
-                        [
-                            {
-                                view: 'template',
-                                type: 'section',
-                                template: 'Архив новостей'
-                            },
-                            {
-                                view: "dataview",
-                                id: "newsDataview",
-                                margin: 20, paddingX: 10,
-                                scroll: 'y',
-                                template: function (obj) {
-                                    var startTime =obj.startTime ? new Date(obj.startTime) : "";
-                                    let startTimeString = startTime.toLocaleString("ru", options)
+                    {}
+                ]
+            },
+            {
+                view: "dataview",
+                id: "newsDataview",
+                margin: 20, paddingX: 10,
+                scroll: 'y',
+                template: function (obj) {
+                    var startTime =obj.startTime ? new Date(obj.startTime) : "";
+                    let startTimeString = startTime.toLocaleString("ru", options)
 
-                                    return "<span class = 'item_title'>" +
-                                                "<a href = \"news?hash_id=" + obj.hashId + "\"'>" +
-                                                    obj.heading +
-                                                "</a>" +
-                                            "</span>"+
-                                            "<span class = 'item_label'>" +
-                                                "Дата публикации: "+ startTimeString +
-                                            "</span>"
-                                },
-                                xCount: 1,
-                                type: {
-                                    // Если height поставить auto,
-                                    // то скроллинг с динамической загрузкой новостей не будет работать
-                                    height: 100,
-                                    width: "auto",
-                                    float: "right"
-                                },
-                                datafetch: 10,
-                                url: 'idata->' + news_archive_url,
-                            },
-                        ]
+                    return "<span class = 'item_title'>" +
+                                // "<a href = \"news?hash_id=" + obj.hashId + "\"'>" +
+                                    obj.heading +
+                                // "</a>" +
+                            "</span>"+
+                            "<span class = 'item_label'>" +
+                                "Дата публикации: "+ startTimeString +
+                            "</span>"
+                },
+                xCount: 1,
+                type: {
+                    // Если height поставить auto,
+                    // то скроллинг с динамической загрузкой новостей не будет работать
+                    height: 100,
+                    width: "auto",
+                    float: "right"
+                },
+                datafetch: 10,
+                url: 'idata->' + news_archive_url,
+                onClick: {
+                    "item_title": function (ev, id) {
+                        let item = this.getItem(id);
+                        var xhr = webix.ajax().sync().get('newsform/' + item.hashId);
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        newsTemplate = generateNewsTemplate(jsonResponse)
+                        webix.ui(newsForm, $$('archiveNewsId'));
+                        $$('newsFormTemplateId').parse({
+                            'newsTemplate': newsTemplate
+                        });
+                    }
+                }
+            },
+        ]
+    }
+}
+
+const news = {
+    view: 'scrollview',
+    id: 'newsId',
+    scroll: 'xy',
+
+    body: {
+        rows: [
+            {
+                view: 'toolbar',
+                id: 'newsToolbar',
+                type: "space",
+                cols: [
+                    {},
+                    {
+                        view: 'button',
+                        id: 'archiveBtn',
+                        type:"icon",
+                        icon:"mdi mdi-newspaper",
+                        align: 'right',
+                        label: 'Архив',
+                        maxWidth: '100',
+                        css:"webix_transparent",
+                        click: function () {
+                            webix.ui(archiveNews, $$('newsId'));
+                        }
+                    },
+                    {gravity: 0.01}
+                ]
+            },
+            {
+                view: "dataview",
+                id: "newsDataview",
+                margin: 20, paddingX: 10,
+                scroll: 'y',
+                template: function (obj) {
+                    let obj_news = obj['news']
+                    let news_files = obj['newsFiles']
+                    let news_dir = obj['newsDirectory']
+                    let startTime =obj_news.startTime ? new Date(obj_news.startTime) : "";
+                    let startTimeString = startTime.toLocaleString("ru", options)
+
+                    let htmlcode =  "<div class = 'class_border'>" +
+                            "<span class = 'item_big_title'>" +
+                                    // "<a href = \"news?hash_id=" + obj_news.hashId + "\"'>" +
+                                        obj_news.heading +
+                                    // "</a>" +
+                                    "</span>"+
+                                    "<div class='item'>" +
+                                        obj_news.message +
+                                    "</div>";
+                    for (var i in news_files) {
+                        let newsFilePath = news_dir + "/" + news_files[i].fileName + news_files[i].fileExtension
+                        htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + newsFilePath + "' download=''><i class='mdi mdi-download'></i>"
+                                    + news_files[i].originalFileName + "</a></div>"
                     }
 
-                ]
+                    return htmlcode +
+                                    "<span class = 'item_label'>" +
+                                    "Дата публикации: "+ startTimeString +
+                                    "</span>" +
+                            "</div>"
+
+                },
+                xCount: 1,
+                type: {
+                    height: "auto",
+                    width: "auto",
+                    float: "right"
+                },
+                url: newsfeed_url,
+                onClick: {
+                    "item_big_title": function (ev, id) {
+                        let item = this.getItem(id);
+                        newsTemplate = generateNewsTemplate(item);
+                        webix.ui(newsForm, $$('newsId'));
+                        $$('newsFormTemplateId').parse({
+                            'newsTemplate': newsTemplate
+                        });
+                    }
+                }
             }
         ]
+    }
+}
+
+const newsForm = {
+    id: 'newsFormId',
+    rows: [
+        {
+            view: 'toolbar',
+            id: 'newsToolbar',
+            type: "space",
+            cols: [
+                {
+                    view: 'button',
+                    id: 'archiveBtn',
+                    type:"icon",
+                    icon:"mdi mdi-menu-left",
+                    align: 'left',
+                    label: 'Новости',
+                    maxWidth: '150',
+                    click: function () {
+                        webix.ui(news, $$('newsFormId'));
+                    }
+                },
+                {}
+            ]
+        },
+        {
+            view:'template',
+            id: 'newsFormTemplateId',
+            scroll: 'xy',
+            template: '#newsTemplate#'
+        }
+    ]
+}
+
+function generateNewsTemplate(obj) {
+    let obj_news = obj['news']
+    let news_files = obj['newsFiles']
+    let news_dir = obj['newsDirectory']
+    if (obj_news.hashId != null) {
+        var startTime =obj_news.startTime ? new Date(obj_news.startTime) : "";
+        let startTimeString = startTime.toLocaleString("ru", options)
+        let htmlcode =  "<div>" +
+            "<span class = 'item_big_title'>" +
+            // "<a href = \"news?hash_id=" + obj_news.hashId + "\"'>" +
+            obj_news.heading +
+            // "</a>" +
+            "</span>" +
+            "<div class='item'>" +
+            obj_news.message +
+            "</div>";
+
+        for (var i in news_files) {
+            let newsFilePath = news_dir + "/" + news_files[i].fileName + news_files[i].fileExtension
+            htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + newsFilePath + "'download=''><i class='mdi mdi-download'></i>"
+                + news_files[i].originalFileName + "</a></div>"
+        }
+        return htmlcode +  "<span class = 'item_label'>" +
+            "Дата публикации: " + startTimeString +
+            "</span>" +
+            "</div>"
+    }
+    else {
+        return ""
     }
 }

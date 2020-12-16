@@ -75,6 +75,12 @@ public class CabinetController {
     @Autowired
     private SettingServiceImpl settingServiceImpl;
 
+    @Autowired
+    private RegNewsFileRepo regNewsFileRepo;
+
+    @Autowired
+    private RegPersonCountRepo regPersonCountRepo;
+
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -86,6 +92,39 @@ public class CabinetController {
         model.addAttribute("link_prefix", applicationConstants.getLinkPrefix());
         model.addAttribute("link_suffix", applicationConstants.getLinkSuffix());
         return "cabinet/main";
+    }
+
+    @GetMapping("/check_consent")
+    public @ResponseBody Map<String, Object> checkConsent(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        boolean isAgreed = ((organization.getConsentDataProcessing() == null) ? false : organization.getConsentDataProcessing());
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("isAgreed", isAgreed);
+
+        return map;
+    }
+
+    @GetMapping("/getConsentPersonalData")
+    public @ResponseBody String getConsentPersonalData() {
+        ClsSettings settings = settingServiceImpl.getConsentPersonalData();
+        return settings.getStringValue();
+    }
+
+    @GetMapping("/saveConsentPersonalData")
+    public @ResponseBody String saveConsentPersonalData(HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return "Не удалось сохранить согласие";
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        organization.setConsentDataProcessing(true);
+        clsOrganizationRepo.save(organization);
+        return "Согласие сохранено";
     }
 
     @GetMapping("/organization")
@@ -391,13 +430,25 @@ public class CabinetController {
     }
 
     @GetMapping("/newsfeed")
-    public @ResponseBody List<ClsNews> getNewsList(HttpSession session) {
+    public @ResponseBody List<Map<String, Object>> getNewsList(HttpSession session) {
+        List<Map<String, Object>> mapList = new ArrayList<>();
+
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
         }
         List<ClsNews> newsList = clsNewsRepo.getCurrentNewsByOrganization_Id(id, new Timestamp(System.currentTimeMillis())).stream().collect(Collectors.toList());
-        return newsList;
+        for (ClsNews news : newsList) {
+            Map<String, Object> map = new HashMap<>();
+            List<RegNewsFile> newsFiles = regNewsFileRepo.findAllByNews(news);
+
+            map.put("news", news);
+            map.put("newsFiles", newsFiles);
+            map.put("newsDirectory", applicationConstants.getNewsUploadPath());
+            mapList.add(map);
+        }
+
+        return mapList;
     }
 
     @GetMapping("/news_archive")
@@ -429,11 +480,19 @@ public class CabinetController {
         return "news_form";
     }
 
-    @GetMapping("/news/{hash_id}")
-    public @ResponseBody ClsNews getNewsById(@PathVariable("hash_id") String hash_id, HttpServletRequest request){
-        ClsNews clsNews = clsNewsRepo.findByHashId(hash_id);
-        requestService.saveLinkClicks(request, clsNews);
-        return clsNews;
+    @GetMapping("/newsform/{hash_id}")
+    public @ResponseBody Map<String, Object> getNewsDataById(@PathVariable("hash_id") String hash_id, HttpServletRequest request){
+        Map<String, Object> map = new HashMap<>();
+
+        ClsNews news = clsNewsRepo.findByHashId(hash_id);
+        List<RegNewsFile> newsFiles = regNewsFileRepo.findAllByNews(news);
+
+        map.put("news", news);
+        map.put("newsFiles", newsFiles);
+        map.put("newsDirectory", applicationConstants.getNewsUploadPath());
+
+        requestService.saveLinkClicks(request, news);
+        return map;
     }
 
     @GetMapping("/my_mailing_list")
@@ -662,5 +721,34 @@ public class CabinetController {
     public @ResponseBody String getRequestsStatusStyle(){
         ClsSettings settings = settingServiceImpl.getRequestsStatusStyle();
         return settings.getValue();
+    }
+
+
+    @GetMapping("/person_count")
+    public @ResponseBody RegPersonCount savePersonCount(HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        RegPersonCount rpc = regPersonCountRepo.getLastPersonCntByOrganization_Id(id);
+        return rpc;
+    }
+
+    @GetMapping("/save_person_count")
+    public @ResponseBody String savePersonCount(@RequestParam(value = "personOfficeCnt") Integer personOfficeCnt,
+                                                        @RequestParam(value = "personRemoteCnt") Integer personRemoteCnt,
+                                                        HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        try {
+            requestService.saveRegPersonCount(organization, personOfficeCnt, personRemoteCnt);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "Не удалось внести изменения";
+        }
+        return "Изменения сохранены";
     }
 }

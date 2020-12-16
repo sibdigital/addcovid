@@ -40,6 +40,7 @@ public class ClsOrganization {
     private Boolean isDeleted;
     private Timestamp timeCreate;
     private Boolean isActivated;
+    private Boolean consentDataProcessing;
 
     @OneToOne
     @JoinColumn(name = "id_principal", referencedColumnName = "id")
@@ -232,6 +233,16 @@ public class ClsOrganization {
 
     public void setActivated(Boolean activated) {
         isActivated = activated;
+    }
+
+    @Basic
+    @Column(name = "consent_data_processing")
+    public Boolean getConsentDataProcessing() {
+        return consentDataProcessing;
+    }
+
+    public void setConsentDataProcessing(Boolean consentDataProcessing) {
+        this.consentDataProcessing = consentDataProcessing;
     }
 
     @JsonIgnore
