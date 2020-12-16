@@ -250,7 +250,7 @@ let bigMainForm = {
                                 view = contacts;
                             } else if (id == 'Mailing') {
                                 view = mailing;
-                            }
+                            }this.select(id)
                             if (view != null) {
                                 webix.ui({
                                     id: 'content',
