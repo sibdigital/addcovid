@@ -14,84 +14,20 @@ function showRequestCreateForm(idTypeRequest, page) {
 
     webix.ajax('cls_type_request/' + idTypeRequest).then(function (data) {
 
-        let typeRequest = data.json();
+        webix.extend($$('newRequestForm'), webix.ProgressBar);
+
+        const typeRequest = data.json();
 
         $$('typeRequestId').setValue(typeRequest.id);
 
         $$('activityKind').setValue(typeRequest.activityKind);
 
-        if (typeRequest.regTypeRequestRestrictionTypes && typeRequest.regTypeRequestRestrictionTypes.length > 0) {
-            $$('restrictionType').setValue(typeRequest.regTypeRequestRestrictionTypes[0].regTypeRequestRestrictionTypeId.clsRestrictionType.name);
+        if (typeRequest.department) {
+            const department = typeRequest.department;
+            departmentId = (department.id);
+            $$("departmentId").setValue(department.id);
+            $$("departmentId").disable();
         }
-
-        if (typeRequest.regTypeRequestPrescriptions && typeRequest.regTypeRequestPrescriptions.length > 0) {
-            typeRequest.regTypeRequestPrescriptions.forEach((prescription, index) => {
-                const files = [];
-                if (prescription.regTypeRequestPrescriptionFiles && prescription.regTypeRequestPrescriptionFiles.length > 0) {
-                    prescription.regTypeRequestPrescriptionFiles.forEach((file) => {
-                        const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
-                            + file.originalFileName + '</a>'
-                        files.push({id: file.id, value: filename})
-                    })
-                }
-                $$('prescriptions').addView({
-                    rows: [
-                        {
-                            view: 'text',
-                            id: 'prescription_id' + index,
-                            value: prescription.id,
-                            hidden: true
-                        },
-                        {
-                            cols: [
-                                {
-                                    view: 'label',
-                                    label: 'Предписание ' + (index + 1),
-                                    align: 'center'
-                                },
-                            ]
-                        },
-                        {
-                            view: 'template',
-                            height: 550,
-                            readonly: true,
-                            scroll: true,
-                            template: prescription.content
-                        },
-                        {
-                            view: 'list',
-                            autoheight: true,
-                            template: '#value#',
-                            data: files,
-                        },
-                        {
-                            view: 'template',
-                            borderless: true,
-                            css: 'personalTemplateStyle',
-                            template: 'Подтверждаю обязательное выполнение предписания <span style = "color: red">*</span>',
-                            autoheight: true
-                        },
-                        {
-                            view: 'checkbox',
-                            id: 'consentPrescription' + index,
-                            labelPosition: 'top',
-                            required: true,
-                            on: {
-                                onChange(newv, oldv) {
-                                    if (allChecked()) {
-                                        $$('send_btn').enable();
-                                    } else {
-                                        $$('send_btn').disable();
-                                    }
-                                }
-                            }
-                        },
-                    ]
-                });
-            })
-        }
-
-        $$('consent').setHTML(typeRequest.consent);
 
         if (typeRequest.settings) {
             const settings = JSON.parse(typeRequest.settings, function (key, value) {
@@ -107,10 +43,111 @@ function showRequestCreateForm(idTypeRequest, page) {
             }
         }
 
-        webix.extend($$('newRequestForm'), webix.ProgressBar);
+        return webix.ajax('type_request_prescriptions', {idTypeRequest: idTypeRequest});
+    }).then(function (data) {
+
+        const prescriptions = data.json();
+
+        if (prescriptions && prescriptions.length > 0) {
+            // $$('prescriptions').addView({
+            //     view: 'label',
+            //     label: 'Ознакомтесь с предписаниями'
+            // })
+
+            prescriptions.forEach((prescription, index) => {
+                if (prescription.prescriptionTexts && prescription.prescriptionTexts.length > 0) {
+                    $$('prescriptions').addView({
+                        id: 'prescription' + prescription.id,
+                        rows: [
+                            {
+                                view: 'template',
+                                type: 'section',
+                                template: prescription.name
+                            },
+                            {
+                                view: 'text',
+                                id: 'prescription_id' + index,
+                                value: prescription.id,
+                                hidden: true
+                            },
+                            {
+                                id: 'prescriptionTexts' + prescription.id,
+                                rows: []
+                            }
+                        ]
+                    });
+
+                    prescription.prescriptionTexts.forEach((pt, ptIndex) => {
+                        const files = [];
+
+                        if (pt.prescriptionTextFiles && pt.prescriptionTextFiles.length > 0) {
+                            pt.prescriptionTextFiles.forEach((file) => {
+                                const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
+                                    + file.originalFileName + '</a>'
+                                files.push({id: file.id, value: filename})
+                            })
+                        }
+
+                        $$('prescriptionTexts' + prescription.id).addView({
+                            rows: [
+                                {
+                                    view: 'text',
+                                    id: 'prescriptionText_id' + prescription.id + '_' + ptIndex,
+                                    value: pt.id,
+                                    hidden: true
+                                },
+                                {
+                                    cols: [
+                                        {
+                                            view: 'label',
+                                            label: 'Текст №' + (ptIndex + 1),
+                                            align: 'center'
+                                        },
+                                    ]
+                                },
+                                {
+                                    view: 'template',
+                                    height: 550,
+                                    readonly: true,
+                                    scroll: true,
+                                    template: pt.content
+                                },
+                                {
+                                    view: 'list',
+                                    autoheight: true,
+                                    template: '#value#',
+                                    data: files,
+                                },
+                                {
+                                    view: 'template',
+                                    borderless: true,
+                                    css: 'personalTemplateStyle',
+                                    template: 'Подтверждаю обязательное выполнение предписания <span style = "color: red">*</span>',
+                                    autoheight: true
+                                },
+                                {
+                                    view: 'checkbox',
+                                    id: 'consentPrescription' + prescription.id + '_' + ptIndex,
+                                    labelPosition: 'top',
+                                    required: true,
+                                    on: {
+                                        onChange(newv, oldv) {
+                                            if (allCheckedText()) {
+                                                $$('send_btn').enable();
+                                            } else {
+                                                $$('send_btn').disable();
+                                            }
+                                        }
+                                    }
+                                },
+                            ]
+                        });
+                    })
+                }
+            })
+        }
     });
 }
-
 
 const requestWizard = {
     view: 'scrollview',
@@ -205,7 +242,7 @@ const requestWizard = {
                                                                 id: 'upload',
                                                                 view: 'uploader',
                                                                 css: 'webix_secondary',
-                                                                value: 'Выбрать',
+                                                                value: 'Загрузить',
                                                                 autosend: false,
                                                                 upload: '/upload_files',
                                                                 required: true,
@@ -221,7 +258,7 @@ const requestWizard = {
                                                                 id: 'loadFileBtn',
                                                                 view: 'button',
                                                                 css: 'webix_primary',
-                                                                value: 'Добавить',
+                                                                value: 'Импорт',
                                                                 align: 'center',
                                                                 click: function () {
                                                                     $$('upload').send(function (response) {
@@ -252,7 +289,7 @@ const requestWizard = {
                                                     {
                                                         view: "label",
                                                         id: "labelFiles",
-                                                        label: "Приложенные к заявке файлы",
+                                                        label: "*Список прикрепленных к заявке файлов",
                                                     },
                                                     {
                                                         view: "list",
@@ -345,66 +382,57 @@ const requestWizard = {
                             },
                             {
                                 rows: [
-                                    { type: 'header', template: 'Шаг 4. Ознакомьтесь с информацией' },
+                                    { type: 'header', template: 'Шаг 4. Подача заявки' },
                                     {
                                         type: 'form',
                                         rows: [
-                                            {
-                                                view: 'template',
-                                                id: 'consent',
-                                                height: 200,
-                                                readonly: true,
-                                                scroll: true,
-                                                template: ''
-                                            },
-                                            {
-                                                rows: [
-                                                    {
-                                                        view: 'template',
-                                                        borderless: true,
-                                                        css: 'personalTemplateStyle',
-                                                        template: 'Подтверждаю согласие работников на обработку персональных данных <span style = "color: red">*</span>',
-                                                        autoheight: true
-                                                    },
-                                                    {
-                                                        view: 'checkbox',
-                                                        name: 'isAgree',
-                                                        id: 'isAgree',
-                                                        labelPosition: 'top',
-                                                        invalidMessage: 'Поле не может быть пустым',
-                                                        required: true,
-                                                        on: {
-                                                            onChange(newv, oldv) {
-                                                                if (allChecked()) {
-                                                                    $$('send_btn').enable();
-                                                                } else {
-                                                                    $$('send_btn').disable();
-                                                                }
-                                                            }
-                                                        }
-                                                    },
-                                                ]
-                                            },
-                                            view_section('Информация о предписании'),
                                             {
                                                 view: 'text',
                                                 id: 'activityKind',
                                                 autoheight: true,
                                                 // align: 'center',
-                                                label: 'Наименование предписания',
+                                                label: 'Тип заявки',
                                                 labelPosition: 'top',
                                                 name: 'activityKind',
                                                 readonly: true
                                             },
                                             {
-                                                view: 'text',
-                                                id: 'restrictionType',
-                                                autoheight: true,
-                                                // align: 'center',
-                                                label: 'Тип ограничения',
-                                                labelPosition: 'top',
-                                                readonly: true
+                                                rows:[
+                                                    {
+                                                        view: 'template',
+                                                        borderless: true,
+                                                        css:{
+                                                            'font-family' : 'Roboto, sans-serif;',
+                                                            'font-size' : '14px;',
+                                                            'font-weight' : '500;',
+                                                            'color' : '#313131;',
+                                                        },
+                                                        template: 'Министерство, курирующее вашу деятельность <span style = "color: red">*</span>',
+                                                        autoheight: true
+                                                    },
+                                                    {
+                                                        view: 'select',
+                                                        id: 'departmentId',
+                                                        name: 'departmentId',
+                                                        labelPosition: 'top',
+                                                        invalidMessage: 'Поле не может быть пустым',
+                                                        required: true,
+                                                        options: 'cls_departments',
+                                                    },
+                                                ]
                                             },
+                                            {
+                                                view: 'textarea',
+                                                height: 150,
+                                                minWidth: 250,
+                                                label: 'Обоснование заявки',
+                                                name: 'reqBasis',
+                                                id: 'reqBasis',
+                                                invalidMessage: 'Поле не может быть пустым',
+                                                required: true,
+                                                labelPosition: 'top'
+                                            },
+                                            view_section('Информация о предписаниях'),
                                             {
                                                 id: 'prescriptions',
                                                 rows: []
@@ -456,27 +484,50 @@ const requestWizard = {
                                                                 params.organizationId = ID_ORGANIZATION;
                                                                 // params.typeRequestId = $$('')
 
-                                                                if (params.isAgree != 1) {
-                                                                    webix.message('Необходимо подтвердить согласие работников на обработку персональных данных', 'error')
-                                                                    return false
+                                                                const selectedFiles = $$('docs_grid').getSelectedItem(true);
+                                                                if (selectedFiles && selectedFiles.length > 0) {
+                                                                    const fileIds = [];
+                                                                    for (let i in selectedFiles) {
+                                                                        fileIds.push(selectedFiles[i].id);
+                                                                    }
+                                                                    params.organizationFileIds = fileIds;
                                                                 }
-
-                                                                const additionalAttributes = {};
 
                                                                 const countPrescriptions = $$('prescriptions').getChildViews().length;
+                                                                console.log('countPrescriptions', countPrescriptions);
                                                                 if (countPrescriptions > 0) {
-                                                                    let consentPrescriptions = [];
-                                                                    for (let num = 0; num < countPrescriptions; num++) {
-                                                                        const id = $$('prescription_id' + num).getValue();
-                                                                        consentPrescriptions.push({
-                                                                            id,
-                                                                            isAgree: $$('consentPrescription' + num).getValue()
-                                                                        });
-                                                                    }
-                                                                    additionalAttributes.consentPrescriptions = consentPrescriptions;
-                                                                }
+                                                                    const docRequestPrescriptions = [];
 
-                                                                params.additionalAttributes = additionalAttributes;
+                                                                    for (let num = 0; num < countPrescriptions; num++) {
+                                                                        const docRequestPrescription = {};
+
+                                                                        const prescriptionId = $$('prescription_id' + num).getValue();
+                                                                        docRequestPrescription.prescriptionId = prescriptionId;
+
+                                                                        const countPrescriptionTexts = $$('prescriptionTexts' + prescriptionId).getChildViews().length;
+                                                                        console.log('countPrescriptionTexts', countPrescriptionTexts);
+                                                                        if (countPrescriptionTexts > 0) {
+                                                                            const additionalAttributes = {};
+
+                                                                            let consentPrescriptions = [];
+                                                                            for (let ptNum = 0; ptNum < countPrescriptionTexts; ptNum++) {
+                                                                                const id = $$('prescriptionText_id' + prescriptionId + '_' + ptNum).getValue();
+                                                                                console.log('prescriptionText_id' + prescriptionId + '_' + ptNum, id)
+                                                                                consentPrescriptions.push({
+                                                                                    id,
+                                                                                    isAgree: $$('consentPrescription' + prescriptionId + '_' + ptNum).getValue()
+                                                                                });
+                                                                            }
+                                                                            additionalAttributes.consentPrescriptions = consentPrescriptions;
+
+                                                                            docRequestPrescription.additionalAttributes = additionalAttributes;
+                                                                        }
+
+                                                                        docRequestPrescriptions.push(docRequestPrescription);
+                                                                    }
+
+                                                                    params.docRequestPrescriptions = docRequestPrescriptions;
+                                                                }
 
                                                                 $$('newRequestForm').showProgress({
                                                                     type: 'icon',
@@ -550,7 +601,7 @@ function attachFile(id){
             title: originalFileName,
         },id)
     }
-    $$("labelFiles").setValue("К заявке приложено "+$$('choosedFiles').count()+" файлов из " + $$("docs_grid").count())
+    $$("labelFiles").setValue("*Список прикрепленных к заявке файлов ("+$$('choosedFiles').count()+")")
 }
 
 function showRequestWizard(data) {
@@ -639,8 +690,6 @@ function showRequestWizard(data) {
                 });
             })
         }
-
-        $$('consent').setHTML(typeRequest.consent);
 
         if (typeRequest.settings) {
             const settings = JSON.parse(typeRequest.settings, function (key, value) {
