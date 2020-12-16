@@ -27,6 +27,10 @@ public class RegOrganizationFile {
     private ClsOrganization clsOrganizationByIdOrganization;
     private DocRequest docRequestByIdRequest;
 
+    public RegOrganizationFile(int organizationFileId) {
+        this.id = organizationFileId;
+    }
+
     @Id
     @Column(name = "id")
     @SequenceGenerator(name = "REG_ORGANIZATION_FILE_SEQ_GEN", sequenceName = "REG_ORGANIZATION_FILE_id_seq", allocationSize = 1, schema = "public")

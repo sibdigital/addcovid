@@ -33,7 +33,7 @@ public class ClsPrescription {
     private Integer status;
     private Timestamp timePublication;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "id_type_request", referencedColumnName = "id")
     private ClsTypeRequest typeRequest;
 
@@ -44,6 +44,10 @@ public class ClsPrescription {
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
     private AdditionalFields additionalFields;
+
+    public ClsPrescription(Long prescriptionId) {
+        this.id = prescriptionId;
+    }
 
     public Long getId() {
         return id;

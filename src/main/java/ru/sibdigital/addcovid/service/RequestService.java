@@ -113,6 +113,12 @@ public class RequestService {
     @Autowired
     private RegOrganizationPrescriptionRepo regOrganizationPrescriptionRepo;
 
+    @Autowired
+    private RegDocRequestFileRepo regDocRequestFileRepo;
+
+    @Autowired
+    private RegDocRequestPrescriptionRepo regDocRequestPrescriptionRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
@@ -762,27 +768,47 @@ public class RequestService {
         } else {
             ClsOrganization organization = clsOrganizationRepo.findById(postForm.getOrganizationId()).orElse(null);
 
-            ClsTypeRequest prescription = clsTypeRequestRepo.findById(postForm.getTypeRequestId()).orElse(null);
+            ClsTypeRequest typeRequest = clsTypeRequestRepo.findById(postForm.getTypeRequestId()).orElse(null);
 
             docRequest = DocRequest.builder()
                     .organization(organization)
-                    .department(prescription.getDepartment())
+                    .department(departmentRepo.getOne(postForm.getDepartmentId()))
                     .personOfficeCnt(0L)
                     .personRemoteCnt(0L)
                     .personSlrySaveCnt(0L)
                     .statusReview(ReviewStatuses.NEW.getValue())
                     .statusImport(0)
                     .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
-                    .typeRequest(prescription)
+                    .typeRequest(typeRequest)
                     .build();
         }
 
-        docRequest.setAgree(postForm.getIsAgree());
-        docRequest.setProtect(postForm.getIsProtect());
+        docRequest.setReqBasis(postForm.getReqBasis());
         docRequest.setAdditionalAttributes(postForm.getAdditionalAttributes());
         docRequest.setStatusReview(ReviewStatuses.OPENED.getValue());
 
         docRequestRepo.save(docRequest);
+
+        if (postForm.getOrganizationFileIds() != null) {
+            for (int organizationFileId : postForm.getOrganizationFileIds()) {
+                RegDocRequestFile regDocRequestFile = RegDocRequestFile.builder()
+                        .request(docRequest)
+                        .organizationFile(new RegOrganizationFile(organizationFileId))
+                        .build();
+                regDocRequestFileRepo.save(regDocRequestFile);
+            }
+        }
+
+        if (postForm.getDocRequestPrescriptions() != null && postForm.getDocRequestPrescriptions().size() > 0) {
+            for (DocRequestPrescriptionDto dto : postForm.getDocRequestPrescriptions()) {
+                RegDocRequestPrescription regDocRequestPrescription = RegDocRequestPrescription.builder()
+                        .request(docRequest)
+                        .prescription(new ClsPrescription(dto.getPrescriptionId()))
+                        .additionalAttributes(dto.getAdditionalAttributes())
+                        .build();
+                regDocRequestPrescriptionRepo.save(regDocRequestPrescription);
+            }
+        }
 
         return docRequest;
     }
@@ -882,5 +908,10 @@ public class RequestService {
         regOrganizationPrescriptionRepo.save(organizationPrescription);
 
         return organizationPrescription;
+    }
+
+    public List<ClsPrescription> getClsPrescriptionsByTypeRequestId(Long idTypeRequest) {
+        List<ClsPrescription> prescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestId(idTypeRequest);
+        return prescriptions;
     }
 }

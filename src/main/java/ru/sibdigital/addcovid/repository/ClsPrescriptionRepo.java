@@ -26,4 +26,12 @@ public interface ClsPrescriptionRepo extends JpaRepository<ClsPrescription, Long
             "   join reg_organization_prescription rop on rop.id_prescription = cp.id " +
             "where rop.id_organization = :orgId")
     List<ClsPrescription> getPrescriptionsByOrganizationId(Long orgId);
+
+    @Query(nativeQuery = true, value = "" +
+            "select * " +
+            "from cls_prescription " +
+            "where id_type_request = :idTypeRequest " +
+            "   and status = 1 " +
+            "order by time_publication")
+    List<ClsPrescription> getPrescriptionsByTypeRequestId(Long idTypeRequest);
 }

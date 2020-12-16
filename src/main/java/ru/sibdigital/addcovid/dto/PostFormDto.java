@@ -83,6 +83,9 @@ public class PostFormDto {
 
     private AdditionalAttributes additionalAttributes;
 
+    private int[] organizationFileIds;
+    private List<DocRequestPrescriptionDto> docRequestPrescriptions;
+
 //    public String getOrganizationInn(){
 //        return this.organizationInn.trim();
 //    }

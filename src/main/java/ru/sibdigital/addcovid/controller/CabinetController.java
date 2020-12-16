@@ -195,6 +195,11 @@ public class CabinetController {
         }
     }
 
+    @GetMapping("/type_request_prescriptions")
+    public @ResponseBody List<ClsPrescription> getTypeRequestPrescriptions(@RequestParam Long idTypeRequest) {
+        return requestService.getClsPrescriptionsByTypeRequestId(idTypeRequest);
+    }
+
     @PostMapping("/cabinet/typed_form")
     public @ResponseBody String postTypedForm(@RequestParam("request_type") Integer idTypeRequest,
                                               @RequestBody PostFormDto postFormDto) {
@@ -519,9 +524,9 @@ public class CabinetController {
     private String validateNewRequest(PostFormDto postFormDto) {
         String errors = "";
         try {
-            if (postFormDto.getIsAgree() == false) {
-                errors += "Необходимо подтвердить согласие работников на обработку персональных данных\n";
-            }
+//            if (postFormDto.getIsAgree() == false) {
+//                errors += "Необходимо подтвердить согласие работников на обработку персональных данных\n";
+//            }
 //            if (postFormDto.getIsProtect() == false) {
 //                errors += "Необходимо подтвердить обязательное выполнение предписания Управления Роспотребнадзора по Республике Бурятия\n";
 //            }
