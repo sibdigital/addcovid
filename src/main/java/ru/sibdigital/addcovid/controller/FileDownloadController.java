@@ -48,10 +48,6 @@ public class FileDownloadController {
     @Autowired
     ClsOrganizationRepo clsOrganizationRepo;
 
-    final String EMPLOYEE_FILENAME = "Employees.xlsx";
-
-    private static final int BUFFER_SIZE = 4096;
-
     @RequestMapping("/download_employees")
     public void downloadEmployees(HttpSession session, HttpServletResponse response) {
         Long id = (Long) session.getAttribute("id_organization");

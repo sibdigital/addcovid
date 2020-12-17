@@ -2,7 +2,10 @@ package ru.sibdigital.addcovid.parser;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
@@ -34,6 +37,8 @@ public class ExcelWriter {
         XSSFSheet sheet = workbook.createSheet(SHEET_NAMES[SHEET_PEOPLE_INDEX]);
 
         Row firstRow = sheet.createRow(0);
+        firstRow.setRowStyle(getFirstRowStyle(workbook));
+
         for (int i = 0; i < EMPLOYEES_COLUMN_NAMES.length; i++) {
             Cell cell = firstRow.createCell(i);
             cell.setCellValue(EMPLOYEES_COLUMN_NAMES[i]);
@@ -43,6 +48,8 @@ public class ExcelWriter {
         for (DocEmployee employee : employees) {
             createEmployeeRow(sheet, employee, rowCount++);
         }
+
+        sheet.setDefaultColumnWidth(20);
 
         try {
             workbook.write(response.getOutputStream());
@@ -63,5 +70,17 @@ public class ExcelWriter {
         cellFirstName.setCellValue(employee.getPerson().getFirstname());
         cellLastName.setCellValue(employee.getPerson().getLastname());
         cellPatronymic.setCellValue(employee.getPerson().getPatronymic());
+    }
+
+    private XSSFCellStyle getFirstRowStyle(XSSFWorkbook workbook ) {
+        XSSFCellStyle style = workbook.createCellStyle();
+
+        XSSFFont boldFont = workbook.createFont();
+        boldFont.setBold(true);
+
+        style.setFont(boldFont);
+        style.setAlignment(HorizontalAlignment.CENTER);
+
+        return style;
     }
 }
