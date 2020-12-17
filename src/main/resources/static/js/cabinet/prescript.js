@@ -13,7 +13,7 @@ const prescript = {
                 resizeColumn: true,
                 datafetch: 25,
                 columns: [
-                    {header: "Тип заявки", template: "#typeRequestName#", fillspace: true},
+                    {header: "Вид деятельности", template: "#typeRequestName#", fillspace: true},
                     {id: 'time_Publication', header: "Дата публикации", adjust: true, format: dateFormat},
                     {
                         id: 'accepted',
@@ -186,7 +186,7 @@ const organizationPrescriptionForm = {
                         id: 'name',
                         autoheight: true,
                         // align: 'center',
-                        label: 'Тип заявки',
+                        label: 'Вид деятельности',
                         labelPosition: 'top',
                         readonly: true
                     },
