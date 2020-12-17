@@ -496,8 +496,10 @@ public class RequestService {
             log.error(e.getMessage(), e);
         }
 
+        String name = organizationDto.getOrganizationName() != null && !organizationDto.getOrganizationName().isEmpty()
+                ? organizationDto.getOrganizationName() : organizationDto.getOrganizationShortName();
         ClsOrganization clsOrganization = ClsOrganization.builder()
-                .name(organizationDto.getOrganizationName())
+                .name(name)
                 .shortName(organizationDto.getOrganizationShortName())
                 .inn(organizationDto.getOrganizationInn())
                 .ogrn(organizationDto.getOrganizationOgrn())

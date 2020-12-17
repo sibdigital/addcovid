@@ -63,8 +63,11 @@ public class RegistrationController {
             // отправим письмо со ссылкой на активацию
             String activateUrl = settingService.findActualByKey("activationUrl", "");
             activateUrl += "/activate?inn=" + clsOrganization.getInn() + "&code=" + clsOrganization.getHashCode();
-            String text = "Для активации учетной записи пройдите по ссылке <a href=\"" + activateUrl + "\">Активация учетной записи</a>";
-            boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(), applicationConstants.getApplicationName(), text);
+            String text = "Здравствуйте! <br/>" +
+                    "Для активации учетной записи " + clsOrganization.getName()+ " в личном кабинете на портале Работающая Бурятия перейдите по ссылке: <a href=\"" + activateUrl + "\">Активация учетной записи</a><br/>" +
+                    "Если вы не регистрировали личный кабинет на портале Работающая Бурятия, проигнорируйте это сообщение";
+            boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(),
+                    "Регистрация на портале " + applicationConstants.getApplicationName(), text);
             if (!emailSent) {
                 return "Не удалось отправить письмо";
             }
