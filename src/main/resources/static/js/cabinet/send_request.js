@@ -297,6 +297,16 @@ const requestWizard = {
                                             {},
                                             {
                                                 view: 'button',
+                                                id: 'firstBackButton',
+                                                css: 'webix_primary',
+                                                maxWidth: 301,
+                                                value: 'Назад',
+                                                click: function () {
+                                                    showTypeRequestsPage();
+                                                }
+                                            },
+                                            {
+                                                view: 'button',
                                                 css: 'webix_primary',
                                                 maxWidth: 301,
                                                 value: 'Продолжить',
@@ -383,7 +393,7 @@ const requestWizard = {
                                                 id: 'activityKind',
                                                 autoheight: true,
                                                 // align: 'center',
-                                                label: 'Тип заявки',
+                                                label: 'Вид деятельности',
                                                 labelPosition: 'top',
                                                 name: 'activityKind',
                                                 readonly: true
@@ -458,7 +468,6 @@ const requestWizard = {
                                                         view: 'button',
                                                         css: 'webix_primary',
                                                         value: 'Отменить',
-                                                        minWidth: 150,
                                                         align: 'center',
                                                         click: function () {
                                                             $$('menu').callEvent('onMenuItemClick', ['Requests']);
@@ -610,6 +619,8 @@ function showRequestWizard(data) {
             requestWizard
         ]
     }, $$('content'));
+
+    $$('firstBackButton').hide();
 
     $$('requestId').setValue(data.id);
     $$('reqBasis').setValue(data.reqBasis);

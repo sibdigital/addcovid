@@ -20,10 +20,22 @@ const requests = {
                         columns: [
                             {
                                 id: "typeRequest",
-                                header: "Тип заявки",
+                                header: "Вид деятельности",
                                 template: "#typeRequest.activityKind#",
                                 minWidth: 350,
                                 fillspace: true
+                            },
+                            {
+                                id: "statusReviewName",
+                                header: "Статус",
+                                adjust: true,
+                                width: 300
+                            },
+                            {
+                                id: "department",
+                                header: "Рассматривает",
+                                template: "#department.name#",
+                                adjust: true,
                             },
                             {
                                 id: "time_Create",
@@ -32,15 +44,20 @@ const requests = {
                                 format: dateFormat,
                             },
                             {
-                                id: "statusReviewName",
-                                header: "Статус",
+                                id: "time_Review",
+                                header: "Дата рассмотрения",
                                 adjust: true,
-                                width: 300
+                                format: dateFormat,
                             },
                         ],
                         scheme: {
                             $init: function (obj) {
-                                obj.time_Create = obj.timeCreate.replace("T", " ") //dateUtil.toDateFormat(obj.timeCreate);
+                                obj.time_Create = obj.timeCreate.replace("T", " ");
+                                if (obj.statusReview == 1 || obj.statusReview == 2) {
+                                    if (obj.timeReview) {
+                                        obj.time_Review = obj.timeReview.replace("T", " ");
+                                    }
+                                }
                                 let requestStatus = obj.statusReviewName;
                                 if(requestStatus == "На рассмотрении"){
                                     obj.$css = 'oncheck';
@@ -106,51 +123,7 @@ const requests = {
                                 css: 'webix_primary',
                                 value: 'Подать заявку',
                                 click: function () {
-
-                                    webix.ajax('/cls_type_requests').then(function (data) {
-                                        let typeRequests = data.json();
-
-                                        // let vtxt = '<br/>' + `<a href="/upload">Общие основания (более 100 сотрудников)</a><br/><br/>`;
-                                        let vtxt = '<br/>';
-
-                                        if (typeRequests.length > 0) {
-                                            for (let j = 0; j < typeRequests.length; j++) {
-                                                if (typeRequests[j].id == 100) {
-                                                    continue;
-                                                }
-                                                if (typeRequests[j].statusRegistration == 1 && typeRequests[j].statusVisible == 1) {
-                                                    let labl = typeRequests[j].activityKind;//.replace(new RegExp(' ', 'g'), '&nbsp');
-                                                    let vdid = typeRequests[j].id;
-                                                    let reqv = 'typed_form?request_type=' + vdid;
-                                                    vtxt += `<a href="#${reqv}" onclick="showRequestCreateForm(${vdid})">` + labl + '</a><br/><br/>';
-                                                }
-                                            }
-                                        } else {
-                                            vtxt += 'Отсутствуют типы заявок.</br></br>';
-                                        }
-
-                                        const v = {
-                                            id: 'content',
-                                            rows: [
-                                                {
-                                                    view: 'scrollview',
-                                                    scroll: 'xy',
-                                                    body: {
-                                                        type: 'space',
-                                                        rows: [
-                                                            {
-                                                                view: 'template',
-                                                                template: vtxt,
-                                                                // width: 200,
-                                                                autoheight: true,
-                                                            }
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        };
-                                        webix.ui(v, $$('content'));
-                                    });
+                                    showTypeRequestsPage();
                                 }
                             }
                         ]
@@ -403,6 +376,59 @@ function showRequestViewForm(data) {
     if (data.statusReview === 1 || data.statusReview === 2) {
         $$('reject_comment').show();
     }
+}
+
+function showTypeRequestsPage() {
+    webix.ajax('/cls_type_requests').then(function (data) {
+        let typeRequests = data.json();
+
+        // let vtxt = '<br/>' + `<a href="/upload">Общие основания (более 100 сотрудников)</a><br/><br/>`;
+        let vtxt = '<br/>';
+
+        if (typeRequests.length > 0) {
+            for (let j = 0; j < typeRequests.length; j++) {
+                if (typeRequests[j].id == 100) {
+                    continue;
+                }
+                if (typeRequests[j].statusRegistration == 1 && typeRequests[j].statusVisible == 1) {
+                    let labl = typeRequests[j].activityKind;//.replace(new RegExp(' ', 'g'), '&nbsp');
+                    let vdid = typeRequests[j].id;
+                    let reqv = 'typed_form?request_type=' + vdid;
+                    vtxt += `<a href="#${reqv}" onclick="showRequestCreateForm(${vdid})">` + labl + '</a><br/><br/>';
+                }
+            }
+        } else {
+            vtxt += 'Отсутствуют доступные виды деятельности.</br></br>';
+        }
+
+        const v = {
+            id: 'content',
+            type: 'space',
+            rows: [
+                {
+                    view: 'scrollview',
+                    scroll: 'xy',
+                    body: {
+                        rows: [
+                            {
+                                view: 'template',
+                                template: '<p><h3 style="text-align: center; color: #000000">Выберите вид деятельности, по которому хотите подать заявку</h3></p>',
+                                autoheight: true,
+                                align: 'center'
+                            },
+                            {
+                                view: 'template',
+                                template: vtxt,
+                                // width: 200,
+                                autoheight: true,
+                            }
+                        ]
+                    }
+                }
+            ]
+        };
+        webix.ui(v, $$('content'));
+    });
 }
 
 function adaptiveRequests(){
