@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:utext="${application_name}"></title>
     <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.min.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/cabinet/cabinet.css}">
     <script th:src="@{/libs/webix.min.js}"></script>
     <style>
         body {margin: 0}
@@ -18,51 +19,86 @@
 <script th:inline="javascript">
     const APPLICATION_NAME = [[${application_name}]]
     const MESSAGE = [[${message}]]
+    const INN = [[${inn}]]
 
     webix.i18n.setLocale("ru-RU");
 
     webix.ui({
-        container: 'app',
-        height: document.body.clientHeight,
-        maxWidth: 360,
-        css: {margin: 'auto', marginTop: 'auto'},
-        rows: [
+        type:"form",
+        id: "mainForm",
+        css: {
+            "background":"#ccd7e6 !important" //#323B55"#ccd7e6
+        },
+        rows:[
             {
-                view: 'toolbar',
-                autoheight: true,
-                id: 't1',
-                rows: [
-                    {
-                        responsive: 't1',
-                        css: 'webix_dark',
-                        cols: [
-                            {
-                                view: 'label',
-                                align: 'center',
-                                label: `<span style="font-size: 1.3rem">Активация учетной записи</span>`,
-                            },
-                        ]
-                    }
-                ]
+                gravity: 0.9,
             },
             {
-                id: 'form',
-                view: 'form',
-                complexData: true,
-                elements: [
-                    {
-                        view: 'label',
-                        label: MESSAGE
-                    },
-                    {
-                        view: 'button',
-                        css: 'webix_primary',
-                        value: 'Отмена',
-                        click: () => { window.location.href = '/login' }
-                    },
-                ]
-            }
+                view: "align",
+                align: "middle,center",
+                body: {
+                    cols: [
+                         {
+                                id: "leftLayout",
+                                margin:0,
+                                padding:{
+                                    top:55, bottom:25
+                                },
+                                width: 350,
+                                css: {
+                                    "background":"#475466 !important" //#2b334a
+                                },
+                                rows: [
+                                    {
+                                        view: "label",
+                                        height: 200,
+                                        id: "logo",
+                                        align: "center",
+                                        template: "<img src = \"logo.png\">"
+                                    },
+                                    { view:"label", label:`<span style="font-size: 1.5rem; color: #ccd7e6">Добро пожаловать!</span>`,height:50, align:"center" },
+                                    { view:"label", label:`<span style="font-size: 1rem; color: #fff6f6">Информационная система</span>`,  height:50, align:"center" },
+                                    { view:"label", label:`<span style="font-size: 1rem; color: #fff6f6">Работающая Бурятия</span>`,height:50, align:"center"},
+                                    { view:"label", label:`<span style="font-size: 0.8rem; color: #fff6f6">©2020</span>`,height:50, align:"center" },
+                                ]
+
+                         },
+                        {
+                            id: 'form',
+                            view: 'form',
+                            width: 350,
+                            complexData: true,
+                            elements: [
+                                {},
+                                {
+                                    rows:[
+                                        {
+                                            view: 'label',
+                                            height: 30,
+                                            label: 'ИНН: ' + INN,
+                                        },
+                                        {
+                                            view: 'label',
+                                            height: 30,
+                                            label: MESSAGE
+                                        },
+                                    ]
+                                },
+                                {
+                                    view: 'button',
+                                    css: 'myClass',
+                                    value: 'Вход',
+                                    click: () => { window.location.href = '/login' }
+                                },
+                                {}
+                            ]
+                        }
+                    ]
+                }
+            },
+            {}
         ]
+
     })
 </script>
 </body>

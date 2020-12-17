@@ -3,12 +3,12 @@ let descrStep1 = '<span style=" height: auto; font-size: 0.8rem; color: #fff6f6"
     'Для регистрации необходимо, чтобы Ваша организация или ИП были зарегистрированы в ЕГРЮЛ или ЕГРИП.' +
     'Если вы открылись недавно, проверка может показать отсутствие сведений.' +
     'В таком случае рекомендуется начать регистрацию повторно через несколько рабочих дней.' +
-    'Если вы являетесь самозанятым, то вам необходимо будет самостоятельно заполнить данные о себе</span>'
+    'Если вы являетесь самозанятым, то вам необходимо будет самостоятельно заполнить данные о себе</span>';
 
 let descrStep2 = '<span style="font-size: 0.8rem; color: #fff6f6">' +
     'Вам необходимо ввести Адрес электронной почты Вашей организации и пароль. ' +
     'После регистрации, на указанный адрес электронной почты, будет отправлено письмо' +
-    'со ссылкой на активацию учётной записи.</span>'
+    'со ссылкой на активацию учётной записи.</span>';
 
 let regLayout = webix.ui({
     height: windowHeight,
@@ -100,6 +100,31 @@ let regLayout = webix.ui({
                                         },
                                         "passwordConfirm":function (value){
                                             return value === $$("password").getValue()
+                                        },
+                                        "organizationEmail":(value) => {
+                                            if (value.length > 100) {
+                                                $$("organizationEmail").config.invalidMessage = 'Превышена длина электронной почты'
+                                                //webix.message('Превышена длина электронной почты', 'error');
+                                                return false;
+                                            } else {
+                                                let bad_val = value.indexOf("*") > -1
+                                                    || value.indexOf("+") > -1
+                                                    || value.indexOf('"') > -1;
+                                                if (bad_val == true) {
+                                                    $$("organizationEmail").config.invalidMessage = 'Адрес содержит недопустимые символы'
+                                                    //webix.message('Недопустимые символы в адресе электронной почты', 'error');
+                                                    return false;
+                                                }
+                                            }
+                                            return true
+                                        },
+                                        "organizationPhone":(value) => {
+                                            if (value.length > 100) {
+                                                $$("organizationEmail").config.invalidMessage = "Превышена длина номера телефона"
+                                                //webix.message('Превышена длина номера телефона', 'error');
+                                                return false;
+                                            }
+                                            return true
                                         }
                                     },
                                     elements: [
@@ -114,6 +139,12 @@ let regLayout = webix.ui({
                                                 {
                                                     rows: [
                                                         {
+                                                            view: 'label',
+                                                            height: 19,
+                                                            id: 'invalidMessages',
+                                                            template:"<span style='padding: 2px;text-align: center; font-size: 0.8rem; color: red'></span>"
+                                                        },
+                                                        {
                                                             view: 'text',
                                                             name: 'searchInn',
                                                             id: 'searchInn',
@@ -122,7 +153,6 @@ let regLayout = webix.ui({
                                                             label: 'Введите ИНН вашей организации',
                                                             placeholder: 'ИНН',
                                                         },
-                                                        {height: 10},
                                                         {
                                                             cols: [
                                                                 {
@@ -146,13 +176,13 @@ let regLayout = webix.ui({
                                                                             const inn = $$('searchInn').getValue();
                                                                             if (inn === '') {
                                                                                 $$('searchInn').focus();
-                                                                                webix.message('ИНН не введен', 'error');
+                                                                                $$("invalidMessages").setValue("ИНН не введен");
                                                                                 $$('searchInn').hideProgress();
                                                                                 $$('egrul_load_button').enable();
                                                                                 return;
                                                                             } else if (isNaN(inn)) {
                                                                                 $$('searchInn').focus();
-                                                                                webix.message('ИНН не соответствует формату', 'error');
+                                                                                $$("invalidMessages").setValue("ИНН не соответствует формату");
                                                                                 $$('searchInn').hideProgress();
                                                                                 $$('egrul_load_button').enable();
                                                                                 return;
@@ -166,7 +196,7 @@ let regLayout = webix.ui({
                                                                             }
                                                                             if (type === '') {
                                                                                 $$('searchInn').focus();
-                                                                                webix.message('ИНН не соответствует формату', 'error');
+                                                                                $$("invalidMessages").setValue("ИНН не соответствует формату");
                                                                                 $$('searchInn').hideProgress();
                                                                                 $$('egrul_load_button').enable();
                                                                                 return;
@@ -174,8 +204,21 @@ let regLayout = webix.ui({
 
                                                                             webix.ajax().get('checkInn?inn=' + inn).then(function (data) {
                                                                                 const result = data.text();
-                                                                                if (result !== 'ИНН не зарегистрирован') {
-                                                                                    webix.message(result, 'error');
+                                                                                if (result == "Данный ИНН уже зарегистрирован в системе"){
+                                                                                    var message = 'Ранее вы уже подавали заявки на портале Работающая Бурятия. ' +
+                                                                                        'В настоящее время ведется перенос истории ваших заявок в личный кабинет. ' +
+                                                                                        'Доступ к личному кабинету будет предоставлен в ближайшее время.' +
+                                                                                        'Сейчас вы можете актуализировать заявку по адресу http://rabota.govrb.ru/actualize_form';
+                                                                                    webix.alert({
+                                                                                        title: "ВНИМАНИЕ!",
+                                                                                        ok: "Актуализировать",
+                                                                                        text: message
+                                                                                    }).then(function () {
+                                                                                        window.location.replace('http://rabota.govrb.ru/actualize_form');
+                                                                                    });;
+                                                                                } else if (result !== 'ИНН не зарегистрирован') {
+                                                                                    $$("invalidMessages").setValue(result);
+                                                                                    //webix.message(result, 'error');
                                                                                     $$('searchInn').hideProgress();
                                                                                     $$('egrul_load_button').enable();
                                                                                 } else {
@@ -194,6 +237,12 @@ let regLayout = webix.ui({
                                                     rows: [
                                                         {
                                                             rows: [
+                                                                {
+                                                                    view: 'label',
+                                                                    height: 19,
+                                                                    id: 'invalidMessagesStep2',
+                                                                    template:"<span style='padding: 2px;text-align: center; font-size: 0.8rem; color: red'></span>"
+                                                                },
                                                                 {
                                                                     view: 'text',
                                                                     id: 'organizationInn',
@@ -280,7 +329,7 @@ let regLayout = webix.ui({
                                                                     required: true,
                                                                     attributes: {autocomplete: 'new-password'},
                                                                     invalidMessage: "Пароли не совпадают"
-                                                                },
+                                                                }
                                                             ]
                                                         },
                                                         {
@@ -301,75 +350,55 @@ let regLayout = webix.ui({
                                                                     click: function () {
                                                                         $$('send_btn').disable();
 
+                                                                        $$("invalidMessagesStep2").config.height = 19;
+                                                                        $$("invalidMessagesStep2").resize()
+
                                                                         if ($$('form').validate()) {
 
                                                                             let params = $$('form').getValues();
                                                                             params.organizationInn = params.organizationInn.trim();
                                                                             params.organizationOgrn = params.organizationOgrn.trim();
 
-                                                                            if (params.organizationEmail.length > 100) {
-                                                                                webix.message('Превышена длина электронной почты', 'error');
-                                                                                return false;
-                                                                            } else {
-                                                                                let bad_val = params.organizationEmail.indexOf("*") > -1
-                                                                                    || params.organizationEmail.indexOf("+") > -1
-                                                                                    || params.organizationEmail.indexOf('"') > -1;
-                                                                                if (bad_val == true) {
-                                                                                    webix.message('Недопустимые символы в адресе электронной почты', 'error');
-                                                                                    return false;
-                                                                                }
-                                                                            }
-
-                                                                            if (params.organizationPhone.length > 100) {
-                                                                                webix.message('Превышена длина номера телефона', 'error');
-                                                                                return false;
-                                                                            }
-
                                                                             webix.ajax()
                                                                                 .headers({'Content-type': 'application/json'})
                                                                                 .post('/registration', JSON.stringify(params)
                                                                                 ).then(function (data) {
                                                                                 const text = data.text();
+                                                                                webix.message(text)
                                                                                 if (text === 'Ок') {
                                                                                     next(2, $$('organizationEmail').getValue());
                                                                                 } else if (text === 'Не удалось отправить письмо') {
-                                                                                    webix.message('Не удалось отправить ссылку для активации на указанный адрес электронной почты', 'error');
+                                                                                    $$("invalidMessagesStep2").config.height = 35;
+                                                                                    $$("invalidMessagesStep2").resize()
+                                                                                    $$("invalidMessagesStep2").setValue('Не удалось отправить ссылку для активации на указанный адрес электронной почты')
+                                                                                    //webix.message('Не удалось отправить ссылку для активации на указанный адрес электронной почты', 'error');
                                                                                 } else {
-                                                                                    webix.message(text, 'error')
+                                                                                    $$("invalidMessagesStep2").setValue(text)
+                                                                                    //webix.message(text, 'error')
                                                                                 }
                                                                                 $$('send_btn').enable();
                                                                             })
                                                                         } else {
-                                                                            webix.message('Не заполнены обязательные поля', 'error')
+                                                                            $$("invalidMessagesStep2").setValue('Не заполнены обязательные поля');
+                                                                            //webix.message('Не заполнены обязательные поля', 'error')
                                                                             $$('send_btn').enable();
                                                                         }
                                                                     }
                                                                 }
                                                             ]
+                                                        },
+                                                        {
+                                                            height: 19
                                                         }
                                                     ]
                                                 },
                                                 {
-                                                    rows:[
-                                                        {
-                                                            view: 'text',
-                                                            id: 'orgEmailAddress',
-                                                            name: 'orgEmailAddress',
-                                                            minWidth: 250,
-                                                            label: 'Ваш адрес электронной почты',
-                                                            labelPosition: 'top',
-                                                            readonly: true,
-                                                        },
-                                                        {
-                                                            view: 'button',
-                                                            css: 'myClass',
-                                                            value: 'Авторизоваться',
-                                                            gravity: 0.5,
-                                                            click: () => {
-                                                                window.location.href = "/login"
-                                                            }
-                                                        }
-                                                    ]
+                                                    view: 'template',
+                                                    id: 'descriptionStep3',
+                                                    borderless: true,
+                                                    autoheight: true,
+                                                    template: descrStep1,
+
                                                 }
                                             ]
                                         },
@@ -390,11 +419,12 @@ let regLayout = webix.ui({
 function loadData(type, inn) {
     webix.ajax('/' + type + '?inn=' + inn).then(function (data) {
         const response = data.json();
-        if (!response.data && response.possiblySelfEmployed == false) {
-            webix.message('Введеный ИНН не найден в ЕГРИП и ЕГРЮЛ. Проверьте введенные данные. Возможно, вы ввели неправильный ИНН.', 'error');
-            $$('searchInn').hideProgress();
-        } else {
-            if (type === 'egrul') {
+        var doNext = false;
+        if (type === 'egrul') {
+            if (response.finded == false){
+                $$("invalidMessages").setValue('Введеный ИНН не найден в ЕГРЮЛ. \nВозможно, вы ввели неправильный ИНН.');
+                $$('searchInn').hideProgress();
+            } else {
                 const result = response.data;
                 $$('form').setValues({
                     organizationType: '1',
@@ -404,38 +434,43 @@ function loadData(type, inn) {
                     organizationInn: result.inn,
                     organizationOgrn: result.ogrn,
                     organizationEmail: result.email
-                })
-            } else {
-                const result = response.data;
-                if (response.possiblySelfEmployed == false){
-                    $$('organizationShortName').config.label = 'ФИО ИП';
-                    $$('form').setValues({
-                        organizationType: '2',
-                        searchInn: inn,
-                        organizationName: result.name,
-                        organizationShortName: result.name,
-                        organizationInn: result.inn,
-                        organizationEmail: result.email
-                    })
-                }else{
-                    $$('organizationShortName').config.label = 'ФИО cамозанятого';
-                    $$('organizationShortName').config.readonly = false;
-                    $$('form').setValues({
-                        organizationType: '3',
-                        searchInn: inn,
-                        isSelfEmployed: true,
-                        organizationInn: inn
-                    })
-
-                }
-
+                });
+                doNext = true;
             }
-
+        } else {
+            if (response.finded == true){
+                const result = response.data;
+                $$('organizationShortName').config.label = 'ФИО ИП';
+                $$('form').setValues({
+                    organizationType: '2',
+                    searchInn: inn,
+                    organizationName: result.name,
+                    organizationShortName: result.name,
+                    organizationInn: result.inn,
+                    organizationEmail: result.email
+                });
+                doNext = true;
+            }else if (response.possiblySelfEmployed == true){
+                $$('organizationShortName').config.label = 'ФИО cамозанятого';
+                $$('organizationShortName').config.readonly = false;
+                $$('form').setValues({
+                    organizationType: '3',
+                    searchInn: inn,
+                    isSelfEmployed: true,
+                    organizationInn: inn
+                });
+                doNext = true;
+            } else{
+                $$("invalidMessages").setValue('Введеный ИНН не найден в ЕГРИП. \nВозможно, вы ввели неправильный ИНН.');
+                $$('searchInn').hideProgress();
+            }
+        }
+        if (doNext){
             $$('searchInn').hideProgress();
             next(1);
         }
     }).catch(function () {
-        webix.message('Не удалось получить данные', 'error');
+        $$("invalidMessages").setValue('Не удалось получить данные', 'error');
         $$('searchInn').hideProgress();
     });
 }
@@ -468,10 +503,11 @@ function next(page, mail) {
             $$("appNameReg").config.height =  50; $$("appNameReg").resize();
         }
         $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 3</span>`)
-        $$("description").setHTML('<span style="font-size: 0.8rem; color: #fff6f6">Необходимо активировать учетную запись. На Ваш почтовый ящик \"' + mail + '\" было оправлено письмо с подтверждением</span>')
-        $$("orgEmailAddress").setValue(mail)
+        $$("descriptionStep3").setHTML('<span style="font-size: 1rem;text-align: center">Необходимо активировать учетную запись. На Ваш почтовый ящик \"' + mail + '\" было оправлено письмо с подтверждением</span>')
+        $$("description").hide()
     }
     $$("wizard").getChildViews()[page].show();
+
 }
 
 webix.ready(function() {

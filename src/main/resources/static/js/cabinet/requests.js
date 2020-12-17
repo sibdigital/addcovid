@@ -272,10 +272,6 @@ function showRequestViewForm(data) {
 
     const typeRequest = data.typeRequest;
 
-    // if (typeRequest.regTypeRequestRestrictionTypes && typeRequest.regTypeRequestRestrictionTypes.length > 0) {
-    //     $$('restrictionType').setValue(typeRequest.regTypeRequestRestrictionTypes[0].regTypeRequestRestrictionTypeId.clsRestrictionType.name);
-    // }
-
     if (data.attachmentPath) {
         let paths = data.attachmentPath.split(',')
 
@@ -298,7 +294,6 @@ function showRequestViewForm(data) {
             $$('filename').hide()
         }
     } else if (data.docRequestFiles && data.docRequestFiles.length > 0) {
-        console.log(data.docRequestFiles)
         let fileList = []
         data.docRequestFiles.forEach((drf, index) => {
             const file = drf.organizationFile;
@@ -306,7 +301,6 @@ function showRequestViewForm(data) {
                 + file.originalFileName + '</a>'
             fileList.push({id: index, value: filename})
         })
-        console.log(fileList)
         if (fileList.length > 0) {
             $$('filename').parse(fileList)
         } else {
@@ -323,9 +317,9 @@ function showRequestViewForm(data) {
                 id: 'prescription' + prescription.id,
                 rows: [
                     {
-                        view: 'template',
-                        type: 'section',
-                        template: prescription.name
+                        view: 'label',
+                        label: prescription.name,
+                        align: 'center'
                     },
                     {
                         id: 'prescriptionTexts' + prescription.id,
@@ -335,7 +329,7 @@ function showRequestViewForm(data) {
             })
 
             if (prescription.prescriptionTexts && prescription.prescriptionTexts.length > 0) {
-                prescription.prescriptionTexts.forEach(pt => {
+                prescription.prescriptionTexts.forEach((pt, ptIndex) => {
                     const files = [];
                     if (pt.prescriptionTextFiles && pt.prescriptionTextFiles.length > 0) {
                         pt.prescriptionTextFiles.forEach((file) => {
@@ -347,15 +341,19 @@ function showRequestViewForm(data) {
 
                     let consentPrescriptionChecked = false;
                     if (drp.additionalAttributes && drp.additionalAttributes.consentPrescriptions) {
-                        consentPrescriptionChecked = drp.additionalAttributes.consentPrescriptions.find(c => c.id == pt.id).isAgree;
+                        const consentPrescription = drp.additionalAttributes.consentPrescriptions.find(c => c.id == pt.id);
+                        if (consentPrescription) {
+                            consentPrescriptionChecked = consentPrescription.isAgree;
+                        }
                     }
+
                     $$('prescriptionTexts' + prescription.id).addView({
                         rows: [
                             {
                                 cols: [
                                     {
                                         view: 'label',
-                                        label: 'Текст №' + (index + 1),
+                                        label: 'Текст №' + (ptIndex + 1),
                                         align: 'center'
                                     },
                                 ]
@@ -365,7 +363,7 @@ function showRequestViewForm(data) {
                                 height: 550,
                                 readonly: true,
                                 scroll: true,
-                                template: drp.content
+                                template: pt.content
                             },
                             {
                                 view: 'list',

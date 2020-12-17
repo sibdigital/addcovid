@@ -80,6 +80,7 @@ public class RegistrationController {
         String message = requestService.activateOrganization(inn, code);
         model.addAttribute("application_name", applicationConstants.getApplicationName());
         model.addAttribute("message", message);
+        model.addAttribute("inn", inn);
         return "activate";
     }
 

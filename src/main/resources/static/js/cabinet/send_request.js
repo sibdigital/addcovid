@@ -13,13 +13,11 @@ function showRequestCreateForm(idTypeRequest, page) {
     ID_TYPE_REQUEST = idTypeRequest;
 
     webix.ajax('cls_type_request/' + idTypeRequest).then(function (data) {
-
         webix.extend($$('newRequestForm'), webix.ProgressBar);
 
         const typeRequest = data.json();
 
         $$('typeRequestId').setValue(typeRequest.id);
-
         $$('activityKind').setValue(typeRequest.activityKind);
 
         if (typeRequest.department) {
@@ -45,14 +43,8 @@ function showRequestCreateForm(idTypeRequest, page) {
 
         return webix.ajax('type_request_prescriptions', {idTypeRequest: idTypeRequest});
     }).then(function (data) {
-
         const prescriptions = data.json();
-
         if (prescriptions && prescriptions.length > 0) {
-            // $$('prescriptions').addView({
-            //     view: 'label',
-            //     label: 'Ознакомтесь с предписаниями'
-            // })
 
             prescriptions.forEach((prescription, index) => {
                 if (prescription.prescriptionTexts && prescription.prescriptionTexts.length > 0) {
@@ -60,9 +52,9 @@ function showRequestCreateForm(idTypeRequest, page) {
                         id: 'prescription' + prescription.id,
                         rows: [
                             {
-                                view: 'template',
-                                type: 'section',
-                                template: prescription.name
+                                view: 'label',
+                                label: prescription.name,
+                                align: 'center'
                             },
                             {
                                 view: 'text',
@@ -242,7 +234,7 @@ const requestWizard = {
                                                                 id: 'upload',
                                                                 view: 'uploader',
                                                                 css: 'webix_secondary',
-                                                                value: 'Загрузить',
+                                                                value: 'Выбрать',
                                                                 autosend: false,
                                                                 upload: '/upload_files',
                                                                 required: true,
@@ -258,7 +250,7 @@ const requestWizard = {
                                                                 id: 'loadFileBtn',
                                                                 view: 'button',
                                                                 css: 'webix_primary',
-                                                                value: 'Импорт',
+                                                                value: 'Добавить',
                                                                 align: 'center',
                                                                 click: function () {
                                                                     $$('upload').send(function (response) {
@@ -458,6 +450,13 @@ const requestWizard = {
                                                     {
                                                         view: 'button',
                                                         css: 'webix_primary',
+                                                        maxWidth: 301,
+                                                        value: 'Назад',
+                                                        click: back
+                                                    },
+                                                    {
+                                                        view: 'button',
+                                                        css: 'webix_primary',
                                                         value: 'Отменить',
                                                         minWidth: 150,
                                                         align: 'center',
@@ -613,82 +612,21 @@ function showRequestWizard(data) {
     }, $$('content'));
 
     $$('requestId').setValue(data.id);
+    $$('reqBasis').setValue(data.reqBasis);
 
     webix.ajax('cls_type_request/' + data.typeRequest.id).then(function (data) {
+        webix.extend($$('newRequestForm'), webix.ProgressBar);
 
         const typeRequest = data.json();
 
+        $$('typeRequestId').setValue(typeRequest.id);
         $$('activityKind').setValue(typeRequest.activityKind);
 
-        if (typeRequest.regTypeRequestRestrictionTypes && typeRequest.regTypeRequestRestrictionTypes.length > 0) {
-            $$('restrictionType').setValue(typeRequest.regTypeRequestRestrictionTypes[0].regTypeRequestRestrictionTypeId.clsRestrictionType.name);
-        }
-
-        if (typeRequest.regTypeRequestPrescriptions && typeRequest.regTypeRequestPrescriptions.length > 0) {
-            typeRequest.regTypeRequestPrescriptions.forEach((prescription, index) => {
-                const files = [];
-                if (prescription.regTypeRequestPrescriptionFiles && prescription.regTypeRequestPrescriptionFiles.length > 0) {
-                    prescription.regTypeRequestPrescriptionFiles.forEach((file) => {
-                        const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
-                                + file.originalFileName + '</a>'
-                        files.push({id: file.id, value: filename})
-                    })
-                }
-                $$('prescriptions').addView({
-                    rows: [
-                        {
-                            view: 'text',
-                            id: 'prescription_id' + index,
-                            value: prescription.id,
-                            hidden: true
-                        },
-                        {
-                            cols: [
-                                {
-                                    view: 'label',
-                                    label: 'Предписание ' + (index + 1),
-                                    align: 'center'
-                                },
-                            ]
-                        },
-                        {
-                            view: 'template',
-                            height: 550,
-                            readonly: true,
-                            scroll: true,
-                            template: prescription.content
-                        },
-                        {
-                            view: 'list',
-                            autoheight: true,
-                            template: '#value#',
-                            data: files,
-                        },
-                        {
-                            view: 'template',
-                            borderless: true,
-                            css: 'personalTemplateStyle',
-                            template: 'Подтверждаю обязательное выполнение предписания <span style = "color: red">*</span>',
-                            autoheight: true
-                        },
-                        {
-                            view: 'checkbox',
-                            id: 'consentPrescription' + index,
-                            labelPosition: 'top',
-                            required: true,
-                            on: {
-                                onChange(newv, oldv) {
-                                    if (allChecked()) {
-                                        $$('send_btn').enable();
-                                    } else {
-                                        $$('send_btn').disable();
-                                    }
-                                }
-                            }
-                        },
-                    ]
-                });
-            })
+        if (typeRequest.department) {
+            const department = typeRequest.department;
+            departmentId = (department.id);
+            $$("departmentId").setValue(department.id);
+            $$("departmentId").disable();
         }
 
         if (typeRequest.settings) {
@@ -705,7 +643,103 @@ function showRequestWizard(data) {
             }
         }
 
-        webix.extend($$('newRequestForm'), webix.ProgressBar);
+        return webix.ajax('type_request_prescriptions', {idTypeRequest: typeRequest.id});
+    }).then(function (data) {
+        const prescriptions = data.json();
+        if (prescriptions && prescriptions.length > 0) {
+
+            prescriptions.forEach((prescription, index) => {
+                if (prescription.prescriptionTexts && prescription.prescriptionTexts.length > 0) {
+                    $$('prescriptions').addView({
+                        id: 'prescription' + prescription.id,
+                        rows: [
+                            {
+                                view: 'label',
+                                label: prescription.name,
+                                align: 'center'
+                            },
+                            {
+                                view: 'text',
+                                id: 'prescription_id' + index,
+                                value: prescription.id,
+                                hidden: true
+                            },
+                            {
+                                id: 'prescriptionTexts' + prescription.id,
+                                rows: []
+                            }
+                        ]
+                    });
+
+                    prescription.prescriptionTexts.forEach((pt, ptIndex) => {
+                        const files = [];
+
+                        if (pt.prescriptionTextFiles && pt.prescriptionTextFiles.length > 0) {
+                            pt.prescriptionTextFiles.forEach((file) => {
+                                const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
+                                    + file.originalFileName + '</a>'
+                                files.push({id: file.id, value: filename})
+                            })
+                        }
+
+                        $$('prescriptionTexts' + prescription.id).addView({
+                            rows: [
+                                {
+                                    view: 'text',
+                                    id: 'prescriptionText_id' + prescription.id + '_' + ptIndex,
+                                    value: pt.id,
+                                    hidden: true
+                                },
+                                {
+                                    cols: [
+                                        {
+                                            view: 'label',
+                                            label: 'Текст №' + (ptIndex + 1),
+                                            align: 'center'
+                                        },
+                                    ]
+                                },
+                                {
+                                    view: 'template',
+                                    height: 550,
+                                    readonly: true,
+                                    scroll: true,
+                                    template: pt.content
+                                },
+                                {
+                                    view: 'list',
+                                    autoheight: true,
+                                    template: '#value#',
+                                    data: files,
+                                },
+                                {
+                                    view: 'template',
+                                    borderless: true,
+                                    css: 'personalTemplateStyle',
+                                    template: 'Подтверждаю обязательное выполнение предписания <span style = "color: red">*</span>',
+                                    autoheight: true
+                                },
+                                {
+                                    view: 'checkbox',
+                                    id: 'consentPrescription' + prescription.id + '_' + ptIndex,
+                                    labelPosition: 'top',
+                                    required: true,
+                                    on: {
+                                        onChange(newv, oldv) {
+                                            if (allCheckedText()) {
+                                                $$('send_btn').enable();
+                                            } else {
+                                                $$('send_btn').disable();
+                                            }
+                                        }
+                                    }
+                                },
+                            ]
+                        });
+                    })
+                }
+            })
+        }
     });
 }
 
