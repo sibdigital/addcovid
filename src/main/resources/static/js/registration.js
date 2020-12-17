@@ -100,6 +100,31 @@ let regLayout = webix.ui({
                                         },
                                         "passwordConfirm":function (value){
                                             return value === $$("password").getValue()
+                                        },
+                                        "organizationEmail":(value) => {
+                                            if (value.length > 100) {
+                                                $$("organizationEmail").config.invalidMessage = 'Превышена длина электронной почты'
+                                                //webix.message('Превышена длина электронной почты', 'error');
+                                                return false;
+                                            } else {
+                                                let bad_val = value.indexOf("*") > -1
+                                                    || value.indexOf("+") > -1
+                                                    || value.indexOf('"') > -1;
+                                                if (bad_val == true) {
+                                                    $$("organizationEmail").config.invalidMessage = 'Адрес содержит недопустимые символы'
+                                                    //webix.message('Недопустимые символы в адресе электронной почты', 'error');
+                                                    return false;
+                                                }
+                                            }
+                                            return true
+                                        },
+                                        "organizationPhone":(value) => {
+                                            if (value.length > 100) {
+                                                $$("organizationEmail").config.invalidMessage = "Превышена длина номера телефона"
+                                                //webix.message('Превышена длина номера телефона', 'error');
+                                                return false;
+                                            }
+                                            return true
                                         }
                                     },
                                     elements: [
@@ -122,7 +147,12 @@ let regLayout = webix.ui({
                                                             label: 'Введите ИНН вашей организации',
                                                             placeholder: 'ИНН',
                                                         },
-                                                        {height: 10},
+                                                        {
+                                                            view: 'label',
+                                                            height: 19,
+                                                            id: 'invalidMessages',
+                                                            template:"<span style='padding: 2px;text-align: center; font-size: 0.8rem; color: red'></span>"
+                                                        },
                                                         {
                                                             cols: [
                                                                 {
@@ -146,13 +176,13 @@ let regLayout = webix.ui({
                                                                             const inn = $$('searchInn').getValue();
                                                                             if (inn === '') {
                                                                                 $$('searchInn').focus();
-                                                                                webix.message('ИНН не введен', 'error');
+                                                                                $$("invalidMessages").setValue("ИНН не введен");
                                                                                 $$('searchInn').hideProgress();
                                                                                 $$('egrul_load_button').enable();
                                                                                 return;
                                                                             } else if (isNaN(inn)) {
                                                                                 $$('searchInn').focus();
-                                                                                webix.message('ИНН не соответствует формату', 'error');
+                                                                                $$("invalidMessages").setValue("ИНН не соответствует формату");
                                                                                 $$('searchInn').hideProgress();
                                                                                 $$('egrul_load_button').enable();
                                                                                 return;
@@ -166,7 +196,7 @@ let regLayout = webix.ui({
                                                                             }
                                                                             if (type === '') {
                                                                                 $$('searchInn').focus();
-                                                                                webix.message('ИНН не соответствует формату', 'error');
+                                                                                $$("invalidMessages").setValue("ИНН не соответствует формату");
                                                                                 $$('searchInn').hideProgress();
                                                                                 $$('egrul_load_button').enable();
                                                                                 return;
@@ -187,7 +217,8 @@ let regLayout = webix.ui({
                                                                                         window.location.replace('http://rabota.govrb.ru/actualize_form');
                                                                                     });;
                                                                                 } else if (result !== 'ИНН не зарегистрирован') {
-                                                                                    webix.message(result, 'error');
+                                                                                    $$("invalidMessages").setValue(result);
+                                                                                    //webix.message(result, 'error');
                                                                                     $$('searchInn').hideProgress();
                                                                                     $$('egrul_load_button').enable();
                                                                                 } else {
@@ -206,6 +237,12 @@ let regLayout = webix.ui({
                                                     rows: [
                                                         {
                                                             rows: [
+                                                                {
+                                                                    view: 'label',
+                                                                    height: 19,
+                                                                    id: 'invalidMessagesStep2',
+                                                                    template:"<span style='padding: 2px;text-align: center; font-size: 0.8rem; color: red'></span>"
+                                                                },
                                                                 {
                                                                     view: 'text',
                                                                     id: 'organizationInn',
@@ -292,7 +329,7 @@ let regLayout = webix.ui({
                                                                     required: true,
                                                                     attributes: {autocomplete: 'new-password'},
                                                                     invalidMessage: "Пароли не совпадают"
-                                                                },
+                                                                }
                                                             ]
                                                         },
                                                         {
@@ -313,75 +350,55 @@ let regLayout = webix.ui({
                                                                     click: function () {
                                                                         $$('send_btn').disable();
 
+                                                                        $$("invalidMessagesStep2").config.height = 19;
+                                                                        $$("invalidMessagesStep2").resize()
+
                                                                         if ($$('form').validate()) {
 
                                                                             let params = $$('form').getValues();
                                                                             params.organizationInn = params.organizationInn.trim();
                                                                             params.organizationOgrn = params.organizationOgrn.trim();
 
-                                                                            if (params.organizationEmail.length > 100) {
-                                                                                webix.message('Превышена длина электронной почты', 'error');
-                                                                                return false;
-                                                                            } else {
-                                                                                let bad_val = params.organizationEmail.indexOf("*") > -1
-                                                                                    || params.organizationEmail.indexOf("+") > -1
-                                                                                    || params.organizationEmail.indexOf('"') > -1;
-                                                                                if (bad_val == true) {
-                                                                                    webix.message('Недопустимые символы в адресе электронной почты', 'error');
-                                                                                    return false;
-                                                                                }
-                                                                            }
-
-                                                                            if (params.organizationPhone.length > 100) {
-                                                                                webix.message('Превышена длина номера телефона', 'error');
-                                                                                return false;
-                                                                            }
-
                                                                             webix.ajax()
                                                                                 .headers({'Content-type': 'application/json'})
                                                                                 .post('/registration', JSON.stringify(params)
                                                                                 ).then(function (data) {
                                                                                 const text = data.text();
+                                                                                webix.message(text)
                                                                                 if (text === 'Ок') {
                                                                                     next(2, $$('organizationEmail').getValue());
                                                                                 } else if (text === 'Не удалось отправить письмо') {
-                                                                                    webix.message('Не удалось отправить ссылку для активации на указанный адрес электронной почты', 'error');
-                                                                                }else {
-                                                                                    webix.message(text, 'error')
+                                                                                    $$("invalidMessagesStep2").config.height = 35;
+                                                                                    $$("invalidMessagesStep2").resize()
+                                                                                    $$("invalidMessagesStep2").setValue('Не удалось отправить ссылку для активации на указанный адрес электронной почты')
+                                                                                    //webix.message('Не удалось отправить ссылку для активации на указанный адрес электронной почты', 'error');
+                                                                                } else {
+                                                                                    $$("invalidMessagesStep2").setValue(text)
+                                                                                    //webix.message(text, 'error')
                                                                                 }
                                                                                 $$('send_btn').enable();
                                                                             })
                                                                         } else {
-                                                                            webix.message('Не заполнены обязательные поля', 'error')
+                                                                            $$("invalidMessagesStep2").setValue('Не заполнены обязательные поля');
+                                                                            //webix.message('Не заполнены обязательные поля', 'error')
                                                                             $$('send_btn').enable();
                                                                         }
                                                                     }
                                                                 }
                                                             ]
+                                                        },
+                                                        {
+                                                            height: 19
                                                         }
                                                     ]
                                                 },
                                                 {
-                                                    rows:[
-                                                        {
-                                                            view: 'text',
-                                                            id: 'orgEmailAddress',
-                                                            name: 'orgEmailAddress',
-                                                            minWidth: 250,
-                                                            label: 'Ваш адрес электронной почты',
-                                                            labelPosition: 'top',
-                                                            readonly: true,
-                                                        },
-                                                        {
-                                                            view: 'button',
-                                                            css: 'myClass',
-                                                            value: 'Авторизоваться',
-                                                            gravity: 0.5,
-                                                            click: () => {
-                                                                window.location.href = "/login"
-                                                            }
-                                                        }
-                                                    ]
+                                                    view: 'template',
+                                                    id: 'descriptionStep3',
+                                                    borderless: true,
+                                                    autoheight: true,
+                                                    template: descrStep1,
+
                                                 }
                                             ]
                                         },
@@ -480,10 +497,11 @@ function next(page, mail) {
             $$("appNameReg").config.height =  50; $$("appNameReg").resize();
         }
         $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 3</span>`)
-        $$("description").setHTML('<span style="font-size: 0.8rem; color: #fff6f6">Необходимо активировать учетную запись. На Ваш почтовый ящик \"' + mail + '\" было оправлено письмо с подтверждением</span>')
-        $$("orgEmailAddress").setValue(mail)
+        $$("descriptionStep3").setHTML('<span style="font-size: 1rem;text-align: center">Необходимо активировать учетную запись. На Ваш почтовый ящик \"' + mail + '\" было оправлено письмо с подтверждением</span>')
+        $$("description").hide()
     }
     $$("wizard").getChildViews()[page].show();
+
 }
 
 webix.ready(function() {
