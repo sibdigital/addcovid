@@ -6,12 +6,10 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
-import ru.sibdigital.addcovid.model.ClsOrganization;
 import ru.sibdigital.addcovid.model.DocEmployee;
 
-import java.io.File;
+import javax.servlet.http.HttpServletResponse;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -21,43 +19,49 @@ public class ExcelWriter {
 
     final String[] SHEET_NAMES = {"РАБОТНИКИ ВЫХОДЯЩИЕ НА РАБОТУ"};
     final int SHEET_PEOPLE_INDEX = 0;
+    final String[] EMPLOYEES_COLUMN_NAMES = {"Фамилия", "Имя", "Отчество"};
+    final String EMPLOYEE_FILENAME = "Employees.xlsx";
 
-    public File createEmployeesFile(List<DocEmployee> employees) throws IOException {
+    public void downloadEmployeesFile(List<DocEmployee> employees, HttpServletResponse response) throws IOException {
+
+        // set headers for the response
+        String headerKey = "Content-Disposition";
+        String headerValue = String.format("attachment; filename=\"%s\"", EMPLOYEE_FILENAME);
+        response.setHeader(headerKey, headerValue);
+        response.setContentType("application/octet-stream");
+
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(SHEET_NAMES[SHEET_PEOPLE_INDEX]);
 
-        File tempFile = File.createTempFile("Employees", ".xlsx");
-
         Row firstRow = sheet.createRow(0);
-        Cell cell1 = firstRow.createCell(0);
-        cell1.setCellValue("Фамилия");
-        Cell cell2 = firstRow.createCell(1);
-        cell2.setCellValue("Имя");
-        Cell cell3 = firstRow.createCell(2);
-        cell3.setCellValue("Отчество");
+        for (int i = 0; i < EMPLOYEES_COLUMN_NAMES.length; i++) {
+            Cell cell = firstRow.createCell(i);
+            cell.setCellValue(EMPLOYEES_COLUMN_NAMES[i]);
+        }
 
         int rowCount = 1;
         for (DocEmployee employee : employees) {
-            Row row = sheet.createRow(rowCount++);
-
-            Cell cellFirstName = row.createCell(0);
-            cellFirstName.setCellValue(employee.getPerson().getFirstname());
-
-            Cell cellLastName = row.createCell(1);
-            cellLastName.setCellValue(employee.getPerson().getLastname());
-
-            Cell cellPatronymic = row.createCell(2);
-            cellPatronymic.setCellValue(employee.getPerson().getPatronymic());
+            createEmployeeRow(sheet, employee, rowCount++);
         }
 
         try {
-            FileOutputStream outputStream = new FileOutputStream(tempFile);
-            workbook.write(outputStream);
-            outputStream.close();
-
+            workbook.write(response.getOutputStream());
+            workbook.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
-        return tempFile;
+    }
+
+
+    private void createEmployeeRow(XSSFSheet sheet, DocEmployee employee, int rowCount) {
+        Row row = sheet.createRow(rowCount);
+
+        Cell cellLastName = row.createCell(0);
+        Cell cellFirstName = row.createCell(1);
+        Cell cellPatronymic = row.createCell(2);
+
+        cellFirstName.setCellValue(employee.getPerson().getFirstname());
+        cellLastName.setCellValue(employee.getPerson().getLastname());
+        cellPatronymic.setCellValue(employee.getPerson().getPatronymic());
     }
 }
