@@ -549,6 +549,18 @@ const employees = {
                                         importEmployees.show()
                                     }
                                 },
+                                {
+                                    view: "button",
+                                    id: "downloadButton",
+                                    minWidth: 150,
+                                    maxWidth: 350,
+                                    value: "Скачать",
+                                    css: 'webix_primary',
+                                    click: function () {
+                                        // webix.ajax('/download_employees').get();
+                                        webix.html.download('/download_employees')
+                                    }
+                                },
                             ]
                         }
                     ]
@@ -590,6 +602,7 @@ function adaptiveEmployees(){
     });
 
     $$("btnsIn").addView($$('uploadButton'), 0);
+    $$("btnsIn").addView($$('downloadButton'), 1);
     $$('Pager').config.group = 2;
     $$("pagerIn").addView($$('Pager'),0)
 
