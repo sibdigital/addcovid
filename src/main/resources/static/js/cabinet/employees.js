@@ -105,7 +105,7 @@ let importEmployees = webix.ui({
                     id: 'upload',
                     view: 'uploader',
                     css: 'webix_secondary',
-                    value: 'Загрузить Excel',
+                    value: 'Выбрать файл',
                     autosend: false,
                     upload: '/import-excel',
                     required: true,
@@ -128,7 +128,7 @@ let importEmployees = webix.ui({
                     id: 'send_btn',
                     view: 'button',
                     css: 'webix_primary',
-                    value: 'Импорт',
+                    value: 'Загрузить',
                     align: 'center',
                     click: function () {
                         $$('upload').send(function (response) {
@@ -602,7 +602,7 @@ function adaptiveEmployees(){
     });
 
     $$("btnsIn").addView($$('uploadButton'), 0);
-    $$("btnsIn").addView($$('downloadButton'), 1);
+    //$$("btnsIn").addView($$('downloadButton'), 1);
     $$('Pager').config.group = 2;
     $$("pagerIn").addView($$('Pager'),0)
 
