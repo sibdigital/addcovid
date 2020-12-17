@@ -81,6 +81,12 @@ public class CabinetController {
     @Autowired
     private RegPersonCountRepo regPersonCountRepo;
 
+    @Autowired
+    private ClsDepartmentRepo clsDepartmentRepo;
+
+    @Autowired
+    private ClsDepartmentContactRepo clsDepartmentContactRepo;
+
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -750,5 +756,22 @@ public class CabinetController {
             return "Не удалось внести изменения";
         }
         return "Изменения сохранены";
+    }
+
+    @GetMapping("/dep_contacts")
+    public @ResponseBody List<Map<String, Object>> getDepartmentContacts() {
+        List<ClsDepartment> departments = clsDepartmentRepo.findByIsDeletedFalseOrderByIdAsc();
+        List<Map<String, Object>> list = new ArrayList<>();
+        for (ClsDepartment department : departments) {
+            Map<String, Object> map = new HashMap<>();
+            List<ClsDepartmentContact> phones = clsDepartmentContactRepo.findAllByDepartmentAndType(department, 1);
+            List<ClsDepartmentContact> emails = clsDepartmentContactRepo.findAllByDepartmentAndType(department, 0);
+            map.put("department", department);
+            map.put("phones", phones);
+            map.put("emails", emails);
+
+            list.add(map);
+        }
+        return list;
     }
 }

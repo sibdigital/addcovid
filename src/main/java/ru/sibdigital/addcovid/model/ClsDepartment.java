@@ -25,6 +25,7 @@ public class ClsDepartment {
     private Integer statusImport;
     private Timestamp timeImport;
     private Boolean isDeleted;
+    private String fullName;
 
     public Long getId() {
         return id;
@@ -82,6 +83,16 @@ public class ClsDepartment {
 
     public void setDeleted(Boolean deleted) {
         isDeleted = deleted;
+    }
+
+    @Basic
+    @Column(name = "full_name")
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     @Override

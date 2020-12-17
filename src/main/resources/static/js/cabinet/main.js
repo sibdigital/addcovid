@@ -43,6 +43,7 @@ let UsercontextMenu = webix.ui({
         {id: "Mailing", value: 'Рассылки', badge: setRequestsBadge()},
         {id: "Help", value: 'Помощь'},
         {id: "Settings", value: 'Настройки'},
+        {id: "DepContacts", value: 'Контакты подразделений'},
         { $template:"Separator" },
         {id: 'Exit', value: 'Выход'}
         ], //"Изменить аватар", ,
@@ -55,6 +56,8 @@ let UsercontextMenu = webix.ui({
                 view = contacts;
             } else if (id === 'Mailing') {
                 view = mailing;
+            } else if (id == 'DepContacts') {
+                view = depContacts;
             } else if (id === 'Help') {
                 window.open('helps', '_blank');
             } else if (id === 'Settings') {
@@ -176,7 +179,7 @@ let bigMainForm = {
                                 view = contacts;
                             } else if (id == 'Mailing') {
                                 view = mailing;
-                            }else {
+                            } else {
                                 helpUrl = 'helps';
                             }
                             this.select(id)
@@ -409,4 +412,5 @@ webix.ready(function () {
         }
 
     })
+
 })
