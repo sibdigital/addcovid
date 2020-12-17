@@ -174,7 +174,19 @@ let regLayout = webix.ui({
 
                                                                             webix.ajax().get('checkInn?inn=' + inn).then(function (data) {
                                                                                 const result = data.text();
-                                                                                if (result !== 'ИНН не зарегистрирован') {
+                                                                                if (result == "Данный ИНН уже зарегистрирован в системе"){
+                                                                                    var message = 'Ранее вы уже подавали заявки на портале Работающая Бурятия. ' +
+                                                                                        'В настоящее время ведется перенос истории ваших заявок в личный кабинет. ' +
+                                                                                        'Доступ к личному кабинету будет предоставлен в ближайшее время.' +
+                                                                                        'Сейчас вы можете актуализировать заявку по адресу http://rabota.govrb.ru/actualize_form';
+                                                                                    webix.alert({
+                                                                                        title: "ВНИМАНИЕ!",
+                                                                                        ok: "Актуализировать",
+                                                                                        text: message
+                                                                                    }).then(function () {
+                                                                                        window.location.replace('http://rabota.govrb.ru/actualize_form');
+                                                                                    });;
+                                                                                } else if (result !== 'ИНН не зарегистрирован') {
                                                                                     webix.message(result, 'error');
                                                                                     $$('searchInn').hideProgress();
                                                                                     $$('egrul_load_button').enable();
@@ -334,7 +346,7 @@ let regLayout = webix.ui({
                                                                                     next(2, $$('organizationEmail').getValue());
                                                                                 } else if (text === 'Не удалось отправить письмо') {
                                                                                     webix.message('Не удалось отправить ссылку для активации на указанный адрес электронной почты', 'error');
-                                                                                } else {
+                                                                                }else {
                                                                                     webix.message(text, 'error')
                                                                                 }
                                                                                 $$('send_btn').enable();
