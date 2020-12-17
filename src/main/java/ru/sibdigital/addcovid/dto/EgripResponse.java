@@ -8,6 +8,7 @@ public class EgripResponse {
 
     private String message;
     private boolean isPossiblySelfEmployed;
+    private boolean isFinded;
 
     public String getMessage() {
         return message;
@@ -23,6 +24,14 @@ public class EgripResponse {
 
     public void setPossiblySelfEmployed(boolean possiblySelfEmployed) {
         isPossiblySelfEmployed = possiblySelfEmployed;
+    }
+
+    public boolean isFinded() {
+        return isFinded;
+    }
+
+    public void setFinded(boolean finded) {
+        isFinded = finded;
     }
 
     private class Data {
@@ -48,6 +57,9 @@ public class EgripResponse {
             return email;
         }
 
+        public String getMessage() {
+            return message;
+        }
     }
 
     private Data data;
@@ -67,5 +79,12 @@ public class EgripResponse {
         String email = sved.getСвАдрЭлПочты() != null ? sved.getСвАдрЭлПочты().getEMail() : "";
 
         this.data = new Data(inn, name, email);
+        isFinded = true;
+    }
+
+    public void empty(String message) {
+        this.message = message;
+        this.data = new  Data("", "", "");
+        isFinded = false;
     }
 }

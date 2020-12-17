@@ -4,6 +4,25 @@ import ru.sibdigital.addcovid.dto.egrul.EGRUL;
 
 public class EgrulResponse {
 
+    private String message;
+    private boolean isFinded;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public boolean isFinded() {
+        return isFinded;
+    }
+
+    public void setFinded(boolean finded) {
+        isFinded = finded;
+    }
+
     private class Data{
         private String inn;
         private String ogrn;
@@ -54,5 +73,11 @@ public class EgrulResponse {
         String email = sved.getСвАдрЭлПочты() != null ? sved.getСвАдрЭлПочты().getEMail() : "";
 
         this.data = new Data(inn, ogrn, name, shortName, email);
+        isFinded = true;
+    }
+    public void empty(String message) {
+        this.message = message;
+        this.data = new Data("", "", "", "", "");
+        isFinded = false;
     }
 }

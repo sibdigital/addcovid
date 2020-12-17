@@ -3,12 +3,12 @@ let descrStep1 = '<span style=" height: auto; font-size: 0.8rem; color: #fff6f6"
     'Для регистрации необходимо, чтобы Ваша организация или ИП были зарегистрированы в ЕГРЮЛ или ЕГРИП.' +
     'Если вы открылись недавно, проверка может показать отсутствие сведений.' +
     'В таком случае рекомендуется начать регистрацию повторно через несколько рабочих дней.' +
-    'Если вы являетесь самозанятым, то вам необходимо будет самостоятельно заполнить данные о себе</span>'
+    'Если вы являетесь самозанятым, то вам необходимо будет самостоятельно заполнить данные о себе</span>';
 
 let descrStep2 = '<span style="font-size: 0.8rem; color: #fff6f6">' +
     'Вам необходимо ввести Адрес электронной почты Вашей организации и пароль. ' +
     'После регистрации, на указанный адрес электронной почты, будет отправлено письмо' +
-    'со ссылкой на активацию учётной записи.</span>'
+    'со ссылкой на активацию учётной записи.</span>';
 
 let regLayout = webix.ui({
     height: windowHeight,
@@ -139,6 +139,12 @@ let regLayout = webix.ui({
                                                 {
                                                     rows: [
                                                         {
+                                                            view: 'label',
+                                                            height: 19,
+                                                            id: 'invalidMessages',
+                                                            template:"<span style='padding: 2px;text-align: center; font-size: 0.8rem; color: red'></span>"
+                                                        },
+                                                        {
                                                             view: 'text',
                                                             name: 'searchInn',
                                                             id: 'searchInn',
@@ -146,12 +152,6 @@ let regLayout = webix.ui({
                                                             labelPosition: 'top',
                                                             label: 'Введите ИНН вашей организации',
                                                             placeholder: 'ИНН',
-                                                        },
-                                                        {
-                                                            view: 'label',
-                                                            height: 19,
-                                                            id: 'invalidMessages',
-                                                            template:"<span style='padding: 2px;text-align: center; font-size: 0.8rem; color: red'></span>"
                                                         },
                                                         {
                                                             cols: [
@@ -419,11 +419,12 @@ let regLayout = webix.ui({
 function loadData(type, inn) {
     webix.ajax('/' + type + '?inn=' + inn).then(function (data) {
         const response = data.json();
-        if (!response.data && response.possiblySelfEmployed == false) {
-            webix.message('Введеный ИНН не найден в ЕГРИП и ЕГРЮЛ. Проверьте введенные данные. Возможно, вы ввели неправильный ИНН.', 'error');
-            $$('searchInn').hideProgress();
-        } else {
-            if (type === 'egrul') {
+        var doNext = false;
+        if (type === 'egrul') {
+            if (response.finded == false){
+                $$("invalidMessages").setValue('Введеный ИНН не найден в ЕГРЮЛ. \nВозможно, вы ввели неправильный ИНН.');
+                $$('searchInn').hideProgress();
+            } else {
                 const result = response.data;
                 $$('form').setValues({
                     organizationType: '1',
@@ -433,38 +434,43 @@ function loadData(type, inn) {
                     organizationInn: result.inn,
                     organizationOgrn: result.ogrn,
                     organizationEmail: result.email
-                })
-            } else {
-                const result = response.data;
-                if (response.possiblySelfEmployed == false){
-                    $$('organizationShortName').config.label = 'ФИО ИП';
-                    $$('form').setValues({
-                        organizationType: '2',
-                        searchInn: inn,
-                        organizationName: result.name,
-                        organizationShortName: result.name,
-                        organizationInn: result.inn,
-                        organizationEmail: result.email
-                    })
-                }else{
-                    $$('organizationShortName').config.label = 'ФИО cамозанятого';
-                    $$('organizationShortName').config.readonly = false;
-                    $$('form').setValues({
-                        organizationType: '3',
-                        searchInn: inn,
-                        isSelfEmployed: true,
-                        organizationInn: inn
-                    })
-
-                }
-
+                });
+                doNext = true;
             }
-
+        } else {
+            if (response.finded == true){
+                const result = response.data;
+                $$('organizationShortName').config.label = 'ФИО ИП';
+                $$('form').setValues({
+                    organizationType: '2',
+                    searchInn: inn,
+                    organizationName: result.name,
+                    organizationShortName: result.name,
+                    organizationInn: result.inn,
+                    organizationEmail: result.email
+                });
+                doNext = true;
+            }else if (response.possiblySelfEmployed == true){
+                $$('organizationShortName').config.label = 'ФИО cамозанятого';
+                $$('organizationShortName').config.readonly = false;
+                $$('form').setValues({
+                    organizationType: '3',
+                    searchInn: inn,
+                    isSelfEmployed: true,
+                    organizationInn: inn
+                });
+                doNext = true;
+            } else{
+                $$("invalidMessages").setValue('Введеный ИНН не найден в ЕГРИП. \nВозможно, вы ввели неправильный ИНН.');
+                $$('searchInn').hideProgress();
+            }
+        }
+        if (doNext){
             $$('searchInn').hideProgress();
             next(1);
         }
     }).catch(function () {
-        webix.message('Не удалось получить данные', 'error');
+        $$("invalidMessages").setValue('Не удалось получить данные', 'error');
         $$('searchInn').hideProgress();
     });
 }

@@ -33,6 +33,8 @@ public class ClassifierController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }else{
+            response.empty("По введенному ИНН не найдено юр. лицо");
         }
         return response;
     }
@@ -50,7 +52,7 @@ public class ClassifierController {
             }
         }else{
             response.setPossiblySelfEmployed(true);
-            response.setMessage("Если вы являетесь самозанятым, заполните информацию о себе");
+            response.empty("Если вы являетесь самозанятым, заполните информацию о себе");
         }
         return response;
     }
