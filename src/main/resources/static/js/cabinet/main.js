@@ -39,7 +39,7 @@ let UsercontextMenu = webix.ui({
     css: 'user_menu_items',
     data: [
         {id: "CommonInfo",  value: 'Профиль'},
-        {id: "Contacts", value: 'Контактная информация'},
+        // {id: "Contacts", value: 'Контактная информация'},
         {id: "Mailing", value: 'Рассылки', badge: setRequestsBadge()},
         {id: "Help", value: 'Помощь'},
         {id: "Settings", value: 'Настройки'},
