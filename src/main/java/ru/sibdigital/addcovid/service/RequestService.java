@@ -385,7 +385,7 @@ public class RequestService {
     }
 
     public List<ClsTypeRequest> getClsTypeRequests() {
-        return StreamSupport.stream(clsTypeRequestRepo.findAllByOrderBySortWeight().spliterator(), false)
+        return StreamSupport.stream(clsTypeRequestRepo.findAllByOrderBySortWeightDesc().spliterator(), false)
                 .collect(Collectors.toList());
     }
 

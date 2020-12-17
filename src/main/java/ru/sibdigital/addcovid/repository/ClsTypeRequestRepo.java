@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ClsTypeRequestRepo extends CrudRepository<ClsTypeRequest, Long> {
-    public List<ClsTypeRequest> findAllByOrderBySortWeight();
+    public List<ClsTypeRequest> findAllByOrderBySortWeightDesc();
 }
