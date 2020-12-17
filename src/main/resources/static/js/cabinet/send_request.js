@@ -234,7 +234,7 @@ const requestWizard = {
                                                                 id: 'upload',
                                                                 view: 'uploader',
                                                                 css: 'webix_secondary',
-                                                                value: 'Загрузить',
+                                                                value: 'Выбрать',
                                                                 autosend: false,
                                                                 upload: '/upload_files',
                                                                 required: true,
@@ -250,7 +250,7 @@ const requestWizard = {
                                                                 id: 'loadFileBtn',
                                                                 view: 'button',
                                                                 css: 'webix_primary',
-                                                                value: 'Импорт',
+                                                                value: 'Добавить',
                                                                 align: 'center',
                                                                 click: function () {
                                                                     $$('upload').send(function (response) {
