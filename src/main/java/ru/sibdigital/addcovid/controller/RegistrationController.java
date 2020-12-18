@@ -98,7 +98,10 @@ public class RegistrationController {
         ClsOrganization clsOrganization = requestService.findOrganizationByInn(inn);
         if (clsOrganization != null) {
             String newPassword = requestService.changeOrganizationPassword(inn);
-            boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(), applicationConstants.getApplicationName(), "Ваш новый пароль от личного кабинета: " + newPassword);
+            boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(),
+                    applicationConstants.getApplicationName() + ". Восстановление пароля",
+                    "По ИНН "+ clsOrganization.getInn() + " произведена смена пароля. " +
+                            "Ваш новый пароль от личного кабинета на портале Работающая Бурятия: " + newPassword);
             if (!emailSent) {
                 return "Не удалось отправить письмо";
             }
