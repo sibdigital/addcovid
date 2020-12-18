@@ -270,13 +270,16 @@ let bigMainForm = {
                                     view: 'icon',
                                     icon: 'mdi mdi-book-open',
                                     click: function () {
+                                        if ($$('dep_contacts_table') != null) {
+                                            $$('dep_contacts_table').destructor();
+                                        }
+
                                         webix.ui({
                                             id: 'content',
                                             rows: [
                                                 depContacts
                                             ]
                                         }, $$('content'));
-                                        $$('dep_contacts_table').load('/dep_contacts');
                                     },
                                 },
                                 {
@@ -353,6 +356,10 @@ let smallMainForm = {
                                     view: 'icon',
                                     icon: 'mdi mdi-book-open',
                                     click: function () {
+                                        if ($$('dep_contacts_table') != null) {
+                                            $$('dep_contacts_table').destructor();
+                                        }
+
                                         webix.ui({
                                             id: 'content',
                                             rows: [
