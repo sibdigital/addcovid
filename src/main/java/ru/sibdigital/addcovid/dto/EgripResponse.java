@@ -34,7 +34,7 @@ public class EgripResponse {
         isFinded = finded;
     }
 
-    private class Data {
+    public class Data {
         private String inn;
         private String name;
         private String email;
