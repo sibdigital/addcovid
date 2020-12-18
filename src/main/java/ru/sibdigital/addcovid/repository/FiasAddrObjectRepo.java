@@ -17,21 +17,15 @@ import java.util.Optional;
 @Repository
 public interface FiasAddrObjectRepo extends JpaRepository<FIASAddrObject, Long> {
 
-    @Query(nativeQuery = true, value = "select * from fias.addr_object where level = :level")
-    Optional<List<FIASAddrObject>> findByLevel(String level);
-
-    @Query(nativeQuery = true, value = "select id, objectguid, name " +
-            " from fias.addr_object where level = :level")
-    List<Map<String, Object>> findByL(String level);
-
     @Query(nativeQuery = true, value = "select id, objectid, name as value, typename, level \n" +
             "from fias.addr_object \n" +
             "where objectid = :objectId")
     Map<String, Object> findByObjectId(@Param("objectId") Long objectId);
 
-    @Query(nativeQuery = true, value = "select fao.id, fao.objectid, fao.name as value, fao.typename \n" +
-            " from fias.addr_object as fao\n" +
-            " where level='1'" +
+    @Query(nativeQuery = true, value = "select fao.id, fao.objectid, fao.name as value, fao.typename, fahi.regioncode\n" +
+            " from fias.addr_object as fao inner join fias.adm_hierarchy_item as fahi\n" +
+            " on fao.objectid = fahi.objectid\n" +
+            " and level=1\n" +
             " order by fao.name")
     List<Map<String, Object>> findRegions();
 
@@ -43,31 +37,50 @@ public interface FiasAddrObjectRepo extends JpaRepository<FIASAddrObject, Long> 
             "select fao.id, fao.objectid, fao.name as value, fao.typename, fao.level \n" +
             " from cit inner join fias.addr_object as fao\n" +
             " on (fao.objectid) = (cit.objectid) " +
-            " where fao.level='2' or fao.level='3' or level='4' or level='5' or level='6'" +
+            " and fao.level between 2 and 6 " +
             " order by fao.level DESC, fao.name " +
             " ")
     List<Map<String, Object>> findRaions(@Param("regionObjectId") Long regionObjectId);
 
     @Query(nativeQuery = true, value = "select fao.id, fao.objectid, fao.name as value, fao.typename " +
-            " from fias.addr_object as fao where level='4' or level='5' or level='6'" +
+            " from fias.addr_object as fao where level between 4 and 6" +
             " order by fao.name")
     List<Map<String, Object>> findCities();
 
-    @Query(nativeQuery = true, value = "with cit as (\n" +
-            "    select fahi.objectid\n" +
-            "    from fias.adm_hierarchy_item as fahi\n" +
-            "    where fahi.parentobjid = :regionOrRaionObjectId " +
+    @Query(nativeQuery = true, value = "with fa as (\n" +
+            "    select objectid as dff, parentobjid, regioncode, areacode, citycode\n" +
+            "    from fias.adm_hierarchy_item as fais\n" +
+            "    where regioncode = :regionCode\n" +
             ")\n" +
-            "select fao.id, fao.objectid, fao.name as value, fao.typename, fao.level \n" +
-            " from fias.addr_object as fao inner join cit\n" +
-            " on (fao.objectid) = (cit.objectid) " +
-            " where fao.level='4' or fao.level='5' or fao.level='6' " +
-            " order by fao.name")
-    List<Map<String, Object>> findCities(@Param("regionOrRaionObjectId") Long regionOrRaionObjectId);
+            "select fao.id, fao.objectid, fao.name as value, fao.typename, fao.level, fao2.objectid as districtObjectId, fao2.name as districtname, fao2.typename as districttypename, fa.areacode, fa.citycode\n" +
+            "from fias.addr_object as fao inner join fa\n" +
+            "    on (fa.dff) = (fao.objectid) and level between 4 and 6\n" +
+            "    inner join fias.addr_object as fao2\n" +
+            "        on (fa.parentobjid) = (fao2.objectid)\n" +
+            " LIMIT 100")
+    List<Map<String, Object>> findCities(@Param("regionCode") Short regionCode);
 
-    @Query(nativeQuery = true, value = "select id, objectid, name as value, typename, level \n" +
-            "from fias.addr_object \n" +
-            "where objectid = :objectId")
+    @Query(nativeQuery = true, value = "with fa as (\n" +
+            "    select objectid as dff, parentobjid, regioncode, areacode, citycode\n" +
+            "    from fias.adm_hierarchy_item as fais\n" +
+            "    where regioncode = :regionCode\n" +
+            ")\n" +
+            "    select fao.id, fao.objectid, fao.name as value, fao.typename, fao.level, fao2.objectid as districtObjectId, fao2.name as districtname, fao2.typename as districttypename, fa.areacode, fa.citycode\n" +
+            "    from fias.addr_object as fao inner join fa\n" +
+            "    on (fa.dff) = (fao.objectid) and level between 4 and 6 and name ~* (:objectName) inner join fias.addr_object as fao2\n" +
+            "    on (fa.parentobjid) = (fao2.objectid)" +
+            " LIMIT 25")
+    List<Map<String, Object>> findCitiesWithFilter(@Param("regionCode") Short regionCode, String objectName);
+
+    @Query(nativeQuery = true, value = "with fa as (\n" +
+            "    select objectid as dff, parentobjid, regioncode, areacode, citycode\n" +
+            "    from fias.adm_hierarchy_item as fais\n" +
+            "    where objectid = :objectId\n" +
+            ")\n" +
+            " select fao.id, fao.objectid, fao.name as value, fao.typename, fao.level, fao2.objectid as districtObjectId, fao2.name as districtname, fao2.typename as districttypename, fa.areacode, fa.citycode\n" +
+            " from fias.addr_object as fao inner join fa\n" +
+            "                                        on (fa.dff) = (fao.objectid) inner join fias.addr_object as fao2\n" +
+            "                                                               on (fa.parentobjid) = (fao2.objectid)")
     Map<String, Object> findCityByObjectId(@Param("objectId") Long objectId);
 
     @Query(nativeQuery = true, value = "with cit as (\n" +

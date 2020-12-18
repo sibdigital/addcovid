@@ -671,11 +671,17 @@ public class CabinetController {
 
     @GetMapping("/cities")
     public @ResponseBody List<Map<String, Object>> getCities(
-            @RequestParam(value = "objectid", required = false) Long objectId
+            @RequestParam(value = "objectid", required = false) Long objectId,
+            @RequestParam(value = "regionCode", required = false) Short regionCode,
+            @RequestParam(value = "name", required = false) String name
     ) {
         List<Map<String, Object>> result = null;
-        if (objectId != null) {
-            result = fiasAddrObjectRepo.findCities(objectId);
+        if (regionCode != null && name == null) {
+            result = fiasAddrObjectRepo.findCities(regionCode);
+        } else if(name != null && regionCode != null) {
+            String parseName = "^" + name + "+";
+            result = fiasAddrObjectRepo.findCitiesWithFilter(regionCode, parseName);
+            System.out.println(parseName);
         }
 
         return result;
@@ -685,7 +691,7 @@ public class CabinetController {
     public @ResponseBody Map<String, Object> getCityByObjectId(@RequestParam(value = "objectid", required = true) Long objectId) {
         Map<String, Object> id = null;
         if (objectId != null) {
-            id = fiasAddrObjectRepo.findByObjectId(objectId);
+            id = fiasAddrObjectRepo.findCityByObjectId(objectId);
         }
         return id;
     }

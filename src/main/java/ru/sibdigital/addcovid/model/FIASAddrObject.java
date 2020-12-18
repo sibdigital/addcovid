@@ -26,7 +26,7 @@ public class FIASAddrObject {
     private Long changeId;
     private String name;
     private String typeName;
-    private String level;
+    private Short level;
     private Long operTypeId;
     private Long prevId;
     private Long nextId;
@@ -98,11 +98,11 @@ public class FIASAddrObject {
 
     @Basic
     @Column(name = "level")
-    public String getLevel() {
+    public Short getLevel() {
         return level;
     }
 
-    public void setLevel(String level) {
+    public void setLevel(Short level) {
         this.level = level;
     }
 

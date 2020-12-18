@@ -24,141 +24,31 @@ const address = {
         rows: [
             {
                 type: 'wide',
-                cols: [
+                rows: [
                     {
-                        view: "dataview",
-                        id: "address_fact_grid",
-                        css: 'contacts',
-                        scroll: true,
-                        select: 1,
-                        url: "address_facts",
-                        xCount: 1,
-                        type: {
-                            height: "auto",
-                            width: "auto",
-                            template: "<div class='overall'><div>#full_address#</div>" +
-                                "<div id='del_button' style='position: absolute;top: 0; right: 5px; font-size: 20px;' onclick='deleteAddress(#id#)' class='mdi mdi-close-thick'></div></div>",
-                        },
-                        body: {
-                            cols: [
-                                // {
-                                //     view: 'text',
-                                //     template: "<div class='overall'><div>#full_address#</div></div>",
-                                // },
-
-                                {
-                                    view: 'button',
-                                    label: 'del'
-                                }
-                            ]
-                        },
-                        on: {
-                            // onItemDblClick: function (id) {
-                            //     let item = this.getItem(id);
-                            //     console.log(item);
-                            //     console.log($$('regions').getList());
-                            //     const region = $$('regions').getList().find((reg) => {
-                            //         console.log('reg', reg);
-                            //         return reg.objectid === item.fias_region_objectid;
-                            //     } );
-                            //     console.log(region);
-                            //     $$('regions').setValue(region[0]);
-                            //
-                            //     const listRaions = $$('raions').getList().find((rai) => {
-                            //         console.log('rai', rai);
-                            //         return rai.objectid === item.fias_raion_objectid;
-                            //     });
-                            //     console.log(listRaions);
-                            //     const listRaions2 = Object.values(listRaions);
-                            //     console.log(listRaions2);
-                            //     console.log(typeof listRaions);
-                            //     for (const [key, value] of Object.entries(listRaions)) {
-                            //         console.log(`${key}: ${value}`);
-                            //     }
-                            //
-                            //     const dtr = getObject('raion?objectid', fias_raion_objectid);
-                            //
-                            //
-                            //
-                            //
-                            //     console.log($$('cities').getList());
-                            //     const city = $$('cities').getList().find((city) => city.objectid === item.fias_city_objectid);
-                            //     console.log(city);
-                            //     if (city.length > 0) {
-                            //         $$('cities').setValue(city[0]);
-                            //     }
-                            //
-                            //     $$('fiasObjectGuid').setValue('');
-                            //     const url = 'streets?objectid=' + item.fias_street_objectid;
-                            //     const suggest_id = $$('fiasObjectGuid').config.suggest;
-                            //     const list = $$(suggest_id).getList();
-                            //     list.clearAll();
-                            //     webix.ajax()
-                            //         .headers({'Content-type': 'application/json'})
-                            //         .get(url)
-                            //         .then(function (data) {
-                            //             console.log(data);
-                            //             if (data !== null) {
-                            //                 list.parse(data);
-                            //                 // const streetId = $$(suggest_id).getItemId(streetLabel.slice(streetLabel.lastIndexOf(' ') + 1));
-                            //                 // console.log(streetId);
-                            //                 // const street = $$(suggest_id).getList().getItem(streetId).objectid || streetLabel;
-                            //             }
-                            //         });
-                            //     $$('house').setValue(item.house_hand);
-                            //     $$('office').setValue(item.apartment_hand);
-                            // }
-
-                            onItemDblClick: async function (id) {
-                                let item = this.getItem(id);
-                                console.log(item);
-                                const region = $$('regions').getList().find((reg) => reg.objectid === item.fias_region_objectid);
-                                console.log(region);
-                                $$('regions').setValue(region[0]);
-
-                                await setObject('raion?objectid=', item.fias_raion_objectid, 'raions');
-                                if (item.fias_city_objectid && item.fias_city_objectid > 0) {
-                                    await setObject('city?objectid=', item.fias_city_objectid, 'cities');
-                                }
-                                //await setObject('city?objectid=', item.fias_city_objectid, 'cities');
-                                // if (item.fias_street_objectid !== 0) {
-                                //     await setObject('street?objectid=', item.fias_street_objectid, 'fiasStreetObjectId');
-                                // } else {
-                                //     $$('fiasStreetObjectId').setValue(item.street_hand);
-                                // }
-
-                                // $$('raions').setValue(raion);
-                                // $$('cities').setValue(city);
-                                const suggest_id = $$('fiasObjectGuid').config.suggest;
-                                //$$(suggest_id).setValue(item.fias_street_objectid);
-                                $$('fiasObjectGuid').setValue(item.street_hand);
-                                $$('house').setValue(item.house_hand);
-                                $$('office').setValue(item.apartment_hand);
-                            }
-                        }
-                    },
-                    {
-                        gravity: 0.4,
+                        //gravity: 0.2,
                         view: 'form',
                         id: 'contact_form',
                         complexData: true,
+                        maxHeight: 210,
+                        height: 210,
+                        scroll: 'y',
                         rules: {
                             "fiasRegionObjectId": webix.rules.isNotEmpty,
-                            "fiasRaionObjectId": webix.rules.isNotEmpty,
+                            //"fiasRaionObjectId": webix.rules.isNotEmpty,
                             "fiasStreetObjectId": webix.rules.isNotEmpty,
-                            //"fiasCityObjectId": webix.rules.isNotEmpty,
+                            "fiasCityObjectId": webix.rules.isNotEmpty,
                             "house_hand": webix.rules.isNotEmpty,
                             "apartment_hand": webix.rules.isNotEmpty
                         },
                         elements: [
-                            { gravity: 0.5 },
                             {
                                 cols: [
                                     {
                                         view: "combo",
                                         id: "regions",
                                         name: "fiasRegionObjectId",
-                                        label: 'Регион<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearRegionForm() class=\'mdi mdi-delete\'></div>',
+                                        label: 'Регион',
                                         value: 'Респ. Бурятия',
                                         labelPosition: 'top',
                                         invalidMessage: 'Регион не может быть пустым',
@@ -202,24 +92,25 @@ const address = {
                                                     console.log(region);
 
                                                     if (region) {
-                                                        let url = 'raions?objectid=' + region.objectid;
+                                                        // let url = 'raions?objectid=' + region.objectid;
+                                                        let url = 'cities?regionCode=' + region.regioncode;
 
                                                         const suggest_id = $$('fiasObjectGuid').config.suggest;
                                                         $$(suggest_id).getList().clearAll();
 
                                                         $$('cities').show();
-                                                        $$('raions').config.label = 'Район<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearRaionForm() class=\'mdi mdi-delete\'></div>';
-                                                        $$('raions').refresh();
-
-                                                        $$('raions').setValue('');
-                                                        $$('raions').getList().clearAll();
-                                                        $$('raions').getList().load(url).then((data) => $$('raions').focus());
+                                                        // $$('raions').config.label = 'Район<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearRaionForm() class=\'mdi mdi-delete\'></div>';
+                                                        // $$('raions').refresh();
+                                                        //
+                                                        // $$('raions').setValue('');
+                                                        // $$('raions').getList().clearAll();
+                                                        // $$('raions').getList().load(url).then((data) => $$('raions').focus());
 
 
                                                         // url = 'cities?objectid=' + region.objectid;
-                                                        // $$('cities').setValue('');
-                                                        // $$('cities').getList().clearAll();
-                                                        // $$('cities').getList().load(url);
+                                                        $$('cities').setValue('');
+                                                        $$('cities').getList().clearAll();
+                                                        $$('cities').getList().load(url);
 
                                                     }
                                                 } catch (e) {
@@ -228,16 +119,110 @@ const address = {
                                             }
                                         },
                                     },
-                                    // {
-                                    //     view: 'button',
-                                    //     autowidth: true,
-                                    //     autoheight: true,
-                                    //     css: 'clear-button',
-                                    //     label: '<span class=\'mdi mdi-minus-circle\'></span>',
-                                    //     click: () => {
-                                    //         $$('regions').setValue('');
-                                    //     }
-                                    // }
+                                    {
+                                        view: "combo",
+                                        id: "cities",
+                                        name: "fiasCityObjectId",
+                                        label: 'Населенный пункт<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearCityForm() class=\'mdi mdi-delete\'></div>',
+                                        labelPosition: 'top',
+                                        invalidMessage: 'Населенный пункт не может быть пустым',
+                                        tooltip: {
+                                            template: 'Вводите название населенного пункта без обозначения (город/село), например: Москва',
+                                        },
+                                        options: {
+                                            keyPressTimeout: 350,
+                                            // filter: (obj, filter) => {
+                                            //     const value = obj.typename.toLowerCase() + '. ' + obj.value.toLowerCase();
+                                            //     const preFilter = filter.toLowerCase();
+                                            //     return obj.typename.toLowerCase().indexOf(preFilter) !== -1 || obj.value.toLowerCase().indexOf(preFilter) !== -1 || value.indexOf(preFilter) !== -1;
+                                            // },
+                                            body: {
+                                                dataFeed: function(inputString) {
+                                                    const stapleIndex = inputString.indexOf('(');
+                                                    const spaceIndex = inputString.indexOf(' ');
+                                                    let str = stapleIndex !== -1 ? inputString.slice(0, stapleIndex - 1) : inputString;
+                                                    str = spaceIndex !== -1 ? str.slice(spaceIndex + 1) : str;
+
+                                                    const region = $$('regions').getList().getItem($$('regions').getValue());
+
+                                                    const prevValue = $$('cities').getList().getItem($$('cities').getValue());
+                                                    console.log(str);
+                                                    console.log(prevValue);
+                                                    //console.log(region);
+
+                                                    if (!region || (str && prevValue && str === prevValue.value)) {
+                                                        return;
+                                                    }
+
+                                                    let url = `cities?regionCode=${region.regioncode}&name=${str}`;
+
+                                                    if (!str.match(/[а-я]/gi)) {
+                                                        url = `cities?regionCode=${region.regioncode}`;
+                                                    }
+
+                                                    return webix.ajax().bind(this).get(url, function(data) {
+                                                        if (data) {
+                                                            //console.log(data);
+                                                            this.parse(data);
+                                                        }
+                                                    });
+                                                },
+                                                dynamic: true,
+                                                template: (item) => {
+                                                    //console.log(item);
+                                                    let result = `<span>${item.typename}. ${item.value}</span>`;
+                                                    if (item.level !== 5) {
+                                                        const raion = item.districtname + '. ' + item.districttypename;
+                                                        result += ` <span>(${raion})</span>`;
+                                                    }
+                                                    return result;
+
+                                                },
+                                                scheme: {
+                                                    $sort: {
+                                                        by: 'value',
+                                                        dir: 'asc',
+                                                        as: 'string'
+                                                    }
+                                                },
+                                                ready: function () {
+                                                }
+                                            }
+                                        },
+                                        on: {
+                                            onChange: (newval, oldval) => {
+                                                try {
+                                                    const indexCity = $$('cities').getValue();
+                                                    console.log(indexCity);
+                                                    if (!indexCity) return;
+
+                                                    const city = $$('cities').getList().getItem(indexCity);
+                                                    console.log(city);
+                                                    console.log($$('cities').getList());
+
+                                                    if (city) {
+                                                        const suggest_id = $$('fiasObjectGuid').config.suggest;
+                                                        const list = $$(suggest_id).getList();
+                                                        list.clearAll();
+                                                        const url = 'streets?objectid=' + city.objectid;
+                                                        //$$('fiasObjectGuid').setValue('');
+                                                        webix.ajax()
+                                                            .headers({'Content-type': 'application/json'})
+                                                            .get(url)
+                                                            .then(function (data) {
+                                                                console.log(data);
+                                                                if (data !== null) {
+                                                                    list.parse(data);
+                                                                    $$('fiasObjectGuid').focus();
+                                                                }
+                                                            });
+                                                    }
+                                                } catch(e) {
+                                                    console.log(e);
+                                                }
+                                            }
+                                        }
+                                    },
                                 ]
                             },
 
@@ -248,6 +233,7 @@ const address = {
                                 name: "fiasRaionObjectId",
                                 label: 'Район<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearRaionForm() class=\'mdi mdi-delete\'></div>',
                                 labelPosition: 'top',
+                                hidden: true,
                                 invalidMessage: 'Район не может быть пустым',
                                 options: {
                                     keyPressTimeout: 150,
@@ -277,195 +263,207 @@ const address = {
                                 },
                                 on: {
                                     onChange: (newval, oldval) => {
-                                        try {
-                                            console.log(newval, oldval);
-                                            const indexRaion = $$('raions').getValue();
-                                            console.log(indexRaion);
-                                            if (!indexRaion) return;
-
-                                            let raion = $$('raions').getList().getItem(indexRaion);
-                                            console.log($$('raions').getList());
-                                            console.log(raion);
-                                            if (!raion && newval) {
-                                                console.log('this');
-                                                raion = newval;
-                                            }
-
-                                            if (raion.level === '4' || raion.level === '5' || raion.level === '6') {
-                                                //$$('cities').disable();
-
-                                                $$('cities').setValue('');
-                                                $$('cities').getList().clearAll();
-                                                $$('cities').hide();
-                                                $$('raions').config.label = 'Населенный пункт<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearRaionForm() class=\'mdi mdi-delete\'></div>';
-                                                $$('raions').refresh();
-                                                //$$('cities').getList().setList($$('raions').getList())
-                                                //$$('cities').getList().load($$('raions').getList());
-
-                                                const url = 'streets?objectid=' + raion.objectid;
-                                                if (!newval.level) {
-                                                    $$('fiasObjectGuid').setValue('');
-                                                }
-                                                const suggest_id = $$('fiasObjectGuid').config.suggest;
-                                                const list = $$(suggest_id).getList();
-                                                list.clearAll();
-                                                webix.ajax()
-                                                    .headers({'Content-type': 'application/json'})
-                                                    .get(url)
-                                                    .then(function (data) {
-                                                        console.log(data);
-                                                        if (data !== null) {
-                                                            list.parse(data);
-                                                            $$('fiasObjectGuid').focus();
-                                                        }
-                                                    });
-
-                                                return;
-                                            } else {
-                                                $$('cities').show();
-                                                $$('raions').config.label = 'Район<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearRaionForm() class=\'mdi mdi-delete\'></div>';
-                                                $$('raions').refresh();
-                                            }
-
-                                            if (raion.value === '<Не выбрано>') {
-                                                // const indexRegion = $$('regions').getValue();
-                                                // const region = $$('regions').getList().getItem(indexRegion);
-                                                // raion.objectid = region.objectid;
-                                            }
-
-                                            if (raion) {
-                                                const url = 'cities?objectid=' + raion.objectid;
-
-                                                const suggest_id = $$('fiasObjectGuid').config.suggest;
-                                                $$(suggest_id).getList().clearAll();
-
-                                                $$('cities').setValue('');
-                                                $$('cities').getList().clearAll();
-                                                $$('cities').getList().load(url).then((data) => $$('cities').focus());
-
-
-                                            }
-                                        } catch(e) {
-                                            console.log(e);
-                                        }
+                                        // try {
+                                        //     console.log(newval, oldval);
+                                        //     const indexRaion = $$('raions').getValue();
+                                        //     console.log(indexRaion);
+                                        //     if (!indexRaion) return;
+                                        //
+                                        //     let raion = $$('raions').getList().getItem(indexRaion);
+                                        //     console.log($$('raions').getList());
+                                        //     console.log(raion);
+                                        //     if (!raion && newval) {
+                                        //         console.log('this');
+                                        //         raion = newval;
+                                        //     }
+                                        //
+                                        //     if (raion.level === 4 || raion.level === 5 || raion.level === 6) {
+                                        //         //$$('cities').disable();
+                                        //
+                                        //         $$('cities').setValue('');
+                                        //         $$('cities').getList().clearAll();
+                                        //         $$('cities').hide();
+                                        //         $$('raions').config.label = 'Населенный пункт<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearRaionForm() class=\'mdi mdi-delete\'></div>';
+                                        //         $$('raions').refresh();
+                                        //         //$$('cities').getList().setList($$('raions').getList())
+                                        //         //$$('cities').getList().load($$('raions').getList());
+                                        //
+                                        //         const url = 'streets?objectid=' + raion.objectid;
+                                        //         if (!newval.level) {
+                                        //             $$('fiasObjectGuid').setValue('');
+                                        //         }
+                                        //         const suggest_id = $$('fiasObjectGuid').config.suggest;
+                                        //         const list = $$(suggest_id).getList();
+                                        //         list.clearAll();
+                                        //         webix.ajax()
+                                        //             .headers({'Content-type': 'application/json'})
+                                        //             .get(url)
+                                        //             .then(function (data) {
+                                        //                 console.log(data);
+                                        //                 if (data !== null) {
+                                        //                     list.parse(data);
+                                        //                     $$('fiasObjectGuid').focus();
+                                        //                 }
+                                        //             });
+                                        //
+                                        //         return;
+                                        //     } else {
+                                        //         $$('cities').show();
+                                        //         $$('raions').config.label = 'Район<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearRaionForm() class=\'mdi mdi-delete\'></div>';
+                                        //         $$('raions').refresh();
+                                        //     }
+                                        //
+                                        //     if (raion.value === '<Не выбрано>') {
+                                        //         // const indexRegion = $$('regions').getValue();
+                                        //         // const region = $$('regions').getList().getItem(indexRegion);
+                                        //         // raion.objectid = region.objectid;
+                                        //     }
+                                        //
+                                        //     if (raion) {
+                                        //         const url = 'cities?objectid=' + raion.objectid;
+                                        //
+                                        //         const suggest_id = $$('fiasObjectGuid').config.suggest;
+                                        //         $$(suggest_id).getList().clearAll();
+                                        //
+                                        //         $$('cities').setValue('');
+                                        //         $$('cities').getList().clearAll();
+                                        //         $$('cities').getList().load(url).then((data) => $$('cities').focus());
+                                        //
+                                        //
+                                        //     }
+                                        // } catch(e) {
+                                        //     console.log(e);
+                                        // }
                                     }
                                 }
                             },
+                            // {
+                            //     view: "combo",
+                            //     id: "cities",
+                            //     name: "fiasCityObjectId",
+                            //     label: 'Населенный пункт<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearCityForm() class=\'mdi mdi-delete\'></div>',
+                            //     labelPosition: 'top',
+                            //     invalidMessage: 'Населенный пункт не может быть пустым',
+                            //     options: {
+                            //         keyPressTimeout: 150,
+                            //         filter: (obj, filter) => {
+                            //             const value = obj.typename.toLowerCase() + '. ' + obj.value.toLowerCase();
+                            //             const preFilter = filter.toLowerCase();
+                            //             return obj.typename.toLowerCase().indexOf(preFilter) !== -1 || obj.value.toLowerCase().indexOf(preFilter) !== -1 || value.indexOf(preFilter) !== -1;
+                            //         },
+                            //         body: {
+                            //             // dynamic: true,
+                            //             // datafetch: 20,
+                            //             //url: 'cities',
+                            //             template: '#typename#. #value#',
+                            //             ready: function () {
+                            //             }
+                            //         }
+                            //     },
+                            //     on: {
+                            //         onChange: (newval, oldval) => {
+                            //             try {
+                            //                 const indexCity = $$('cities').getValue();
+                            //                 console.log(indexCity);
+                            //                 if (!indexCity) return;
+                            //
+                            //                 const city = $$('cities').getList().getItem(indexCity);
+                            //                 console.log(city);
+                            //
+                            //                 if (city) {
+                            //                     const url = 'streets?objectid=' + city.objectid;
+                            //                     $$('fiasObjectGuid').setValue('');
+                            //                     const suggest_id = $$('fiasObjectGuid').config.suggest;
+                            //                     const list = $$(suggest_id).getList();
+                            //                     list.clearAll();
+                            //                     webix.ajax()
+                            //                         .headers({'Content-type': 'application/json'})
+                            //                         .get(url)
+                            //                         .then(function (data) {
+                            //                             console.log(data);
+                            //                             if (data !== null) {
+                            //                                 list.parse(data);
+                            //                                 $$('fiasObjectGuid').focus();
+                            //                             }
+                            //                         });
+                            //                 }
+                            //             } catch(e) {
+                            //                 console.log(e);
+                            //             }
+                            //         }
+                            //     }
+                            // },
+
                             {
-                                view: "combo",
-                                id: "cities",
-                                name: "fiasCityObjectId",
-                                label: 'Населенный пункт<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearCityForm() class=\'mdi mdi-delete\'></div>',
-                                labelPosition: 'top',
-                                invalidMessage: 'Населенный пункт не может быть пустым',
-                                options: {
-                                    keyPressTimeout: 150,
-                                    filter: (obj, filter) => {
-                                        const value = obj.typename.toLowerCase() + '. ' + obj.value.toLowerCase();
-                                        const preFilter = filter.toLowerCase();
-                                        return obj.typename.toLowerCase().indexOf(preFilter) !== -1 || obj.value.toLowerCase().indexOf(preFilter) !== -1 || value.indexOf(preFilter) !== -1;
-                                    },
-                                    body: {
-                                        // dynamic: true,
-                                        // datafetch: 20,
-                                        //url: 'cities',
-                                        template: '#typename#. #value#',
-                                        ready: function () {
-                                        }
-                                    }
-                                },
-                                on: {
-                                    onChange: (newval, oldval) => {
-                                        try {
-                                            const indexCity = $$('cities').getValue();
-                                            console.log(indexCity);
-                                            if (!indexCity) return;
-
-                                            const city = $$('cities').getList().getItem(indexCity);
-                                            console.log(city);
-
-                                            if (city) {
-                                                const url = 'streets?objectid=' + city.objectid;
-                                                $$('fiasObjectGuid').setValue('');
-                                                const suggest_id = $$('fiasObjectGuid').config.suggest;
-                                                const list = $$(suggest_id).getList();
-                                                list.clearAll();
-                                                webix.ajax()
-                                                    .headers({'Content-type': 'application/json'})
-                                                    .get(url)
-                                                    .then(function (data) {
-                                                        console.log(data);
-                                                        if (data !== null) {
-                                                            list.parse(data);
-                                                            $$('fiasObjectGuid').focus();
-                                                        }
-                                                    });
+                                cols: [
+                                    {
+                                        view: 'text',
+                                        id: 'fiasObjectGuid',
+                                        name: 'fiasStreetObjectId',
+                                        label: 'Улица',
+                                        labelPosition: 'top',
+                                        invalidMessage: "Адрес не может быть пустым",
+                                        suggest: {
+                                            keyPressTimeout: 200,
+                                            filter: (obj, filter) => {
+                                                const value = (obj.typename + (obj.typename.includes('.') ? ' ' : '. ') + obj.value).toLowerCase();
+                                                const preFilter = filter.toLowerCase();
+                                                return obj.typename.toLowerCase().indexOf(preFilter) !== -1 || obj.value.toLowerCase().indexOf(preFilter) !== -1 || value.indexOf(preFilter) !== -1;
+                                            },
+                                            body: {
+                                                // dynamic: true,
+                                                // datafetch: 15,
+                                                // template: '#typename#' + '#typename#'.includes('.') ? '. ' : ' ' + '#value#',
+                                                template: (item) => {
+                                                    const isDot = item.typename.includes('.');
+                                                    return item.typename + (isDot ? ' ' : '. ') + item.value;
+                                                },
                                             }
-                                        } catch(e) {
-                                            console.log(e);
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                view: 'text',
-                                id: 'fiasObjectGuid',
-                                name: 'fiasStreetObjectId',
-                                label: 'Улица',
-                                labelPosition: 'top',
-                                invalidMessage: "Адрес не может быть пустым",
-                                suggest: {
-                                    //keyPressTimeout: 500,
-                                    filter: (obj, filter) => {
-                                        const value = (obj.typename + (obj.typename.includes('.') ? ' ' : '. ') + obj.value).toLowerCase();
-                                        const preFilter = filter.toLowerCase();
-                                        return obj.typename.toLowerCase().indexOf(preFilter) !== -1 || obj.value.toLowerCase().indexOf(preFilter) !== -1 || value.indexOf(preFilter) !== -1;
-                                    },
-                                    body: {
-                                        // dynamic: true,
-                                        // datafetch: 15,
-                                        // template: '#typename#' + '#typename#'.includes('.') ? '. ' : ' ' + '#value#',
-                                        template: (item) => {
-                                            const isDot = item.typename.includes('.');
-                                            return item.typename + (isDot ? ' ' : '. ') + item.value;
                                         },
-                                    }
-                                },
-                                on: {
-                                    onChange: (newval, oldval) => {
-                                        console.log('fiasObjectGuid', newval);
-                                        $$('house').focus();
-                                    }
-                                }
+                                        on: {
+                                            onChange: (newval, oldval) => {
+                                                console.log('fiasObjectGuid', newval);
+                                                $$('house').focus();
+                                            }
+                                        }
+                                    },
+                                    {
+                                        cols: [
+                                            {
+                                                view: 'text',
+                                                id: 'house',
+                                                name: 'house_hand',
+                                                label: 'Дом',
+                                                labelPosition: 'top',
+                                                invalidMessage: "Дом не может быть пустым",
+                                                suggest: {
+                                                    keyPressTimeout: 500,
+                                                    body: {
+                                                        dynamic: true,
+                                                        datafetch: 15
+                                                    }
+                                                },
+                                                on: {
+                                                    onChange: (newval, oldval) => {
+                                                        //$$('office').focus();
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                view: 'text',
+                                                id: 'office',
+                                                name: 'apartment_hand',
+                                                label: 'Офис/помещение',
+                                                labelPosition: 'top',
+                                                invalidMessage: "Офис/помещение не может быть пустым",
+                                            },
+                                        ]
+                                    },
+
+                                ]
                             },
-                            {
-                                view: 'text',
-                                id: 'house',
-                                name: 'house_hand',
-                                label: 'Дом',
-                                labelPosition: 'top',
-                                invalidMessage: "Дом не может быть пустым",
-                                suggest: {
-                                    keyPressTimeout: 500,
-                                    body: {
-                                        dynamic: true,
-                                        datafetch: 15
-                                    }
-                                },
-                                on: {
-                                    onChange: (newval, oldval) => {
-                                        //$$('office').focus();
-                                    }
-                                }
-                            },
-                            {
-                                view: 'text',
-                                id: 'office',
-                                name: 'apartment_hand',
-                                label: 'Офис/помещение',
-                                labelPosition: 'top',
-                                invalidMessage: "Офис/помещение не может быть пустым",
-                            },
+
+
                             {
                                 cols: [
                                     // {
@@ -485,7 +483,6 @@ const address = {
                                     }
                                 ]
                             },
-                            {}
                         ],
                         elementsConfig: {
                             on: {
@@ -494,7 +491,78 @@ const address = {
                                 }
                             }
                         }
-                    }
+                    },
+                    {
+                        view: "dataview",
+                        id: "address_fact_grid",
+                        css: 'contacts',
+                        scroll: true,
+                        select: 1,
+                        url: "address_facts",
+                        xCount: 1,
+                        label: 'Список сохраненных адресов',
+                        labelPosition: 'top',
+                        type: {
+                            height: "auto",
+                            width: "auto",
+                            template: "<div class='overall'><div>#full_address#</div>" +
+                                "<div id='del_button' style='position: absolute;top: 0; right: 5px; font-size: 20px;' onclick='deleteAddress(#id#)' class='mdi mdi-close-thick'></div></div>",
+                        },
+                        body: {
+                            cols: [
+                                // {
+                                //     view: 'text',
+                                //     template: "<div class='overall'><div>#full_address#</div></div>",
+                                // },
+
+                                {
+                                    view: 'button',
+                                    label: 'del'
+                                }
+                            ]
+                        },
+                        on: {
+                            onItemDblClick: async function (id) {
+                                let item = this.getItem(id);
+                                console.log(item);
+                                const region = $$('regions').getList().find((reg) => reg.objectid === item.fias_region_objectid);
+                                console.log(region);
+                                $$('regions').setValue(region[0]);
+
+                                //await setObject('raion?objectid=', item.fias_raion_objectid, 'raions');
+                                await setObject('city?objectid=', item.fias_city_objectid, 'cities');
+                                // if (item.fias_city_objectid && item.fias_city_objectid > 0) {
+                                //     await setObject('city?objectid=', item.fias_city_objectid, 'cities');
+                                // }
+                                //await setObject('city?objectid=', item.fias_city_objectid, 'cities');
+                                // if (item.fias_street_objectid !== 0) {
+                                //     await setObject('street?objectid=', item.fias_street_objectid, 'fiasStreetObjectId');
+                                // } else {
+                                //     $$('fiasStreetObjectId').setValue(item.street_hand);
+                                // }
+
+                                // $$('raions').setValue(raion);
+                                // $$('cities').setValue(city);
+                                $$('house').setValue(item.house_hand);
+                                $$('office').setValue(item.apartment_hand);
+                                const suggest_id = $$('fiasObjectGuid').config.suggest;
+                                const list = $$(suggest_id).getList();
+                                list.clearAll();
+                                const url = 'streets?objectid=' + item.fias_city_objectid;
+                                webix.ajax()
+                                    .headers({'Content-type': 'application/json'})
+                                    .get(url)
+                                    .then(function (data) {
+                                        console.log(data);
+                                        if (data !== null) {
+                                            list.parse(data);
+                                            $$('fiasObjectGuid').setValue(item.street_hand);
+                                        }
+                                    });
+                            }
+                        }
+                    },
+
                 ]
             },
         ],
@@ -514,16 +582,26 @@ function addAddress() {
 
         params.fiasRegionObjectId = region.objectid;
 
-        const indexRaion = $$('raions').getValue();
-        const raion = $$('raions').getList().getItem(indexRaion);
-        console.log(raion);
-        const raionLabel = raion ? (raion.typename.toLowerCase() === 'г' ? raion.typename + '. ' + raion.value : raion.value + ' ' + raion.typename) : null;
-
-        params.fiasRaionObjectId = raion ? raion.objectid : 0;
+        // const indexRaion = $$('raions').getValue();
+        // const raion = $$('raions').getList().getItem(indexRaion);
+        // console.log(raion);
+        // const raionLabel = raion ? (raion.typename.toLowerCase() === 'г' ? raion.typename + '. ' + raion.value : raion.value + ' ' + raion.typename) : null;
+        //
+        params.fiasRaionObjectId = 0;
 
         const indexCity = $$('cities').getValue();
         const city = $$('cities').getList().getItem(indexCity);
         const cityLabel = city ? (city.typename + '. ' + city.value) : null;
+        let raionLabelTest = null;
+
+        console.log(city);
+
+        if (city && city.districttypename) {
+            raionLabelTest = city.districttypename.toLowerCase() === 'респ' ? city.districttypename + '. ' + city.districtname : city.districtname + ' ' + city.districttypename;
+            params.fiasRaionObjectId = city ? city.districtobjectid : 0;
+        }
+
+        console.log(raionLabelTest);
 
         params.fiasCityObjectId = city ? city.objectid : 0;
 
@@ -556,10 +634,10 @@ function addAddress() {
         params.fiasHouseObjectId = 0;
 
         params.fiasObjectId = 0;
-        if (cityLabel) {
-            params.fullAddress = [regionLabel, raionLabel, cityLabel, streetLabel, house, office].join(', ');
+        if (raionLabelTest && raionLabelTest !== regionLabel) {
+            params.fullAddress = [regionLabel, raionLabelTest, cityLabel, streetLabel, house, office].join(', ');
         } else {
-            params.fullAddress = [regionLabel, raionLabel, streetLabel, house, office].join(', ');
+            params.fullAddress = [regionLabel, cityLabel, streetLabel, house, office].join(', ');
         }
         params.houseHand = house;
         params.apartmentHand = office;
@@ -570,6 +648,8 @@ function addAddress() {
         console.log(selectedItem);
 
         console.log(params);
+
+        //return;
 
         webix.ajax()
             .headers({'Content-type': 'application/json'})
@@ -588,7 +668,7 @@ function addAddress() {
             });
         form.clear();
         form.clearValidation();
-        $$('cities').enable();
+        //$$('cities').enable();
     }
     else {
         console.log('false');
