@@ -7,8 +7,8 @@ const depContacts = {
             {
                 view: 'datatable',
                 id: "dep_contacts_table",
-                // select: "row",
-                // navigation: true,
+                select: "row",
+                navigation: true,
                 // resizeColumn: true,
                 fixedRowHeight:false,
                 columns: [
@@ -76,7 +76,8 @@ const depContacts = {
                 on: {
                     'data->onStoreUpdated': function() {
                         this.data.each(function (obj, i) {
-                            obj.index = i + 1;
+                            var j = i + 1;
+                            obj.index = "<p>" + j + "</p>";
                         });
                         this.adjustRowHeight(null, true);
                     }
