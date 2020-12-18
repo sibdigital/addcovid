@@ -1,8 +1,8 @@
 const settings = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // scroll: 'xy',
+    // body: {
+    //     type: 'space',
         rows: [
             {
                 view: 'form',
@@ -58,5 +58,5 @@ const settings = {
                 ]
             }
         ]
-    }
+    // }
 }

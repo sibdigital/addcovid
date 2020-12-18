@@ -208,7 +208,6 @@ let bigMainForm = {
         },
         {
             rows: [
-
                 {
                     view: 'toolbar',
                     id: 'toolbar',
@@ -245,7 +244,14 @@ let bigMainForm = {
                     ]
                 },
                 {
-                    id: 'content'
+                    view: 'scrollview',
+                    scroll: 'xy',
+                    body: {
+                        padding: 20,
+                        rows: [
+                            {id: 'content'}
+                        ]
+                    }
                 }
             ],
         }
@@ -364,7 +370,13 @@ let smallMainForm = {
                     }
                 },
                 {
-                    id: 'content'
+                    view: 'scrollview',
+                    scroll: 'xy',
+                    body: {
+                        rows: [
+                            {id: 'content'}
+                        ]
+                    }
                 }
             ],
         }

@@ -1,8 +1,8 @@
 const requests = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // scroll: 'xy',
+    // body: {
+    //     type: 'space',
         rows: [
             {
                 autowidth: true,
@@ -131,7 +131,7 @@ const requests = {
                 ]
             }
         ]
-    }
+    // }
 }
 
 function allCheckedText() {
@@ -154,12 +154,12 @@ function showRequestViewForm(data) {
     webix.ui({
         id: 'content',
         rows: [
-            {
-                view: 'scrollview',
-                scroll: 'xy',
-                body: {
-                    type: 'space',
-                    rows: [
+            // {
+                // view: 'scrollview',
+                // scroll: 'xy',
+                // body: {
+                //     type: 'space',
+                //     rows: [
                         {
                             id: 'form',
                             view: 'form',
@@ -237,9 +237,9 @@ function showRequestViewForm(data) {
                                 },
                             ]
                         }
-                    ]
-                }
-            }
+            //         ]
+            //     }
+            // }
         ]
     }, $$('content'));
 
@@ -403,13 +403,13 @@ function showTypeRequestsPage() {
 
         const v = {
             id: 'content',
-            type: 'space',
+            // type: 'space',
             rows: [
-                {
-                    view: 'scrollview',
-                    scroll: 'xy',
-                    body: {
-                        rows: [
+            //     {
+            //         view: 'scrollview',
+            //         scroll: 'xy',
+            //         body: {
+            //             rows: [
                             {
                                 view: 'template',
                                 template: '<p><h3 style="text-align: center; color: #000000">Выберите вид деятельности, по которому хотите подать заявку</h3></p>',
@@ -422,9 +422,9 @@ function showTypeRequestsPage() {
                                 // width: 200,
                                 autoheight: true,
                             }
-                        ]
-                    }
-                }
+            //             ]
+            //         }
+            //     }
             ]
         };
         webix.ui(v, $$('content'));

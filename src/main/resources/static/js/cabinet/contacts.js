@@ -1,12 +1,12 @@
 const contacts = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // scroll: 'xy',
+    // body: {
+    //     type: 'space',
         id: 'contactsMainLayout',
         rows: [
             {
-                type: 'wide',
+                // type: 'wide',
                 responsive: 'contactsMainLayout',
                 cols: [
                     {
@@ -120,7 +120,7 @@ const contacts = {
                 ]
             },
         ],
-    }
+    // }
 }
 
 function addContact() {

@@ -158,10 +158,10 @@ let importEmployees = webix.ui({
 });
 
 const employees = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // scroll: 'xy',
+    // body: {
+        type: 'form',
         rows: [
             {
                 id: 'cntIn',
@@ -308,7 +308,7 @@ const employees = {
                             },
                     },
                     {
-                        type: 'wide',
+                        // type: 'wide',
                         responsive: 'tableIn',
                         cols:
                             [
@@ -570,7 +570,7 @@ const employees = {
                 rows:[]
             },
         ]
-    }
+    // }
 }
 
 //Для поиска по кнопке

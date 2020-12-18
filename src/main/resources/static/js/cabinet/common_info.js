@@ -1,8 +1,8 @@
 const commonInfo = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // scroll: 'xy',
+    // body: {
+    //     type: 'space',
         rows: [
             {
                 view: 'form',
@@ -11,7 +11,7 @@ const commonInfo = {
                 elements: [
                     view_section('Данные о вашей организации'),
                     {
-                        type: 'space',
+                        // type: 'space',
                         margin: 5,
                         rows: [
                             {
@@ -163,7 +163,7 @@ const commonInfo = {
                 url: 'organization'
             }
         ],
-    }
+    // }
 }
 
 function adaptiveCommonInfo(){

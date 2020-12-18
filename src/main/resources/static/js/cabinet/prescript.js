@@ -1,8 +1,8 @@
 const prescript = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // scroll: 'xy',
+    // body: {
+    //     type: 'space',
         rows: [
             {
                 view: 'datatable',
@@ -55,7 +55,7 @@ const prescript = {
                 url: 'prescriptions'
             },
         ]
-    }
+    // }
 }
 
 function showOrganizationPrescriptionCreateForm(idPrescription, accepted) {
@@ -164,10 +164,10 @@ function allChecked() {
 }
 
 const organizationPrescriptionForm = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // scroll: 'xy',
+    // body: {
+    //     type: 'space',
         rows: [
             {
                 view: 'form',
@@ -285,5 +285,5 @@ const organizationPrescriptionForm = {
                 ]
             }
         ]
-    }
+    // }
 };

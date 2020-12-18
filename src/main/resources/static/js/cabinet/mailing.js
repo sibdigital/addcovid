@@ -1,8 +1,8 @@
 const mailing = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // scroll: 'xy',
+    // body: {
+    //     type: 'space',
         rows: [
             {
                 view: "segmented", type: "bottom", multiview: true, options: [
@@ -196,7 +196,7 @@ const mailing = {
             },
 
         ]
-    }
+    // }
 }
 
 function getMyMailingList(dtable){
