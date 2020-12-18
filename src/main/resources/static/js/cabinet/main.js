@@ -25,7 +25,11 @@ webix.html.addStyle(
     "font-weight: 500;" +
     "color: #313131;" +
     "padding: 8px 3px !important;" +
-    "}"
+    "}"+
+    ".topMenuIcon .webix_icon:before{\n" +
+    "color: #1992af;" +
+    "font-size: 1.5rem;\n" +
+    " }"
 );
 
 webix.attachEvent("onFocusChange", function (to, from) {
@@ -248,6 +252,8 @@ let bigMainForm = {
                                 {
                                     view: 'icon',
                                     icon: 'mdi mdi-account-circle',
+                                    css: 'topMenuIcon',
+                                    tooltip: 'Профиль',
                                     click: function () {
                                         webix.ui({
                                             id: 'content',
@@ -260,8 +266,10 @@ let bigMainForm = {
                                 {
                                     view: 'icon',
                                     id: 'bigHelpId',
+                                    css: 'topMenuIcon',
                                     icon: 'mdi mdi-help-circle',
                                     value: 'helps',
+                                    tooltip: 'Помощь',
                                     click: function () {
                                         window.open(this.getValue())
                                     },
@@ -269,6 +277,8 @@ let bigMainForm = {
                                 {
                                     view: 'icon',
                                     icon: 'mdi mdi-book-open',
+                                    css: 'topMenuIcon',
+                                    tooltip: 'Контакты ИОГВ',
                                     click: function () {
                                         if ($$('dep_contacts_table') != null) {
                                             $$('dep_contacts_table').destructor();
@@ -284,7 +294,9 @@ let bigMainForm = {
                                 },
                                 {
                                     view: 'icon',
+                                    css: 'topMenuIcon',
                                     icon: 'mdi mdi-exit-to-app',
+                                    tooltip: 'Выход',
                                     click: function () {
                                         webix.send("/logout");
                                     },
@@ -334,6 +346,7 @@ let smallMainForm = {
                                 {
                                     view: 'icon',
                                     icon: 'mdi mdi-account-circle',
+                                    tooltip: 'Профиль',
                                     click: function () {
                                         webix.ui({
                                             id: 'content',
@@ -347,7 +360,9 @@ let smallMainForm = {
                                     view: 'icon',
                                     id: 'smallHelpId',
                                     icon: 'mdi mdi-help-circle',
+                                    css: 'topMenuIcon',
                                     value: 'helps',
+                                    tooltip: 'Помощь',
                                     click: function () {
                                         window.open(this.getValue());
                                     },
@@ -355,6 +370,8 @@ let smallMainForm = {
                                 {
                                     view: 'icon',
                                     icon: 'mdi mdi-book-open',
+                                    css: 'topMenuIcon',
+                                    tooltip: 'Контакты ИОГВ',
                                     click: function () {
                                         if ($$('dep_contacts_table') != null) {
                                             $$('dep_contacts_table').destructor();
@@ -371,6 +388,8 @@ let smallMainForm = {
                                 {
                                     view: 'icon',
                                     icon: 'mdi mdi-exit-to-app',
+                                    css: 'topMenuIcon',
+                                    tooltip: 'Выход',
                                     click: function () {
                                         webix.send("/logout");
                                     },
