@@ -38,61 +38,6 @@ webix.attachEvent("onFocusChange", function (to, from) {
     }
 })
 
-let UsercontextMenu = webix.ui({
-    view: "contextmenu",
-    css: 'user_menu_items',
-    data: [
-        {id: "CommonInfo",  value: 'Профиль'},
-        // {id: "Contacts", value: 'Контактная информация'},
-        {id: "Mailing", value: 'Рассылки', badge: setRequestsBadge()},
-        {id: "Help", value: 'Помощь'},
-        {id: "Settings", value: 'Настройки'},
-        {id: "DepContacts", value: 'Контакты подразделений'},
-        { $template:"Separator" },
-        {id: 'Exit', value: 'Выход'}
-        ], //"Изменить аватар", ,
-    on: {
-        onMenuItemClick: function (id) {
-            let view;
-            if (id === 'CommonInfo') {
-                view = commonInfo;
-            } else if (id === 'Contacts') {
-                view = contacts;
-            } else if (id === 'Mailing') {
-                view = mailing;
-            } else if (id == 'DepContacts') {
-                view = depContacts;
-            } else if (id === 'Help') {
-                window.open('helps', '_blank');
-            } else if (id === 'Settings') {
-                view = settings;
-            } else if (id === 'Exit') {
-                webix.send("/logout");
-            }
-            if (view != null) {
-                webix.ui({
-                    id: 'content',
-                    rows: [
-                        view
-                    ]
-                }, $$('content'))
-            }
-        }
-    }
-});
-
-function showDropDownMenu(span){
-    if(span.offsetWidth < 100){
-        UsercontextMenu.config.width = 190; UsercontextMenu.resize();
-    }else{
-        UsercontextMenu.config.width = span.offsetWidth+85; UsercontextMenu.resize();
-    }
-    let toolBarHeight = $$('toolbar').config.height - 5;
-    UsercontextMenu.show({
-        x:document.body.clientWidth-span.offsetWidth-50,y:toolBarHeight
-    })
-}
-
 function setRequestsBadge(){
     webix.ajax("count_confirmed_requests").then(function(data){
         let requestsCount = data.json().length;
@@ -197,8 +142,7 @@ let bigMainForm = {
                                 }, $$('content'));
                                 itemValue = this.getMenuItem(id).value
                                 $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + itemValue + " " + requestsBadge + "</span>");
-                                // $$("helpHrefId").setValue(`<div style='text-align: right'><a class='mdi mdi-help-circle' target='_blank' href=${helpUrl}></a></div>`);
-                                // $$("helpHrefId").refresh();
+
                                 $$('bigHelpId').setValue(helpUrl);
                                 $$('bigHelpId').refresh();
                             }
@@ -232,23 +176,6 @@ let bigMainForm = {
                         },
                         {
                             cols: [
-                            //     {
-                            //     id: 'helpHrefId',
-                            //     view: 'label',
-                            //     borderless: true,
-                            //
-                            //     label: "<div style='text-align: right'><a class='mdi mdi-help-circle' target=\'_blank\' href=\'helps\'></a></div>",
-                            // },
-                                // {
-                                //     view: 'template',
-                                //     borderless: true,
-                                //     maxWidth: 128,
-                                //     template: "<div style='text-align: left'>" +
-                                //         "<img class='user_avatar' src = \"avatar.jpg\"> " +
-                                //         "<span id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\"" +
-                                //         "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
-                                //     url: 'organization',
-                                // }
                                 {
                                     view: 'icon',
                                     icon: 'mdi mdi-account-circle',
@@ -280,6 +207,7 @@ let bigMainForm = {
                                     css: 'topMenuIcon',
                                     tooltip: 'Контакты ИОГВ',
                                     click: function () {
+                                        // fix bug
                                         if ($$('dep_contacts_table') != null) {
                                             $$('dep_contacts_table').destructor();
                                         }
@@ -336,13 +264,6 @@ let smallMainForm = {
                                     view: 'label',
                                     label: `<span style="font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
                                 },
-                                // {
-                                //     view: 'template',
-                                //     width: 50,
-                                //     borderless: true,
-                                //     template: "<div id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\" " +
-                                //         "style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> ",
-                                // },
                                 {
                                     view: 'icon',
                                     icon: 'mdi mdi-account-circle',
@@ -373,6 +294,7 @@ let smallMainForm = {
                                     css: 'topMenuIcon',
                                     tooltip: 'Контакты ИОГВ',
                                     click: function () {
+                                        // fix bug
                                         if ($$('dep_contacts_table') != null) {
                                             $$('dep_contacts_table').destructor();
                                         }

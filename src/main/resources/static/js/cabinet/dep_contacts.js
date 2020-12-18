@@ -9,7 +9,6 @@ const depContacts = {
                 id: "dep_contacts_table",
                 select: "row",
                 navigation: true,
-                // resizeColumn: true,
                 fixedRowHeight:false,
                 columns: [
                     {
@@ -20,54 +19,21 @@ const depContacts = {
                     },
                     {
                         header: "ИОГВ",
-                        template: function (obj) {
-                            if (obj.department.fullName != null) {
-                                return "<p>" + obj.department.fullName + "</p>"
-                            }
-                            else {
-                                return "<p>" + obj.department.name + "</p>"
-                            }
-                        },
+                        template: obj => getDepartmentName(obj),
                         adjust: true,
                         fillspace: true,
                         readonly: true,
                     },
                     {
                         header: "Телефоны",
-                        template: function (obj) {
-                            temp = "";
-                            if (obj.phones.length != 0) {
-                                for (var i in obj.phones) {
-                                    var contact = obj.phones[i];
-                                    if (contact.description == '') {
-                                        temp = temp + "<p>" + contact.contactValue + "</p>";
-                                    } else {
-                                        temp = temp + "<p>" + contact.description + ": " + contact.contactValue + "</p>";
-                                    }
-                                }
-                            }
-                            return temp;
-                        },
+                        template: obj => getPhones(obj),
                         fillspace: true,
                         // adjust: true,
                         readonly: true,
                     },
                     {
                         header: "Электронная почта",
-                        template: function (obj) {
-                            temp = "";
-                            if (obj.emails.length != 0) {
-                                for (var i in obj.emails) {
-                                    var contact = obj.emails[i];
-                                    if (contact.description == '') {
-                                        temp = temp + "<p>" + contact.contactValue + "</p>";
-                                    } else {
-                                        temp = temp + "<p>" + contact.description + ": " + contact.contactValue + "</p>";
-                                    }
-                                }
-                            }
-                            return temp;
-                        },
+                        template: obj => getEmails(obj),
                         fillspace: true,
                         // adjust: true,
                         readonly: true,
@@ -86,4 +52,44 @@ const depContacts = {
             },
         ],
     }
+}
+
+
+function getDepartmentName(obj) {
+    if (obj.department.fullName != null) {
+        return "<p>" + obj.department.fullName + "</p>"
+    }
+    else {
+        return "<p>" + obj.department.name + "</p>"
+    }
+}
+
+function getPhones(obj) {
+    temp = "";
+    if (obj.phones.length != 0) {
+        for (var i in obj.phones) {
+            var contact = obj.phones[i];
+            if (contact.description == '') {
+                temp = temp + "<p>" + contact.contactValue + "</p>";
+            } else {
+                temp = temp + "<p>" + contact.description + ": " + contact.contactValue + "</p>";
+            }
+        }
+    }
+    return temp;
+}
+
+function getEmails(obj) {
+    temp = "";
+    if (obj.emails.length != 0) {
+        for (var i in obj.emails) {
+            var contact = obj.emails[i];
+            if (contact.description == '') {
+                temp = temp + "<p>" + contact.contactValue + "</p>";
+            } else {
+                temp = temp + "<p>" + contact.description + ": " + contact.contactValue + "</p>";
+            }
+        }
+    }
+    return temp;
 }
