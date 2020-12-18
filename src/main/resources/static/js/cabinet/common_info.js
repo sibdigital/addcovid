@@ -1,22 +1,17 @@
 const commonInfo = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
-        rows: [
-            {
-                view: 'form',
-                id: 'form',
-                complexData: true,
-                elements: [
-                    view_section('Данные о вашей организации'),
-                    {
-                        type: 'space',
-                        margin: 5,
-                        rows: [
-                            {
-                                view: 'text',
-                                name: 'name',
+
+    view: 'form',
+    id: 'common_info_form',
+    complexData: true,
+    elements: [
+        view_section('Данные о вашей организации'),
+        {
+            type: 'space',
+            margin: 5,
+            rows: [
+                {
+                    view: 'text',
+                    name: 'name',
                                 id: 'organizationName',
                                 label: 'Полное наименование организации/фамилия, имя, отчество индивидуального предпринимателя',
                                 labelPosition: 'top',
@@ -161,14 +156,5 @@ const commonInfo = {
                     }
                 ],
                 url: 'organization'
-            }
-        ],
-    }
-}
-
-function adaptiveCommonInfo(){
-
-    $$("organizationName").config.label = "Наим. орг./ФИО ИП";$$("organizationName").refresh();
-    $$("shortOrganizationName").config.label = "Краткое наим. орг."; $$("shortOrganizationName").refresh();
 
 }

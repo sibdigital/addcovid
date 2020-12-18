@@ -189,7 +189,7 @@ const requestWizard = {
                                                         attachFile(obj)
                                                     },
                                                     onAfterSelect:function (id){
-                                                        document.getElementById(id).innerHTML="<img style='width: 65px; height: 65px' src='galochka.png'>"
+                                                        document.getElementById("doc_id_"+id).innerHTML="<img style='width: 65px; height: 65px' src='galochka.png'>"
                                                     }
                                                 },
                                                 template: function (obj) {
@@ -200,9 +200,9 @@ const requestWizard = {
                                                     } else {
                                                         docImg = "pdf.png"
                                                     }
-                                                    return "<div id='2' class='overallRequestNew' >" +
+                                                    return "<div class='overallRequestNew' >" +
                                                                 "<div>" +
-                                                                    "<div style='position: absolute; ' id='"+obj.id+"'><img src = " + docImg + "></div>" +
+                                                                    "<div style='position: absolute; ' id='doc_id_"+obj.id+"'><img src = " + docImg + "></div>" +
                                                                     "<div class='doc_title'>" + obj.originalFileName.slice(0, -4) + "</div>" +
                                                                     //"<div id='del_button' style='position: absolute;top: 0; right: 5px;' ondblclick='del_file()' class='mdi mdi-close-thick'></div>" +
                                                                     //"<div id='plus_button' style='position: absolute;top: 0; right: 20px;'  ondblclick='' class='mdi mdi-plus-thick'></div>" +

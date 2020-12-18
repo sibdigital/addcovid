@@ -102,7 +102,7 @@ let importEmployees = webix.ui({
             position: 'center',
             elements: [
                 {
-                    id: 'upload',
+                    id: 'uploadExcel',
                     view: 'uploader',
                     css: 'webix_secondary',
                     value: 'Выбрать файл',
@@ -111,10 +111,10 @@ let importEmployees = webix.ui({
                     required: true,
                     accept: '.xlsx, .xls, .csv',
                     multiple: true,
-                    link: 'filelist',
+                    link: 'excelFilesList',
                 },
                 {
-                    view: 'list', id: 'filelist', type: 'uploader',
+                    view: 'list', id: 'excelFilesList', type: 'uploader',
                     autoheight: true, borderless: true
                 },
                 {
@@ -125,15 +125,15 @@ let importEmployees = webix.ui({
                     id: 'no_pdf'
                 },
                 {
-                    id: 'send_btn',
+                    id: 'load_files_btn',
                     view: 'button',
                     css: 'webix_primary',
                     value: 'Загрузить',
                     align: 'center',
                     click: function () {
-                        $$('upload').send(function (response) {
+                        $$('uploadExcel').send(function (response) {
                             let uploadedFiles = []
-                            $$('upload').files.data.each(function (obj) {
+                            $$('uploadExcel').files.data.each(function (obj) {
                                 let status = obj.status
                                 let name = obj.name
                                 if (status == 'server') {
@@ -141,13 +141,13 @@ let importEmployees = webix.ui({
                                     uploadedFiles.push(sname)
                                 }
                             })
-                            if (uploadedFiles.length != $$('upload').files.data.count()) {
+                            if (uploadedFiles.length != $$('uploadExcel').files.data.count()) {
                                 webix.message('Не удалось загрузить файлы.', "error")
-                                $$('upload').focus()
+                                $$('uploadExcel').focus()
                             }
                             $$('employees_table').clearAll();
                             $$('employees_table').load('employees');
-                            $$("upload").files.data.clearAll();
+                            $$("uploadExcel").files.data.clearAll();
                             importEmployees.hide();
                             console.log(uploadedFiles)
                         })
