@@ -17,13 +17,13 @@ const setObject = async (url, id, idView) => {
 
 
 const address = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // scroll: 'xy',
+    // body: {
+    //     type: 'space',
         rows: [
             {
-                type: 'wide',
+                // type: 'wide',
                 rows: [
                     {
                         //gravity: 0.2,

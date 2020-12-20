@@ -142,13 +142,14 @@ function showRequestCreateForm(idTypeRequest, page) {
 }
 
 const requestWizard = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // scroll: 'xy',
+    // body: {
+    //     type: 'space',
         rows: [
             {
                 view: 'form',
+                type: 'clean',
                 id: 'newRequestForm',
                 minWidth: 200,
                 complexData: true,
@@ -173,7 +174,7 @@ const requestWizard = {
                                 rows: [
                                     {type: 'header', id:"headerId", template: 'Шаг 1. Приложите документы'},
                                     {
-                                        type: 'wide',
+                                        // type: 'wide',
                                         responsive: 'documentsMainLayout',
                                         cols: [
                                             {
@@ -595,7 +596,7 @@ const requestWizard = {
                 ]
             }
         ]
-    }
+    // }
 }
 
 function attachFile(id){

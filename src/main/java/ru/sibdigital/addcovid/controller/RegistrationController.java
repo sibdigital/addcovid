@@ -7,11 +7,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.config.ApplicationConstants;
+import ru.sibdigital.addcovid.dto.EgripResponse;
+import ru.sibdigital.addcovid.dto.EgrulResponse;
 import ru.sibdigital.addcovid.dto.OrganizationDto;
+import ru.sibdigital.addcovid.dto.egrip.EGRIP;
+import ru.sibdigital.addcovid.dto.egrul.EGRUL;
 import ru.sibdigital.addcovid.model.ClsOrganization;
+import ru.sibdigital.addcovid.model.classifier.gov.RegEgrip;
+import ru.sibdigital.addcovid.model.classifier.gov.RegEgrul;
 import ru.sibdigital.addcovid.service.EmailService;
 import ru.sibdigital.addcovid.service.RequestService;
 import ru.sibdigital.addcovid.service.SettingService;
+import ru.sibdigital.addcovid.service.crassifier.EgrulService;
 
 @Slf4j
 @Controller
@@ -31,6 +38,9 @@ public class RegistrationController {
 
     @Autowired
     private SettingService settingService;
+
+    @Autowired
+    private EgrulService egrulService;
 
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -94,19 +104,70 @@ public class RegistrationController {
     }
 
     @PostMapping("/recovery")
-    public @ResponseBody String recovery(@RequestParam(name = "inn") String inn) {
-        ClsOrganization clsOrganization = requestService.findOrganizationByInn(inn);
+    public @ResponseBody String recovery(@RequestBody OrganizationDto dto) {
+        ClsOrganization clsOrganization = requestService.findOrganizationByInn(dto.getOrganizationInn());
         if (clsOrganization != null) {
-            String newPassword = requestService.changeOrganizationPassword(inn);
-            boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(),
-                    applicationConstants.getApplicationName() + ". Восстановление пароля",
-                    "По ИНН "+ clsOrganization.getInn() + " произведена смена пароля. " +
-                            "Ваш новый пароль от личного кабинета на портале Работающая Бурятия: " + newPassword);
-            if (!emailSent) {
-                return "Не удалось отправить письмо";
+            String inn = dto.getOrganizationInn();
+            if (inn == null || inn.isBlank()) {
+                return "ИНН не указан";
             }
-            return "Ок";
+            String email = dto.getOrganizationEmail();
+            if (email == null || email.isBlank()) {
+                return "Адрес электронной почты не указан";
+            }
+
+            boolean emailLinked;
+            try {
+                emailLinked = isEmailLinked(clsOrganization, email);
+            } catch (Exception e) {
+                e.getMessage();
+                return "Не удалось проверить адрес электронной почты";
+            }
+
+            if (emailLinked) {
+                String newPassword = requestService.changeOrganizationPassword(dto.getOrganizationInn());
+                boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(),
+                        applicationConstants.getApplicationName() + ". Восстановление пароля",
+                        "По ИНН " + clsOrganization.getInn() + " произведена смена пароля. " +
+                                "Ваш новый пароль от личного кабинета на портале Работающая Бурятия: " + newPassword);
+                if (!emailSent) {
+                    return "Не удалось отправить письмо";
+                }
+                return "Ок";
+            } else {
+                return "Адрес электронной почты не привязан к учетной записи";
+            }
         }
         return "ИНН не найден";
+    }
+
+    private boolean isEmailLinked(ClsOrganization organization, String email) throws Exception {
+        boolean emailLinked = false;
+        if (email.equals(organization.getEmail())) {
+            emailLinked = true;
+        } else {
+            if (organization.getInn().length() == 10) {
+                RegEgrul egrul = egrulService.getEgrul(organization.getInn());
+                if (egrul != null) {
+                    EgrulResponse response = new EgrulResponse();
+                    response.build(mapper.readValue(egrul.getData(), EGRUL.СвЮЛ.class));
+                    if (response.getData().getEmail() != null && !response.getData().getEmail().isBlank()
+                            && email.equals(response.getData().getEmail())) {
+                        emailLinked = true;
+                    }
+                }
+            } else {
+                RegEgrip egrip = egrulService.getEgrip(organization.getInn());
+                if (egrip != null) {
+                    EgripResponse response = new EgripResponse();
+                    response.build(mapper.readValue(egrip.getData(), EGRIP.СвИП.class));
+                    if (response.getData().getEmail() != null && !response.getData().getEmail().isBlank()
+                            && email.equals(response.getData().getEmail())) {
+                        emailLinked = true;
+                    }
+                }
+            }
+        }
+        return emailLinked;
     }
 }

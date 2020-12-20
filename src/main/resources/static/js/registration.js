@@ -1,3 +1,7 @@
+webix.i18n.setLocale("ru-RU");
+
+const windowHeight = window.innerHeight
+
 let descrStep1 = '<span style=" height: auto; font-size: 0.8rem; color: #fff6f6">' +
     'Вам необходимо ввести ИНН Вашей организации или ИП. ИНН будет проверен по ЕГРЮЛ и ЕГРИП.' +
     'Для регистрации необходимо, чтобы Ваша организация или ИП были зарегистрированы в ЕГРЮЛ или ЕГРИП.' +
@@ -55,7 +59,7 @@ let leftLayout = {
             css:{"background-color":"#475466", "text-align":"center", "padding-left":"2px","padding-right":"2px"},
             borderless: true,
             autoheight: true,
-            template: descrStep1
+            template: descrStep1,
         },
     ]
 
@@ -294,7 +298,6 @@ let rightLayout = {
                     borderless: true,
                     autoheight: true,
                     template: descrStep1,
-
                 }
             ]
         },

@@ -6,7 +6,7 @@ const commonInfo = {
     elements: [
         view_section('Данные о вашей организации'),
         {
-            type: 'space',
+            //type: 'space',
             margin: 5,
             rows: [
                 {

@@ -1,12 +1,12 @@
 const documents = {
-    view: 'scrollview',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // scroll: 'xy',
+    // body: {
+    //     type: 'space',
         id: 'documentsMainLayout',
         rows: [
             {
-                type: 'wide',
+                // type: 'wide',
                 responsive: 'documentsMainLayout',
                 cols:[
                     {
@@ -105,7 +105,7 @@ const documents = {
                 ]
             }
         ],
-    }
+    // }
 }
 
 function del_file(){

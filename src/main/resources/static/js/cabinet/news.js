@@ -133,10 +133,10 @@ var options = {
 };
 
 const archiveNews =  {
-    view: 'scrollview',
+    // view: 'scrollview',
     id: 'archiveNewsId',
-    scroll: 'xy',
-    body: {
+    // scroll: 'xy',
+    // body: {
         rows: [
             {
                 view: 'toolbar',
@@ -200,15 +200,15 @@ const archiveNews =  {
                 }
             },
         ]
-    }
+    // }
 }
 
 const news = {
-    view: 'scrollview',
+    // view: 'scrollview',
     id: 'newsId',
-    scroll: 'xy',
+    // scroll: 'xy',
 
-    body: {
+    // body: {
         rows: [
             {
                 view: 'toolbar',
@@ -285,7 +285,7 @@ const news = {
                 }
             }
         ]
-    }
+    // }
 }
 
 const newsForm = {

@@ -23,7 +23,7 @@ public class EgrulResponse {
         isFinded = finded;
     }
 
-    private class Data{
+    public class Data{
         private String inn;
         private String ogrn;
         private String name;
