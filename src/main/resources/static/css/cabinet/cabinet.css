@@ -258,7 +258,7 @@ body {margin: 0}
     box-shadow: 0 1px 1px #d4d7de;
 }
 
-.webix_list_item.webix_selected {
+.webix_list_item.my_menubar_item.webix_selected {
   background-color: #373a42 !important;
   /*box-shadow: inset 2px 0 #1CA1C1;*/
 }

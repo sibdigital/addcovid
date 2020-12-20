@@ -38,7 +38,7 @@ let UsercontextMenu = webix.ui({
     view: "contextmenu",
     css: 'user_menu_items',
     data: [
-        {id: "CommonInfo",  value: 'Профиль'},
+        {id: "Profile",  value: 'Профиль'},
         // {id: "Contacts", value: 'Контактная информация'},
         {id: "Mailing", value: 'Рассылки', badge: setRequestsBadge()},
         {id: "Help", value: 'Помощь'},
@@ -50,8 +50,8 @@ let UsercontextMenu = webix.ui({
     on: {
         onMenuItemClick: function (id) {
             let view;
-            if (id === 'CommonInfo') {
-                view = commonInfo;
+            if (id === 'Profile') {
+                view = profile;
             } else if (id === 'Contacts') {
                 view = contacts;
             } else if (id === 'Mailing') {
@@ -60,8 +60,6 @@ let UsercontextMenu = webix.ui({
                 view = depContacts;
             } else if (id === 'Help') {
                 window.open('helps', '_blank');
-            } else if (id === 'Settings') {
-                view = settings;
             } else if (id === 'Exit') {
                 webix.send("/logout");
             }
@@ -135,15 +133,14 @@ let bigMainForm = {
                     //collapsed: true,
                     layout: 'y',
                     data: [
-                        {id: "CommonInfo", icon: "mdi mdi-information", value: 'Общая информация'},
+                        {id: "Profile", icon: "mdi mdi-account-circle", value: 'Профиль'},
                         {id: "Employees", icon: "mdi mdi-account-group", value: 'Сотрудники'},
                         {id: "Documents", icon: "mdi mdi-cloud-upload-outline", value: 'Документы'},
                         {id: "Address", icon: "mdi mdi-home-city-outline", value: 'Фактические адреса'},
                         {id: "Prescript", icon: "mdi mdi-text-box-check-outline", value: 'Предписания'},
                         {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
                         {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
-                        {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Доп.контакты'},
-                        {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
+                        {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Доп.контакты'}
                     ],
                     type: {
                         css: 'my_menubar_item',
@@ -155,8 +152,8 @@ let bigMainForm = {
                             let itemValue;
                             let requestsBadge = "";
                             let helpUrl = 'helps?key=' + id;
-                            if (id == 'CommonInfo') {
-                                view = commonInfo;
+                            if (id == 'Profile') {
+                                view = profile;
                             } else if (id == 'Requests') {
                                 view = requests;
                                 let checkReqBadge = this.getMenuItem(id).badge
@@ -292,7 +289,7 @@ let smallMainForm = {
                     css: 'my_menubar',
                     //collapsed: true,
                     data: [
-                        {id: "CommonInfo", value: 'Общая информация',},
+                        {id: "Profile", value: 'Профиль',},
                         {id: "Employees", value: 'Сотрудники',},
                         {
                             value: "<span class='mdi mdi-dots-horizontal'></span>",
@@ -333,8 +330,8 @@ let smallMainForm = {
                         onMenuItemClick: function (id) {
                             let view;
 
-                            if (id == 'CommonInfo') {
-                                view = commonInfo;
+                            if (id == 'Profile') {
+                                view = profile;
                             } else if (id == 'Requests') {
                                 view = requests;
                             } else if (id == 'Employees') {

@@ -24,7 +24,7 @@ const documents = {
                             }else{
                                 docImg = "pdf.png"
                             }
-                            return "<div id='2' class='overall'>" +
+                            return "<div class='overall'>" +
                                         "<div>" +
                                             "<img style='position: absolute' src = "+docImg+"> " +
                                             "<div class='doc_title'>"+obj.originalFileName.slice(0, -4)+"</div>" +
@@ -49,7 +49,6 @@ const documents = {
                         minWidth: 200,
                         position: 'center',
                         elements: [
-                            {gravity: 0.6},
                             {
                                 id: 'upload',
                                 view: 'uploader',
