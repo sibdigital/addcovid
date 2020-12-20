@@ -25,7 +25,11 @@ webix.html.addStyle(
     "font-weight: 500;" +
     "color: #313131;" +
     "padding: 8px 3px !important;" +
-    "}"
+    "}"+
+    ".topMenuIcon .webix_icon:before{\n" +
+    "color: #1992af;" +
+    "font-size: 1.5rem;\n" +
+    " }"
 );
 
 webix.attachEvent("onFocusChange", function (to, from) {
@@ -140,6 +144,7 @@ let bigMainForm = {
                         {id: "Prescript", icon: "mdi mdi-text-box-check-outline", value: 'Предписания'},
                         {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
                         {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
+                        {id: "Mailing", icon: "mdi mdi-email", value: 'Рассылки',},
                         {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Доп.контакты'}
                     ],
                     type: {
@@ -189,8 +194,9 @@ let bigMainForm = {
                                 }, $$('content'));
                                 itemValue = this.getMenuItem(id).value
                                 $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + itemValue + " " + requestsBadge + "</span>");
-                                $$("helpHrefId").setValue(`<div style='text-align: right'><a class='mdi mdi-help-circle' target='_blank' href=${helpUrl}></a></div>`);
-                                $$("helpHrefId").refresh();
+
+                                $$('bigHelpId').setValue(helpUrl);
+                                $$('bigHelpId').refresh();
                             }
 
                             // webix.ajax("/check_session").then(function (data){
@@ -220,23 +226,61 @@ let bigMainForm = {
                             label: 'Личный кабинет',
                         },
                         {
-                            cols: [{
-                                id: 'helpHrefId',
-                                view: 'label',
-                                borderless: true,
-
-                                label: "<div style='text-align: right'><a class='mdi mdi-help-circle' target=\'_blank\' href=\'helps\'></a></div>",
-                            },
+                            cols: [
                                 {
-                                    view: 'template',
-                                    borderless: true,
-                                    maxWidth: 128,
-                                    template: "<div style='text-align: left'>" +
-                                        "<img class='user_avatar' src = \"avatar.jpg\"> " +
-                                        "<span id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\"" +
-                                        "class='user_shortName' style='margin-right: 25px'>#shortName#</span></div>",
-                                    url: 'organization',
-                                }]
+                                    view: 'icon',
+                                    icon: 'mdi mdi-account-circle',
+                                    css: 'topMenuIcon',
+                                    tooltip: 'Профиль',
+                                    click: function () {
+                                        webix.ui({
+                                            id: 'content',
+                                            rows: [
+                                                commonInfo
+                                            ]
+                                        }, $$('content'))
+                                    },
+                                },
+                                {
+                                    view: 'icon',
+                                    id: 'bigHelpId',
+                                    css: 'topMenuIcon',
+                                    icon: 'mdi mdi-help-circle',
+                                    value: 'helps',
+                                    tooltip: 'Помощь',
+                                    click: function () {
+                                        window.open(this.getValue())
+                                    },
+                                },
+                                {
+                                    view: 'icon',
+                                    icon: 'mdi mdi-book-open',
+                                    css: 'topMenuIcon',
+                                    tooltip: 'Контакты ИОГВ',
+                                    click: function () {
+                                        // fix bug
+                                        if ($$('dep_contacts_table') != null) {
+                                            $$('dep_contacts_table').destructor();
+                                        }
+
+                                        webix.ui({
+                                            id: 'content',
+                                            rows: [
+                                                depContacts
+                                            ]
+                                        }, $$('content'));
+                                    },
+                                },
+                                {
+                                    view: 'icon',
+                                    css: 'topMenuIcon',
+                                    icon: 'mdi mdi-exit-to-app',
+                                    tooltip: 'Выход',
+                                    click: function () {
+                                        webix.send("/logout");
+                                    },
+                                },
+                                ]
                         },
                     ]
                 },
@@ -279,11 +323,56 @@ let smallMainForm = {
                                     label: `<span style="font-size: 16px; font-family: Roboto, sans-serif;">${APPLICATION_NAME}</span>`,
                                 },
                                 {
-                                    view: 'template',
-                                    width: 50,
-                                    borderless: true,
-                                    template: "<div id='username' onclick=\"showDropDownMenu(document.getElementById('username'));\" " +
-                                        "style='text-align: right'><img class='user_avatar' src = \"avatar.jpg\"> ",
+                                    view: 'icon',
+                                    icon: 'mdi mdi-account-circle',
+                                    tooltip: 'Профиль',
+                                    click: function () {
+                                        webix.ui({
+                                            id: 'content',
+                                            rows: [
+                                                commonInfo
+                                            ]
+                                        }, $$('content'))
+                                    },
+                                },
+                                {
+                                    view: 'icon',
+                                    id: 'smallHelpId',
+                                    icon: 'mdi mdi-help-circle',
+                                    css: 'topMenuIcon',
+                                    value: 'helps',
+                                    tooltip: 'Помощь',
+                                    click: function () {
+                                        window.open(this.getValue());
+                                    },
+                                },
+                                {
+                                    view: 'icon',
+                                    icon: 'mdi mdi-book-open',
+                                    css: 'topMenuIcon',
+                                    tooltip: 'Контакты ИОГВ',
+                                    click: function () {
+                                        // fix bug
+                                        if ($$('dep_contacts_table') != null) {
+                                            $$('dep_contacts_table').destructor();
+                                        }
+
+                                        webix.ui({
+                                            id: 'content',
+                                            rows: [
+                                                depContacts
+                                            ]
+                                        }, $$('content'))
+                                    },
+                                },
+                                {
+                                    view: 'icon',
+                                    icon: 'mdi mdi-exit-to-app',
+                                    css: 'topMenuIcon',
+                                    tooltip: 'Выход',
+                                    click: function () {
+                                        webix.send("/logout");
+                                    },
                                 },
                             ]
                         },
@@ -318,6 +407,7 @@ let smallMainForm = {
                                     badge: setRequestsBadge()
                                 },
                                 {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
+                                {id: "Mailing", icon: "mdi mdi-email", value: 'Рассылки',},
                                 {
                                     id: "Contacts",
                                     icon: "mdi mdi-book-open-blank-variant",
@@ -352,6 +442,8 @@ let smallMainForm = {
                                 view = prescript;
                             } else if (id == 'News') {
                                 view = news;
+                            } else if (id == 'Mailing') {
+                                view = mailing;
                             } else if (id == 'Contacts') {
                                 view = contacts;
                             }
@@ -362,6 +454,8 @@ let smallMainForm = {
                                         view
                                     ]
                                 }, $$('content'));
+                                $$('smallHelpId').setValue('helps?key=' + id);
+                                $$('smallHelpId').refresh();
                             }
                         }
                     }
