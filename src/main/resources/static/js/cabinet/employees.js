@@ -204,6 +204,7 @@ const employees = {
                             hotkey: "enter",
                             click: function (){
                                 filterText();
+                                $$("dtFilter").setValue("")
                             }
                         },
                         {gravity: 0.02},
@@ -315,7 +316,7 @@ const employees = {
                                 {
                                     view: 'datatable',
                                     id: "employees_table",
-                                    height: userWindowHeight - 210,
+                                    height: userWindowHeight - 263,
                                     minWidth: 220,
                                     select: "row",
                                     navigation: true,
@@ -561,7 +562,7 @@ const employees = {
                                         webix.html.download('/download_employees')
                                     }
                                 },
-                            ]
+                            ],
                         }
                     ]
             },
@@ -584,7 +585,6 @@ function filterText() {
             return webix.ajax().headers({'Content-type': 'application/json'}).post("/filter", text);
         });
     }
-    $$("dtFilter").setValue("")
 }
 
 function adaptiveEmployees(){

@@ -236,7 +236,7 @@ let bigMainForm = {
                                         webix.ui({
                                             id: 'content',
                                             rows: [
-                                                commonInfo
+                                                profile
                                             ]
                                         }, $$('content'))
                                     },
@@ -330,7 +330,7 @@ let smallMainForm = {
                                         webix.ui({
                                             id: 'content',
                                             rows: [
-                                                commonInfo
+                                                profile
                                             ]
                                         }, $$('content'))
                                     },
@@ -383,11 +383,15 @@ let smallMainForm = {
                     id: 'menu',
                     css: 'my_menubar',
                     //collapsed: true,
+                    submenuConfig:{
+                        width: 170,
+                    },
                     data: [
                         {id: "Profile", value: 'Профиль',},
                         {id: "Employees", value: 'Сотрудники',},
                         {
                             value: "<span class='mdi mdi-dots-horizontal'></span>",
+                            width: 190,
                             submenu: [
                                 {id: "Documents", icon: "mdi mdi-cloud-upload-outline", value: 'Документы'},
                                 {
@@ -412,8 +416,7 @@ let smallMainForm = {
                                     id: "Contacts",
                                     icon: "mdi mdi-book-open-blank-variant",
                                     value: 'Доп. контакты'
-                                },
-                                {id: "Settings", icon: "mdi mdi-cogs", value: 'Настройки'},
+                                }
                             ]
                         }
 

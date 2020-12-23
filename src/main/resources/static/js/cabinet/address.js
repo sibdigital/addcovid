@@ -43,237 +43,247 @@ const address = {
                     },
                     elements: [
                         {
-                            cols: [
+                            id: "factAddressData",
+                            rows: [
                                 {
-                                    view: "combo",
-                                    id: "regions",
-                                    name: "fiasRegionObjectId",
-                                    label: 'Регион',
-                                    value: 'Респ. Бурятия',
-                                    labelPosition: 'top',
-                                    invalidMessage: 'Регион не может быть пустым',
-                                    options: {
-                                        keyPressTimeout: 250,
-                                        filter: (obj, filter) => {
-                                            const value = (obj.typename.toLowerCase() === 'респ' ? obj.typename + '. ' + obj.value : obj.value + ' ' + obj.typename).toLowerCase();
-                                            const preFilter = filter.toLowerCase();
+                                    responsive: "factAddressData",
+                                    cols: [
+                                        {
+                                            view: "combo",
+                                            id: "regions",
+                                            name: "fiasRegionObjectId",
+                                            minWidth: 200,
+                                            label: 'Регион',
+                                            value: 'Респ. Бурятия',
+                                            labelPosition: 'top',
+                                            invalidMessage: 'Регион не может быть пустым',
+                                            options: {
+                                                keyPressTimeout: 250,
+                                                filter: (obj, filter) => {
+                                                    const value = (obj.typename.toLowerCase() === 'респ' ? obj.typename + '. ' + obj.value : obj.value + ' ' + obj.typename).toLowerCase();
+                                                    const preFilter = filter.toLowerCase();
 
-                                            return obj.typename.toLowerCase().indexOf(preFilter) !== -1 || obj.value.toLowerCase().indexOf(preFilter) !== -1 || value.indexOf(preFilter) !== -1;
-                                        },
-                                        body: {
+                                                    return obj.typename.toLowerCase().indexOf(preFilter) !== -1 || obj.value.toLowerCase().indexOf(preFilter) !== -1 || value.indexOf(preFilter) !== -1;
+                                                },
+                                                body: {
 
-                                            url: 'regions',
-                                            template: (item) => {
-                                                const value = item.typename.toLowerCase() === 'респ' ? item.typename + '. ' + item.value : item.value + ' ' + item.typename;
-                                                return value;
-                                                // return `${value}"<div id='del_button' style='position: absolute;top: 0; right: 5px; font-size: 20px;' onclick='$$('regions').setValue('')' class='mdi mdi-delete'></div>",`;
-                                            },
-                                            ready: function () {
-                                                console.log('ready function');
-                                                $$('regions').setValue(60635); //60635 = Респ. Бурятия
-                                            }
-
-                                        }
-                                    },
-                                    on: {
-                                        onChange: (newval, oldval) => {
-                                            try {
-                                                console.log('onChange regions');
-                                                console.log(newval);
-                                                const indexRegion = $$('regions').getValue();
-                                                console.log(indexRegion);
-                                                if (!indexRegion) return;
-
-                                                const region = $$('regions').getList().getItem(indexRegion);
-                                                console.log(region);
-
-                                                if (region) {
-                                                    // let url = 'raions?objectid=' + region.objectid;
-                                                    let url = 'cities?regionCode=' + region.regioncode;
-
-                                                    const suggest_id = $$('fiasObjectGuid').config.suggest;
-                                                    $$(suggest_id).getList().clearAll();
-
-                                                    $$('cities').show();
-                                                    $$('cities').setValue('');
-                                                    $$('cities').getList().clearAll();
-                                                    $$('cities').getList().load(url);
-
-                                                }
-                                            } catch (e) {
-                                                console.log(e);
-                                            }
-                                        }
-                                    },
-                                },
-                                {
-                                    view: "combo",
-                                    id: "cities",
-                                    name: "fiasCityObjectId",
-                                    label: 'Населенный пункт<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearCityForm() class=\'mdi mdi-delete\'></div>',
-                                    labelPosition: 'top',
-                                    invalidMessage: 'Населенный пункт не может быть пустым',
-                                    tooltip: {
-                                        template: 'Вводите название населенного пункта без обозначения (город/село), например: Москва',
-                                    },
-                                    options: {
-                                        keyPressTimeout: 350,
-                                        body: {
-                                            dataFeed: function (inputString) {
-                                                const stapleIndex = inputString.indexOf('(');
-                                                const spaceIndex = inputString.indexOf(' ');
-                                                let str = stapleIndex !== -1 ? inputString.slice(0, stapleIndex - 1) : inputString;
-                                                str = spaceIndex !== -1 ? str.slice(spaceIndex + 1) : str;
-
-                                                const region = $$('regions').getList().getItem($$('regions').getValue());
-
-                                                const prevValue = $$('cities').getList().getItem($$('cities').getValue());
-                                                console.log(str);
-                                                console.log(prevValue);
-                                                //console.log(region);
-
-                                                if (!region || (str && prevValue && str === prevValue.value)) {
-                                                    return;
-                                                }
-
-                                                let url = `cities?regionCode=${region.regioncode}&name=${str}`;
-
-                                                if (!str.match(/[а-я]/gi)) {
-                                                    url = `cities?regionCode=${region.regioncode}`;
-                                                }
-
-                                                return webix.ajax().bind(this).get(url, function (data) {
-                                                    if (data) {
-                                                        //console.log(data);
-                                                        this.parse(data);
+                                                    url: 'regions',
+                                                    template: (item) => {
+                                                        const value = item.typename.toLowerCase() === 'респ' ? item.typename + '. ' + item.value : item.value + ' ' + item.typename;
+                                                        return value;
+                                                        // return `${value}"<div id='del_button' style='position: absolute;top: 0; right: 5px; font-size: 20px;' onclick='$$('regions').setValue('')' class='mdi mdi-delete'></div>",`;
+                                                    },
+                                                    ready: function () {
+                                                        console.log('ready function');
+                                                        $$('regions').setValue(60635); //60635 = Респ. Бурятия
                                                     }
-                                                });
-                                            },
-                                            dynamic: true,
-                                            template: (item) => {
-                                                //console.log(item);
-                                                let result = `<span>${item.typename}. ${item.value}</span>`;
-                                                if (item.level !== 5) {
-                                                    const raion = item.districtname + '. ' + item.districttypename;
-                                                    result += ` <span>(${raion})</span>`;
-                                                }
-                                                return result;
 
-                                            },
-                                            scheme: {
-                                                $sort: {
-                                                    by: 'value',
-                                                    dir: 'asc',
-                                                    as: 'string'
                                                 }
                                             },
-                                            ready: function () {
-                                            }
-                                        }
-                                    },
-                                    on: {
-                                        onChange: (newval, oldval) => {
-                                            try {
-                                                const indexCity = $$('cities').getValue();
-                                                console.log(indexCity);
-                                                if (!indexCity) return;
+                                            on: {
+                                                onChange: (newval, oldval) => {
+                                                    try {
+                                                        console.log('onChange regions');
+                                                        console.log(newval);
+                                                        const indexRegion = $$('regions').getValue();
+                                                        console.log(indexRegion);
+                                                        if (!indexRegion) return;
 
-                                                const city = $$('cities').getList().getItem(indexCity);
-                                                console.log(city);
-                                                console.log($$('cities').getList());
+                                                        const region = $$('regions').getList().getItem(indexRegion);
+                                                        console.log(region);
 
-                                                if (city) {
-                                                    const suggest_id = $$('fiasObjectGuid').config.suggest;
-                                                    const list = $$(suggest_id).getList();
-                                                    list.clearAll();
-                                                    const url = 'streets?objectid=' + city.objectid;
-                                                    //$$('fiasObjectGuid').setValue('');
-                                                    webix.ajax()
-                                                        .headers({'Content-type': 'application/json'})
-                                                        .get(url)
-                                                        .then(function (data) {
-                                                            console.log(data);
-                                                            if (data !== null) {
-                                                                list.parse(data);
-                                                                $$('fiasObjectGuid').focus();
+                                                        if (region) {
+                                                            // let url = 'raions?objectid=' + region.objectid;
+                                                            let url = 'cities?regionCode=' + region.regioncode;
+
+                                                            const suggest_id = $$('fiasObjectGuid').config.suggest;
+                                                            $$(suggest_id).getList().clearAll();
+
+                                                            $$('cities').show();
+                                                            $$('cities').setValue('');
+                                                            $$('cities').getList().clearAll();
+                                                            $$('cities').getList().load(url);
+
+                                                        }
+                                                    } catch (e) {
+                                                        console.log(e);
+                                                    }
+                                                }
+                                            },
+                                        },
+                                        {
+                                            view: "combo",
+                                            id: "cities",
+                                            name: "fiasCityObjectId",
+                                            minWidth: 200,
+                                            label: 'Населенный пункт<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearCityForm() class=\'mdi mdi-delete\'></div>',
+                                            labelPosition: 'top',
+                                            invalidMessage: 'Населенный пункт не может быть пустым',
+                                            tooltip: {
+                                                template: 'Вводите название населенного пункта без обозначения (город/село), например: Москва',
+                                            },
+                                            options: {
+                                                keyPressTimeout: 350,
+                                                body: {
+                                                    dataFeed: function (inputString) {
+                                                        const stapleIndex = inputString.indexOf('(');
+                                                        const spaceIndex = inputString.indexOf(' ');
+                                                        let str = stapleIndex !== -1 ? inputString.slice(0, stapleIndex - 1) : inputString;
+                                                        str = spaceIndex !== -1 ? str.slice(spaceIndex + 1) : str;
+
+                                                        const region = $$('regions').getList().getItem($$('regions').getValue());
+
+                                                        const prevValue = $$('cities').getList().getItem($$('cities').getValue());
+                                                        console.log(str);
+                                                        console.log(prevValue);
+                                                        //console.log(region);
+
+                                                        if (!region || (str && prevValue && str === prevValue.value)) {
+                                                            return;
+                                                        }
+
+                                                        let url = `cities?regionCode=${region.regioncode}&name=${str}`;
+
+                                                        if (!str.match(/[а-я]/gi)) {
+                                                            url = `cities?regionCode=${region.regioncode}`;
+                                                        }
+
+                                                        return webix.ajax().bind(this).get(url, function (data) {
+                                                            if (data) {
+                                                                //console.log(data);
+                                                                this.parse(data);
                                                             }
                                                         });
+                                                    },
+                                                    dynamic: true,
+                                                    template: (item) => {
+                                                        //console.log(item);
+                                                        let result = `<span>${item.typename}. ${item.value}</span>`;
+                                                        if (item.level !== 5) {
+                                                            const raion = item.districtname + '. ' + item.districttypename;
+                                                            result += ` <span>(${raion})</span>`;
+                                                        }
+                                                        return result;
+
+                                                    },
+                                                    scheme: {
+                                                        $sort: {
+                                                            by: 'value',
+                                                            dir: 'asc',
+                                                            as: 'string'
+                                                        }
+                                                    },
+                                                    ready: function () {
+                                                    }
                                                 }
-                                            } catch (e) {
-                                                console.log(e);
+                                            },
+                                            on: {
+                                                onChange: (newval, oldval) => {
+                                                    try {
+                                                        const indexCity = $$('cities').getValue();
+                                                        console.log(indexCity);
+                                                        if (!indexCity) return;
+
+                                                        const city = $$('cities').getList().getItem(indexCity);
+                                                        console.log(city);
+                                                        console.log($$('cities').getList());
+
+                                                        if (city) {
+                                                            const suggest_id = $$('fiasObjectGuid').config.suggest;
+                                                            const list = $$(suggest_id).getList();
+                                                            list.clearAll();
+                                                            const url = 'streets?objectid=' + city.objectid;
+                                                            //$$('fiasObjectGuid').setValue('');
+                                                            webix.ajax()
+                                                                .headers({'Content-type': 'application/json'})
+                                                                .get(url)
+                                                                .then(function (data) {
+                                                                    console.log(data);
+                                                                    if (data !== null) {
+                                                                        list.parse(data);
+                                                                        $$('fiasObjectGuid').focus();
+                                                                    }
+                                                                });
+                                                        }
+                                                    } catch (e) {
+                                                        console.log(e);
+                                                    }
+                                                }
                                             }
-                                        }
-                                    }
+                                        },
+                                    ]
                                 },
-                            ]
-                        },
-
-                        {
-                            view: "combo",
-                            id: "raions",
-                            //id: "cities",
-                            name: "fiasRaionObjectId",
-                            label: 'Район<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearRaionForm() class=\'mdi mdi-delete\'></div>',
-                            labelPosition: 'top',
-                            hidden: true,
-                            invalidMessage: 'Район не может быть пустым',
-                            options: {
-                                keyPressTimeout: 150,
-                                filter: (obj, filter) => {
-                                    const value = (obj.typename.toLowerCase() === 'г' ? obj.typename + '. ' + obj.value : obj.value + ' ' + obj.typename).toLowerCase();
-                                    const preFilter = filter.toLowerCase();
-                                    return obj.typename.toLowerCase().indexOf(preFilter) !== -1 || obj.value.toLowerCase().indexOf(preFilter) !== -1 || value.indexOf(preFilter) !== -1;
-                                },
-                                body: {
-                                    template: (item) => {
-                                        return item.typename.toLowerCase() === 'г' ? item.typename + '. ' + item.value : item.value + ' ' + item.typename;
-                                    },
-                                    ready: function () {
-                                    }
-                                }
-                            },
-                            on: {
-                                onChange: (newval, oldval) => {
-                                }
-                            }
-                        },
-
-                        {
-                            cols: [
                                 {
-                                    view: 'text',
-                                    id: 'fiasObjectGuid',
-                                    name: 'fiasStreetObjectId',
-                                    label: 'Улица',
+                                    view: "combo",
+                                    id: "raions",
+                                    //id: "cities",
+                                    name: "fiasRaionObjectId",
+                                    label: 'Район<div id=\'del_button\' style=\'position: absolute; right: 0px; font-size: 20px; margin-block-start: 6px;\' onclick=clearRaionForm() class=\'mdi mdi-delete\'></div>',
                                     labelPosition: 'top',
-                                    invalidMessage: "Адрес не может быть пустым",
-                                    suggest: {
-                                        keyPressTimeout: 200,
+                                    hidden: true,
+                                    invalidMessage: 'Район не может быть пустым',
+                                    options: {
+                                        keyPressTimeout: 150,
                                         filter: (obj, filter) => {
-                                            const value = (obj.typename + (obj.typename.includes('.') ? ' ' : '. ') + obj.value).toLowerCase();
+                                            const value = (obj.typename.toLowerCase() === 'г' ? obj.typename + '. ' + obj.value : obj.value + ' ' + obj.typename).toLowerCase();
                                             const preFilter = filter.toLowerCase();
                                             return obj.typename.toLowerCase().indexOf(preFilter) !== -1 || obj.value.toLowerCase().indexOf(preFilter) !== -1 || value.indexOf(preFilter) !== -1;
                                         },
                                         body: {
                                             template: (item) => {
-                                                const isDot = item.typename.includes('.');
-                                                return item.typename + (isDot ? ' ' : '. ') + item.value;
+                                                return item.typename.toLowerCase() === 'г' ? item.typename + '. ' + item.value : item.value + ' ' + item.typename;
                                             },
+                                            ready: function () {
+                                            }
                                         }
                                     },
                                     on: {
                                         onChange: (newval, oldval) => {
-                                            console.log('fiasObjectGuid', newval);
-                                            $$('house').focus();
                                         }
                                     }
                                 },
                                 {
+                                    id: "streetHouseOfficeRows",
+                                    rows:[]
+                                },
+                                {
+
+                                    responsive: "streetHouseOfficeRows",
                                     cols: [
+                                        {
+                                            view: 'text',
+                                            id: 'fiasObjectGuid',
+                                            name: 'fiasStreetObjectId',
+                                            minWidth: 200,
+                                            label: 'Улица',
+                                            labelPosition: 'top',
+                                            invalidMessage: "Адрес не может быть пустым",
+                                            suggest: {
+                                                keyPressTimeout: 200,
+                                                filter: (obj, filter) => {
+                                                    const value = (obj.typename + (obj.typename.includes('.') ? ' ' : '. ') + obj.value).toLowerCase();
+                                                    const preFilter = filter.toLowerCase();
+                                                    return obj.typename.toLowerCase().indexOf(preFilter) !== -1 || obj.value.toLowerCase().indexOf(preFilter) !== -1 || value.indexOf(preFilter) !== -1;
+                                                },
+                                                body: {
+                                                    template: (item) => {
+                                                        const isDot = item.typename.includes('.');
+                                                        return item.typename + (isDot ? ' ' : '. ') + item.value;
+                                                    },
+                                                }
+                                            },
+                                            on: {
+                                                onChange: (newval, oldval) => {
+                                                    console.log('fiasObjectGuid', newval);
+                                                    $$('house').focus();
+                                                }
+                                            }
+                                        },
                                         {
                                             view: 'text',
                                             id: 'house',
                                             name: 'house_hand',
+                                            minWidth: 200,
                                             label: 'Дом',
                                             labelPosition: 'top',
                                             invalidMessage: "Дом не может быть пустым",
@@ -294,29 +304,28 @@ const address = {
                                             view: 'text',
                                             id: 'office',
                                             name: 'apartment_hand',
+                                            minWidth: 200,
                                             label: 'Офис/помещение',
                                             labelPosition: 'top',
                                             invalidMessage: "Офис/помещение не может быть пустым",
                                         },
                                     ]
                                 },
-
-                            ]
-                        },
-
-
-                        {
-                            cols: [
                                 {
-                                    view: 'button',
-                                    id: 'add_contact',
-                                    css: 'webix_primary',
-                                    label: "<span class='mdi mdi-plus-circle' style='padding-right: 5px'></span><span class='text'>Сохранить</span>",
-                                    hotkey: 'enter',
-                                    click: () => addAddress()
+                                    cols:[
+                                        {
+                                            view: 'button',
+                                            id: 'add_contact',
+                                            css: 'webix_primary',
+                                            label: "<span class='mdi mdi-plus-circle' style='padding-right: 5px'></span><span class='text'>Сохранить</span>",
+                                            hotkey: 'enter',
+                                            click: () => addAddress()
+                                        }
+                                    ]
                                 }
                             ]
                         },
+
                     ],
                     elementsConfig: {
                         on: {

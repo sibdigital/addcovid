@@ -41,6 +41,15 @@ const documents = {
                             width: "auto",
                             float: "right"
                         },
+                        scheme: {
+                        },
+                        on:{
+                            onBeforeLoad:() =>{
+                                if(document.body.clientWidth < 1281){
+                                    $$("docs_grid").config.xCount = 1;
+                                }
+                            }
+                        }
                     },
                     {
                         gravity: 0.4,

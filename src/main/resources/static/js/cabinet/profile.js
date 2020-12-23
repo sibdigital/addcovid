@@ -7,9 +7,10 @@ const profile = {
             id: "tabs",
             multiview: true,
             borderless: true,
-            width: 350,
+            maxWidth: 350,
+            minWidth: 300,
             options: [
-                {value: "Общая информация", id: 'common_info_form'},
+                {value: "Общая информация", width: 170, id: 'common_info_form'},
                 {value: "Настройки", id: 'form_pass', width: 150}
             ]
         },

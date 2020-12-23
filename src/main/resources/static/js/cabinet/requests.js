@@ -15,6 +15,7 @@ const requests = {
                         select: 'row',
                         navigation: true,
                         resizeColumn: true,
+                        //fixedRowHeight:false,
                         pager: 'Pager',
                         datafetch: 25,
                         columns: [
@@ -91,7 +92,10 @@ const requests = {
                                         showRequestViewForm(item);
                                     }
                                 }, 10);
-                            }
+                            },
+                            // 'data->onStoreUpdated': function() {
+                            //     this.adjustRowHeight(null, true);
+                            // }
                         },
                         url: 'org_requests'
                     },

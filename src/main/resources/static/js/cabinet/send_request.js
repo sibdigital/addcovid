@@ -182,7 +182,8 @@ const requestWizard = {
                                                 id: "docs_grid",
                                                 css: 'contacts',
                                                 scroll: 'y',
-                                                minWidth: 320,
+                                                minHeight: 300,
+                                                minWidth: 300,
                                                 select:true,
                                                 multiselect:"touch",
                                                 on:{
@@ -280,6 +281,10 @@ const requestWizard = {
                                                         ]
                                                     },
                                                     {
+                                                        id: 'documentsMainLayout',
+                                                        rows:[]
+                                                    },
+                                                    {
                                                         view: "label",
                                                         id: "labelFiles",
                                                         label: "Приложенные к заявке файлы",
@@ -287,6 +292,7 @@ const requestWizard = {
                                                     {
                                                         view: "list",
                                                         id: "choosedFiles",
+                                                        minHeight: 150,
                                                         template: "#title#"
                                                     }
                                                 ]
