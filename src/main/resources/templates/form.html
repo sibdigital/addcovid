@@ -5,14 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:utext="${application_name}"></title>
-    <!--<link type="text/css" rel="stylesheet" href="/libs/webix.min.css">
-    <script src="/libs/webix.min.js"></script> -->
     <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.min.css}">
     <script th:src="@{/libs/webix.min.js}"></script>
     <script th:src="@{/libs/routie.min.js}"></script>
     <script th:src="@{/libs/jquery-3.4.1.min.js}"></script>
-    <!--<script th:src="@{/js/barber/barber.js}"></script>
-    <script th:src="@{/js/dacha/dacha.js}"></script> -->
     <style>body {margin: 0}</style>
 </head>
 <body>
@@ -27,6 +23,5 @@
     const SUBDOMAIN_FORM = [[${subdomain_form}]]
 </script>
 <script th:src="@{/js/form.js}"></script>
-<!--<script src="/js/form.js"></script> -->
 </body>
 </html>

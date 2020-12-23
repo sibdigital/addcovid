@@ -192,7 +192,7 @@ define(function() {
                                                                                     'Authorization': 'Bearer ' + TOKEN
                                                                                 }
                                                                             )
-                                                                            .put('/doc_requests/' + params.id,
+                                                                            .put('doc_requests/' + params.id,
                                                                                 JSON.stringify(params))
                                                                             .then(
                                                                                 function (text, data, xhr) {
@@ -373,7 +373,7 @@ define(function() {
                                                             align: 'center',
                                                             click: function () {
                                                                 let params = this.getTopParentView().config.item
-                                                                webix.html.download('/download/' + params.id, 'myfile.pdf')
+                                                                webix.html.download('download/' + params.id, 'myfile.pdf')
                                                             }
                                                         },
                                                     ]
@@ -504,7 +504,7 @@ define(function() {
                                                     {'Content-type': 'application/json',
                                                         'Authorization': 'Bearer ' + TOKEN }
                                                 )
-                                                .put('/doc_requests/' + params.id,
+                                                .put('doc_requests/' + params.id,
                                                     JSON.stringify(params))
                                                 .then(function (text, data, xhr) {
                                                         let obj = JSON.parse(text)
@@ -570,7 +570,7 @@ define(function() {
                                                      'Authorization': 'Bearer ' + TOKEN
                                                     }
                                                 )
-                                                .put('/doc_requests/' + params.id,
+                                                .put('doc_requests/' + params.id,
                                                     JSON.stringify(params),)
                                                 .then(function (text, data, xhr) {
                                                         let modal = $$('show_layout').getTopParentView();

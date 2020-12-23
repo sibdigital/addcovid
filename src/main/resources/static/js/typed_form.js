@@ -538,7 +538,7 @@ webix.ready(function () {
                                 autoheight: true,
                                 value: 'Загрузить PDF-файл(-ы) или ZIP-архив(-ы)  с пояснением обоснования',
                                 autosend: false,
-                                upload: '/uploadpart',
+                                upload: 'uploadpart',
                                 required: true,
                                 accept: 'application/pdf, application/zip',
                                 multiple: true,
@@ -985,7 +985,7 @@ webix.ready(function () {
                                             webix.ajax()
                                                 .headers({'Content-type': 'application/json'})
                                                 //.headers({'Content-type': 'application/x-www-form-urlencoded'})
-                                                .post('/typed_form?request_type=' + ID_TYPE_REQUEST,
+                                                .post('typed_form?request_type=' + ID_TYPE_REQUEST,
                                                     JSON.stringify(params),
                                                     //params,
                                                     function (text, data, xhr) {

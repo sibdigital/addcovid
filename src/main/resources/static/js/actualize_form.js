@@ -51,7 +51,7 @@ const searchRequests = () => {
                         '</thead>';
                     template += '<tbody>';
                     result.forEach(item => {
-                        var a = "<a href='/typed_form?request_type=" + item.typeRequest.id + "&id=" + item.id + "'>Актуализировать</a>";
+                        var a = "<a href='typed_form?request_type=" + item.typeRequest.id + "&id=" + item.id + "'>Актуализировать</a>";
 
                         if (item.idActualizedRequest != undefined) {
                             a = "ВЫ АКТУАЛИЗИРОВАЛИ ЗАЯВКУ";

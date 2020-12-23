@@ -86,7 +86,7 @@ const step1 = {
                     view: 'button',
                     css: 'myClass',
                     value: 'Отмена',
-                    click: () => { window.location.href = '/login' }
+                    click: () => { window.location.href = 'login' }
                 },
                 {width: 5},
                 {
@@ -290,7 +290,7 @@ function recovery() {
 
     webix.ajax()
         .headers({'Content-type': 'application/json'})
-        .post('/recovery', JSON.stringify(params))
+        .post('recovery', JSON.stringify(params))
         .then(function (data) {
             const text = data.text();
             webix.message(text === 'Ок' ? 'Письмо отправлено на вашу почту' : text);

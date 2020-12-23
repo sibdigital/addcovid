@@ -459,7 +459,7 @@ function addAddress() {
 
         webix.ajax()
             .headers({'Content-type': 'application/json'})
-            .post('/save_address_fact', JSON.stringify(params))
+            .post('save_address_fact', JSON.stringify(params))
             .then(function (data) {
                 if (data !== null) {
                     if (params.id) {
@@ -490,7 +490,7 @@ function deleteAddress(id = null) {
     }).then(() => {
         webix.ajax()
             .headers({'Content-type': 'application/json'})
-            .post('/delete_address_fact', JSON.stringify(params))
+            .post('delete_address_fact', JSON.stringify(params))
             .then(function (data) {
                 if (data !== null) {
                     $$("address_fact_grid").remove($$("address_fact_grid").getSelectedId());

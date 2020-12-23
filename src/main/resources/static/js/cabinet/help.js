@@ -57,7 +57,7 @@ const helps = {
 //     if (form.validate()) {
 //         webix.ajax()
 //             .headers({'Content-type': 'application/json'})
-//             .post('/save_contact', JSON.stringify(params))
+//             .post('save_contact', JSON.stringify(params))
 //             .then(function (data) {
 //                 if (data !== null) {
 //                     if (params.id) {
@@ -84,7 +84,7 @@ const helps = {
 //     let params = $$('contact_grid').getSelectedItem()
 //     webix.ajax()
 //         .headers({'Content-type': 'application/json'})
-//         .post('/delete_org_contact', JSON.stringify(params))
+//         .post('delete_org_contact', JSON.stringify(params))
 //         .then(function (data) {
 //             if (data !== null) {
 //                 $$("contact_grid").remove($$("contact_grid").getSelectedId());
@@ -223,7 +223,7 @@ function getFormWithData(url) {
                 const nodes = data.json();
                 return webix.ajax()
                     .headers({'Content-Type': 'application/json'})
-                    .get('/help/statistic/globalIds', params)
+                    .get('help/statistic/globalIds', params)
                     .then(function (data) {
                         if (data.json()) {
                             const globalIds = data.json();
@@ -372,7 +372,7 @@ const addHelpForm = {
                                     const params = $$('newHelpForm').getValues();
                                     webix.ajax()
                                         .headers({ 'Content-Type': 'application/json' })
-                                        .post('/help/add', JSON.stringify(params));
+                                        .post('help/add', JSON.stringify(params));
 
                                     webix.ui({
                                         id: 'content',

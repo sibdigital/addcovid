@@ -379,10 +379,10 @@ function showRequestViewForm(data) {
 }
 
 function showTypeRequestsPage() {
-    webix.ajax('/cls_type_requests').then(function (data) {
+    webix.ajax('cls_type_requests').then(function (data) {
         let typeRequests = data.json();
 
-        // let vtxt = '<br/>' + `<a href="/upload">Общие основания (более 100 сотрудников)</a><br/><br/>`;
+        // let vtxt = '<br/>' + `<a href="upload">Общие основания (более 100 сотрудников)</a><br/><br/>`;
         let vtxt = '<br/>';
 
         if (typeRequests.length > 0) {

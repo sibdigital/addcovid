@@ -5,14 +5,14 @@
     <title th:utext="${application_name}"></title>
 
 
-    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
     <!-- Compiled and minified CSS -->
 
 
     <!-- Compiled and minified JavaScript -->
-    <script src="/libs/popper.min.js"></script>
-    <script src="/libs/jquery-3.4.1.min.js"></script>
-    <script src="/libs/bootstrap.min.js"></script>
+    <script th:src="@{/libs/popper.min.js}"></script>
+    <script th:src="@{/libs/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{/libs/bootstrap.min.js}"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 

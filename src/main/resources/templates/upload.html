@@ -5,16 +5,16 @@
     <title th:utext="${application_name}"></title>
 
 
-    <link type="text/css" rel="stylesheet" href="/css/bootstrap.min.css">
-    <link type="text/css" rel="stylesheet" href="/libs/webix.min.css">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.min.css}">
     <!-- Compiled and minified CSS -->
 
 
     <!-- Compiled and minified JavaScript -->
-    <script src="/libs/popper.min.js"></script>
-    <script src="/libs/jquery-3.4.1.min.js"></script>
-    <script src="/libs/bootstrap.min.js"></script>
-    <script src="/libs/webix.min.js"></script>
+    <script th:src="@{/libs/popper.min.js}"></script>
+    <script th:src="@{/libs/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{/libs/bootstrap.min.js}"></script>
+    <script th:src="@{/libs/webix.min.js}"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -29,7 +29,7 @@
 </div>
 
 <div class="container" onload="refreshFields(); checkFields()">
-    <form name="upload" enctype="multipart/form-data" action="/upload" method="POST">
+    <form name="upload" enctype="multipart/form-data" action="upload" method="POST">
         <ul class="list-group">
             <li class="list-group-item"><a download style="text-align: center;" th:href="${DOWNLOAD_XLSX_TEMPLATE}" target="_blank">Скачать шаблон</a></li>
             <li class="list-group-item"><a  style="text-align: center;" th:href="${XLSX_FILL_INSTRUCTION}" target="_blank">Инструкция по заполнению шаблона Excel </a></li>
@@ -251,7 +251,7 @@
                     }
                 ]
             });
-            webix.ajax('/cls_type_request/1').then(function (data) {
+            webix.ajax('cls_type_request/1').then(function (data) {
                 const typeRequest = data.json();
                 $("#fake_textarea").html(typeRequest.prescription)
                 $("#consent").html(typeRequest.consent)

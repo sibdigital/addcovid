@@ -563,7 +563,7 @@ webix.ready(function() {
 
                                         webix.ajax()
                                             .headers({'Content-type': 'application/json'})
-                                            .post('/dacha',
+                                            .post('dacha',
                                                 JSON.stringify(params),
                                                 function (data) {
                                                     webix.alert({

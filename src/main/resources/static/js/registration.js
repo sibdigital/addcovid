@@ -133,7 +133,7 @@ let step1 = {
                     view: 'button',
                     css: 'myClass',
                     value: 'Отмена',
-                    click: () => { window.location.href = '/login' }
+                    click: () => { window.location.href = 'login' }
                 },
                 {width: 5},
                 {
@@ -338,7 +338,7 @@ let regLayout = webix.ui({
 })
 
 function loadData(type, inn) {
-    webix.ajax('/' + type + '?inn=' + inn).then(function (data) {
+    webix.ajax(type + '?inn=' + inn).then(function (data) {
         const response = data.json();
         var doNext = false;
         if (type === 'egrul') {
@@ -447,7 +447,7 @@ function registrate() {
 
         webix.ajax()
             .headers({'Content-type': 'application/json'})
-            .post('/registration', JSON.stringify(params)
+            .post('registration', JSON.stringify(params)
             ).then(function (data) {
             const text = data.text();
             webix.message(text === 'Ок' ? 'Письмо отправлено на вашу почту' : text)

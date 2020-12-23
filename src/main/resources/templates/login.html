@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="/libs/webix.min.css" type="text/css">
+    <link rel="stylesheet" th:href="@{/libs/webix.min.css}" type="text/css">
     <link type="text/css" rel="stylesheet" th:href="@{/css/cabinet/cabinet.css}">
-    <script src="/libs/webix.min.js" type="text/javascript"></script>
+    <script th:src="@{/libs/webix.min.js}" type="text/javascript"></script>
     <title th:utext="${application_name}"></title>
 
 </head>
@@ -20,7 +20,7 @@
 
     console.log(message)
 
-    if (window.location.pathname + window.location.search === "/login?error=true") {
+    if (window.location.search === "?error=true") {
         webix.message("Введен неверный логин или пароль", "error")
     }
 
@@ -124,7 +124,7 @@
                                                 view: 'label',
                                                 id: 'lbl',
                                                 align: 'center',
-                                                label: '<a href="/registration" style=" margin-right: 10px; color: #6e6e6e">Регистрация</a> <a href="/recovery" style="color: #6e6e6e">Не могу войти</a>'
+                                                label: '<a href="registration" style=" margin-right: 10px; color: #6e6e6e">Регистрация</a> <a href="recovery" style="color: #6e6e6e">Не могу войти</a>'
                                             }
                                         ]
                                     },

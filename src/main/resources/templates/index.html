@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:utext="${application_name}"></title>
-<!--    <link type="text/css" rel="stylesheet" href="/libs/webix.min.css">-->
-<!--    <script src="/libs/webix.min.js"></script>-->
     <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.min.css}">
     <script th:src="@{/libs/webix.min.js}"></script>
     <script th:src="@{/libs/routie.min.js}"></script>
@@ -21,9 +19,6 @@
     const SUBDOMAIN_WORK = [[${subdomain_work}]]
     const SUBDOMAIN_FORM = [[${subdomain_form}]]
 </script>
-<script th:src="@{/js/main_form.js}" >
-
-</script>
-<!--<script src="/js/main_form.js"></script> -->
+<script th:src="@{/js/main_form.js}"></script>
 </body>
 </html>

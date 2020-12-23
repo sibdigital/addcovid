@@ -237,7 +237,7 @@ const requestWizard = {
                                                                 css: 'webix_secondary',
                                                                 value: 'Выбрать',
                                                                 autosend: false,
-                                                                upload: '/upload_files',
+                                                                upload: 'upload_files',
                                                                 required: true,
                                                                 accept: 'application/pdf, application/zip',
                                                                 multiple: true,
@@ -545,7 +545,7 @@ const requestWizard = {
 
                                                                 webix.ajax()
                                                                     .headers({'Content-type': 'application/json'})
-                                                                    .post('/cabinet/new_request', JSON.stringify(params))
+                                                                    .post('cabinet/new_request', JSON.stringify(params))
                                                                     .then(function (data) {
                                                                         const text = data.text();
                                                                         console.log(text);
