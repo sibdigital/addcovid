@@ -25,11 +25,7 @@ webix.html.addStyle(
     "font-weight: 500;" +
     "color: #313131;" +
     "padding: 8px 3px !important;" +
-    "}"+
-    ".topMenuIcon .webix_icon:before{\n" +
-    "color: #1992af;" +
-    "font-size: 1.5rem;\n" +
-    " }"
+    "}"
 );
 
 webix.attachEvent("onFocusChange", function (to, from) {

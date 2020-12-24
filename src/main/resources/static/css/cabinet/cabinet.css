@@ -263,6 +263,11 @@ body {margin: 0}
   /*box-shadow: inset 2px 0 #1CA1C1;*/
 }
 
+.topMenuIcon .webix_icon:before{
+    color: #1992af;" +
+    font-size: 1.5rem;
+}
+
 .styleIcon .webix_icon:before{
     color: #147187;
 }
@@ -285,7 +290,7 @@ body {margin: 0}
   }
   50% {
   opacity:1;
-  box-shadow: 0 0 10px 3px #f58799;
+  box-shadow: 0 0 10px 3px transparent;
   }
   100% {
   opacity:0;

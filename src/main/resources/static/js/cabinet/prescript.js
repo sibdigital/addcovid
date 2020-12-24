@@ -22,10 +22,10 @@ let acceptedColumn = {
     adjust: true,
     template: function (obj, type, value) {
         if (value) {
-            return "<span class='webix_icon styleIcon mdi mdi-check'></span>";
+            return "<span class='webix_icon mdi mdi-check'></span>";
         }
         else {
-            return "<span class='webix_icon mdi mdi-new-box'></span>";
+            return "<span class='webix_icon blinking mdi mdi-new-box'></span>";
         }
     },
     css: 'styleIcon'
@@ -41,9 +41,9 @@ let enterToAcceptColumn = {
             return "";
         } else {
             if (document.body.clientWidth < 760) {
-                return "<span class='webix_icon mdi mdi-arrow-right'></span>";
+                return "<span class='webix_icon blinking mdi mdi-arrow-right-thick'></span>";
             } else {
-                return "Войдите, чтобы ознакомиться<span class='webix_icon mdi mdi-arrow-right'></span>";
+                return "Войдите, чтобы ознакомиться <span class='webix_icon blinking mdi mdi-arrow-right-thick'></span>";
             }
         }
     },
@@ -354,7 +354,7 @@ function colorRowsByAccepted(obj) {
     }
     else {
         obj.$css = 'prescription_non_accepted';
-        $$('prescriptions_table').addCellCss(obj.id, 'enterToAccept', 'blinking', true);
+        // $$('prescriptions_table').addCellCss(obj.id, 'enterToAccept', 'blinking', true);
         $$('prescriptions_table').showColumn('enterToAccept');
     }
 }
