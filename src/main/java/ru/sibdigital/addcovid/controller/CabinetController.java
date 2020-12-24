@@ -220,6 +220,16 @@ public class CabinetController {
         return prescriptions;
     }
 
+    @GetMapping("/count_non_consent_prescriptions")
+    public @ResponseBody Map<String, Integer> getAllNonConsentPrescription(HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null){
+            return Map.of("count", 0);
+        }
+        Integer count = requestService.getCountOfNewClsPrescriptionsByOrgId(id);
+        return Map.of("count", count);
+    }
+
     @GetMapping("/prescription")
     public @ResponseBody ClsPrescription getClsPrescription(@RequestParam Long id) {
         return requestService.getClsPrescriptionById(id);

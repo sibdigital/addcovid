@@ -1,3 +1,22 @@
+let btnBackRequests = {
+    view: 'button',
+    id: 'btnBack',
+    label: 'Назад',
+    maxWidth: 100,
+    align: 'left',
+    type: 'icon',
+    icon: 'mdi mdi-arrow-left',
+    css: 'backBtnStyle',
+    click: function () {
+        webix.ui({
+            id: 'content',
+            rows: [
+                requests
+            ]
+        }, $$('content'));
+    }
+}
+
 const requests = {
     // view: 'scrollview',
     // scroll: 'xy',
@@ -15,6 +34,7 @@ const requests = {
                         select: 'row',
                         navigation: true,
                         resizeColumn: true,
+                        fixedRowHeight:false,
                         pager: 'Pager',
                         datafetch: 25,
                         columns: [
@@ -91,7 +111,10 @@ const requests = {
                                         showRequestViewForm(item);
                                     }
                                 }, 10);
-                            }
+                            },
+                            'data->onStoreUpdated': function() {
+                                this.adjustRowHeight(null, true);
+                            },
                         },
                         url: 'org_requests'
                     },
@@ -160,6 +183,12 @@ function showRequestViewForm(data) {
                 // body: {
                 //     type: 'space',
                 //     rows: [
+                        {
+                            cols: [
+                                btnBackRequests,
+                                {}
+                            ]
+                        },
                         {
                             id: 'form',
                             view: 'form',
@@ -410,6 +439,12 @@ function showTypeRequestsPage() {
             //         scroll: 'xy',
             //         body: {
             //             rows: [
+                            {
+                                cols:[
+                                    btnBackRequests,
+                                    {}
+                                ]
+                            },
                             {
                                 view: 'template',
                                 template: '<p><h3 style="text-align: center; color: #000000">Выберите вид деятельности, по которому хотите подать заявку</h3></p>',

@@ -74,6 +74,25 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
 var newsfeed_url = 'newsfeed'
 var news_archive_url = 'news_archive'
 
+let backBtnNews = {
+    view: 'button',
+    id: 'btnBack',
+    label: 'Назад',
+    maxWidth: 100,
+    align: 'left',
+    type: 'icon',
+    icon: 'mdi mdi-arrow-left',
+    css: 'backBtnStyle',
+    click: function () {
+        webix.ui({
+            id: 'content',
+            rows: [
+                news
+            ]
+        }, $$('content'));
+    }
+}
+
 //define proxy
 webix.proxy.idata = {
     $proxy:true,
@@ -143,18 +162,7 @@ const archiveNews =  {
                 id: 'newsToolbar',
                 type: "space",
                 cols: [
-                    {
-                        view: 'button',
-                        id: 'archiveBtn',
-                        type:"icon",
-                        icon:"mdi mdi-menu-left",
-                        align: 'left',
-                        label: 'Новости',
-                        maxWidth: '150',
-                        click: function () {
-                            webix.ui(news, $$('archiveNewsId'));
-                        }
-                    },
+                    backBtnNews,
                     {}
                 ]
             },
@@ -296,18 +304,7 @@ const newsForm = {
             id: 'newsToolbar',
             type: "space",
             cols: [
-                {
-                    view: 'button',
-                    id: 'archiveBtn',
-                    type:"icon",
-                    icon:"mdi mdi-menu-left",
-                    align: 'left',
-                    label: 'Новости',
-                    maxWidth: '150',
-                    click: function () {
-                        webix.ui(news, $$('newsFormId'));
-                    }
-                },
+                backBtnNews,
                 {}
             ]
         },

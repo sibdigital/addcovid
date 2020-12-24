@@ -186,8 +186,9 @@ const mailing = {
                             {id: 'index', name: 'index',  view: 'text', label: 'Код', labelPosition: 'top', readonly: true,},
                             {id: 'name', name: 'name', view: 'text', label: 'Наименование', labelPosition: 'top', readonly: true,},
                             {id: 'description', name: 'description', view: 'textarea', label: 'Описание', labelPosition: 'top', readonly: true},
-                            {cols: [ {id: 'btnBack', view: 'button',  align: 'right', maxWidth: 200,
-                                    css: 'webix_primary', value: 'Назад', click: function () {
+                            {cols: [ {id: 'btnBack', view: 'button',  align: 'right', maxWidth: 100,
+                                    type: 'icon', icon: 'mdi mdi-arrow-left', css: 'backBtnStyle',
+                                    label: 'Назад', click: function () {
                                         $$('views').back();
                                     }
                                 }]}],

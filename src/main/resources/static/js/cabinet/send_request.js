@@ -1,3 +1,21 @@
+let btnBackToRequests = {
+    view: 'button',
+    label: 'Назад',
+    maxWidth: 100,
+    align: 'left',
+    type: 'icon',
+    icon: 'mdi mdi-arrow-left',
+    css: 'backBtnStyle',
+    click: function () {
+        webix.ui({
+            id: 'content',
+            rows: [
+                requests
+            ]
+        }, $$('content'));
+    }
+}
+
 function showRequestCreateForm(idTypeRequest, page) {
     webix.ui({
         id: 'content',
@@ -147,6 +165,12 @@ const requestWizard = {
     // body: {
     //     type: 'space',
         rows: [
+            {
+                cols: [
+                    btnBackToRequests,
+                    {}
+                ]
+            },
             {
                 view: 'form',
                 type: 'clean',
