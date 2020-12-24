@@ -262,7 +262,7 @@ const organizationPrescriptionForm = {
 
                                         webix.ajax()
                                             .headers({'Content-type': 'application/json'})
-                                            .post('/cabinet/organization_prescription', JSON.stringify(params))
+                                            .post('cabinet/organization_prescription', JSON.stringify(params))
                                             .then(function (data) {
                                                 const text = data.text();
                                                 if (text.includes('Предписание сохранено')) {

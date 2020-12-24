@@ -64,7 +64,7 @@ let updateFIOmodal = webix.ui({
                     if (form.validate()) {
                         webix.ajax()
                             .headers({'Content-type': 'application/json'})
-                            .post('/employee', JSON.stringify(params))
+                            .post('employee', JSON.stringify(params))
                             .then(function (data) {
                                 if (data !== null) {
                                     $$('modal_form_employee').clear()
@@ -107,7 +107,7 @@ let importEmployees = webix.ui({
                     css: 'webix_secondary',
                     value: 'Выбрать файл',
                     autosend: false,
-                    upload: '/import-excel',
+                    upload: 'import-excel',
                     required: true,
                     accept: '.xlsx, .xls, .csv',
                     multiple: true,
@@ -188,7 +188,7 @@ const employees = {
                                         $$("employees_table").load(function(){
                                         return webix.ajax().
                                         headers({'Content-type':'application/json'}).
-                                        post("/filter", text);
+                                        post("filter", text);
                                     });
                                     }
                                 }
@@ -266,7 +266,7 @@ const employees = {
                                                           'personOfficeCnt': $$('personOfficeCnt').getValue(),
                                                           'personRemoteCnt': $$('personRemoteCnt').getValue()
                                                       };
-                                                      webix.ajax().get('/save_person_count', params).then(function (data) {
+                                                      webix.ajax().get('save_person_count', params).then(function (data) {
                                                           if (data.text() === 'Изменения сохранены') {
                                                               $$('personOfficeCnt').config.readonly = true;
                                                               $$('personRemoteCnt').config.readonly = true;
@@ -292,7 +292,7 @@ const employees = {
                                   }
                               },
                             ],
-                            url: '/person_count'
+                            url: 'person_count'
                         },
                     ]
             },
@@ -453,7 +453,7 @@ const employees = {
                                                 if (form.validate()) {
                                                     webix.ajax()
                                                         .headers({'Content-type': 'application/json'})
-                                                        .post('/employee', JSON.stringify(params))
+                                                        .post('employee', JSON.stringify(params))
                                                         .then(function (data) {
                                                             if (data !== null) {
                                                                 $$('form_employee').clear()
@@ -523,7 +523,7 @@ const employees = {
                                         $$("employees_table").remove($$("employees_table").getSelectedId());
                                         webix.ajax()
                                             .headers({'Content-type': 'application/json'})
-                                            .post('/deleteEmployee', JSON.stringify(params))
+                                            .post('deleteEmployee', JSON.stringify(params))
                                             .then(function (data) {
                                                 if (data !== null) {
                                                     webix.message("Сотрудник удалён", 'success');
@@ -558,8 +558,8 @@ const employees = {
                                     value: "Скачать",
                                     css: 'webix_primary',
                                     click: function () {
-                                        // webix.ajax('/download_employees').get();
-                                        webix.html.download('/download_employees')
+                                        // webix.ajax('download_employees').get();
+                                        webix.html.download('download_employees')
                                     }
                                 },
                             ],
@@ -582,7 +582,7 @@ function filterText() {
         return $$("employees_table").load("employees");
     else {
         $$("employees_table").load(function () {
-            return webix.ajax().headers({'Content-type': 'application/json'}).post("/filter", text);
+            return webix.ajax().headers({'Content-type': 'application/json'}).post("filter", text);
         });
     }
 }

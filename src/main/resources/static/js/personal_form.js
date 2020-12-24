@@ -276,7 +276,7 @@ webix.ready(function() {
                                 css: 'webix_secondary',
                                 value: 'Загрузить PDF-файл(-ы) или ZIP-архив(-ы)  с пояснением',
                                 autosend: false,
-                                upload: '/uploadpart',
+                                upload: 'uploadpart',
                                 required: true,
                                 accept: 'application/pdf, application/zip',
                                 multiple: true,
@@ -487,7 +487,7 @@ webix.ready(function() {
 
                                             webix.ajax()
                                                 .headers({'Content-type': 'application/json'})
-                                                .post('/personal_form',
+                                                .post('personal_form',
                                                     JSON.stringify(params),
                                                     //params,
                                                     function (text, data, xhr) {

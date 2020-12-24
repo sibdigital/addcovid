@@ -64,7 +64,7 @@ const documents = {
                                 css: 'webix_secondary',
                                 value: 'Выбрать',
                                 autosend: false,
-                                upload: '/upload_files',
+                                upload: 'upload_files',
                                 required: true,
                                 accept: 'application/pdf, application/zip',
                                 multiple: true,
@@ -127,7 +127,7 @@ function del_file(){
     }).then(function(){
         webix.ajax()
             .headers({'Content-type': 'application/json'})
-            .post('/delete_file', JSON.stringify(param))
+            .post('delete_file', JSON.stringify(param))
             .then(function (data) {
                 if (data !== null) {
                     $$("docs_grid").remove($$("docs_grid").getSelectedId());

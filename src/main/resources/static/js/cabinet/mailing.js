@@ -201,7 +201,7 @@ const mailing = {
 
 function getMyMailingList(dtable){
     dtable.clearAll();
-    var data = webix.ajax("/my_mailing_list").then(function (data) {
+    var data = webix.ajax("my_mailing_list").then(function (data) {
         var js = data.json();
         for (el in js) {
             js[el].checkbox = true;
@@ -215,14 +215,14 @@ function getAllAvailableMailing() {
     dtable = $$("available_mailing_table");
     getMyMailingList(dtable);
 
-    var data2 = webix.ajax("/available_not_mine_mailing_list");
+    var data2 = webix.ajax("available_not_mine_mailing_list");
     $$("available_mailing_table").parse(data2);
 }
 
 function saveMailing(selectedMailing){
     webix.ajax()
         .headers({'Content-type': 'application/json'})
-        .post('/saveMailing', JSON.stringify(selectedMailing))
+        .post('saveMailing', JSON.stringify(selectedMailing))
         .then(function (data) {
             if (data !== null) {
                 webix.message('Рассылки сохранены', 'success');
@@ -235,7 +235,7 @@ function saveMailing(selectedMailing){
 function deactivateMailing(selectedMailing){
     webix.ajax()
         .headers({'Content-type': 'application/json'})
-        .post('/deactivateMailing', JSON.stringify(selectedMailing))
+        .post('deactivateMailing', JSON.stringify(selectedMailing))
         .then(function (data) {
             if (data.text() != 'Рассылки деактивированы') {
                 webix.message({text: data.text(), type: 'error'});

@@ -50,26 +50,31 @@ public interface FiasAddrObjectRepo extends JpaRepository<FIASAddrObject, Long> 
     @Query(nativeQuery = true, value = "with fa as (\n" +
             "    select objectid as dff, parentobjid, regioncode, areacode, citycode\n" +
             "    from fias.adm_hierarchy_item as fais\n" +
-            "    where regioncode = :regionCode\n" +
+            "    where regioncode = :regionCode and plancode = '0' and streetcode = '0'\n" +
+            "    limit 100\n" +
             ")\n" +
-            "select fao.id, fao.objectid, fao.name as value, fao.typename, fao.level, fao2.objectid as districtObjectId, fao2.name as districtname, fao2.typename as districttypename, fa.areacode, fa.citycode\n" +
-            "from fias.addr_object as fao inner join fa\n" +
-            "    on (fa.dff) = (fao.objectid) and level between 4 and 6\n" +
-            "    inner join fias.addr_object as fao2\n" +
-            "        on (fa.parentobjid) = (fao2.objectid)\n" +
-            " LIMIT 100")
+            " select fao.id, fao.objectid, fao.name as value, fao.typename, fao.level, fao2.objectid as districtObjectId, fao2.name as districtname, fao2.typename as districttypename, fa.areacode, fa.citycode\n" +
+            " from fias.addr_object as fao inner join fa\n" +
+            "                                        on (fa.dff) = (fao.objectid) and level between 4 and 6\n" +
+            "                             inner join fias.addr_object as fao2\n" +
+            "                                        on (fa.parentobjid) = (fao2.objectid)\n" +
+            " ORDER BY fao.name")
     List<Map<String, Object>> findCities(@Param("regionCode") Short regionCode);
 
-    @Query(nativeQuery = true, value = "with fa as (\n" +
-            "    select objectid as dff, parentobjid, regioncode, areacode, citycode\n" +
-            "    from fias.adm_hierarchy_item as fais\n" +
-            "    where regioncode = :regionCode\n" +
+    @Query(nativeQuery = true, value = "with nd as (\n" +
+            "    select id, objectid, name as value, typename, level\n" +
+            "    from fias.addr_object as fao\n" +
+            "    where level between 4 and 6\n" +
+            "      and name ~* (:objectName)\n" +
             ")\n" +
-            "    select fao.id, fao.objectid, fao.name as value, fao.typename, fao.level, fao2.objectid as districtObjectId, fao2.name as districtname, fao2.typename as districttypename, fa.areacode, fa.citycode\n" +
-            "    from fias.addr_object as fao inner join fa\n" +
-            "    on (fa.dff) = (fao.objectid) and level between 4 and 6 and name ~* (:objectName) inner join fias.addr_object as fao2\n" +
-            "    on (fa.parentobjid) = (fao2.objectid)" +
-            " LIMIT 25")
+            " select nd.*, fao.objectid as districtObjectId, fao.name as districtname, fao.typename as districttypename, fahi.areacode, fahi.citycode\n" +
+            " from fias.adm_hierarchy_item as fahi\n" +
+            "    inner join nd\n" +
+            "        on (nd.objectid) = (fahi.objectid) and fahi.regioncode=:regionCode and plancode = '0' and streetcode = '0'\n" +
+            "    inner join fias.addr_object as fao\n" +
+            "        on (fahi.parentobjid) = (fao.objectid)\n" +
+            " order by nd.value\n" +
+            " limit 50")
     List<Map<String, Object>> findCitiesWithFilter(@Param("regionCode") Short regionCode, String objectName);
 
     @Query(nativeQuery = true, value = "with fa as (\n" +

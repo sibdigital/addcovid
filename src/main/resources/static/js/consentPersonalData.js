@@ -36,9 +36,9 @@ const consentPersonalDataModal = {
                         align: 'right',
                         click: function () {
                             if ($$('isAgreed').getValue() == 0) {
-                                webix.send("/logout");
+                                webix.send("logout");
                             } else {
-                                webix.ajax().get('/saveConsentPersonalData').then(function (data) {
+                                webix.ajax().get('saveConsentPersonalData').then(function (data) {
                                     if (data.text() === 'Согласие сохранено') {
                                         if (document.body.clientWidth < 760) {
                                             layout = webix.ui(smallMainForm)
@@ -61,7 +61,7 @@ const consentPersonalDataModal = {
 }
 
 function checkConsentPersonalDataProc(){
-    var xhr = webix.ajax().sync().get('/check_consent');
+    var xhr = webix.ajax().sync().get('check_consent');
     var jsonResponse = JSON.parse(xhr.responseText);
 
     if (jsonResponse.isAgreed != null) {

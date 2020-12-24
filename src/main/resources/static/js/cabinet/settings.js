@@ -37,7 +37,7 @@ const settings = {
             value: 'Применить',
             click: () => {
                 webix.ajax().headers({'Content-Type': 'application/json'})
-                    .post('/save_pass', $$('form_pass').getValues()).then(function (data) {
+                    .post('save_pass', $$('form_pass').getValues()).then(function (data) {
                     if (data.text() === 'Пароль обновлен') {
                         $$('new_pass').setValue('');
                         $$('retry_pass').setValue('');

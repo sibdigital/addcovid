@@ -65,7 +65,7 @@ let UsercontextMenu = webix.ui({
             } else if (id === 'Help') {
                 window.open('helps', '_blank');
             } else if (id === 'Exit') {
-                webix.send("/logout");
+                webix.send("logout");
             }
             if (view != null) {
                 webix.ui({
@@ -101,7 +101,7 @@ function setRequestsBadge(){
 }
 
 function getRequestStyles(){
-    webix.ajax('/requests_status_style')
+    webix.ajax('requests_status_style')
         .then(function (data) {
             let styleBody = Object.values(data.json())
             let styleClassName = Object.keys(data.json())
@@ -199,9 +199,9 @@ let bigMainForm = {
                                 $$('bigHelpId').refresh();
                             }
 
-                            // webix.ajax("/check_session").then(function (data){
+                            // webix.ajax("check_session").then(function (data){
                             //     if(data.text() == "Expired"){
-                            //         //webix.send("/logout")
+                            //         //webix.send("logout")
                             //     }
                             // })
                         }
@@ -277,7 +277,7 @@ let bigMainForm = {
                                     icon: 'mdi mdi-exit-to-app',
                                     tooltip: 'Выход',
                                     click: function () {
-                                        webix.send("/logout");
+                                        webix.send("logout");
                                     },
                                 },
                                 ]
@@ -371,7 +371,7 @@ let smallMainForm = {
                                     css: 'topMenuIcon',
                                     tooltip: 'Выход',
                                     click: function () {
-                                        webix.send("/logout");
+                                        webix.send("logout");
                                     },
                                 },
                             ]

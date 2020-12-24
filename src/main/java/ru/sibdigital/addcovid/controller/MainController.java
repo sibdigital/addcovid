@@ -104,7 +104,7 @@ public class MainController {
             if (validateOgrn) {
                 if (postFormDto.getOrganizationOgrn() == null || postFormDto.getOrganizationOgrn().isEmpty()) {
                     errors += "Заполните ОГРН";
-                } else if (!(postFormDto.getOrganizationInn().length() == 15 || postFormDto.getOrganizationInn().length() == 13)) {
+                } else if (!(postFormDto.getOrganizationOgrn().length() == 15 || postFormDto.getOrganizationOgrn().length() == 13)) {
                     errors += "Неправильная длина ОГРН";
                 }
             }

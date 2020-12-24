@@ -442,7 +442,7 @@ webix.ready(function() {
                                 css: 'webix_secondary',
                                 value: 'Загрузить PDF-файл(-ы) или ZIP-архив(-ы)  с пояснением обоснования',
                                 autosend: false,
-                                upload: '/uploadpart',
+                                upload: 'uploadpart',
                                 required: true,
                                 accept: 'application/pdf, application/zip',
                                 multiple: true,
@@ -865,7 +865,7 @@ webix.ready(function() {
                                             webix.ajax()
                                                 .headers({'Content-type': 'application/json'})
                                                 //.headers({'Content-type': 'application/x-www-form-urlencoded'})
-                                                .post('/barber',
+                                                .post('barber',
                                                     JSON.stringify(params),
                                                     //params,
                                                     function (text, data, xhr) {
