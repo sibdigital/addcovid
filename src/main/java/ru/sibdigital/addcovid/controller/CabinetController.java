@@ -780,4 +780,19 @@ public class CabinetController {
         }
         return list;
     }
+
+    @PostMapping("/check_current_pass")
+    public @ResponseBody String checkCurrentPass(@RequestBody String incomingPass, HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return "Не удалось получить данные организации";
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        String currentPass = organization.getPrincipal().getPassword();
+        if(passwordEncoder.matches(incomingPass,currentPass)){
+            return "Пароли совпадают";
+        }else{
+            return "Пароли не совпадают";
+        }
+    }
 }
