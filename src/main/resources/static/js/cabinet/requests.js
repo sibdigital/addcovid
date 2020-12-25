@@ -41,7 +41,7 @@ const requests = {
                             {
                                 id: "typeRequest",
                                 header: "Вид деятельности",
-                                template: "#typeRequest.activityKind#",
+                                template: "#activityKind#",
                                 minWidth: 350,
                                 fillspace: true
                             },
@@ -54,7 +54,7 @@ const requests = {
                             {
                                 id: "department",
                                 header: "Рассматривает",
-                                template: "#department.name#",
+                                template: "#departmentName#",
                                 adjust: true,
                             },
                             {
@@ -102,15 +102,26 @@ const requests = {
                             onLoadError: function () {
                                 this.hideOverlay();
                             },
-                            onItemClick: function (id) {
+                            onItemDblClick: function (id) {
                                 let item = this.getItem(id);
                                 setTimeout(function () {
-                                    if (item.new) {
+                                    if (item.statusReview == 100) {
                                         showRequestWizard(item);
                                     } else {
                                         showRequestViewForm(item);
                                     }
-                                }, 10);
+                                }, 100);
+                            },
+                            'data->onStoreUpdated': function() {
+                                this.adjustRowHeight(null, true);
+                            },
+                        },
+                        onClick: {
+                            resubmit: function (ev, id, html) {
+                                let item = this.getItem(id);
+                                setTimeout(function () {
+                                    showRequestWizard(item);
+                                }, 100)
                             },
                             'data->onStoreUpdated': function() {
                                 this.adjustRowHeight(null, true);
@@ -202,7 +213,15 @@ function showRequestViewForm(data) {
                                     // align: 'center',
                                     label: 'Тип заявки',
                                     labelPosition: 'top',
-                                    name: 'typeRequest.activityKind',
+                                    readonly: true
+                                },
+                                {
+                                    view: 'text',
+                                    id: 'departmentId',
+                                    autoheight: true,
+                                    // align: 'center',
+                                    label: 'Рассматривает',
+                                    labelPosition: 'top',
                                     readonly: true
                                 },
                                 view_section('Обоснование'),
@@ -210,9 +229,9 @@ function showRequestViewForm(data) {
                                     rows: [
                                         {
                                             view: 'textarea',
+                                            id: 'reqBasis',
                                             height: 150,
                                             label: 'Обоснование заявки',
-                                            name: 'reqBasis',
                                             readonly: true,
                                             labelPosition: 'top'
                                         },
@@ -272,139 +291,153 @@ function showRequestViewForm(data) {
         ]
     }, $$('content'));
 
-    const typeRequest = data.typeRequest;
+    webix.ajax('org_requests/' + data.id).then(function (data) {
+        data = data.json();
 
-    if (data.attachmentPath) {
-        let paths = data.attachmentPath.split(',')
+        $$('departmentId').setValue(data.department.name);
+        $$('reqBasis').setValue(data.reqBasis);
 
-        let fileList = []
-        paths.forEach((path, index) => {
-            let filename = path.split('\\').pop().split('/').pop()
-            if (filename != '' &&
-                ((filename.toUpperCase().indexOf('.PDF') != -1) ||
-                    (filename.toUpperCase().indexOf('.ZIP') != -1)
-                )) {
-                filename = '<a href="' + LINK_PREFIX + filename + LINK_SUFFIX + '" target="_blank">'
-                    + filename + '</a>'
-                fileList.push({id: index, value: filename})
-            }
-        })
-        if (fileList.length > 0) {
-            $$('filename').parse(fileList)
-        } else {
-            $$('filename_label').hide()
-            $$('filename').hide()
-        }
-    } else if (data.docRequestFiles && data.docRequestFiles.length > 0) {
-        let fileList = []
-        data.docRequestFiles.forEach((drf, index) => {
-            const file = drf.organizationFile;
-            const filename = '<a href="' + LINK_PREFIX + file.filename + LINK_SUFFIX + '" target="_blank">'
-                + file.originalFileName + '</a>'
-            fileList.push({id: index, value: filename})
-        })
-        if (fileList.length > 0) {
-            $$('filename').parse(fileList)
-        } else {
-            $$('filename_label').hide()
-            $$('filename').hide()
-        }
-    }
+        if (data.attachmentPath) {
+            let paths = data.attachmentPath.split(',')
 
-    if (data.docRequestPrescriptions && data.docRequestPrescriptions.length > 0) {
-        data.docRequestPrescriptions.forEach((drp, index) => {
-            const prescription = drp.prescription;
-
-            $$('prescriptions').addView({
-                id: 'prescription' + prescription.id,
-                rows: [
-                    {
-                        view: 'label',
-                        label: prescription.name,
-                        align: 'center'
-                    },
-                    {
-                        id: 'prescriptionTexts' + prescription.id,
-                        rows: []
-                    }
-                ]
+            let fileList = []
+            paths.forEach((path, index) => {
+                let filename = path.split('\\').pop().split('/').pop()
+                if (filename != '' &&
+                    ((filename.toUpperCase().indexOf('.PDF') != -1) ||
+                        (filename.toUpperCase().indexOf('.ZIP') != -1)
+                    )) {
+                    filename = '<a href="' + LINK_PREFIX + filename + LINK_SUFFIX + '" target="_blank">'
+                        + filename + '</a>'
+                    fileList.push({id: index, value: filename})
+                }
             })
+            if (fileList.length > 0) {
+                $$('filename').parse(fileList)
+            } else {
+                $$('filename_label').hide()
+                $$('filename').hide()
+            }
+        } else if (data.docRequestFiles && data.docRequestFiles.length > 0) {
+            let fileList = []
+            data.docRequestFiles.forEach((drf, index) => {
+                const file = drf.organizationFile;
+                const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
+                    + file.originalFileName + '</a>'
+                fileList.push({id: index, value: filename})
+            })
+            if (fileList.length > 0) {
+                $$('filename').parse(fileList)
+            } else {
+                $$('filename_label').hide()
+                $$('filename').hide()
+            }
+        }
 
-            if (prescription.prescriptionTexts && prescription.prescriptionTexts.length > 0) {
-                prescription.prescriptionTexts.forEach((pt, ptIndex) => {
-                    const files = [];
-                    if (pt.prescriptionTextFiles && pt.prescriptionTextFiles.length > 0) {
-                        pt.prescriptionTextFiles.forEach((file) => {
-                            const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
-                                + file.originalFileName + '</a>'
-                            files.push({id: file.id, value: filename})
-                        })
-                    }
+        if (data.docRequestPrescriptions && data.docRequestPrescriptions.length > 0) {
+            data.docRequestPrescriptions.forEach((drp, index) => {
+                const prescription = drp.prescription;
 
-                    let consentPrescriptionChecked = false;
-                    if (drp.additionalAttributes && drp.additionalAttributes.consentPrescriptions) {
-                        const consentPrescription = drp.additionalAttributes.consentPrescriptions.find(c => c.id == pt.id);
-                        if (consentPrescription) {
-                            consentPrescriptionChecked = consentPrescription.isAgree;
+                $$('prescriptions').addView({
+                    id: 'prescription' + prescription.id,
+                    rows: [
+                        {
+                            view: 'label',
+                            label: prescription.name,
+                            align: 'center'
+                        },
+                        {
+                            id: 'prescriptionTexts' + prescription.id,
+                            rows: []
                         }
-                    }
+                    ]
+                })
 
-                    $$('prescriptionTexts' + prescription.id).addView({
-                        rows: [
-                            {
-                                cols: [
-                                    {
-                                        view: 'label',
-                                        label: 'Текст №' + (ptIndex + 1),
-                                        align: 'center'
-                                    },
-                                ]
-                            },
-                            {
-                                view: 'template',
-                                height: 550,
-                                readonly: true,
-                                scroll: true,
-                                template: pt.content
-                            },
-                            {
-                                view: 'list',
-                                autoheight: true,
-                                template: '#value#',
-                                data: files,
-                            },
-                            {
-                                view: 'checkbox',
-                                name: 'agree',
-                                labelPosition: 'top',
-                                readonly: true,
-                                labelRight: 'Подтверждено обязательное выполнение предписания',
-                                value: consentPrescriptionChecked
-                            },
-                        ]
-                    });
+                if (prescription.prescriptionTexts && prescription.prescriptionTexts.length > 0) {
+                    prescription.prescriptionTexts.forEach((pt, ptIndex) => {
+                        const files = [];
+                        if (pt.prescriptionTextFiles && pt.prescriptionTextFiles.length > 0) {
+                            pt.prescriptionTextFiles.forEach((file) => {
+                                const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
+                                    + file.originalFileName + '</a>'
+                                files.push({id: file.id, value: filename})
+                            })
+                        }
+
+                        let consentPrescriptionChecked = false;
+                        if (drp.additionalAttributes && drp.additionalAttributes.consentPrescriptions) {
+                            const consentPrescription = drp.additionalAttributes.consentPrescriptions.find(c => c.id == pt.id);
+                            if (consentPrescription) {
+                                consentPrescriptionChecked = consentPrescription.isAgree;
+                            }
+                        }
+
+                        $$('prescriptionTexts' + prescription.id).addView({
+                            rows: [
+                                {
+                                    cols: [
+                                        {
+                                            view: 'label',
+                                            label: 'Текст №' + (ptIndex + 1),
+                                            align: 'center'
+                                        },
+                                    ]
+                                },
+                                {
+                                    view: 'template',
+                                    height: 550,
+                                    readonly: true,
+                                    scroll: true,
+                                    template: pt.content
+                                },
+                                {
+                                    view: 'list',
+                                    autoheight: true,
+                                    template: '#value#',
+                                    data: files,
+                                },
+                                {
+                                    view: 'checkbox',
+                                    name: 'agree',
+                                    labelPosition: 'top',
+                                    readonly: true,
+                                    labelRight: 'Подтверждено обязательное выполнение предписания',
+                                    value: consentPrescriptionChecked
+                                },
+                            ]
+                        });
+                    })
+                }
+            })
+        } else {
+            $$('prescriptions').addView({
+                view: 'label',
+                label: 'Отсутствуют предписания'
+            });
+        }
+
+        if (data.statusReview === 1 || data.statusReview === 2) {
+            $$('reject_comment').show();
+        }
+
+        const typeRequest = data.typeRequest;
+
+        $$('activityKind').setValue(typeRequest.activityKind);
+
+        if (typeRequest.settings) {
+            const settings = JSON.parse(typeRequest.settings, function (key, value) {
+                if (value === 'webix.rules.isChecked') {
+                    return webix.rules.isChecked;
+                }
+                return value;
+            });
+            if (settings.fields) {
+                settings.fields.forEach(field => {
+                    $$('form').addView(field.ui, field.pos);
                 })
             }
-        })
-    }
-
-    if (typeRequest.settings) {
-        const settings = JSON.parse(typeRequest.settings, function (key, value) {
-            if (value === 'webix.rules.isChecked') {
-                return webix.rules.isChecked;
-            }
-            return value;
-        });
-        if (settings.fields) {
-            settings.fields.forEach(field => {
-                $$('form').addView(field.ui, field.pos);
-            })
         }
-    }
-
-    if (data.statusReview === 1 || data.statusReview === 2) {
-        $$('reject_comment').show();
-    }
+    });
 }
 
 function showTypeRequestsPage() {

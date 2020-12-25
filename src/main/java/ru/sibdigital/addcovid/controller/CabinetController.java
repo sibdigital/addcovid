@@ -174,14 +174,23 @@ public class CabinetController {
     }
 
     @GetMapping("/org_requests")
-    public @ResponseBody List<DocRequest> getRequests(HttpSession session) {
+    public @ResponseBody List<DocRequestDto> getRequests(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         List<DocRequest> requests = docRequestRepo.getAllByInn(organization.getInn()).orElse(null);
-        return requests;
+        List<DocRequestDto> dtos = requests.stream().map(request -> new DocRequestDto(request.getId(),
+                request.getTypeRequest().getActivityKind(), request.getStatusReview(), request.getStatusReviewName(),
+                request.getDepartment().getName(), request.getTimeCreate(), request.getTimeReview()))
+                .collect(Collectors.toList());
+        return dtos;
+    }
+
+    @GetMapping("/org_requests/{id}")
+    public @ResponseBody DocRequest getDocRequest(@PathVariable("id") Long id) {
+        return docRequestRepo.findById(id).orElse(null);
     }
 
     @GetMapping("/count_confirmed_requests")
