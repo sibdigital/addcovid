@@ -62,52 +62,62 @@ const documents = {
                                 id: 'upload',
                                 view: 'uploader',
                                 css: 'webix_secondary',
-                                value: 'Выбрать',
-                                autosend: false,
+                                value: 'Загрузить',
                                 upload: 'upload_files',
                                 required: true,
+                                autosend: true,
                                 accept: 'application/pdf, application/zip',
                                 multiple: true,
                                 link: 'docslist',
-                                formData:{
-                                    cause: '123'
-                                }
-                            },
-                            {
-                                view: 'list', id: 'docslist', type: 'uploader',
-                                autoheight: true, borderless: true
-                            },
-                            {
-                                id: 'send_btn',
-                                view: 'button',
-                                css: 'webix_primary',
-                                value: 'Добавить',
-                                align: 'center',
-                                click: function () {
-                                    $$('upload').send(function (response) {
-                                        if(response.status == "server")
-                                        {
-                                            if(response.cause == "Файл успешно загружен"){
-
-                                                webix.message(response.cause + ": " + response.sname, "success")
-                                                console.log(response.cause)
-
-                                            }
-                                            else if(response.cause == "Ошибка сохранения" || response.cause == "Отсутствует организация"){
-
-                                                webix.message(response.cause, "error")
-                                                console.log(response.cause)
-
-                                            }else if(response.cause == "Вы уже загружали этот файл"){
-                                                webix.message(response.cause + ": " + response.sname, "error")
-                                                console.log(response.cause)
-                                            }
+                                on:{
+                                    onFileUpload:(response) => {
+                                        if(response.cause == "Ошибка сохранения" || response.cause == "Отсутствует организация"){
+                                            webix.message(response.cause, "error")
+                                        }else if(response.cause == "Вы уже загружали этот файл"){
+                                            webix.message(response.cause + ": " + response.sname, "error")
+                                            console.log(response.cause)
+                                        }else{
+                                            webix.message(response.cause + ": " + response.sname, "success")
+                                            $$('docs_grid').load('org_files');
                                         }
-                                        $$("upload").files.data.clearAll();
-                                        $$('docs_grid').load('org_files');
-                                    })
+                                    }
                                 }
                             },
+                            // {
+                            //     view: 'list', id: 'docslist', type: 'uploader',
+                            //     autoheight: true, borderless: true
+                            // },
+                            // {
+                            //     id: 'send_btn',
+                            //     view: 'button',
+                            //     css: 'webix_primary',
+                            //     value: 'Добавить',
+                            //     align: 'center',
+                            //     click: function () {
+                            //         $$('upload').send(function (response) {
+                            //             if(response.status == "server")
+                            //             {
+                            //                 if(response.cause == "Файл успешно загружен"){
+                            //
+                            //                     webix.message(response.cause + ": " + response.sname, "success")
+                            //                     console.log(response.cause)
+                            //
+                            //                 }
+                            //                 else if(response.cause == "Ошибка сохранения" || response.cause == "Отсутствует организация"){
+                            //
+                            //                     webix.message(response.cause, "error")
+                            //                     console.log(response.cause)
+                            //
+                            //                 }else if(response.cause == "Вы уже загружали этот файл"){
+                            //                     webix.message(response.cause + ": " + response.sname, "error")
+                            //                     console.log(response.cause)
+                            //                 }
+                            //             }
+                            //             $$("upload").files.data.clearAll();
+                            //             $$('docs_grid').load('org_files');
+                            //         })
+                            //     }
+                            // },
                             {}
                     ]
                     }
