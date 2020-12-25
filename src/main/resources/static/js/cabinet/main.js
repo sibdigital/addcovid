@@ -17,6 +17,7 @@ let uploadFile = '';
 let uploadFilename = '';
 let pred_date = new Date();
 let upload_chack_error = 'Загружать можно только PDF-файлы и ZIP-архивы!';
+let btnBackHandler = null;
 
 webix.html.addStyle(
     ".personalTemplateStyle .webix_template {" +
@@ -145,7 +146,10 @@ let btnBack = {
 
 function showBtnBack(view, tableId) {
     $$('btnBackMainId').show();
-    $$('btnBackMainId').attachEvent("onItemClick", function(id, e) {
+    if (btnBackHandler != null) {
+        $$('btnBackMainId').detachEvent(btnBackHandler);
+    }
+    btnBackHandler = $$('btnBackMainId').attachEvent("onItemClick", function(id, e) {
         if ($$(tableId) != null) {
             $$(tableId).destructor();
         }
@@ -159,13 +163,14 @@ function showBtnBack(view, tableId) {
 
         if (view != archiveNews) {
             $$('btnBackMainId').hide();
-            // if (view == news) {
-            //     $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Новости" + "</span>");
-            // }
+            if (view == news) {
+                $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Новости" + "</span>");
+            }
         } else {
             showBtnBack(news,)
-            // $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Архив новостей" + "</span>");
+            $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Архив новостей" + "</span>");
         }
+
 
         return false;
     });

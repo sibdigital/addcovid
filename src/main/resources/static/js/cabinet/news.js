@@ -104,7 +104,7 @@ let btnArchiveNews = {
     click: function () {
         webix.ui(archiveNews, $$('newsId'));
         showBtnBack(news,);
-        // $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Архив новостей" + "</span>");
+        $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Архив новостей" + "</span>");
     }
 };
 
