@@ -15,10 +15,11 @@ public interface ClsPrescriptionRepo extends JpaRepository<ClsPrescription, Long
             "select * " +
             "from cls_prescription cp " +
             "where cp.id_type_request in (:typeRequestIds) " +
-            "   and cp.status = 1 " +
+            "   and cp.status = :status " +
             "   and cp.id not in (select id_prescription from reg_organization_prescription where id_organization = :orgId)" +
             "order by cp.time_publication desc")
-    List<ClsPrescription> getPrescriptionsByTypeRequestIds(Set<Long> typeRequestIds, Long orgId);
+    List<ClsPrescription> getPrescriptionsByTypeRequestIds(Set<Long> typeRequestIds, Long orgId, Integer status);
+
 
     @Query(nativeQuery = true, value = "" +
             "select * " +
@@ -31,7 +32,7 @@ public interface ClsPrescriptionRepo extends JpaRepository<ClsPrescription, Long
             "select * " +
             "from cls_prescription " +
             "where id_type_request = :idTypeRequest " +
-            "   and status = 1 " +
+            "   and status = :status " +
             "order by time_publication")
-    List<ClsPrescription> getPrescriptionsByTypeRequestId(Long idTypeRequest);
+    List<ClsPrescription> getPrescriptionsByTypeRequestId(Long idTypeRequest, Integer status);
 }

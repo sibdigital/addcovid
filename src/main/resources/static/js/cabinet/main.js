@@ -88,12 +88,12 @@ function showDropDownMenu(span){
 }
 
 function setRequestsBadge(){
-    webix.ajax("count_confirmed_requests").then(function(data){
-        let requestsCount = data.json().length;
-        let request = $$('menu').getItem("Requests");
-        request.badge = requestsCount;
-        $$('menu').updateItem("Requests", request);
-    });
+    // webix.ajax("count_confirmed_requests").then(function(data){
+    //     let requestsCount = data.json().length;
+    //     let request = $$('menu').getItem("Requests");
+    //     request.badge = requestsCount;
+    //     $$('menu').updateItem("Requests", request);
+    // });
 }
 
 function setPrescriptionBadge(){
@@ -124,6 +124,53 @@ function getRequestStyles(){
         })
 }
 
+function hideBtnBack() {
+    $$('btnBackMainId').hide();
+}
+
+let btnBack = {
+    id: 'btnBackMainId',
+    view: 'button',
+    label: 'Назад',
+    maxWidth: 100,
+    align: 'left',
+    type: 'icon',
+    icon: 'mdi mdi-arrow-left',
+    css: 'backBtnStyle',
+    hidden: true,
+    click: function () {
+
+    }
+}
+
+function showBtnBack(view, tableId) {
+    $$('btnBackMainId').show();
+    $$('btnBackMainId').attachEvent("onItemClick", function(id, e) {
+        if ($$(tableId) != null) {
+            $$(tableId).destructor();
+        }
+
+        webix.ui({
+            id: 'content',
+            rows: [
+                view
+            ]
+        }, $$('content'));
+
+        if (view != archiveNews) {
+            $$('btnBackMainId').hide();
+            // if (view == news) {
+            //     $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Новости" + "</span>");
+            // }
+        } else {
+            showBtnBack(news,)
+            // $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Архив новостей" + "</span>");
+        }
+
+        return false;
+    });
+}
+
 let bigMainForm = {
     id: 'bigMainFormId',
     cols: [
@@ -152,7 +199,9 @@ let bigMainForm = {
                         {id: "Documents", icon: "mdi mdi-cloud-upload-outline", value: 'Документы'},
                         {id: "Address", icon: "mdi mdi-home-city-outline", value: 'Фактические адреса'},
                         {id: "Prescript", icon: "mdi mdi-text-box-check-outline", value: 'Предписания',  badge: setPrescriptionBadge()},
-                        {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
+                        {id: "Requests", icon: "wxi-file", value: 'Заявки',
+                            // badge: setRequestsBadge()
+                        },
                         {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
                         {id: "Mailing", icon: "mdi mdi-email", value: 'Рассылки',},
                         {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Доп.контакты'}
@@ -172,10 +221,10 @@ let bigMainForm = {
                                 view = profile;
                             } else if (id == 'Requests') {
                                 view = requests;
-                                let checkReqBadge = this.getMenuItem(id).badge
-                                if (checkReqBadge != null) {
-                                    requestsBadge = "(" + checkReqBadge + ")";
-                                }
+                                // let checkReqBadge = this.getMenuItem(id).badge
+                                // if (checkReqBadge != null) {
+                                //     requestsBadge = "(" + checkReqBadge + ")";
+                                // }
                             } else if (id == 'Employees') {
                                 view = employees;
                             } else if (id == 'Settings') {
@@ -222,6 +271,7 @@ let bigMainForm = {
                                 $$('bigHelpId').setValue(helpUrl);
                                 $$('bigHelpId').refresh();
                             }
+                            hideBtnBack();
 
                             // webix.ajax("check_session").then(function (data){
                             //     if(data.text() == "Expired"){
@@ -241,11 +291,11 @@ let bigMainForm = {
                     // padding: 5,
                     height: 45,
                     elements: [
-
+                        btnBack,
                         {
                             view: 'label',
                             id: 'labelLK',
-                            align: 'left',
+                            align: 'center',
                             css: {"padding-left": "5px"},
                             label: 'Личный кабинет',
                         },
@@ -266,6 +316,7 @@ let bigMainForm = {
 
                                         $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Профиль" + "</span>");
                                         $$('menu').unselectAll();
+                                        hideBtnBack();
                                     },
                                 },
                                 {
@@ -299,6 +350,7 @@ let bigMainForm = {
 
                                         $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Контакты ИОГВ" + "</span>");
                                         $$('menu').unselectAll();
+                                        hideBtnBack();
                                     },
                                 },
                                 {
@@ -364,6 +416,7 @@ let smallMainForm = {
                                             ]
                                         }, $$('content'));
                                         $$('menu').unselectAll();
+                                        hideBtnBack();
                                     },
                                 },
                                 {
@@ -395,6 +448,7 @@ let smallMainForm = {
                                             ]
                                         }, $$('content'));
                                         $$('menu').unselectAll();
+                                        hideBtnBack();
                                     },
                                 },
                                 {
@@ -437,7 +491,7 @@ let smallMainForm = {
                                     id: "Requests",
                                     icon: "wxi-file",
                                     value: 'Заявки',
-                                    badge: setRequestsBadge()
+                                    // badge: setRequestsBadge()
                                 },
                                 {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
                                 {id: "Mailing", icon: "mdi mdi-email", value: 'Рассылки',},
@@ -498,6 +552,7 @@ let smallMainForm = {
                                 $$('smallHelpId').setValue('helps?key=' + id);
                                 $$('smallHelpId').refresh();
                             }
+                            hideBtnBack();
                         }
                     }
                 },

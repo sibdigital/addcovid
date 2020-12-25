@@ -174,6 +174,7 @@ function allCheckedText() {
 }
 
 function showRequestViewForm(data) {
+    showBtnBack(requests, 'requests_table');
     webix.ui({
         id: 'content',
         rows: [
@@ -183,12 +184,6 @@ function showRequestViewForm(data) {
                 // body: {
                 //     type: 'space',
                 //     rows: [
-                        {
-                            cols: [
-                                btnBackRequests,
-                                {}
-                            ]
-                        },
                         {
                             id: 'form',
                             view: 'form',
