@@ -20,4 +20,5 @@ public class DocRequestDto {
     private String departmentName;
     private Timestamp timeCreate;
     private Timestamp timeReview;
+    private Long typeRequestId;
 }

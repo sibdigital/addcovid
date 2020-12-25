@@ -42,7 +42,6 @@ const requests = {
                                 id: "typeRequest",
                                 header: "Вид деятельности",
                                 template: "#activityKind#",
-                                minWidth: 350,
                                 fillspace: true
                             },
                             {
@@ -68,6 +67,19 @@ const requests = {
                                 header: "Дата рассмотрения",
                                 adjust: true,
                                 format: dateFormat,
+                            },
+                            {
+                                width: 160,
+                                template: function (obj) {
+                                    if (obj.statusReview == 0) {
+                                        return '<button class="view_request">Просмотреть</button>';
+                                    } else if (obj.statusReview == 100) {
+                                        return '<button class="edit_request">Редактировать</button>';
+                                    } else {
+                                        return '<button class="view_request">Просмотреть</button>' +
+                                            '<button class="resubmit_request">Подать повторно</button>';
+                                    }
+                                }
                             },
                         ],
                         scheme: {
@@ -102,24 +114,48 @@ const requests = {
                             onLoadError: function () {
                                 this.hideOverlay();
                             },
-                            onItemDblClick: function (id) {
-                                let item = this.getItem(id);
-                                setTimeout(function () {
-                                    if (item.statusReview == 100) {
-                                        showRequestWizard(item);
-                                    } else {
-                                        showRequestViewForm(item);
-                                    }
-                                }, 100);
-                            },
                             'data->onStoreUpdated': function() {
                                 this.adjustRowHeight(null, true);
                             },
                         },
                         onClick: {
-                            resubmit: function (ev, id, html) {
+                            view_request: function (ev, id, html) {
                                 let item = this.getItem(id);
                                 setTimeout(function () {
+                                    showRequestViewForm(item);
+                                }, 100);
+                            },
+                            edit_request: function (ev, id, html) {
+                                let item = this.getItem(id);
+                                setTimeout(function () {
+                                    showRequestWizard(item);
+                                }, 100);
+                            },
+                            resubmit_request: function (ev, id, html) {
+                                let item = this.getItem(id);
+                                setTimeout(function () {
+                                    const request = findRequestByType(item.typeRequestId)
+                                    if (request.id != 0) {
+                                        if (request.status == 100) {
+                                            webix.alert({
+                                                title: "Подача заявки",
+                                                ok: "ОК",
+                                                text: "Заявка с таким видом деятельности уже создана. Отредактируйте и подайте её."
+                                            }).then(function () {
+                                                $$('menu').callEvent('onMenuItemClick', ['Requests']);
+                                            });
+                                            return;
+                                        } else if (request.status == 0) {
+                                            webix.alert({
+                                                title: "Подача заявки",
+                                                ok: "ОК",
+                                                text: "Заявка с таким видом деятельности уже находится на рассмотрении. Повторная подача невозможна."
+                                            }).then(function () {
+                                                $$('menu').callEvent('onMenuItemClick', ['Requests']);
+                                            });
+                                            return;
+                                        }
+                                    }
                                     showRequestWizard(item);
                                 }, 100)
                             },
@@ -166,6 +202,11 @@ const requests = {
             }
         ]
     // }
+}
+
+function findRequestByType(idTypeRequest) {
+    const xhr = webix.ajax().sync().get('check_existence_request', {id: idTypeRequest});
+    return JSON.parse(xhr.responseText);
 }
 
 function allCheckedText() {

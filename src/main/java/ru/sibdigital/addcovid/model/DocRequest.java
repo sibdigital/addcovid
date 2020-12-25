@@ -53,6 +53,8 @@ public class DocRequest {
     private Long old_department_id;
     private Boolean isActualization;
 
+    private Integer statusActivity;
+
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
     private AdditionalAttributes additionalAttributes;
@@ -339,6 +341,16 @@ public class DocRequest {
 
     public void setOld_department_id(Long old_department_id) {
         this.old_department_id = old_department_id;
+    }
+
+    @Basic
+    @Column(name = "status_activity")
+    public Integer getStatusActivity() {
+        return statusActivity;
+    }
+
+    public void setStatusActivity(Integer statusActivity) {
+        this.statusActivity = statusActivity;
     }
 
     public String getStatusReviewName(){
