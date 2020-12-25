@@ -957,7 +957,7 @@ public class RequestService {
     public List<ClsPrescriptionDto> getClsPrescriptionsByOrganizationId(Long id) {
         List<DocRequestPrs> requests = docRequestPrsRepo.getActualizedRequestsByOrganizationId(id);
         Set<Long> typeRequestIds = requests.stream().map(request -> request.getTypeRequest().getId()).collect(Collectors.toSet());
-        List<ClsPrescription> newPrescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestIds(typeRequestIds, id);
+        List<ClsPrescription> newPrescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestIds(typeRequestIds, id, PublicationStatuses.PUBLISHED.getValue());
         List<ClsPrescriptionDto> newDtos = newPrescriptions.stream().map(prescription ->
                 new ClsPrescriptionDto(prescription.getId(), prescription.getName(), prescription.getTypeRequest().getActivityKind(), prescription.getTimePublication(), false))
                 .collect(Collectors.toList());
@@ -973,7 +973,7 @@ public class RequestService {
     public Integer getCountOfNewClsPrescriptionsByOrgId(Long id) {
         List<DocRequestPrs> requests = docRequestPrsRepo.getActualizedRequestsByOrganizationId(id);
         Set<Long> typeRequestIds = requests.stream().map(request -> request.getTypeRequest().getId()).collect(Collectors.toSet());
-        List<ClsPrescription> newPrescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestIds(typeRequestIds, id);
+        List<ClsPrescription> newPrescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestIds(typeRequestIds, id, PublicationStatuses.PUBLISHED.getValue());
         if (newPrescriptions != null) {
             return newPrescriptions.size();
         }
@@ -1001,7 +1001,7 @@ public class RequestService {
     }
 
     public List<ClsPrescription> getClsPrescriptionsByTypeRequestId(Long idTypeRequest) {
-        List<ClsPrescription> prescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestId(idTypeRequest);
+        List<ClsPrescription> prescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestId(idTypeRequest, PublicationStatuses.PUBLISHED.getValue());
         return prescriptions;
     }
 
