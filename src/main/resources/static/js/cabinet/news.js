@@ -74,6 +74,38 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
 var newsfeed_url = 'newsfeed'
 var news_archive_url = 'news_archive'
 
+let backBtnNews = {
+    view: 'button',
+    id: 'btnBack',
+    label: 'Назад',
+    maxWidth: 100,
+    align: 'left',
+    type: 'icon',
+    icon: 'mdi mdi-arrow-left',
+    css: 'backBtnStyle',
+    click: function () {
+        webix.ui({
+            id: 'content',
+            rows: [
+                news
+            ]
+        }, $$('content'));
+    }
+}
+
+let btnArchiveNews = {
+    view: 'button',
+    type:"icon",
+    icon:"mdi mdi-newspaper",
+    align: 'right',
+    label: 'Архив',
+    maxWidth: '100',
+    css:"webix_transparent",
+    click: function () {
+        webix.ui(archiveNews, $$('newsId'));
+    }
+};
+
 //define proxy
 webix.proxy.idata = {
     $proxy:true,
@@ -143,39 +175,16 @@ const archiveNews =  {
                 id: 'newsToolbar',
                 type: "space",
                 cols: [
-                    {
-                        view: 'button',
-                        id: 'archiveBtn',
-                        type:"icon",
-                        icon:"mdi mdi-menu-left",
-                        align: 'left',
-                        label: 'Новости',
-                        maxWidth: '150',
-                        click: function () {
-                            webix.ui(news, $$('archiveNewsId'));
-                        }
-                    },
+                    backBtnNews,
                     {}
                 ]
             },
             {
                 view: "dataview",
-                id: "newsDataview",
+                id: "newsArchiveDataview",
                 margin: 20, paddingX: 10,
                 scroll: 'y',
-                template: function (obj) {
-                    var startTime =obj.startTime ? new Date(obj.startTime) : "";
-                    let startTimeString = startTime.toLocaleString("ru", options)
-
-                    return "<span class = 'item_title'>" +
-                                // "<a href = \"news?hash_id=" + obj.hashId + "\"'>" +
-                                    obj.heading +
-                                // "</a>" +
-                            "</span>"+
-                            "<span class = 'item_label'>" +
-                                "Дата публикации: "+ startTimeString +
-                            "</span>"
-                },
+                template: function (obj) {return generateArchiveNewsRow(obj)},
                 xCount: 1,
                 type: {
                     // Если height поставить auto,
@@ -187,16 +196,7 @@ const archiveNews =  {
                 datafetch: 10,
                 url: 'idata->' + news_archive_url,
                 onClick: {
-                    "item_title": function (ev, id) {
-                        let item = this.getItem(id);
-                        var xhr = webix.ajax().sync().get('newsform/' + item.hashId);
-                        var jsonResponse = JSON.parse(xhr.responseText);
-                        newsTemplate = generateNewsTemplate(jsonResponse)
-                        webix.ui(newsForm, $$('archiveNewsId'));
-                        $$('newsFormTemplateId').parse({
-                            'newsTemplate': newsTemplate
-                        });
-                    }
+                    "item_title": function (ev, id) { openArchiveNews(ev, id);}
                 }
             },
         ]
@@ -216,19 +216,7 @@ const news = {
                 type: "space",
                 cols: [
                     {},
-                    {
-                        view: 'button',
-                        id: 'archiveBtn',
-                        type:"icon",
-                        icon:"mdi mdi-newspaper",
-                        align: 'right',
-                        label: 'Архив',
-                        maxWidth: '100',
-                        css:"webix_transparent",
-                        click: function () {
-                            webix.ui(archiveNews, $$('newsId'));
-                        }
-                    },
+                    btnArchiveNews,
                     {gravity: 0.01}
                 ]
             },
@@ -237,35 +225,7 @@ const news = {
                 id: "newsDataview",
                 margin: 20, paddingX: 10,
                 scroll: 'y',
-                template: function (obj) {
-                    let obj_news = obj['news']
-                    let news_files = obj['newsFiles']
-                    let news_dir = obj['newsDirectory']
-                    let startTime =obj_news.startTime ? new Date(obj_news.startTime) : "";
-                    let startTimeString = startTime.toLocaleString("ru", options)
-
-                    let htmlcode =  "<div class = 'class_border'>" +
-                            "<span class = 'item_big_title'>" +
-                                    // "<a href = \"news?hash_id=" + obj_news.hashId + "\"'>" +
-                                        obj_news.heading +
-                                    // "</a>" +
-                                    "</span>"+
-                                    "<div class='item'>" +
-                                        obj_news.message +
-                                    "</div>";
-                    for (var i in news_files) {
-                        let newsFilePath = news_dir + "/" + news_files[i].fileName + news_files[i].fileExtension
-                        htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + newsFilePath + "' download=''><i class='mdi mdi-download'></i>"
-                                    + news_files[i].originalFileName + "</a></div>"
-                    }
-
-                    return htmlcode +
-                                    "<span class = 'item_label'>" +
-                                    "Дата публикации: "+ startTimeString +
-                                    "</span>" +
-                            "</div>"
-
-                },
+                template: function (obj) {return generateNewfeedRow(obj)},
                 xCount: 1,
                 type: {
                     height: "auto",
@@ -274,14 +234,7 @@ const news = {
                 },
                 url: newsfeed_url,
                 onClick: {
-                    "item_big_title": function (ev, id) {
-                        let item = this.getItem(id);
-                        newsTemplate = generateNewsTemplate(item);
-                        webix.ui(newsForm, $$('newsId'));
-                        $$('newsFormTemplateId').parse({
-                            'newsTemplate': newsTemplate
-                        });
-                    }
+                    "item_big_title": function (ev, id) { openCurrentNews(ev, id);}
                 }
             }
         ]
@@ -296,18 +249,7 @@ const newsForm = {
             id: 'newsToolbar',
             type: "space",
             cols: [
-                {
-                    view: 'button',
-                    id: 'archiveBtn',
-                    type:"icon",
-                    icon:"mdi mdi-menu-left",
-                    align: 'left',
-                    label: 'Новости',
-                    maxWidth: '150',
-                    click: function () {
-                        webix.ui(news, $$('newsFormId'));
-                    }
-                },
+                backBtnNews,
                 {}
             ]
         },
@@ -350,4 +292,68 @@ function generateNewsTemplate(obj) {
     else {
         return ""
     }
+}
+
+function generateArchiveNewsRow(obj) {
+    var startTime = obj.startTime ? new Date(obj.startTime) : "";
+    let startTimeString = startTime.toLocaleString("ru", options)
+
+    return "<span class = 'item_title'>" +
+        // "<a href = \"news?hash_id=" + obj.hashId + "\"'>" +
+        obj.heading +
+        // "</a>" +
+        "</span>"+
+        "<span class = 'item_label'>" +
+        "Дата публикации: "+ startTimeString +
+        "</span>"
+}
+
+function generateNewfeedRow(obj) {
+
+    let obj_news = obj['news']
+    let news_files = obj['newsFiles']
+    let news_dir = obj['newsDirectory']
+    let startTime =obj_news.startTime ? new Date(obj_news.startTime) : "";
+    let startTimeString = startTime.toLocaleString("ru", options)
+
+    let htmlcode =  "<div class = 'class_border'>" +
+        "<span class = 'item_big_title'>" +
+        // "<a href = \"news?hash_id=" + obj_news.hashId + "\"'>" +
+        obj_news.heading +
+        // "</a>" +
+        "</span>"+
+        "<div class='item'>" +
+        obj_news.message +
+        "</div>";
+    for (var i in news_files) {
+        let newsFilePath = news_dir + "/" + news_files[i].fileName + news_files[i].fileExtension
+        htmlcode = htmlcode + "<div class='item_link'><a class='link' href='" + newsFilePath + "' download=''><i class='mdi mdi-download'></i>"
+            + news_files[i].originalFileName + "</a></div>"
+    }
+
+    return htmlcode +
+        "<span class = 'item_label'>" +
+        "Дата публикации: "+ startTimeString +
+        "</span>" +
+        "</div>"
+}
+
+function openArchiveNews(ev, id) {
+    let item = $$('newsArchiveDataview').getItem(id);
+    var xhr = webix.ajax().sync().get('newsform/' + item.hashId);
+    var jsonResponse = JSON.parse(xhr.responseText);
+    newsTemplate = generateNewsTemplate(jsonResponse)
+    webix.ui(newsForm, $$('archiveNewsId'));
+    $$('newsFormTemplateId').parse({
+        'newsTemplate': newsTemplate
+    });
+}
+
+function openCurrentNews(ev, id) {
+    let item = $$('newsDataview').getItem(id);
+    newsTemplate = generateNewsTemplate(item);
+    webix.ui(newsForm, $$('newsId'));
+    $$('newsFormTemplateId').parse({
+        'newsTemplate': newsTemplate
+    });
 }

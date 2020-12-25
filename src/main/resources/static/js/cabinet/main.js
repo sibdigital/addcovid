@@ -25,11 +25,7 @@ webix.html.addStyle(
     "font-weight: 500;" +
     "color: #313131;" +
     "padding: 8px 3px !important;" +
-    "}"+
-    ".topMenuIcon .webix_icon:before{\n" +
-    "color: #1992af;" +
-    "font-size: 1.5rem;\n" +
-    " }"
+    "}"
 );
 
 webix.attachEvent("onFocusChange", function (to, from) {
@@ -100,6 +96,20 @@ function setRequestsBadge(){
     });
 }
 
+function setPrescriptionBadge(){
+    webix.ajax("count_non_consent_prescriptions").then(function(data){
+        let prescriptCount = data.json().count;
+        let prescript = $$('menu').getItem("Prescript");
+        if (prescriptCount == 0) {
+            prescript.badge = false;
+        }
+        else {
+            prescript.badge = prescriptCount;
+        }
+        $$('menu').updateItem("Prescript", prescript);
+    });
+}
+
 function getRequestStyles(){
     webix.ajax('requests_status_style')
         .then(function (data) {
@@ -141,7 +151,7 @@ let bigMainForm = {
                         {id: "Employees", icon: "mdi mdi-account-group", value: 'Сотрудники'},
                         {id: "Documents", icon: "mdi mdi-cloud-upload-outline", value: 'Документы'},
                         {id: "Address", icon: "mdi mdi-home-city-outline", value: 'Фактические адреса'},
-                        {id: "Prescript", icon: "mdi mdi-text-box-check-outline", value: 'Предписания'},
+                        {id: "Prescript", icon: "mdi mdi-text-box-check-outline", value: 'Предписания',  badge: setPrescriptionBadge()},
                         {id: "Requests", icon: "wxi-file", value: 'Заявки', badge: setRequestsBadge()},
                         {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
                         {id: "Mailing", icon: "mdi mdi-email", value: 'Рассылки',},
@@ -156,6 +166,7 @@ let bigMainForm = {
                             let view;
                             let itemValue;
                             let requestsBadge = "";
+                            let prescriptBadge = "";
                             let helpUrl = 'helps?key=' + id;
                             if (id == 'Profile') {
                                 view = profile;
@@ -175,12 +186,25 @@ let bigMainForm = {
                                 view = address;
                             } else if (id == 'Prescript') {
                                 view = prescript;
+                                let checkReqBadge = this.getMenuItem(id).badge
+                                if (checkReqBadge != null && checkReqBadge != false) {
+                                    prescriptBadge = "(" + checkReqBadge + ")";
+                                }
+
+                                // fix bug при двойном клике пустая таблица выходила
+                                if ($$('prescriptions_table') != null) {
+                                    $$('prescriptions_table').destructor();
+                                }
                             } else if (id == 'News') {
                                 view = news;
                             } else if (id == 'Contacts') {
                                 view = contacts;
                             } else if (id == 'Mailing') {
                                 view = mailing;
+                                // fix bug при двойном клике пустая таблица выходила
+                                if ($$('my_mailing_table') != null) {
+                                    $$('my_mailing_table').destructor();
+                                }
                             } else {
                                 helpUrl = 'helps';
                             }
@@ -193,7 +217,7 @@ let bigMainForm = {
                                     ]
                                 }, $$('content'));
                                 itemValue = this.getMenuItem(id).value
-                                $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + itemValue + " " + requestsBadge + "</span>");
+                                $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + itemValue + " " + requestsBadge + prescriptBadge + "</span>");
 
                                 $$('bigHelpId').setValue(helpUrl);
                                 $$('bigHelpId').refresh();
@@ -239,6 +263,9 @@ let bigMainForm = {
                                                 profile
                                             ]
                                         }, $$('content'))
+
+                                        $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Профиль" + "</span>");
+                                        $$('menu').unselectAll();
                                     },
                                 },
                                 {
@@ -258,7 +285,7 @@ let bigMainForm = {
                                     css: 'topMenuIcon',
                                     tooltip: 'Контакты ИОГВ',
                                     click: function () {
-                                        // fix bug
+                                        // fix bug при двойном клике пустая таблица выходила
                                         if ($$('dep_contacts_table') != null) {
                                             $$('dep_contacts_table').destructor();
                                         }
@@ -269,6 +296,9 @@ let bigMainForm = {
                                                 depContacts
                                             ]
                                         }, $$('content'));
+
+                                        $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Контакты ИОГВ" + "</span>");
+                                        $$('menu').unselectAll();
                                     },
                                 },
                                 {
@@ -332,7 +362,8 @@ let smallMainForm = {
                                             rows: [
                                                 profile
                                             ]
-                                        }, $$('content'))
+                                        }, $$('content'));
+                                        $$('menu').unselectAll();
                                     },
                                 },
                                 {
@@ -352,7 +383,7 @@ let smallMainForm = {
                                     css: 'topMenuIcon',
                                     tooltip: 'Контакты ИОГВ',
                                     click: function () {
-                                        // fix bug
+                                        // fix bug при двойном клике пустая таблица выходила
                                         if ($$('dep_contacts_table') != null) {
                                             $$('dep_contacts_table').destructor();
                                         }
@@ -362,7 +393,8 @@ let smallMainForm = {
                                             rows: [
                                                 depContacts
                                             ]
-                                        }, $$('content'))
+                                        }, $$('content'));
+                                        $$('menu').unselectAll();
                                     },
                                 },
                                 {
@@ -402,7 +434,8 @@ let smallMainForm = {
                                 {
                                     id: "Prescript",
                                     icon: "mdi mdi-text-box-check-outline",
-                                    value: 'Предписания'
+                                    value: 'Предписания',
+                                    badge: setPrescriptionBadge()
                                 },
                                 {
                                     id: "Requests",
@@ -443,10 +476,18 @@ let smallMainForm = {
                                 view = address;
                             } else if (id == 'Prescript') {
                                 view = prescript;
+                                // fix bug
+                                if ($$('prescriptions_table') != null) {
+                                    $$('prescriptions_table').destructor();
+                                }
                             } else if (id == 'News') {
                                 view = news;
                             } else if (id == 'Mailing') {
                                 view = mailing;
+                                // fix bug
+                                if ($$('my_mailing_table') != null) {
+                                    $$('my_mailing_table').destructor();
+                                }
                             } else if (id == 'Contacts') {
                                 view = contacts;
                             }

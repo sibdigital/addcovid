@@ -262,3 +262,42 @@ body {margin: 0}
   background-color: #373a42 !important;
   /*box-shadow: inset 2px 0 #1CA1C1;*/
 }
+
+.topMenuIcon .webix_icon:before{
+    color: #1992af;" +
+    font-size: 1.5rem;
+}
+
+.styleIcon .webix_icon:before{
+    color: #147187;
+}
+
+.prescription_accepted {
+    background-color: #d4f9ff;
+}
+
+.prescription_non_accepted {
+    background-color: #fff2f4;
+}
+
+.blinking {
+  -webkit-animation: blinking 2s infinite;
+  }
+  @-webkit-keyframes blinking {
+  0% {
+  opacity:0;
+  box-shadow: 0 0 3px transparent;
+  }
+  50% {
+  opacity:1;
+  box-shadow: 0 0 10px 3px transparent;
+  }
+  100% {
+  opacity:0;
+  box-shadow: 0 0 3px transparent;
+  }
+}
+
+.backBtnStyle button.webix_button{
+  background-color: transparent;
+}

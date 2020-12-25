@@ -950,6 +950,18 @@ public class RequestService {
         return newDtos;
     }
 
+    public Integer getCountOfNewClsPrescriptionsByOrgId(Long id) {
+        List<DocRequestPrs> requests = docRequestPrsRepo.getActualizedRequestsByOrganizationId(id);
+        Set<Long> typeRequestIds = requests.stream().map(request -> request.getTypeRequest().getId()).collect(Collectors.toSet());
+        List<ClsPrescription> newPrescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestIds(typeRequestIds, id);
+        if (newPrescriptions != null) {
+            return newPrescriptions.size();
+        }
+        else {
+            return 0;
+        }
+    }
+
     public ClsPrescription getClsPrescriptionById(Long id) {
         return clsPrescriptionRepo.findById(id).orElse(null);
     }
