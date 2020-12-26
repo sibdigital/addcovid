@@ -103,6 +103,8 @@ let btnArchiveNews = {
     css:"webix_transparent",
     click: function () {
         webix.ui(archiveNews, $$('newsId'));
+        showBtnBack(news,);
+        $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Архив новостей" + "</span>");
     }
 };
 
@@ -171,15 +173,6 @@ const archiveNews =  {
     // body: {
         rows: [
             {
-                view: 'toolbar',
-                id: 'newsToolbar',
-                type: "space",
-                cols: [
-                    backBtnNews,
-                    {}
-                ]
-            },
-            {
                 view: "dataview",
                 id: "newsArchiveDataview",
                 margin: 20, paddingX: 10,
@@ -244,15 +237,6 @@ const news = {
 const newsForm = {
     id: 'newsFormId',
     rows: [
-        {
-            view: 'toolbar',
-            id: 'newsToolbar',
-            type: "space",
-            cols: [
-                backBtnNews,
-                {}
-            ]
-        },
         {
             view:'template',
             id: 'newsFormTemplateId',
@@ -347,6 +331,7 @@ function openArchiveNews(ev, id) {
     $$('newsFormTemplateId').parse({
         'newsTemplate': newsTemplate
     });
+    showBtnBack(archiveNews,);
 }
 
 function openCurrentNews(ev, id) {
@@ -356,4 +341,5 @@ function openCurrentNews(ev, id) {
     $$('newsFormTemplateId').parse({
         'newsTemplate': newsTemplate
     });
+    showBtnBack(news,);
 }

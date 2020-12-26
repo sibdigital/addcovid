@@ -17,12 +17,44 @@ let btnBackToRequests = {
 }
 
 function showRequestCreateForm(idTypeRequest, page) {
+    const request = findRequestByType(idTypeRequest);
+    if (request.id != 0) {
+        if (request.status == 100) {
+            webix.alert({
+                title: "Подача заявки",
+                ok: "ОК",
+                text: "Заявка с таким видом деятельности уже создана. Отредактируйте и подайте её."
+            }).then(function () {
+                $$('menu').callEvent('onMenuItemClick', ['Requests']);
+            });
+        } else if (request.status == 0) {
+            webix.alert({
+                title: "Подача заявки",
+                ok: "ОК",
+                text: "Заявка с таким видом деятельности уже находится на рассмотрении. Повторная подача невозможна."
+            }).then(function () {
+                $$('menu').callEvent('onMenuItemClick', ['Requests']);
+            });
+        } else {
+            webix.alert({
+                title: "Подача заявки",
+                ok: "ОК",
+                text: "Заявка с таким видом деятельности уже подавалась ранее. Подайте заявку через 'Подать повторно'."
+            }).then(function () {
+                $$('menu').callEvent('onMenuItemClick', ['Requests']);
+            });
+        }
+        return;
+    }
+
     webix.ui({
         id: 'content',
         rows: [
             requestWizard
         ]
     }, $$('content'))
+
+    webix.extend($$('newRequestForm'), webix.ProgressBar);
 
     if (page) {
         $$("wizard").getChildViews()[page].show();
@@ -31,8 +63,6 @@ function showRequestCreateForm(idTypeRequest, page) {
     ID_TYPE_REQUEST = idTypeRequest;
 
     webix.ajax('cls_type_request/' + idTypeRequest).then(function (data) {
-        webix.extend($$('newRequestForm'), webix.ProgressBar);
-
         const typeRequest = data.json();
 
         $$('typeRequestId').setValue(typeRequest.id);
@@ -63,7 +93,6 @@ function showRequestCreateForm(idTypeRequest, page) {
     }).then(function (data) {
         const prescriptions = data.json();
         if (prescriptions && prescriptions.length > 0) {
-
             prescriptions.forEach((prescription, index) => {
                 if (prescription.prescriptionTexts && prescription.prescriptionTexts.length > 0) {
                     $$('prescriptions').addView({
@@ -155,6 +184,11 @@ function showRequestCreateForm(idTypeRequest, page) {
                     })
                 }
             })
+        } else {
+            $$('prescriptions').addView({
+                view: 'label',
+                label: 'Отсутствуют предписания'
+            });
         }
     });
 }
@@ -211,8 +245,20 @@ const requestWizard = {
                                                 select:true,
                                                 multiselect:"touch",
                                                 on:{
-                                                    "onItemClick":function (obj){
-                                                        attachFile(obj)
+                                                    "onItemClick":function (id){
+                                                        let originalFileName = $$("docs_grid").getItem(id).originalFileName
+                                                        if($$("docs_grid").isSelected(id)){
+                                                            $$("choosedFiles").remove(id)
+                                                            $$("labelFiles").refresh()
+                                                        }else{
+                                                            if (!$$("choosedFiles").exists(id)) {
+                                                                $$("choosedFiles").add({
+                                                                    id: id,
+                                                                    title: originalFileName,
+                                                                }, id)
+                                                            }
+                                                        }
+                                                        $$("labelFiles").setValue("К заявке приложено "+$$('choosedFiles').count()+" файлов из " + $$("docs_grid").count())
                                                     },
                                                     onAfterSelect:function (id){
                                                         document.getElementById("doc_id_"+id).innerHTML="<img style='width: 65px; height: 65px' src='galochka.png'>"
@@ -519,21 +565,9 @@ const requestWizard = {
 
                                                                 let params = $$('newRequestForm').getValues();
 
-                                                                // params.requestId = $$('requestId').getValue();
-                                                                params.organizationId = ID_ORGANIZATION;
-                                                                // params.typeRequestId = $$('')
-
-                                                                const selectedFiles = $$('docs_grid').getSelectedItem(true);
-                                                                if (selectedFiles && selectedFiles.length > 0) {
-                                                                    const fileIds = [];
-                                                                    for (let i in selectedFiles) {
-                                                                        fileIds.push(selectedFiles[i].id);
-                                                                    }
-                                                                    params.organizationFileIds = fileIds;
-                                                                }
+                                                                params.organizationFileIds = $$('choosedFiles').serialize().map(file => file.id);;
 
                                                                 const countPrescriptions = $$('prescriptions').getChildViews().length;
-                                                                console.log('countPrescriptions', countPrescriptions);
                                                                 if (countPrescriptions > 0) {
                                                                     const docRequestPrescriptions = [];
 
@@ -544,7 +578,6 @@ const requestWizard = {
                                                                         docRequestPrescription.prescriptionId = prescriptionId;
 
                                                                         const countPrescriptionTexts = $$('prescriptionTexts' + prescriptionId).getChildViews().length;
-                                                                        console.log('countPrescriptionTexts', countPrescriptionTexts);
                                                                         if (countPrescriptionTexts > 0) {
                                                                             const additionalAttributes = {};
 
@@ -629,20 +662,6 @@ const requestWizard = {
     // }
 }
 
-function attachFile(id){
-    let originalFileName = $$("docs_grid").getItem(id).originalFileName
-    if($$("docs_grid").isSelected(id)){
-        $$("choosedFiles").remove(id)
-        $$("labelFiles").refresh()
-    }else{
-        $$("choosedFiles").add({
-            id: id,
-            title: originalFileName,
-        },id)
-    }
-    $$("labelFiles").setValue("К заявке приложено "+$$('choosedFiles').count()+" файлов из " + $$("docs_grid").count())
-}
-
 function showRequestWizard(data) {
     webix.ui({
         id: 'content',
@@ -651,15 +670,27 @@ function showRequestWizard(data) {
         ]
     }, $$('content'));
 
+    webix.extend($$('newRequestForm'), webix.ProgressBar);
+
     $$('firstBackButton').hide();
 
-    $$('requestId').setValue(data.id);
-    $$('reqBasis').setValue(data.reqBasis);
+    webix.ajax('org_requests/' + data.id).then(function (data) {
+        data = data.json();
 
-    webix.ajax('cls_type_request/' + data.typeRequest.id).then(function (data) {
-        webix.extend($$('newRequestForm'), webix.ProgressBar);
+        $$('requestId').setValue(data.id);
+        $$('reqBasis').setValue(data.reqBasis);
 
-        const typeRequest = data.json();
+        if (data.docRequestFiles && data.docRequestFiles.length > 0) {
+            data.docRequestFiles.forEach(drf => {
+                const id = drf.organizationFile.id;
+                $$("choosedFiles").add({
+                    id,
+                    title: drf.organizationFile.originalFileName,
+                })
+            })
+        }
+
+        const typeRequest = data.typeRequest;
 
         $$('typeRequestId').setValue(typeRequest.id);
         $$('activityKind').setValue(typeRequest.activityKind);
@@ -689,7 +720,6 @@ function showRequestWizard(data) {
     }).then(function (data) {
         const prescriptions = data.json();
         if (prescriptions && prescriptions.length > 0) {
-
             prescriptions.forEach((prescription, index) => {
                 if (prescription.prescriptionTexts && prescription.prescriptionTexts.length > 0) {
                     $$('prescriptions').addView({
@@ -781,6 +811,11 @@ function showRequestWizard(data) {
                     })
                 }
             })
+        } else {
+            $$('prescriptions').addView({
+                view: 'label',
+                label: 'Отсутствуют предписания'
+            });
         }
     });
 }

@@ -175,14 +175,24 @@ public class CabinetController {
     }
 
     @GetMapping("/org_requests")
-    public @ResponseBody List<DocRequest> getRequests(HttpSession session) {
+    public @ResponseBody List<DocRequestDto> getRequests(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         List<DocRequest> requests = docRequestRepo.getAllByInn(organization.getInn()).orElse(null);
-        return requests;
+        List<DocRequestDto> dtos = requests.stream().map(request -> new DocRequestDto(request.getId(),
+                request.getTypeRequest().getActivityKind(), request.getStatusReview(), request.getStatusReviewName(),
+                request.getDepartment().getName(), request.getTimeCreate(), request.getTimeReview(),
+                request.getTypeRequest().getId()))
+                .collect(Collectors.toList());
+        return dtos;
+    }
+
+    @GetMapping("/org_requests/{id}")
+    public @ResponseBody DocRequest getDocRequest(@PathVariable("id") Long id) {
+        return docRequestRepo.findById(id).orElse(null);
     }
 
     @GetMapping("/count_confirmed_requests")
@@ -193,6 +203,31 @@ public class CabinetController {
         }
         List<DocRequest> confirmedRequestStatus = docRequestRepo.getAllRequestWithConfirmedStatus(id).orElse(null);
         return confirmedRequestStatus;
+    }
+
+    @GetMapping("/check_existence_request")
+    public @ResponseBody Map getRequestByType(@RequestParam("id") Long typeRequestId, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        Long requestId = requestService.getRequestByOrganizationIdAndTypeRequestId(id, typeRequestId, ReviewStatuses.NEW.getValue());
+        if (requestId != null) {
+            return Map.of("id", requestId, "status", ReviewStatuses.NEW.getValue());
+        }
+        requestId = requestService.getRequestByOrganizationIdAndTypeRequestId(id, typeRequestId, ReviewStatuses.OPENED.getValue());
+        if (requestId != null) {
+            return Map.of("id", requestId, "status", ReviewStatuses.OPENED.getValue());
+        }
+        requestId = requestService.getRequestByOrganizationIdAndTypeRequestId(id, typeRequestId, ReviewStatuses.CONFIRMED.getValue());
+        if (requestId != null) {
+            return Map.of("id", requestId, "status", ReviewStatuses.CONFIRMED.getValue());
+        }
+        requestId = requestService.getRequestByOrganizationIdAndTypeRequestId(id, typeRequestId, ReviewStatuses.REJECTED.getValue());
+        if (requestId != null) {
+            return Map.of("id", requestId, "status", ReviewStatuses.REJECTED.getValue());
+        }
+        return Map.of("id", 0);
     }
 
     @PostMapping("/save_pass")
@@ -582,8 +617,15 @@ public class CabinetController {
     }
 
     @PostMapping("/cabinet/new_request")
-    public @ResponseBody String postNewRequest(@RequestBody PostFormDto postFormDto) {
+    public @ResponseBody String postNewRequest(@RequestBody PostFormDto postFormDto, HttpSession session) {
         try {
+            Long id = (Long) session.getAttribute("id_organization");
+            if (id == null) {
+                return "Ид организации не указан";
+            }
+
+            postFormDto.setOrganizationId(id);
+
             String errors = validateNewRequest(postFormDto);
             if (errors.isEmpty()) {
                 requestService.saveNewRequest(postFormDto);

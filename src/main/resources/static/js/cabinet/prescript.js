@@ -1,21 +1,3 @@
-let btnBackPrescripts = {
-    view: 'button',
-    label: 'Назад',
-    maxWidth: 100,
-    align: 'left',
-    type: 'icon',
-    icon: 'mdi mdi-arrow-left',
-    css: 'backBtnStyle',
-    click: function () {
-        webix.ui({
-            id: 'content',
-            rows: [
-                prescript
-            ]
-        }, $$('content'));
-    }
-}
-
 let acceptedColumn = {
     id: 'accepted',
     header: "",
@@ -184,6 +166,7 @@ function showOrganizationPrescriptionCreateForm(idPrescription, accepted) {
         ]
     }, $$('content'))
 
+    showBtnBack(prescript, 'prescriptions_table');
     webix.ajax('prescription', {id: idPrescription}).then(function (data) {
 
         const prescription = data.json();
@@ -287,12 +270,6 @@ const organizationPrescriptionForm = {
     // body: {
     //     type: 'space',
         rows: [
-            {
-              cols: [
-                  btnBackPrescripts,
-                  {}
-              ]
-            },
             {
                 view: 'form',
                 id: 'organizationPrescriptionForm',

@@ -808,29 +808,49 @@ public class RequestService {
     public DocRequest saveNewRequest(PostFormDto postForm) {
         DocRequest docRequest;
 
+        ClsOrganization organization = clsOrganizationRepo.findById(postForm.getOrganizationId()).orElse(null);
+
+        ClsTypeRequest typeRequest = clsTypeRequestRepo.findById(postForm.getTypeRequestId()).orElse(null);
+
         if (postForm.getRequestId() != null) {
             docRequest = docRequestRepo.findById(postForm.getRequestId()).orElse(null);
+            docRequest.setStatusActivity(ActivityStatuses.HISTORICAL.getValue());
+            docRequestRepo.save(docRequest);
+
+            DocRequest newDocRequest = DocRequest.builder()
+                    .organization(organization)
+                    .department(departmentRepo.getOne(postForm.getDepartmentId()))
+                    .personOfficeCnt(0L)
+                    .personRemoteCnt(0L)
+                    .personSlrySaveCnt(0L)
+                    .statusReview(ReviewStatuses.OPENED.getValue())
+                    .statusImport(0)
+                    .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
+                    .typeRequest(typeRequest)
+                    .actualizedRequest(docRequest)
+                    .isActualization(true)
+                    .statusActivity(ActivityStatuses.ACTIVE.getValue())
+                    .build();
+
+            docRequestRepo.save(newDocRequest);
+
+            docRequest = newDocRequest;
         } else {
-            ClsOrganization organization = clsOrganizationRepo.findById(postForm.getOrganizationId()).orElse(null);
-
-            ClsTypeRequest typeRequest = clsTypeRequestRepo.findById(postForm.getTypeRequestId()).orElse(null);
-
             docRequest = DocRequest.builder()
                     .organization(organization)
                     .department(departmentRepo.getOne(postForm.getDepartmentId()))
                     .personOfficeCnt(0L)
                     .personRemoteCnt(0L)
                     .personSlrySaveCnt(0L)
-                    .statusReview(ReviewStatuses.NEW.getValue())
+                    .statusReview(ReviewStatuses.OPENED.getValue())
                     .statusImport(0)
                     .timeCreate(Timestamp.valueOf(LocalDateTime.now()))
                     .typeRequest(typeRequest)
+                    .statusActivity(ActivityStatuses.ACTIVE.getValue())
                     .build();
         }
 
         docRequest.setReqBasis(postForm.getReqBasis());
-        docRequest.setAdditionalAttributes(postForm.getAdditionalAttributes());
-        docRequest.setStatusReview(ReviewStatuses.OPENED.getValue());
 
         docRequestRepo.save(docRequest);
 
@@ -937,7 +957,7 @@ public class RequestService {
     public List<ClsPrescriptionDto> getClsPrescriptionsByOrganizationId(Long id) {
         List<DocRequestPrs> requests = docRequestPrsRepo.getActualizedRequestsByOrganizationId(id);
         Set<Long> typeRequestIds = requests.stream().map(request -> request.getTypeRequest().getId()).collect(Collectors.toSet());
-        List<ClsPrescription> newPrescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestIds(typeRequestIds, id);
+        List<ClsPrescription> newPrescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestIds(typeRequestIds, id, PublicationStatuses.PUBLISHED.getValue());
         List<ClsPrescriptionDto> newDtos = newPrescriptions.stream().map(prescription ->
                 new ClsPrescriptionDto(prescription.getId(), prescription.getName(), prescription.getTypeRequest().getActivityKind(), prescription.getTimePublication(), false))
                 .collect(Collectors.toList());
@@ -953,7 +973,7 @@ public class RequestService {
     public Integer getCountOfNewClsPrescriptionsByOrgId(Long id) {
         List<DocRequestPrs> requests = docRequestPrsRepo.getActualizedRequestsByOrganizationId(id);
         Set<Long> typeRequestIds = requests.stream().map(request -> request.getTypeRequest().getId()).collect(Collectors.toSet());
-        List<ClsPrescription> newPrescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestIds(typeRequestIds, id);
+        List<ClsPrescription> newPrescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestIds(typeRequestIds, id, PublicationStatuses.PUBLISHED.getValue());
         if (newPrescriptions != null) {
             return newPrescriptions.size();
         }
@@ -981,7 +1001,11 @@ public class RequestService {
     }
 
     public List<ClsPrescription> getClsPrescriptionsByTypeRequestId(Long idTypeRequest) {
-        List<ClsPrescription> prescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestId(idTypeRequest);
+        List<ClsPrescription> prescriptions = clsPrescriptionRepo.getPrescriptionsByTypeRequestId(idTypeRequest, PublicationStatuses.PUBLISHED.getValue());
         return prescriptions;
+    }
+
+    public Long getRequestByOrganizationIdAndTypeRequestId(Long orgId, Long typeRequestId, Integer status) {
+        return docRequestRepo.getRequestByOrganizationIdAndTypeRequestId(orgId, typeRequestId, status);
     }
 }

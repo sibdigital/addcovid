@@ -93,7 +93,13 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
             "ORDER BY date desc, total")
     public List<Map<String, Object>> getStatisticForEachDay();
 
-    @Query("SELECT dr FROM DocRequest dr WHERE dr.organization.inn = :inn ORDER BY dr.timeCreate DESC")
+    @Query(nativeQuery = true, value = "" +
+            "select dr.* " +
+            "from doc_request dr " +
+            "   join cls_organization co on co.id = dr.id_organization " +
+            "where co.inn = :inn " +
+            "   and dr.status_activity = 1 " +
+            "order by dr.time_create desc")
     Optional<List<DocRequest>> getAllByInn(@Param("inn")String inn);
 
     @Query(value = "SELECT dr FROM DocRequest dr WHERE  dr.organization.inn = :inn AND dr.statusReview = :status ORDER BY dr.timeReview DESC")
@@ -104,4 +110,14 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
 
     @Query("SELECT dr FROM DocRequest dr WHERE dr.organization.id =:idOrganization and dr.statusReview = 100")
     Optional<List<DocRequest>> getAllRequestWithConfirmedStatus (Long idOrganization);
+
+    @Query(nativeQuery = true, value = "" +
+            "select dr.id " +
+            "from doc_request dr " +
+            "where dr.id_organization = :orgId " +
+            "   and dr.id_type_request = :idTypeRequest " +
+            "   and dr.status_review = :status " +
+            "   and dr.status_activity = 1 " +
+            "limit 1 ")
+    Long getRequestByOrganizationIdAndTypeRequestId(Long orgId, Long idTypeRequest, Integer status);
 }
