@@ -233,140 +233,121 @@ const requestWizard = {
                                     {type: 'header', id:"headerId", template: 'Шаг 1. Приложите документы'},
                                     {
                                         // type: 'wide',
-                                        responsive: 'documentsMainLayout',
-                                        cols: [
+                                        rows: [
                                             {
-                                                view: "dataview",
-                                                id: "docs_grid",
-                                                css: 'contacts',
-                                                scroll: 'y',
-                                                minHeight: 300,
-                                                minWidth: 300,
-                                                select:true,
-                                                multiselect:"touch",
-                                                on:{
-                                                    "onItemClick":function (id){
-                                                        let originalFileName = $$("docs_grid").getItem(id).originalFileName
-                                                        if($$("docs_grid").isSelected(id)){
-                                                            $$("choosedFiles").remove(id)
-                                                            $$("labelFiles").refresh()
-                                                        }else{
-                                                            if (!$$("choosedFiles").exists(id)) {
-                                                                $$("choosedFiles").add({
-                                                                    id: id,
-                                                                    title: originalFileName,
-                                                                }, id)
-                                                            }
-                                                        }
-                                                        $$("labelFiles").setValue("К заявке приложено "+$$('choosedFiles').count()+" файлов из " + $$("docs_grid").count())
-                                                    },
-                                                    onAfterSelect:function (id){
-                                                        document.getElementById("doc_id_"+id).innerHTML="<img style='width: 65px; height: 65px' src='galochka.png'>"
-                                                    }
-                                                },
-                                                template: function (obj) {
-                                                    let docImg;
-                                                    let downloadTime = obj.timeCreate.substr(11, 8) + ', ' + obj.timeCreate.substr(0, 10)
-                                                    if (obj.fileExtension == ".zip") {
-                                                        docImg = "zip.png"
-                                                    } else {
-                                                        docImg = "pdf.png"
-                                                    }
-                                                    return "<div class='overallRequestNew' >" +
-                                                                "<div>" +
-                                                                    "<div style='position: absolute; ' id='doc_id_"+obj.id+"'><img src = " + docImg + "></div>" +
-                                                                    "<div class='doc_title'>" + obj.originalFileName.slice(0, -4) + "</div>" +
-                                                                    //"<div id='del_button' style='position: absolute;top: 0; right: 5px;' ondblclick='del_file()' class='mdi mdi-close-thick'></div>" +
-                                                                    //"<div id='plus_button' style='position: absolute;top: 0; right: 20px;'  ondblclick='' class='mdi mdi-plus-thick'></div>" +
-                                                                    "<div class='doc_time_create'>" + downloadTime + "</div>" +
-                                                                    "<div class='download_docs'><a style='text-decoration: none; color: #1ca1c1' href=/uploads/" + obj.fileName + obj.fileExtension + " download>Скачать файл</a></div>" +
-                                                                    //"<div id='"+obj.id+"' style='right: 0'></div> "+
-                                                                "</div>" +
-                                                            "</div>"
-                                                },
-                                                url: "org_files",
-                                                xCount: 1,
-                                                type: {
-                                                    height: "auto",
-                                                    width: "auto",
-                                                    float: "right"
-                                                },
-                                            },
-                                            {
-                                                rows:[
+                                                responsive: 'documentsMainLayout',
+                                                cols: [
                                                     {
-                                                        gravity: 0.4,
-                                                        view: 'form',
-                                                        id: 'formDocsLoad',
-                                                        minWidth: 200,
-                                                        position: 'center',
-                                                        elements: [
-                                                            {gravity: 0.6},
+                                                        rows: [
                                                             {
                                                                 id: 'upload',
                                                                 view: 'uploader',
-                                                                css: 'webix_secondary',
-                                                                value: 'Выбрать',
-                                                                autosend: false,
+                                                                css: 'backBtnStyle',
+                                                                type: "icon",
+                                                                icon: "mdi mdi-download",
+                                                                label: 'Загрузить',
                                                                 upload: 'upload_files',
                                                                 required: true,
+                                                                autosend: true,
                                                                 accept: 'application/pdf, application/zip',
                                                                 multiple: true,
                                                                 link: 'docslist',
+                                                                on: {
+                                                                    onFileUpload: (response) => {
+                                                                        if (response.cause == "Ошибка сохранения" || response.cause == "Отсутствует организация") {
+                                                                            webix.message(response.cause, "error")
+                                                                        } else if (response.cause == "Вы уже загружали этот файл") {
+                                                                            webix.message(response.cause + ": " + response.sname, "error")
+                                                                            console.log(response.cause)
+                                                                        } else {
+                                                                            webix.message(response.cause + ": " + response.sname, "success")
+                                                                            $$('docs_grid').load('org_files');
+                                                                        }
+                                                                    }
+                                                                }
+
                                                             },
                                                             {
-                                                                view: 'list', id: 'docslist', type: 'uploader',
-                                                                autoheight: true, borderless: true
-                                                            },
-                                                            {
-                                                                id: 'loadFileBtn',
-                                                                view: 'button',
-                                                                css: 'webix_primary',
-                                                                value: 'Добавить',
-                                                                align: 'center',
-                                                                click: function () {
-                                                                    $$('upload').send(function (response) {
-                                                                        if (response.status == "server") {
-                                                                            if (response.cause == "Файл успешно загружен") {
-
-                                                                                webix.message(response.cause + ": " + response.sname, "success")
-                                                                                console.log(response.cause)
-
-                                                                            } else if (response.cause == "Ошибка сохранения" || response.cause == "Отсутствует организация") {
-
-                                                                                webix.message(response.cause, "error")
-                                                                                console.log(response.cause)
-
-                                                                            } else if (response.cause == "Вы уже загружали этот файл") {
-                                                                                webix.message(response.cause + ": " + response.sname, "error")
-                                                                                console.log(response.cause)
+                                                                view: "dataview",
+                                                                id: "docs_grid",
+                                                                css: 'contacts',
+                                                                scroll: 'y',
+                                                                minHeight: 300,
+                                                                minWidth: 300,
+                                                                select: true,
+                                                                multiselect: "touch",
+                                                                on: {
+                                                                    "onItemClick": function (id) {
+                                                                        let originalFileName = $$("docs_grid").getItem(id).originalFileName
+                                                                        if ($$("docs_grid").isSelected(id)) {
+                                                                            $$("choosedFiles").remove(id)
+                                                                            $$("labelFiles").refresh()
+                                                                        } else {
+                                                                            if (!$$("choosedFiles").exists(id)) {
+                                                                                $$("choosedFiles").add({
+                                                                                    id: id,
+                                                                                    title: originalFileName,
+                                                                                }, id)
                                                                             }
                                                                         }
-                                                                        $$("upload").files.data.clearAll();
-                                                                        $$('docs_grid').load('org_files');
-                                                                    })
-                                                                }
+                                                                        $$("labelFiles").setValue("К заявке приложено " + $$('choosedFiles').count() + " файлов из " + $$("docs_grid").count())
+                                                                    },
+                                                                    onAfterSelect: function (id) {
+                                                                        document.getElementById("doc_id_" + id).innerHTML = "<img style='width: 65px; height: 65px' src='galochka.png'>"
+                                                                    }
+                                                                },
+                                                                template: function (obj) {
+                                                                    let docImg;
+                                                                    let downloadTime = obj.timeCreate.substr(11, 8) + ', ' + obj.timeCreate.substr(0, 10)
+                                                                    if (obj.fileExtension == ".zip") {
+                                                                        docImg = "zip.png"
+                                                                    } else {
+                                                                        docImg = "pdf.png"
+                                                                    }
+                                                                    return "<div class='overallRequestNew' >" +
+                                                                        "<div>" +
+                                                                        "<div style='position: absolute; ' id='doc_id_" + obj.id + "'><img src = " + docImg + "></div>" +
+                                                                        "<div class='doc_title'>" + obj.originalFileName.slice(0, -4) + "</div>" +
+                                                                        //"<div id='del_button' style='position: absolute;top: 0; right: 5px;' ondblclick='del_file()' class='mdi mdi-close-thick'></div>" +
+                                                                        //"<div id='plus_button' style='position: absolute;top: 0; right: 20px;'  ondblclick='' class='mdi mdi-plus-thick'></div>" +
+                                                                        "<div class='doc_time_create'>" + downloadTime + "</div>" +
+                                                                        "<div class='download_docs'><a style='text-decoration: none; color: #1ca1c1' href=uploads/" + obj.fileName + obj.fileExtension + " download>Скачать файл</a></div>" +
+                                                                        //"<div id='"+obj.id+"' style='right: 0'></div> "+
+                                                                        "</div>" +
+                                                                        "</div>"
+                                                                },
+                                                                url: "org_files",
+                                                                xCount: 1,
+                                                                type: {
+                                                                    height: "auto",
+                                                                    width: "auto",
+                                                                    float: "right"
+                                                                },
                                                             },
-                                                            {}
                                                         ]
                                                     },
                                                     {
-                                                        id: 'documentsMainLayout',
-                                                        rows:[]
+                                                        rows: [
+                                                            {
+                                                                id: 'documentsMainLayout',
+                                                                rows: []
+                                                            },
+                                                            {
+                                                                view: "label",
+                                                                id: "labelFiles",
+                                                                label: "Приложенные к заявке файлы",
+                                                            },
+                                                            {
+                                                                view: "list",
+                                                                id: "choosedFiles",
+                                                                minWidth: 200,
+                                                                minHeight: 150,
+                                                                template: "#title#"
+                                                            }
+                                                        ]
                                                     },
-                                                    {
-                                                        view: "label",
-                                                        id: "labelFiles",
-                                                        label: "Приложенные к заявке файлы",
-                                                    },
-                                                    {
-                                                        view: "list",
-                                                        id: "choosedFiles",
-                                                        minHeight: 150,
-                                                        template: "#title#"
-                                                    }
                                                 ]
-                                            },
+                                            }
                                         ]
                                     },
                                     {
