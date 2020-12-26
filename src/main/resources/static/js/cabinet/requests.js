@@ -1,22 +1,3 @@
-let btnBackRequests = {
-    view: 'button',
-    id: 'btnBack',
-    label: 'Назад',
-    maxWidth: 100,
-    align: 'left',
-    type: 'icon',
-    icon: 'mdi mdi-arrow-left',
-    css: 'backBtnStyle',
-    click: function () {
-        webix.ui({
-            id: 'content',
-            rows: [
-                requests
-            ]
-        }, $$('content'));
-    }
-}
-
 const requests = {
     // view: 'scrollview',
     // scroll: 'xy',
@@ -509,12 +490,6 @@ function showTypeRequestsPage() {
             //         body: {
             //             rows: [
                             {
-                                cols:[
-                                    btnBackRequests,
-                                    {}
-                                ]
-                            },
-                            {
                                 view: 'template',
                                 template: '<p><h3 style="text-align: center; color: #000000">Выберите вид деятельности, по которому хотите подать заявку</h3></p>',
                                 autoheight: true,
@@ -533,6 +508,7 @@ function showTypeRequestsPage() {
         };
         webix.ui(v, $$('content'));
     });
+    showBtnBack(requests, );
 }
 
 function adaptiveRequests(){

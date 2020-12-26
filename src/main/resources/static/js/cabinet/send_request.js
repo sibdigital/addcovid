@@ -1,21 +1,3 @@
-let btnBackToRequests = {
-    view: 'button',
-    label: 'Назад',
-    maxWidth: 100,
-    align: 'left',
-    type: 'icon',
-    icon: 'mdi mdi-arrow-left',
-    css: 'backBtnStyle',
-    click: function () {
-        webix.ui({
-            id: 'content',
-            rows: [
-                requests
-            ]
-        }, $$('content'));
-    }
-}
-
 function showRequestCreateForm(idTypeRequest, page) {
     const request = findRequestByType(idTypeRequest);
     if (request.id != 0) {
@@ -199,12 +181,6 @@ const requestWizard = {
     // body: {
     //     type: 'space',
         rows: [
-            {
-                cols: [
-                    btnBackToRequests,
-                    {}
-                ]
-            },
             {
                 view: 'form',
                 type: 'clean',
@@ -663,6 +639,7 @@ function showRequestWizard(data) {
             requestWizard
         ]
     }, $$('content'));
+    showBtnBack(requests,)
 
     webix.extend($$('newRequestForm'), webix.ProgressBar);
 
