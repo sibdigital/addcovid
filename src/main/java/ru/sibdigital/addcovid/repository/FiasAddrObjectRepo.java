@@ -51,14 +51,14 @@ public interface FiasAddrObjectRepo extends JpaRepository<FIASAddrObject, Long> 
             "    select objectid as dff, parentobjid, regioncode, areacode, citycode\n" +
             "    from fias.adm_hierarchy_item as fais\n" +
             "    where regioncode = :regionCode and plancode = '0' and streetcode = '0'\n" +
-            "    limit 100\n" +
+            "    order by citycode desc limit 100\n" +
             ")\n" +
             " select fao.id, fao.objectid, fao.name as value, fao.typename, fao.level, fao2.objectid as districtObjectId, fao2.name as districtname, fao2.typename as districttypename, fa.areacode, fa.citycode\n" +
             " from fias.addr_object as fao inner join fa\n" +
             "                                        on (fa.dff) = (fao.objectid) and level between 4 and 6\n" +
             "                             inner join fias.addr_object as fao2\n" +
             "                                        on (fa.parentobjid) = (fao2.objectid)\n" +
-            " ORDER BY fao.name")
+            " ORDER BY fao.level, fao.name")
     List<Map<String, Object>> findCities(@Param("regionCode") Short regionCode);
 
     @Query(nativeQuery = true, value = "with nd as (\n" +
