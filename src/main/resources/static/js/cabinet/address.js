@@ -173,6 +173,7 @@ const Cities = {
                             if (data !== null) {
                                 list.parse(data);
                                 $$('fiasObjectGuid').focus();
+                                $$('fiasObjectGuid').setValue("");
                             }
                         });
                 }
