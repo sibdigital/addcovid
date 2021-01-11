@@ -146,7 +146,7 @@ const Cities = {
                 $sort: {
                     by: 'value',
                     dir: 'asc',
-                    as: 'string'
+                    as: sortByCityName
                 }
             },
             ready: function () {
@@ -173,6 +173,7 @@ const Cities = {
                             if (data !== null) {
                                 list.parse(data);
                                 $$('fiasObjectGuid').focus();
+                                $$('fiasObjectGuid').setValue("");
                             }
                         });
                 }
@@ -225,12 +226,11 @@ const Streets = {
                     view: 'text',
                     id: 'house',
                     name: 'house_hand',
-                    label: "Дом<span style='color: red;'>*</span>",
+                    label: "Дом",
                     labelPosition: 'left',
                     labelWidth: 45,
                     maxWidth: 305,
                     css: { 'margin-inline-end': '10px' },
-                    invalidMessage: "Дом не может быть пустым",
                     placeholder: 'Введите номер дома',
                     suggest: {
                         keyPressTimeout: 500,
@@ -244,17 +244,15 @@ const Streets = {
                     view: 'text',
                     id: 'office',
                     name: 'apartment_hand',
-                    label: "Помещение<span style='color: red;'>*</span>",
+                    label: "Помещение",
                     labelPosition: 'left',
                     labelWidth: 100,
                     maxWidth: 305,
                     tooltip: 'Помещение',
-                    placeholder: 'Введите номер помещения/офиса',
-                    invalidMessage: "Офис/помещение не может быть пустым",
+                    placeholder: 'Введите номер помещения/офиса'
                 },
             ]
         },
-
     ]
 };
 
@@ -271,14 +269,11 @@ const address = {
                     view: 'form',
                     id: 'contact_form',
                     complexData: true,
-                    maxHeight: 110,
-                    height: 110,
+                    autoheight: true,
                     rules: {
                         "fiasRegionObjectId": webix.rules.isNotEmpty,
                         "fiasStreetObjectId": webix.rules.isNotEmpty,
-                        "fiasCityObjectId": webix.rules.isNotEmpty,
-                        "house_hand": webix.rules.isNotEmpty,
-                        "apartment_hand": webix.rules.isNotEmpty
+                        "fiasCityObjectId": webix.rules.isNotEmpty
                     },
                     elements: [
                         {
@@ -306,7 +301,10 @@ const address = {
                                             maxWidth: 150,
                                             label: "<span class='mdi mdi-plus-circle' style='padding-right: 5px'></span><span class='text'>Сохранить</span>",
                                             hotkey: 'enter',
-                                            click: () => addAddress()
+                                            click: () => {
+                                                addAddress()
+                                                $$('regions').setValue(60635); //60635 = Респ. Бурятия
+                                            }
                                         }
                                     ]
                                 }
@@ -372,6 +370,13 @@ const address = {
     ],
     // }
 };
+
+function sortByCityName(a){
+    if($$("regions").getValue() === 60635){
+        let cityName = $$("cities").getList().getItem("60676").value //Улан-Удэ
+        return a === cityName ? -1 : 1;
+    }
+}
 
 const getRegion = () => {
     const indexRegion = $$('regions').getValue();

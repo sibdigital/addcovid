@@ -102,6 +102,11 @@ let importEmployees = webix.ui({
             position: 'center',
             elements: [
                 {
+                    autoheight: true,
+                    borderless: true,
+                    template:"<a class='webix_primary' style='text-decoration: none; color: #1ca1c1' href=emptemplate.xlsx download>Скачать шаблон</a>"
+                },
+                {
                     id: 'uploadExcel',
                     view: 'uploader',
                     css: 'webix_secondary',
@@ -116,13 +121,6 @@ let importEmployees = webix.ui({
                 {
                     view: 'list', id: 'excelFilesList', type: 'uploader',
                     autoheight: true, borderless: true
-                },
-                {
-                    paddingLeft: 10,
-                    view: 'label',
-                    visible: false,
-                    label: '',
-                    id: 'no_pdf'
                 },
                 {
                     id: 'load_files_btn',
