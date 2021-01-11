@@ -300,7 +300,7 @@ let bigMainForm = {
                         {
                             view: 'label',
                             id: 'labelLK',
-                            align: 'center',
+                            align: 'left',
                             css: {"padding-left": "5px"},
                             label: 'Личный кабинет',
                         },
