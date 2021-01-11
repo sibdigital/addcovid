@@ -14,12 +14,14 @@ const depContacts = {
                     {
                         header: "№",
                         id: 'index',
+                        width: 70,
                         name: 'index',
                         readonly: true,
                     },
                     {
                         header: "ИОГВ",
                         template: obj => getDepartmentName(obj),
+                        minWidth: 150,
                         adjust: true,
                         fillspace: true,
                         readonly: true,
@@ -27,6 +29,7 @@ const depContacts = {
                     {
                         header: "Телефоны",
                         template: obj => getPhones(obj),
+                        minWidth: 150,
                         fillspace: true,
                         // adjust: true,
                         readonly: true,
@@ -36,6 +39,7 @@ const depContacts = {
                         template: obj => getEmails(obj),
                         fillspace: true,
                         // adjust: true,
+                        minWidth: 150,
                         readonly: true,
                     },
                 ],

@@ -3,6 +3,7 @@ package ru.sibdigital.addcovid.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -831,5 +832,49 @@ public class CabinetController {
             list.add(map);
         }
         return list;
+    }
+
+    @PostMapping("/check_current_pass")
+    public @ResponseBody String checkCurrentPass(@RequestBody String incomingPass, HttpSession session){
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return "Не удалось получить данные организации";
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        String currentPass = organization.getPrincipal().getPassword();
+        if(passwordEncoder.matches(incomingPass,currentPass)){
+            return "Пароли совпадают";
+        }else{
+            return "Пароли не совпадают";
+        }
+    }
+
+    @PostMapping("/edit_common_info")
+    public @ResponseBody
+    ResponseEntity<Object>  editCommonInfo(@RequestBody OrganizationCommonInfoDto organizationCommonInfoDto, HttpSession session){
+        ResponseEntity<Object> responseEntity = null;
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+           return null;
+        }
+
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
+        String email = organizationCommonInfoDto.getOrganizationEmail().trim();
+        String phone = organizationCommonInfoDto.getOrganizationPhone().trim();
+        if (organization != null && email != null && phone != null) {
+            organization.setEmail(email);
+            organization.setPhone(phone);
+            clsOrganizationRepo.save(organization);
+        }
+        String newPass = organizationCommonInfoDto.getNewPass();
+        if(!newPass.isBlank()){
+            PrincipalDto principalDto = new PrincipalDto();
+            principalDto.setPassword(newPass);
+            savePassword(principalDto,session);
+        }
+        responseEntity = ResponseEntity.ok()
+                .body("{\"cause\": \"Данные успешно обновлены\"," +
+                        "\"status\": \"server\"}");
+        return responseEntity;
     }
 }

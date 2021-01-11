@@ -43,7 +43,7 @@ const contacts = {
                         gravity: 0.4,
                         view: 'form',
                         id: 'contact_form',
-                        minWidth: 200,
+                        minWidth: 230,
                         complexData: true,
                         rules: {
                             "contactPerson": webix.rules.isNotEmpty,
