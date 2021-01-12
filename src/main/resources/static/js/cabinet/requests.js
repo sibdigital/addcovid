@@ -17,6 +17,7 @@ const requests = {
                         resizeColumn: true,
                         fixedRowHeight:false,
                         tooltip: true,
+                        rowLineHeight:28,
                         pager: 'Pager',
                         datafetch: 25,
                         columns: [
@@ -25,39 +26,38 @@ const requests = {
                                 header: "Вид деятельности",
                                 template: "#activityKind#",
                                 tooltip: false,
+                                minWidth: 400,
                                 fillspace: true
                             },
                             {
                                 id: "statusReviewName",
                                 header: "Статус",
-                                adjust: true,
                                 tooltip: false,
-                                width: 300
+                                width: 200
                             },
                             {
                                 id: "department",
                                 header: "Рассматривает",
                                 template: "#departmentName#",
                                 tooltip: false,
-                                adjust: true,
+                                width: 200
                             },
                             {
                                 id: "time_Create",
                                 header: "Дата подачи",
-                                adjust: true,
+                                width: 200,
                                 tooltip: false,
-                                format: dateFormat,
                             },
                             {
                                 id: "time_Review",
                                 header: "Дата рассмотрения",
-                                adjust: true,
+                                width: 200,
                                 tooltip: false,
-                                format: dateFormat,
                             },
                             {
                                 tooltip: false,
-                                width: 160,
+                                width: 100,
+                                header: "Действия",
                                 template: function (obj) {
                                     if (obj.statusReview == 0) {
                                         return '<span webix_tooltip="Просмотреть" class="webix_icon mdi mdi-eye-outline"></span>';
@@ -65,17 +65,19 @@ const requests = {
                                         return '<span webix_tooltip="Редактировать" class="webix_icon mdi mdi-pencil-plus-outline"></span>';
                                     } else {
                                         return '<span webix_tooltip="Просмотреть" class="webix_icon mdi mdi-eye-outline"></span>' +
-                                            '<span webix_tooltip="Подать повторно" class="webix_icon mdi mdi-keyboard-return"></span>';
+                                            '<span webix_tooltip="Подать повторно" style="margin-left: 5px" class="webix_icon mdi mdi-keyboard-return"></span>';
                                     }
                                 }
                             },
                         ],
                         scheme: {
                             $init: function (obj) {
-                                obj.time_Create = obj.timeCreate.replace("T", " ");
+                                let tmp_time_create = obj.timeCreate.substr(0, 16);
+                                obj.time_Create = tmp_time_create.replace("T", " ");
                                 if (obj.statusReview == 1 || obj.statusReview == 2) {
                                     if (obj.timeReview) {
-                                        obj.time_Review = obj.timeReview.replace("T", " ");
+                                        let tmp_time_review = obj.timeReview.substr(0, 16);
+                                        obj.time_Review = tmp_time_review.replace("T", " ");
                                     }
                                 }
                                 let requestStatus = obj.statusReviewName;

@@ -306,4 +306,15 @@ body {margin: 0}
 .mdi-pencil-plus-outline:hover,
 .mdi-keyboard-return:hover {
     color:#1CA1C1;
+    border: 1px solid #1CA1C1;
+}
+
+.mdi-eye-outline,
+.mdi-pencil-plus-outline,
+.mdi-keyboard-return {
+    margin-top: 5px;
+    border-radius: 4px;
+    border: 1px solid #282727;
+    background: #f3f3f3;
+    padding: 2px;
 }
