@@ -74,25 +74,6 @@ webix.html.addStyle(".listStyle {float:left; margin:20px;} " +
 var newsfeed_url = 'newsfeed'
 var news_archive_url = 'news_archive'
 
-let backBtnNews = {
-    view: 'button',
-    id: 'btnBack',
-    label: 'Назад',
-    maxWidth: 100,
-    align: 'left',
-    type: 'icon',
-    icon: 'mdi mdi-arrow-left',
-    css: 'backBtnStyle',
-    click: function () {
-        webix.ui({
-            id: 'content',
-            rows: [
-                news
-            ]
-        }, $$('content'));
-    }
-}
-
 let btnArchiveNews = {
     view: 'button',
     type:"icon",

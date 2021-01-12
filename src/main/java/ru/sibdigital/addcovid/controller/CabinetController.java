@@ -191,8 +191,16 @@ public class CabinetController {
     }
 
     @GetMapping("/org_requests/{id}")
-    public @ResponseBody DocRequest getDocRequest(@PathVariable("id") Long id) {
-        return docRequestRepo.findById(id).orElse(null);
+    public @ResponseBody DocRequest getDocRequest(@PathVariable("id") Long idRequest, HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
+        if (id == null) {
+            return null;
+        }
+        DocRequest request = docRequestRepo.findById(idRequest).orElse(null);
+        if (request != null && request.getOrganization().getId().equals(id)) {
+            return request;
+        }
+        return null;
     }
 
     @GetMapping("/count_confirmed_requests")

@@ -11,5 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 public class AdditionalAttributes {
 
+    private String isCheckingAgree;
     private ConsentPrescription[] consentPrescriptions;
 }
