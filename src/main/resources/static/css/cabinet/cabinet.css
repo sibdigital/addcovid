@@ -301,3 +301,9 @@ body {margin: 0}
 .backBtnStyle button.webix_button{
   background-color: transparent;
 }
+
+.mdi-eye-outline:hover,
+.mdi-pencil-plus-outline:hover,
+.mdi-keyboard-return:hover {
+    color:#1CA1C1;
+}

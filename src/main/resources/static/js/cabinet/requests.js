@@ -16,6 +16,7 @@ const requests = {
                         navigation: true,
                         resizeColumn: true,
                         fixedRowHeight:false,
+                        tooltip: true,
                         pager: 'Pager',
                         datafetch: 25,
                         columns: [
@@ -23,42 +24,48 @@ const requests = {
                                 id: "typeRequest",
                                 header: "Вид деятельности",
                                 template: "#activityKind#",
+                                tooltip: false,
                                 fillspace: true
                             },
                             {
                                 id: "statusReviewName",
                                 header: "Статус",
                                 adjust: true,
+                                tooltip: false,
                                 width: 300
                             },
                             {
                                 id: "department",
                                 header: "Рассматривает",
                                 template: "#departmentName#",
+                                tooltip: false,
                                 adjust: true,
                             },
                             {
                                 id: "time_Create",
                                 header: "Дата подачи",
                                 adjust: true,
+                                tooltip: false,
                                 format: dateFormat,
                             },
                             {
                                 id: "time_Review",
                                 header: "Дата рассмотрения",
                                 adjust: true,
+                                tooltip: false,
                                 format: dateFormat,
                             },
                             {
+                                tooltip: false,
                                 width: 160,
                                 template: function (obj) {
                                     if (obj.statusReview == 0) {
-                                        return '<button class="view_request">Просмотреть</button>';
+                                        return '<span webix_tooltip="Просмотреть" class="webix_icon mdi mdi-eye-outline"></span>';
                                     } else if (obj.statusReview == 100) {
-                                        return '<button class="edit_request">Редактировать</button>';
+                                        return '<span webix_tooltip="Редактировать" class="webix_icon mdi mdi-pencil-plus-outline"></span>';
                                     } else {
-                                        return '<button class="view_request">Просмотреть</button>' +
-                                            '<button class="resubmit_request">Подать повторно</button>';
+                                        return '<span webix_tooltip="Просмотреть" class="webix_icon mdi mdi-eye-outline"></span>' +
+                                            '<span webix_tooltip="Подать повторно" class="webix_icon mdi mdi-keyboard-return"></span>';
                                     }
                                 }
                             },
@@ -100,19 +107,19 @@ const requests = {
                             },
                         },
                         onClick: {
-                            view_request: function (ev, id, html) {
+                            "mdi-eye-outline": function (ev, id, html) {
                                 let item = this.getItem(id);
                                 setTimeout(function () {
                                     showRequestViewForm(item);
                                 }, 100);
                             },
-                            edit_request: function (ev, id, html) {
+                            "mdi-pencil-plus-outline": function (ev, id, html) {
                                 let item = this.getItem(id);
                                 setTimeout(function () {
                                     showRequestWizard(item);
                                 }, 100);
                             },
-                            resubmit_request: function (ev, id, html) {
+                            "mdi-keyboard-return": function (ev, id, html) {
                                 let item = this.getItem(id);
                                 setTimeout(function () {
                                     const request = findRequestByType(item.typeRequestId)
