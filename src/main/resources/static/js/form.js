@@ -783,7 +783,7 @@ webix.ready(function() {
                                         params.organizationInn = params.organizationInn.trim();
                                         params.organizationOgrn = params.organizationOgrn.trim();
 
-                                        iif(!(params.organizationInn.length == 12 || params.organizationInn.length == 10) ){
+                                        if(!(params.organizationInn.length == 12 || params.organizationInn.length == 10) ){
                                             webix.message('Проверьте длину ИНН', 'error')
                                             return false
                                         }
