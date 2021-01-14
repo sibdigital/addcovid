@@ -64,6 +64,11 @@ public class MainController {
         return "index";
     }
 
+    @GetMapping("/index_list")
+    public String greetingIndexList(Map<String, Object> model) throws JsonProcessingException {
+        return greeting(model);
+    }
+
     @PostMapping(value = "/uploadpart", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> uploadFile(@RequestParam(value = "upload") MultipartFile file){
         return ResponseEntity.ok().body(requestService.uploadFile(file));
