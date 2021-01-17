@@ -34,6 +34,10 @@ public class DocPerson {
     @Column(name = "patronymic", nullable = true, length = 100)
     private String patronymic;
 
+    @Basic
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted;
+
 
 
 /*
@@ -86,7 +90,14 @@ public class DocPerson {
         this.patronymic = patronymic;
     }
 
-/*
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+    /*
     public Boolean getAgree() {
         return isAgree;
     }

@@ -3,6 +3,7 @@ package ru.sibdigital.addcovid.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -52,4 +53,8 @@ public interface DocPersonRepo extends JpaRepository<DocPerson, Long> {
 
     @Query(nativeQuery = true, value = "select * from doc_person where id_request = :id_request")
     Page<DocPerson> findAllByDocRequest(Long id_request, Pageable pageable);
+
+    @Modifying
+    @Query(nativeQuery = true, value = "update doc_person set is_deleted = true where id=:id")
+    void setPersonIsDeletedTrueById(Long id);
 }

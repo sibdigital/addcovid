@@ -19,12 +19,14 @@ public class PersonDto {
     private String patronymic;
     //private Boolean isAgree;
     private String status;
+    private boolean isDeleted;
 
    public DocPerson convertToPersonEntity(){
        return DocPerson.builder().firstname(this.firstname)
                .lastname(this.lastname)
                //.isAgree(this.isAgree)
                .patronymic(this.patronymic)
+               .isDeleted(this.isDeleted)
                .build();
    }
 
