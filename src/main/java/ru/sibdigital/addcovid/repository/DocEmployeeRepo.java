@@ -12,8 +12,8 @@ import java.util.Optional;
 @Repository
 public interface DocEmployeeRepo extends JpaRepository<DocEmployee, Long> {
 
-    @Query(nativeQuery = true, value = "select * from doc_employee where id_organization = :id")
-    Optional<List<DocEmployee>> findAllByOrganization(Long id);
+    @Query(nativeQuery = true, value = "select * from doc_employee where id_organization = :id and is_deleted = false")
+    Optional<List<DocEmployee>> findAllByOrganizationAndIsDeletedStatus(Long id);
 
     @Modifying
     @Query(nativeQuery = true, value = "update doc_employee set is_deleted = true where id=:id")

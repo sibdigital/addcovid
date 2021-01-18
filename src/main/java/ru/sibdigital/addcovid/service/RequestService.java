@@ -594,8 +594,8 @@ public class RequestService {
         return null;
     }
 
-    public List<DocEmployee> getEmployeesByOrganizationId(Long id) {
-        return docEmployeeRepo.findAllByOrganization(id).orElse(null);
+    public List<DocEmployee> getEmployeesByOrganizationIdAndIsDeletedStatus(Long id) {
+        return docEmployeeRepo.findAllByOrganizationAndIsDeletedStatus(id).orElse(null);
     }
 
     public List<RegOrganizationOkved> getRegOrganizationOkvedAddByIdOrganization(Long id) {
@@ -747,6 +747,7 @@ public class RequestService {
                 .person(updatePerson)
                 .isVaccinatedFlu(employeeDto.getIsVaccinatedFlu())
                 .isVaccinatedCovid(employeeDto.getIsVaccinatedCovid())
+                .isDeleted(false)
                 .build();
 
         return updatedEmployee;
