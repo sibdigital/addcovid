@@ -45,7 +45,7 @@ public interface DocPersonRepo extends JpaRepository<DocPerson, Long> {
             "                                                                                                  ) as s\n" +
             "                                                                                             group by id_req\n" +
             "                                                                                         ) as m group by id_req\n" +
-            ") as ss on d.id_request = ss.id_req and is_deleted = false;")
+            ") as ss on d.id_request = ss.id_req and d.is_deleted = false;")
     Map<String, Long> getTotalPeopleStatistic();
 
     @Query(nativeQuery = true, value = "select * from doc_person where id_request = :id_request and is_deleted = false")
