@@ -181,7 +181,8 @@ public class CabinetController {
             return null;
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
-        List<DocRequest> requests = docRequestRepo.getAllByInn(organization.getInn()).orElse(null);
+        List<DocRequest> requests = docRequestRepo.getRequestsByOrganizationIdAndStatusActivity(organization.getId(),
+                ActivityStatuses.ACTIVE.getValue()).orElse(new ArrayList<>());
         List<DocRequestDto> dtos = requests.stream().map(request -> new DocRequestDto(request.getId(),
                 request.getTypeRequest().getActivityKind(), request.getStatusReview(), request.getStatusReviewName(),
                 request.getDepartment().getName(), request.getTimeCreate(), request.getTimeReview(),

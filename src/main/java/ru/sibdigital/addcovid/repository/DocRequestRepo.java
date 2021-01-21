@@ -120,4 +120,7 @@ public interface DocRequestRepo extends JpaRepository<DocRequest, Long> {
             "   and dr.status_activity = 1 " +
             "limit 1 ")
     Long getRequestByOrganizationIdAndTypeRequestId(Long orgId, Long idTypeRequest, Integer status);
+
+    @Query("SELECT dr FROM DocRequest dr WHERE dr.organization.id = :id and dr.statusActivity = :status")
+    Optional<List<DocRequest>> getRequestsByOrganizationIdAndStatusActivity(Long id, int status);
 }
