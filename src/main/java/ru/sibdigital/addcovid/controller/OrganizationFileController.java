@@ -106,10 +106,10 @@ public class OrganizationFileController {
         try {
 
             final String absolutePath = Paths.get(uploadingDir).toFile().getAbsolutePath();
-            final String filename = organization.getId().toString() + "_" + UUID.randomUUID();
             final String originalFilename = part.getOriginalFilename();
             String extension = getFileExtension(originalFilename);
-            File file = new File(String.format("%s/%s%s", absolutePath, filename, extension));
+            final String filename = organization.getId().toString() + "_" + UUID.randomUUID() + extension;
+            File file = new File(String.format("%s/%s", absolutePath, filename));
             part.transferTo(file);
 
             final String fileHash = getFileHash(file);

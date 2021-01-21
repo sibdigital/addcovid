@@ -323,28 +323,7 @@ function showRequestViewForm(data) {
         $$('departmentId').setValue(data.department.name);
         $$('reqBasis').setValue(data.reqBasis);
 
-        if (data.attachmentPath) {
-            let paths = data.attachmentPath.split(',')
-
-            let fileList = []
-            paths.forEach((path, index) => {
-                let filename = path.split('\\').pop().split('/').pop()
-                if (filename != '' &&
-                    ((filename.toUpperCase().indexOf('.PDF') != -1) ||
-                        (filename.toUpperCase().indexOf('.ZIP') != -1)
-                    )) {
-                    filename = '<a href="' + LINK_PREFIX + filename + LINK_SUFFIX + '" target="_blank">'
-                        + filename + '</a>'
-                    fileList.push({id: index, value: filename})
-                }
-            })
-            if (fileList.length > 0) {
-                $$('filename').parse(fileList)
-            } else {
-                $$('filename_label').hide()
-                $$('filename').hide()
-            }
-        } else if (data.docRequestFiles && data.docRequestFiles.length > 0) {
+        if (data.docRequestFiles && data.docRequestFiles.length > 0) {
             let fileList = []
             data.docRequestFiles.forEach((drf, index) => {
                 const file = drf.organizationFile;
