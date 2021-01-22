@@ -53,7 +53,7 @@ public class FileDownloadController {
         Long id = (Long) session.getAttribute("id_organization");
         if (id != null) {
             ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
-            List<DocEmployee> employees = requestService.getEmployeesByOrganizationId(organization.getId());
+            List<DocEmployee> employees = requestService.getEmployeesByOrganizationIdAndIsDeletedStatus(organization.getId());
 
             try {
                 excelWriter.downloadEmployeesFile(employees, response);

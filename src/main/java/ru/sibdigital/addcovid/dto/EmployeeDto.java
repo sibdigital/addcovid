@@ -16,5 +16,6 @@ public class EmployeeDto {
     private PersonDto person;
     private Boolean isVaccinatedFlu;
     private Boolean isVaccinatedCovid;
+    private Boolean isDeleted;
 
 }

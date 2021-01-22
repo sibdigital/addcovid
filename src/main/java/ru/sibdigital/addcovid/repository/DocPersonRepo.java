@@ -3,6 +3,7 @@ package ru.sibdigital.addcovid.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,10 +16,10 @@ import java.util.Optional;
 @Repository
 public interface DocPersonRepo extends JpaRepository<DocPerson, Long> {
 
-    @Query(nativeQuery = true, value = "select count(*) from ( select distinct lastname, firstname, patronymic from doc_person) as s")
+    @Query(nativeQuery = true, value = "select count(*) from ( select distinct lastname, firstname, patronymic from doc_person where is_deleted = false) as s")
     Long getTotalPeople();
 
-    @Query(nativeQuery = true, value = "SELECT count(*) FROM ( SELECT DISTINCT firstname, lastname, patronymic FROM doc_person WHERE id_request IN (SELECT id FROM doc_request WHERE status_review = :status)) AS s;")
+    @Query(nativeQuery = true, value = "SELECT count(*) FROM ( SELECT DISTINCT firstname, lastname, patronymic FROM doc_person WHERE is_deleted = false and id_request IN (SELECT id FROM doc_request WHERE status_review = :status)) AS s;")
     Long getTotalApprovedPeopleByReviewStatus(@Param("status") int status);
 
     @Query(nativeQuery = true, value = "select sum(neobr) as awaiting, sum(utv) as accepted, sum(otkl) as declined from doc_person as d\n" +
@@ -44,12 +45,16 @@ public interface DocPersonRepo extends JpaRepository<DocPerson, Long> {
             "                                                                                                  ) as s\n" +
             "                                                                                             group by id_req\n" +
             "                                                                                         ) as m group by id_req\n" +
-            ") as ss on d.id_request = ss.id_req;")
+            ") as ss on d.id_request = ss.id_req and d.is_deleted = false;")
     Map<String, Long> getTotalPeopleStatistic();
 
-    @Query(nativeQuery = true, value = "select * from doc_person where id_request = :id_request")
+    @Query(nativeQuery = true, value = "select * from doc_person where id_request = :id_request and is_deleted = false")
     Optional<List<DocPerson>> findByDocRequest(Long id_request);
 
-    @Query(nativeQuery = true, value = "select * from doc_person where id_request = :id_request")
+    @Query(nativeQuery = true, value = "select * from doc_person where id_request = :id_request and is_deleted = false")
     Page<DocPerson> findAllByDocRequest(Long id_request, Pageable pageable);
+
+    @Modifying
+    @Query(nativeQuery = true, value = "update doc_person set is_deleted = true where id=:id")
+    void setPersonIsDeletedTrueById(Long id);
 }

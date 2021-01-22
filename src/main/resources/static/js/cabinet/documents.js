@@ -60,7 +60,7 @@ const documents = {
                 if (obj.docRequestByIdRequest !== null) {
                     acceptionStatus = "Прикреплен"
                 } else {
-                    result += "<div id='del_button' style='position: absolute;top: 0; right: 5px;' ondblclick='del_file()' class='mdi mdi-close-thick'></div>"
+                    result += "<div id='del_button' style='position: absolute;top: 0; right: 5px;' onclick='del_file("+obj.id+")' class='mdi mdi-close-thick'></div>"
 
                 }
                 result += "<div class='doc_time_create'>" + downloadTime + "</div>" +
@@ -167,8 +167,8 @@ const documents = {
     // }
 }
 
-function del_file(){
-    let param = $$('docs_grid').getSelectedId()
+function del_file(id = null){
+    let param = id === null ? $$('docs_grid').getSelectedItem() : $$('docs_grid').getItem(id)
     webix.confirm({
         title:"Подтверждение",
         type:"confirm-warning",
@@ -177,7 +177,7 @@ function del_file(){
     }).then(function(){
         webix.ajax()
             .headers({'Content-type': 'application/json'})
-            .post('delete_file', JSON.stringify(param))
+            .post('delete_file', JSON.stringify(param.id))
             .then(function (data) {
                 if (data !== null) {
                     $$("docs_grid").remove($$("docs_grid").getSelectedId());

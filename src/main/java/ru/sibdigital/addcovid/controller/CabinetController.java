@@ -440,7 +440,7 @@ public class CabinetController {
             return null;
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
-        List<DocEmployee> employees = requestService.getEmployeesByOrganizationId(organization.getId());
+        List<DocEmployee> employees = requestService.getEmployeesByOrganizationIdAndIsDeletedStatus(organization.getId());
         return employees;
     }
 

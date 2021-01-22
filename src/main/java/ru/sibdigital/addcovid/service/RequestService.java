@@ -597,8 +597,8 @@ public class RequestService {
         return null;
     }
 
-    public List<DocEmployee> getEmployeesByOrganizationId(Long id) {
-        return docEmployeeRepo.findAllByOrganization(id).orElse(null);
+    public List<DocEmployee> getEmployeesByOrganizationIdAndIsDeletedStatus(Long id) {
+        return docEmployeeRepo.findAllByOrganizationAndIsDeletedStatus(id).orElse(null);
     }
 
     public List<RegOrganizationOkved> getRegOrganizationOkvedAddByIdOrganization(Long id) {
@@ -701,8 +701,9 @@ public class RequestService {
 
         if(personId!=null){          //Если существует person с personId в таблице doc_person
             docPerson.setId(personId);
-             docEmployee = constructUpdatePerson(docPerson,employeeDto,clsOrganization);
+            docEmployee = constructUpdatePerson(docPerson,employeeDto,clsOrganization);
         }else{
+            docPerson.setDeleted(false);
             docEmployee = constructNewPerson(docPerson,employeeDto,clsOrganization);
         }
 
@@ -721,6 +722,7 @@ public class RequestService {
                 .person(docPerson)
                 .isVaccinatedFlu(employeeDto.getIsVaccinatedFlu())
                 .isVaccinatedCovid(employeeDto.getIsVaccinatedCovid())
+                .isDeleted(false)
                 .build();
 
         return newEmployee;
@@ -748,6 +750,7 @@ public class RequestService {
                 .person(updatePerson)
                 .isVaccinatedFlu(employeeDto.getIsVaccinatedFlu())
                 .isVaccinatedCovid(employeeDto.getIsVaccinatedCovid())
+                .isDeleted(false)
                 .build();
 
         return updatedEmployee;
@@ -755,10 +758,11 @@ public class RequestService {
 
     @Transactional
     public void deleteEmployee(EmployeeDto employeeDto){
+        //update reg_organization_file set is_deleted = true where id=:id
         Long personId = employeeDto.getPerson().getId();
 
-        docEmployeeRepo.deleteById(employeeDto.getId());
-        docPersonRepo.deleteById(personId);
+        docEmployeeRepo.setEmployeeIsDeletedTrueById(employeeDto.getId());
+        docPersonRepo.setPersonIsDeletedTrueById(personId);
 
     }
 
