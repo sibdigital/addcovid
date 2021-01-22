@@ -39,7 +39,7 @@ public class RegOrganizationPrescription {
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
-    private AdditionalAttributes additionalAttributes;
+    private RegOrganizationPrescriptionAttributes additionalAttributes;
 
     public Long getId() {
         return id;
@@ -65,11 +65,11 @@ public class RegOrganizationPrescription {
         this.prescription = prescription;
     }
 
-    public AdditionalAttributes getAdditionalAttributes() {
+    public RegOrganizationPrescriptionAttributes getAdditionalAttributes() {
         return additionalAttributes;
     }
 
-    public void setAdditionalAttributes(AdditionalAttributes additionalAttributes) {
+    public void setAdditionalAttributes(RegOrganizationPrescriptionAttributes additionalAttributes) {
         this.additionalAttributes = additionalAttributes;
     }
 

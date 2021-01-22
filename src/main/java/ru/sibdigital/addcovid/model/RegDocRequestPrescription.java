@@ -39,7 +39,7 @@ public class RegDocRequestPrescription {
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
-    private AdditionalAttributes additionalAttributes;
+    private RegDocRequestPrescriptionAttributes additionalAttributes;
 
     public Long getId() {
         return id;
@@ -57,11 +57,11 @@ public class RegDocRequestPrescription {
         this.prescription = prescription;
     }
 
-    public AdditionalAttributes getAdditionalAttributes() {
+    public RegDocRequestPrescriptionAttributes getAdditionalAttributes() {
         return additionalAttributes;
     }
 
-    public void setAdditionalAttributes(AdditionalAttributes additionalAttributes) {
+    public void setAdditionalAttributes(RegDocRequestPrescriptionAttributes additionalAttributes) {
         this.additionalAttributes = additionalAttributes;
     }
 

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class AdditionalAttributes {
+public class RegOrganizationPrescriptionAttributes {
 
-    private String isCheckingAgree;
+    private ConsentPrescription[] consentPrescriptions;
 }

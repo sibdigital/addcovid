@@ -196,7 +196,7 @@ function showOrganizationPrescriptionCreateForm(idPrescription, accepted) {
                             cols: [
                                 {
                                     view: 'label',
-                                    label: 'Предписание ' + (index + 1),
+                                    label: 'Текст №' + (index + 1),
                                     align: 'center'
                                 },
                             ]
@@ -218,7 +218,7 @@ function showOrganizationPrescriptionCreateForm(idPrescription, accepted) {
                             view: 'template',
                             borderless: true,
                             css: 'personalTemplateStyle',
-                            template: 'Подтверждаю обязательное выполнение предписания <span style = "color: red">*</span>',
+                            template: 'Подтверждаю обязательное выполнение <span style = "color: red">*</span>',
                             autoheight: true,
                             hidden: accepted
                         },

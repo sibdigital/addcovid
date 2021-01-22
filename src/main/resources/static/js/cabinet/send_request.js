@@ -57,20 +57,6 @@ function showRequestCreateForm(idTypeRequest, page) {
             $$("departmentId").disable();
         }
 
-        if (typeRequest.settings) {
-            const settings = JSON.parse(typeRequest.settings, function (key, value) {
-                if (value === 'webix.rules.isChecked') {
-                    return webix.rules.isChecked;
-                }
-                return value;
-            });
-            if (settings.fields) {
-                settings.fields.forEach(field => {
-                    $$('form').addView(field.ui, field.pos);
-                })
-            }
-        }
-
         return webix.ajax('type_request_prescriptions', {idTypeRequest: idTypeRequest});
     }).then(function (data) {
         const prescriptions = data.json();
@@ -143,7 +129,7 @@ function showRequestCreateForm(idTypeRequest, page) {
                                     view: 'template',
                                     borderless: true,
                                     css: 'personalTemplateStyle',
-                                    template: 'Подтверждаю обязательное выполнение предписания <span style = "color: red">*</span>',
+                                    template: 'Подтверждаю обязательное выполнение <span style = "color: red">*</span>',
                                     autoheight: true
                                 },
                                 {
@@ -633,6 +619,7 @@ function showRequestWizard(data) {
     $$('firstBackButton').hide();
 
     webix.ajax('org_requests/' + data.id).then(function (data) {
+        console.log('asdasd')
         data = data.json();
 
         $$('requestId').setValue(data.id);
@@ -658,20 +645,6 @@ function showRequestWizard(data) {
             departmentId = (department.id);
             $$("departmentId").setValue(department.id);
             $$("departmentId").disable();
-        }
-
-        if (typeRequest.settings) {
-            const settings = JSON.parse(typeRequest.settings, function (key, value) {
-                if (value === 'webix.rules.isChecked') {
-                    return webix.rules.isChecked;
-                }
-                return value;
-            });
-            if (settings.fields) {
-                settings.fields.forEach(field => {
-                    $$('form').addView(field.ui, field.pos);
-                })
-            }
         }
 
         return webix.ajax('type_request_prescriptions', {idTypeRequest: typeRequest.id});
@@ -746,7 +719,7 @@ function showRequestWizard(data) {
                                     view: 'template',
                                     borderless: true,
                                     css: 'personalTemplateStyle',
-                                    template: 'Подтверждаю обязательное выполнение предписания <span style = "color: red">*</span>',
+                                    template: 'Подтверждаю обязательное выполнение <span style = "color: red">*</span>',
                                     autoheight: true
                                 },
                                 {

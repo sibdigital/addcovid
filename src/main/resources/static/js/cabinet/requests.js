@@ -406,7 +406,7 @@ function showRequestViewForm(data) {
                                     name: 'agree',
                                     labelPosition: 'top',
                                     readonly: true,
-                                    labelRight: 'Подтверждено обязательное выполнение предписания',
+                                    labelRight: 'Подтверждено обязательное выполнение',
                                     value: consentPrescriptionChecked
                                 },
                             ]
@@ -428,20 +428,6 @@ function showRequestViewForm(data) {
         const typeRequest = data.typeRequest;
 
         $$('activityKind').setValue(typeRequest.activityKind);
-
-        if (typeRequest.settings) {
-            const settings = JSON.parse(typeRequest.settings, function (key, value) {
-                if (value === 'webix.rules.isChecked') {
-                    return webix.rules.isChecked;
-                }
-                return value;
-            });
-            if (settings.fields) {
-                settings.fields.forEach(field => {
-                    $$('form').addView(field.ui, field.pos);
-                })
-            }
-        }
     });
 }
 

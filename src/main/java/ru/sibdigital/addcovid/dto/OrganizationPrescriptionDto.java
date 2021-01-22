@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.sibdigital.addcovid.model.AdditionalAttributes;
+import ru.sibdigital.addcovid.model.RegOrganizationPrescriptionAttributes;
 
 @Data
 @Builder(toBuilder = true)
@@ -13,5 +13,5 @@ import ru.sibdigital.addcovid.model.AdditionalAttributes;
 public class OrganizationPrescriptionDto {
 
     private Long prescriptionId;
-    private AdditionalAttributes additionalAttributes;
+    private RegOrganizationPrescriptionAttributes additionalAttributes;
 }
