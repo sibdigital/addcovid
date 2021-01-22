@@ -882,7 +882,7 @@ public class RequestService {
             }
         }
 
-        List<DocEmployee> employees = docEmployeeRepo.findAllByOrganization(organization.getId()).orElse(null);
+        List<DocEmployee> employees = docEmployeeRepo.findAllByOrganizationAndIsDeletedStatus(organization.getId()).orElse(null);
         if (employees != null) {
             for (DocEmployee employee: employees) {
                 RegDocRequestEmployee regDocRequestEmployee = RegDocRequestEmployee.builder()
