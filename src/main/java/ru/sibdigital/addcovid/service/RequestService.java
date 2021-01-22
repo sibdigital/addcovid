@@ -127,6 +127,9 @@ public class RequestService {
     @Autowired
     private RegDocRequestPrescriptionRepo regDocRequestPrescriptionRepo;
 
+    @Autowired
+    private RegDocRequestEmployeeRepo regDocRequestEmployeeRepo;
+
     @Value("${upload.path:/uploads}")
     String uploadingDir;
 
@@ -872,6 +875,17 @@ public class RequestService {
                         .additionalAttributes(dto.getAdditionalAttributes())
                         .build();
                 regDocRequestPrescriptionRepo.save(regDocRequestPrescription);
+            }
+        }
+
+        List<DocEmployee> employees = docEmployeeRepo.findAllByOrganization(organization.getId()).orElse(null);
+        if (employees != null) {
+            for (DocEmployee employee: employees) {
+                RegDocRequestEmployee regDocRequestEmployee = RegDocRequestEmployee.builder()
+                        .request(docRequest)
+                        .docEmployee(employee)
+                        .build();
+                regDocRequestEmployeeRepo.save(regDocRequestEmployee);
             }
         }
 
