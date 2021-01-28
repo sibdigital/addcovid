@@ -74,8 +74,10 @@ public class RegistrationController {
             String activateUrl = settingService.findActualByKey("activationUrl", "");
             activateUrl += "/activate?inn=" + clsOrganization.getInn() + "&code=" + clsOrganization.getHashCode();
             String text = "Здравствуйте! <br/>" +
-                    "Для активации учетной записи " + clsOrganization.getName()+ " в личном кабинете на портале Работающая Бурятия перейдите по ссылке: <a href=\"" + activateUrl + "\">Активация учетной записи</a><br/>" +
-                    "Если вы не регистрировали личный кабинет на портале Работающая Бурятия, проигнорируйте это сообщение";
+                    "Для активации учетной записи " + clsOrganization.getName()+ " в личном кабинете на портале " +
+                    applicationConstants.getApplicationName() + " перейдите по ссылке: <a href=\"" + activateUrl + "\">Активация учетной записи</a><br/>" +
+                    "Если вы не регистрировали личный кабинет на портале " +
+                    applicationConstants.getApplicationName() + ", проигнорируйте это сообщение";
             boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(),
                     "Регистрация на портале " + applicationConstants.getApplicationName(), text);
             if (!emailSent) {
@@ -150,7 +152,7 @@ public class RegistrationController {
                 RegEgrul egrul = egrulService.getEgrul(organization.getInn());
                 if (egrul != null) {
                     EgrulResponse response = new EgrulResponse();
-                    response.build(mapper.readValue(egrul.getData(), EGRUL.СвЮЛ.class));
+                    response.build(egrul);
                     if (response.getData().getEmail() != null && !response.getData().getEmail().isBlank()
                             && email.equals(response.getData().getEmail())) {
                         emailLinked = true;
@@ -160,7 +162,7 @@ public class RegistrationController {
                 RegEgrip egrip = egrulService.getEgrip(organization.getInn());
                 if (egrip != null) {
                     EgripResponse response = new EgripResponse();
-                    response.build(mapper.readValue(egrip.getData(), EGRIP.СвИП.class));
+                    response.build(egrip);
                     if (response.getData().getEmail() != null && !response.getData().getEmail().isBlank()
                             && email.equals(response.getData().getEmail())) {
                         emailLinked = true;

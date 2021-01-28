@@ -11,7 +11,8 @@ import java.util.List;
 @Repository
 public interface RegEgrulRepo extends JpaRepository<RegEgrul, Long> {
 
-    RegEgrul findByInn(String inn);
+    RegEgrul findByInnAndActiveStatus(String inn, int status);
+
     @Query("select r from RegEgrul r where inn in :inns")
     List<RegEgrul> findAllByInnList(@Param("inns") List<String> inn);
 }

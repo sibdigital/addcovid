@@ -11,7 +11,7 @@ let descrStep1 = '<span style=" height: auto; font-size: 0.8rem; color: #fff6f6"
 
 let descrStep2 = '<span style="font-size: 0.8rem; color: #fff6f6">' +
     'Вам необходимо ввести Адрес электронной почты Вашей организации и пароль. ' +
-    'После регистрации, на указанный адрес электронной почты, будет отправлено письмо' +
+    'После регистрации, на указанный адрес электронной почты, будет отправлено письмо ' +
     'со ссылкой на активацию учётной записи.</span>';
 
 let leftLayout = {
@@ -161,6 +161,30 @@ let step2 = {
                 },
                 {
                     view: 'text',
+                    id: 'egrulId',
+                    name: 'egrulId',
+                    hidden: true,
+                },
+                {
+                    view: 'text',
+                    id: 'egripId',
+                    name: 'egripId',
+                    hidden: true,
+                },
+                {
+                    view: 'text',
+                    id: 'filialId',
+                    name: 'filialId',
+                    hidden: true,
+                },
+                {
+                    view: 'text',
+                    id: 'organizationType',
+                    name: 'organizationType',
+                    hidden: true,
+                },
+                {
+                    view: 'text',
                     id: 'organizationInn',
                     name: 'organizationInn',
                     minWidth: 250,
@@ -169,6 +193,29 @@ let step2 = {
                     validate: webix.rules.isNumber,
                     readonly: true,
                     required: true
+                },
+                {
+                    view: 'combo',
+                    id: 'selectOrg',
+                    label: 'Организация',
+                    labelPosition: 'top',
+                    hidden: true,
+                    required: true,
+                    on: {
+                        onChange(newVal, oldVal) {
+                            if (newVal && newVal !== oldVal) {
+                                const data = organizations.find(org => org.id === newVal).data;
+                                $$('egrulId').setValue(data.id);
+                                $$('filialId').setValue(data.filialId);
+                                $$('organizationType').setValue(data.type);
+                                $$('organizationName').setValue(data.name);
+                                $$('organizationShortName').setValue(data.shortName);
+                                $$('organizationOgrn').setValue(data.ogrn);
+                                $$('organizationKpp').setValue(data.kpp);
+                                $$('organizationAddressJur').setValue(data.jurAddress);
+                            }
+                        }
+                    }
                 },
                 {
                     view: 'text',
@@ -207,6 +254,28 @@ let step2 = {
                     validate: webix.rules.isNumber,
                     labelPosition: 'top',
                     hidden: true,
+                    readonly: true,
+                    required: true
+                },
+                {
+                    view: 'text',
+                    id: 'organizationKpp',
+                    name: 'organizationKpp',
+                    label: 'КПП',
+                    validate: webix.rules.isNumber,
+                    labelPosition: 'top',
+                    hidden: true,
+                    required: true
+                },
+                {
+                    view: 'textarea',
+                    height: 150,
+                    id: 'organizationAddressJur',
+                    name: 'organizationAddressJur',
+                    label: 'Юридический адрес',
+                    labelPosition: 'top',
+                    hidden: true,
+                    readonly: true,
                     required: true
                 },
                 {
@@ -337,6 +406,8 @@ let regLayout = webix.ui({
     ]
 })
 
+let organizations;
+
 function loadData(type, inn) {
     webix.ajax(type + '?inn=' + inn).then(function (data) {
         const response = data.json();
@@ -346,39 +417,104 @@ function loadData(type, inn) {
                 $$("invalidMessages").setValue('Введеный ИНН не найден в ЕГРЮЛ. \nВозможно, вы ввели неправильный ИНН.');
                 $$('searchInn').hideProgress();
             } else {
+                $$('organizationOgrn').show();
+                $$('organizationKpp').show();
                 const result = response.data;
-                $$('form').setValues({
-                    organizationType: '1',
-                    searchInn: inn,
-                    organizationName: result.name,
-                    organizationShortName: (result.shortName ? result.shortName : result.name),
-                    organizationInn: result.inn,
-                    organizationOgrn: result.ogrn,
-                    organizationEmail: result.email
-                });
+                if (result.filials && result.filials.length > 0) {
+                    $$('organizationShortName').hide();
+                    organizations = [];
+                    organizations.push({id: result.id + '', /*value: result.shortName + '\n' + result.jurAddress, */data: result});
+                    const filials = result.filials.map(filial => {
+                        return {id: filial.id + '_' + filial.filialId, /*value: filial.shortName+ '\n' + result.jurAddress, */data: filial}
+                    })
+                    organizations = organizations.concat(filials);
+                    $$('selectOrg').define('options', {
+                        body: {
+                            template: '<div>#data.shortName#</div><div>#data.jurAddress#</div>',
+                        },
+                        data: organizations,
+                    });
+                    $$('selectOrg').refresh();
+                    $$('selectOrg').show();
+                    $$('form').setValues({
+                        egripId: '',
+                        searchInn: inn,
+                        organizationName: result.name,
+                        organizationShortName: (result.shortName ? result.shortName : result.name),
+                        organizationInn: result.inn,
+                    });
+                } else {
+                    $$('organizationShortName').define('label', 'Наименование организации');
+                    $$('organizationShortName').define('readonly', true);
+                    $$('organizationShortName').refresh();
+                    $$('organizationShortName').show();
+                    $$('selectOrg').hide();
+                    $$('form').setValues({
+                        egrulId: result.id,
+                        egripId: '',
+                        filialId: '',
+                        organizationType: '1',
+                        searchInn: inn,
+                        isSelfEmployed: false,
+                        organizationName: result.name,
+                        organizationShortName: (result.shortName ? result.shortName : result.name),
+                        organizationInn: result.inn,
+                        organizationOgrn: result.ogrn,
+                        organizationKpp: result.kpp,
+                        organizationAddressJur: result.jurAddress,
+                        organizationEmail: result.email
+                    });
+                }
                 doNext = true;
             }
         } else {
             if (response.finded == true){
                 const result = response.data;
-                $$('organizationShortName').config.label = 'ФИО ИП';
+                $$('organizationShortName').define('label', 'ФИО ИП');
+                $$('organizationShortName').define('readonly', true);
+                $$('organizationShortName').refresh();
+                $$('organizationShortName').show();
+                $$('selectOrg').hide();
+                $$('organizationOgrn').show();
+                $$('organizationKpp').hide();
                 $$('form').setValues({
+                    egrulId: '',
+                    egripId: result.id,
+                    filialId: '',
                     organizationType: '2',
                     searchInn: inn,
+                    isSelfEmployed: false,
                     organizationName: result.name,
-                    organizationShortName: result.name,
+                    organizationShortName: (result.shortName ? result.shortName : result.name),
                     organizationInn: result.inn,
+                    organizationOgrn: result.ogrn,
+                    organizationKpp: '',
+                    organizationAddressJur: result.jurAddress,
                     organizationEmail: result.email
                 });
                 doNext = true;
             }else if (response.possiblySelfEmployed == true){
-                $$('organizationShortName').config.label = 'ФИО cамозанятого';
-                $$('organizationShortName').config.readonly = false;
+                $$('organizationShortName').define('label', 'ФИО cамозанятого');
+                $$('organizationShortName').define('readonly', false);
+                $$('organizationShortName').refresh();
+                $$('organizationShortName').show();
+                $$('selectOrg').hide();
+                $$('organizationOgrn').hide();
+                $$('organizationKpp').hide();
                 $$('form').setValues({
+                    egrulId: '',
+                    egripId: '',
+                    filialId: '',
                     organizationType: '3',
                     searchInn: inn,
                     isSelfEmployed: true,
-                    organizationInn: inn
+                    organizationName: '',
+                    organizationShortName: '',
+                    organizationInn: inn,
+                    organizationOgrn: '',
+                    organizationKpp: '',
+                    organizationAddressJur: '',
+                    organizationEmail: ''
                 });
                 doNext = true;
             } else{
@@ -450,7 +586,7 @@ function registrate() {
             .post('registration', JSON.stringify(params)
             ).then(function (data) {
             const text = data.text();
-            webix.message(text === 'Ок' ? 'Письмо отправлено на вашу почту' : text)
+            // webix.message(text === 'Ок' ? 'Письмо отправлено на вашу почту' : text)
             if (text === 'Ок') {
                 next(2, $$('organizationEmail').getValue());
             } else if (text === 'Не удалось отправить письмо') {
@@ -508,17 +644,19 @@ function searchByInn(){
         webix.ajax().get('checkInn?inn=' + inn).then(function (data) {
             const result = data.text();
             if (result == "Данный ИНН уже зарегистрирован в системе"){
-                var message = 'Ранее вы уже подавали заявки на портале Работающая Бурятия. ' +
-                    'В настоящее время ведется перенос истории ваших заявок в личный кабинет. ' +
-                    'Доступ к личному кабинету будет предоставлен в ближайшее время.' +
-                    'Сейчас вы можете актуализировать заявку по адресу http://rabota.govrb.ru/actualize_form';
-                webix.alert({
-                    title: "ВНИМАНИЕ!",
-                    ok: "Актуализировать",
-                    text: message
-                }).then(function () {
-                    window.location.replace('http://rabota.govrb.ru/actualize_form');
-                });;
+                // var message = 'Ранее вы уже подавали заявки на портале Работающая Бурятия. ' +
+                //     'В настоящее время ведется перенос истории ваших заявок в личный кабинет. ' +
+                //     'Доступ к личному кабинету будет предоставлен в ближайшее время.' +
+                //     'Сейчас вы можете актуализировать заявку по адресу http://rabota.govrb.ru/actualize_form';
+                // webix.alert({
+                //     title: "ВНИМАНИЕ!",
+                //     ok: "Актуализировать",
+                //     text: message
+                // }).then(function () {
+                //     window.location.replace('http://rabota.govrb.ru/actualize_form');
+                // });;
+                $$("invalidMessages").setValue(result);
+                $$('searchInn').hideProgress();
             } else if (result !== 'ИНН не зарегистрирован') {
                 $$("invalidMessages").setValue(result);
                 //webix.message(result, 'error');

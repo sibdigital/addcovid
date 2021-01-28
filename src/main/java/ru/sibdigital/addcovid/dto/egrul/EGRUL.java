@@ -3244,6 +3244,10 @@ public class EGRUL {
             return this.свСтатус;
         }
 
+        public void setСвСтатус(List<СвСтатус> свСтатус) {
+            this.свСтатус = свСтатус;
+        }
+
         /**
          * Gets the value of the свПрекрЮЛ property.
          *
@@ -4573,7 +4577,7 @@ public class EGRUL {
             protected ГРНДатаТип грнДата;
             @XmlElement(name = "\u0413\u0420\u041d\u0414\u0430\u0442\u0430\u0418\u0441\u043f\u0440")
             protected ГРНДатаТип грнДатаИспр;
-            @XmlAttribute(name = "eMail", required = true)
+            @XmlAttribute(name = "E-mail", required = true)
             protected String eMail;
 
             /**

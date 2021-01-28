@@ -11,27 +11,32 @@ public class JuridicalUtils {
         String result = "";
         final EGRUL.СвЮЛ.СвАдресЮЛ adr = sved.getСвАдресЮЛ();
         if (adr != null) {
-            final АдрРФЕГРЮЛТип adrrf = adr.getАдресРФ();
-            if (adrrf != null) {
-                final РегионТип region = adrrf.getРегион();
-                final ГородТип gorod = adrrf.getГород();
-                final String index = adrrf.getИндекс() != null ? adrrf.getИндекс() : "";
-                final РайонТип raion = adrrf.getРайон();
-                final НаселПунктТип naspunkt = adrrf.getНаселПункт();
-                final УлицаТип ulica = adrrf.getУлица();
-                final String dom = adrrf.getДом() != null ? adrrf.getДом() : "";
-                final String kvart = adrrf.getКварт() != null ? adrrf.getКварт() : "";
-                final String korpus = adrrf.getКорпус() != null ? adrrf.getКорпус() : "";
+            result = constructAddress(adr.getАдресРФ());
+        }
+        return result;
+    }
 
-                String regionFormat = region != null ? (region.getТипРегион() + " " + region.getНаимРегион()) : "";
-                String gorodFormat = gorod != null ? (gorod.getТипГород() + " " + gorod.getНаимГород()) : "";
-                String raionFormat = raion != null ? (raion.getТипРайон() + " " + raion.getНаимРайон()) : "";
-                String naspunktFormat = naspunkt != null ? (naspunkt.getТипНаселПункт() + " " + naspunkt.getНаимНаселПункт()) : "";
-                String ulicaFormat = ulica != null ? (ulica.getТипУлица() + " " + ulica.getНаимУлица()) : "";
+    public static String constructAddress(АдрРФЕГРЮЛТип adrrf) {
+        String result = "";
+        if (adrrf != null) {
+            final РегионТип region = adrrf.getРегион();
+            final ГородТип gorod = adrrf.getГород();
+            final String index = adrrf.getИндекс() != null ? adrrf.getИндекс() : "";
+            final РайонТип raion = adrrf.getРайон();
+            final НаселПунктТип naspunkt = adrrf.getНаселПункт();
+            final УлицаТип ulica = adrrf.getУлица();
+            final String dom = adrrf.getДом() != null ? adrrf.getДом() : "";
+            final String kvart = adrrf.getКварт() != null ? adrrf.getКварт() : "";
+            final String korpus = adrrf.getКорпус() != null ? adrrf.getКорпус() : "";
 
-                result = index + ", " + regionFormat + ", " + gorodFormat + ", " + raionFormat + ", " + naspunktFormat
-                        + ", " + ulicaFormat + ", " + dom + ", " + korpus + ", " + kvart;
-            }
+            String regionFormat = region != null ? (region.getТипРегион() + " " + region.getНаимРегион()) : "";
+            String gorodFormat = gorod != null ? (gorod.getТипГород() + " " + gorod.getНаимГород()) : "";
+            String raionFormat = raion != null ? (raion.getТипРайон() + " " + raion.getНаимРайон()) : "";
+            String naspunktFormat = naspunkt != null ? (naspunkt.getТипНаселПункт() + " " + naspunkt.getНаимНаселПункт()) : "";
+            String ulicaFormat = ulica != null ? (ulica.getТипУлица() + " " + ulica.getНаимУлица()) : "";
+
+            result = index + ", " + regionFormat + ", " + gorodFormat + ", " + raionFormat + ", " + naspunktFormat
+                    + ", " + ulicaFormat + ", " + dom + ", " + korpus + ", " + kvart;
         }
         return result;
     }

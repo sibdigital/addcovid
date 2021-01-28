@@ -15,6 +15,7 @@ public class OrganizationDto {
     private String organizationShortName;
     private String organizationInn;
     private String organizationOgrn;
+    private String organizationKpp;
     private String organizationOkvedAdd;
     private String organizationOkved;
     private String organizationAddressJur;
@@ -22,6 +23,10 @@ public class OrganizationDto {
     private String organizationPhone;
     private Integer organizationType;
     private Boolean isSelfEmployed;
+
+    private Long egrulId;
+    private Long egripId;
+    private Long filialId;
 
     private String password;
 

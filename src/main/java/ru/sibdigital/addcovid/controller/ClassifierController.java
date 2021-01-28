@@ -17,8 +17,6 @@ import ru.sibdigital.addcovid.service.crassifier.EgrulService;
 @RestController
 public class ClassifierController {
 
-    private static ObjectMapper mapper = new ObjectMapper();
-
     @Autowired
     private EgrulService egrulService;
 
@@ -28,11 +26,7 @@ public class ClassifierController {
         EgrulResponse response = new EgrulResponse();
         RegEgrul egrul = egrulService.getEgrul(inn);
         if (egrul != null) {
-            try {
-                response.build(mapper.readValue(egrul.getData(), EGRUL.СвЮЛ.class));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            response.build(egrul);
         }else{
             response.empty("По введенному ИНН не найдено юр. лицо");
         }
@@ -45,11 +39,7 @@ public class ClassifierController {
         EgripResponse response = new EgripResponse();
         RegEgrip egrip = egrulService.getEgrip(inn);
         if (egrip != null) {
-            try {
-                response.build(mapper.readValue(egrip.getData(), EGRIP.СвИП.class));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            response.build(egrip);
         }else{
             response.setPossiblySelfEmployed(true);
             response.empty("Если вы являетесь самозанятым, заполните информацию о себе");

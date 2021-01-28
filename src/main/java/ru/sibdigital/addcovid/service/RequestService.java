@@ -1,6 +1,5 @@
 package ru.sibdigital.addcovid.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -15,15 +14,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.dto.*;
-import ru.sibdigital.addcovid.dto.egrip.EGRIP;
-import ru.sibdigital.addcovid.dto.egrul.EGRUL;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.model.classifier.gov.*;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.repository.classifier.gov.OkvedRepo;
 import ru.sibdigital.addcovid.repository.classifier.gov.RegEgripRepo;
 import ru.sibdigital.addcovid.repository.classifier.gov.RegEgrulRepo;
-import ru.sibdigital.addcovid.utils.JuridicalUtils;
+import ru.sibdigital.addcovid.repository.classifier.gov.RegFilialRepo;
 import ru.sibdigital.addcovid.utils.PasswordGenerator;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
@@ -129,6 +126,9 @@ public class RequestService {
 
     @Autowired
     private RegDocRequestEmployeeRepo regDocRequestEmployeeRepo;
+
+    @Autowired
+    private RegFilialRepo regFilialRepo;
 
     @Value("${upload.path:/uploads}")
     String uploadingDir;
@@ -482,21 +482,27 @@ public class RequestService {
 
         String code = SHA256Generator.generate(organizationDto.getOrganizationInn(), organizationDto.getOrganizationName(), String.valueOf(System.currentTimeMillis()));
 
-        String juradress = "";
-        try {
-            if (typeOrganization == OrganizationTypes.JURIDICAL.getValue()) {
-                regEgrul = regEgrulRepo.findByInn(organizationDto.getOrganizationInn());
-                final EGRUL.СвЮЛ svedul = mapper.readValue(regEgrul.getData(), EGRUL.СвЮЛ.class);
-                juradress = JuridicalUtils.constructJuridicalAdress(svedul);
-            } else if (typeOrganization == OrganizationTypes.PHYSICAL.getValue()) {
-                regEgrip = regEgripRepo.findByInn(organizationDto.getOrganizationInn());
-                final EGRIP.СвИП svip = mapper.readValue(regEgrip.getData(), EGRIP.СвИП.class);
-                juradress = JuridicalUtils.constructJuridicalAdress(svip);
+        RegOrganizationClassifier regOrganizationClassifier = null;
+        if (typeOrganization == OrganizationTypes.JURIDICAL.getValue() || typeOrganization == OrganizationTypes.FILIATION.getValue()
+                || typeOrganization == OrganizationTypes.REPRESENTATION.getValue() || typeOrganization == OrganizationTypes.DETACHED.getValue()) {
+            regEgrul = regEgrulRepo.findById(organizationDto.getEgrulId()).orElse(null);
+            if (regEgrul != null) {
+                RegFilial regFilial = null;
+                if (typeOrganization == OrganizationTypes.FILIATION.getValue() || typeOrganization == OrganizationTypes.REPRESENTATION.getValue()) {
+                    regFilial = regFilialRepo.findById(organizationDto.getFilialId()).orElse(null);
+                }
+                regOrganizationClassifier = RegOrganizationClassifier.builder()
+                        .regEgrul(regEgrul)
+                        .regFilial(regFilial)
+                        .build();
             }
-        } catch (JsonProcessingException e) {
-            log.error(e.getMessage(), e);
-        }catch (Exception e) {
-            log.error(e.getMessage(), e);
+        } else if (typeOrganization == OrganizationTypes.PHYSICAL.getValue()) {
+            regEgrip = regEgripRepo.findById(organizationDto.getEgripId()).orElse(null);
+            if (regEgrip != null) {
+                regOrganizationClassifier = RegOrganizationClassifier.builder()
+                        .regEgrip(regEgrip)
+                        .build();
+            }
         }
 
         String name = organizationDto.getOrganizationName() != null && !organizationDto.getOrganizationName().isEmpty()
@@ -506,7 +512,8 @@ public class RequestService {
                 .shortName(organizationDto.getOrganizationShortName())
                 .inn(organizationDto.getOrganizationInn())
                 .ogrn(organizationDto.getOrganizationOgrn())
-                .addressJur(juradress)
+                .kpp(organizationDto.getOrganizationKpp())
+                .addressJur(organizationDto.getOrganizationAddressJur())
                 .okvedAdd(organizationDto.getOrganizationOkvedAdd())
                 .okved(organizationDto.getOrganizationOkved())
                 .email(organizationDto.getOrganizationEmail())
@@ -518,6 +525,7 @@ public class RequestService {
                 .isDeleted(false)
                 .isActivated(false)
                 .hashCode(code)
+                .regOrganizationClassifier(regOrganizationClassifier)
                 .build();
 
         clsOrganizationRepo.save(clsOrganization);
