@@ -10,15 +10,16 @@ import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.dto.EgripResponse;
 import ru.sibdigital.addcovid.dto.EgrulResponse;
 import ru.sibdigital.addcovid.dto.OrganizationDto;
-import ru.sibdigital.addcovid.dto.egrip.EGRIP;
-import ru.sibdigital.addcovid.dto.egrul.EGRUL;
 import ru.sibdigital.addcovid.model.ClsOrganization;
+import ru.sibdigital.addcovid.model.OrganizationTypes;
 import ru.sibdigital.addcovid.model.classifier.gov.RegEgrip;
 import ru.sibdigital.addcovid.model.classifier.gov.RegEgrul;
 import ru.sibdigital.addcovid.service.EmailService;
 import ru.sibdigital.addcovid.service.RequestService;
 import ru.sibdigital.addcovid.service.SettingService;
 import ru.sibdigital.addcovid.service.crassifier.EgrulService;
+
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -78,11 +79,11 @@ public class RegistrationController {
                     applicationConstants.getApplicationName() + " перейдите по ссылке: <a href=\"" + activateUrl + "\">Активация учетной записи</a><br/>" +
                     "Если вы не регистрировали личный кабинет на портале " +
                     applicationConstants.getApplicationName() + ", проигнорируйте это сообщение";
-            boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(),
-                    "Регистрация на портале " + applicationConstants.getApplicationName(), text);
-            if (!emailSent) {
-                return "Не удалось отправить письмо";
-            }
+//            boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(),
+//                    "Регистрация на портале " + applicationConstants.getApplicationName(), text);
+//            if (!emailSent) {
+//                return "Не удалось отправить письмо";
+//            }
             return "Ок";
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -107,6 +108,7 @@ public class RegistrationController {
 
     @PostMapping("/recovery")
     public @ResponseBody String recovery(@RequestBody OrganizationDto dto) {
+        // TODO переделать, тк по инн могут быть несколько организаций
         ClsOrganization clsOrganization = requestService.findOrganizationByInn(dto.getOrganizationInn());
         if (clsOrganization != null) {
             String inn = dto.getOrganizationInn();
@@ -148,7 +150,9 @@ public class RegistrationController {
         if (email.equals(organization.getEmail())) {
             emailLinked = true;
         } else {
-            if (organization.getInn().length() == 10) {
+            int typeOrganization = organization.getIdTypeOrganization().intValue();
+            if (typeOrganization == OrganizationTypes.JURIDICAL.getValue() || typeOrganization == OrganizationTypes.FILIATION.getValue()
+                    || typeOrganization == OrganizationTypes.REPRESENTATION.getValue() || typeOrganization == OrganizationTypes.DETACHED.getValue()) {
                 RegEgrul egrul = egrulService.getEgrul(organization.getInn());
                 if (egrul != null) {
                     EgrulResponse response = new EgrulResponse();
@@ -158,14 +162,16 @@ public class RegistrationController {
                         emailLinked = true;
                     }
                 }
-            } else {
-                RegEgrip egrip = egrulService.getEgrip(organization.getInn());
-                if (egrip != null) {
+            } else if (typeOrganization == OrganizationTypes.IP.getValue() || typeOrganization == OrganizationTypes.KFH.getValue()) {
+                List<RegEgrip> egrips = egrulService.getEgrip(organization.getInn());
+                if (egrips != null && egrips.size() > 0) {
                     EgripResponse response = new EgripResponse();
-                    response.build(egrip);
-                    if (response.getData().getEmail() != null && !response.getData().getEmail().isBlank()
-                            && email.equals(response.getData().getEmail())) {
-                        emailLinked = true;
+                    response.build(egrips);
+                    for (EgripResponse.Data data: response.getData()) {
+                        if (data.getEmail() != null && !data.getEmail().isBlank()
+                                && email.equals(data.getEmail())) {
+                            emailLinked = true;
+                        }
                     }
                 }
             }

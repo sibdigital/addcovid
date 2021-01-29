@@ -3,8 +3,12 @@ package ru.sibdigital.addcovid.dto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.sibdigital.addcovid.dto.egrip.EGRIP;
 import ru.sibdigital.addcovid.dto.egrip.EGRIP.СвИП;
+import ru.sibdigital.addcovid.model.OrganizationTypes;
 import ru.sibdigital.addcovid.model.classifier.gov.RegEgrip;
 import ru.sibdigital.addcovid.utils.JuridicalUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class EgripResponse {
 
@@ -45,14 +49,16 @@ public class EgripResponse {
         private String name;
         private String email;
         private String jurAddress;
+        private int type;
 
-        public Data(Long id, String inn, String ogrn, String name, String email, String jurAddress) {
+        public Data(Long id, String inn, String ogrn, String name, String email, String jurAddress, int type) {
             this.id = id;
             this.inn = inn;
             this.ogrn = ogrn;
             this.name = name;
             this.email = email;
             this.jurAddress = jurAddress;
+            this.type = type;
         }
 
         public Long getId() {
@@ -79,34 +85,50 @@ public class EgripResponse {
             return jurAddress;
         }
 
+        public int getType() {
+            return type;
+        }
+
         public String getMessage() {
             return message;
         }
     }
 
-    private Data data;
+    private List<Data> data;
 
-    public Data getData() {
+    public List<Data> getData() {
         return data;
     }
 
-    public void build(RegEgrip egrip) {
+    public void build(List<RegEgrip> egrips) {
         try {
-            СвИП sved = mapper.readValue(egrip.getData(), EGRIP.СвИП.class);
+            this.data = new ArrayList<>();
+            for (RegEgrip egrip: egrips) {
+                СвИП sved = mapper.readValue(egrip.getData(), EGRIP.СвИП.class);
 
-            Long id = egrip.getId();
-            String inn = sved.getИННФЛ();
-            String ogrn = sved.getОГРНИП();
-            String name = "";
-            if (sved.getСвФЛ() != null && sved.getСвФЛ().getФИОРус() != null) {
-                name = sved.getСвФЛ().getФИОРус().getФамилия()
-                        + " " + sved.getСвФЛ().getФИОРус().getИмя()
-                        + " " + sved.getСвФЛ().getФИОРус().getОтчество();
+                Long id = egrip.getId();
+                String inn = sved.getИННФЛ();
+                String ogrn = sved.getОГРНИП();
+                String name = "";
+                int type = 0;
+                if (sved.getКодВидИП().equals("1")) {
+                    type = OrganizationTypes.IP.getValue();
+                    name += "ИП ";
+                } else if (sved.getКодВидИП().equals("2")) {
+                    type = OrganizationTypes.KFH.getValue();
+                    name += "КФХ ";
+                }
+                if (sved.getСвФЛ() != null && sved.getСвФЛ().getФИОРус() != null) {
+                    name += sved.getСвФЛ().getФИОРус().getФамилия()
+                            + " " + sved.getСвФЛ().getФИОРус().getИмя()
+                            + " " + sved.getСвФЛ().getФИОРус().getОтчество();
+                }
+                String email = sved.getСвАдрЭлПочты() != null ? sved.getСвАдрЭлПочты().getEMail() : "";
+                String jurAddress = JuridicalUtils.constructJuridicalAdress(sved);
+
+                data.add(new Data(id, inn, ogrn, name, email, jurAddress, type));
             }
-            String email = sved.getСвАдрЭлПочты() != null ? sved.getСвАдрЭлПочты().getEMail() : "";
-            String jurAddress = JuridicalUtils.constructJuridicalAdress(sved);
 
-            this.data = new Data(id, inn, ogrn, name, email, jurAddress);
             isFinded = true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,7 +137,7 @@ public class EgripResponse {
 
     public void empty(String message) {
         this.message = message;
-        this.data = new  Data(null, "", "", "", "", "");
+        this.data = new ArrayList<>(0);
         isFinded = false;
     }
 }

@@ -45,6 +45,16 @@ public class RegFilial {
     @Basic
     @Column(name = "type")
     private Integer type;
+    @Basic
+    @Column(name = "kladr_address")
+    private String kladrAddress;
+    @Basic
+    @Column(name = "kladr_address_hash")
+    private Integer kladrAddressHash;
+    @Basic
+    @Column(name = "kladr_code")
+    private String kladrCode;
+
 
     public Long getId() {
         return id;
@@ -100,23 +110,44 @@ public class RegFilial {
         this.type = type;
     }
 
+    public String getKladrAddress() {
+        return kladrAddress;
+    }
+
+    public void setKladrAddress(String kladrAddress) {
+        this.kladrAddress = kladrAddress;
+    }
+
+    public Integer getKladrAddressHash() {
+        return kladrAddressHash;
+    }
+
+    public void setKladrAddressHash(Integer kladrAddressHash) {
+        this.kladrAddressHash = kladrAddressHash;
+    }
+
+    public String getKladrCode() {
+        return kladrCode;
+    }
+
+    public void setKladrCode(String kladrCode) {
+        this.kladrCode = kladrCode;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegFilial regFilial = (RegFilial) o;
         return Objects.equals(id, regFilial.id) &&
-                Objects.equals(inn, regFilial.inn) &&
-                Objects.equals(kpp, regFilial.kpp) &&
-                Objects.equals(fullName, regFilial.fullName) &&
-                Objects.equals(data, regFilial.data) &&
                 Objects.equals(egrul, regFilial.egrul) &&
-                Objects.equals(type, regFilial.type);
+                Objects.equals(type, regFilial.type) &&
+                Objects.equals(kladrAddressHash, regFilial.kladrAddressHash) ;
     }
 
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, inn, kpp, fullName, data, egrul, type);
+        return Objects.hash(id, egrul, type, kladrAddressHash);
     }
 }

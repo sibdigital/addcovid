@@ -1,17 +1,15 @@
 package ru.sibdigital.addcovid.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.sibdigital.addcovid.dto.EgripResponse;
 import ru.sibdigital.addcovid.dto.EgrulResponse;
-import ru.sibdigital.addcovid.dto.egrip.EGRIP;
-import ru.sibdigital.addcovid.dto.egrul.EGRUL;
 import ru.sibdigital.addcovid.model.classifier.gov.RegEgrip;
 import ru.sibdigital.addcovid.model.classifier.gov.RegEgrul;
 import ru.sibdigital.addcovid.service.crassifier.EgrulService;
+
+import java.util.List;
 
 @Log4j2
 @RestController
@@ -37,9 +35,9 @@ public class ClassifierController {
     @GetMapping("/egrip")
     public EgripResponse getEgrip(@RequestParam(name = "inn") String inn) {
         EgripResponse response = new EgripResponse();
-        RegEgrip egrip = egrulService.getEgrip(inn);
-        if (egrip != null) {
-            response.build(egrip);
+        List<RegEgrip> egrips = egrulService.getEgrip(inn);
+        if (egrips != null && egrips.size() > 0) {
+            response.build(egrips);
         }else{
             response.setPossiblySelfEmployed(true);
             response.empty("Если вы являетесь самозанятым, заполните информацию о себе");

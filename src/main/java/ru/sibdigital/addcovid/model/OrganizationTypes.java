@@ -2,11 +2,13 @@ package ru.sibdigital.addcovid.model;
 
 public enum OrganizationTypes {
     JURIDICAL(1),
+    PHYSICAL(2),
+    SELF_EMPLOYED(3),
     FILIATION(4),
     REPRESENTATION(5),
     DETACHED(6),
-    PHYSICAL(2),
-    SELF_EMPLOYED(3);
+    IP(7),
+    KFH(8);
 
     private final int value;
 

@@ -197,7 +197,7 @@ let step2 = {
                 {
                     view: 'combo',
                     id: 'selectOrg',
-                    label: 'Организация',
+                    label: 'Выберите организацию',
                     labelPosition: 'top',
                     hidden: true,
                     required: true,
@@ -212,6 +212,27 @@ let step2 = {
                                 $$('organizationShortName').setValue(data.shortName);
                                 $$('organizationOgrn').setValue(data.ogrn);
                                 $$('organizationKpp').setValue(data.kpp);
+                                $$('organizationAddressJur').setValue(data.jurAddress);
+                            }
+                        }
+                    }
+                },
+                {
+                    view: 'combo',
+                    id: 'selectIP',
+                    label: 'Выберите ИП/КФХ',
+                    labelPosition: 'top',
+                    hidden: true,
+                    required: true,
+                    on: {
+                        onChange(newVal, oldVal) {
+                            if (newVal && newVal !== oldVal) {
+                                const data = organizations.find(org => org.id === newVal).data;
+                                $$('egripId').setValue(data.id);
+                                $$('organizationType').setValue(data.type);
+                                $$('organizationName').setValue(data.name);
+                                $$('organizationShortName').setValue(data.shortName);
+                                $$('organizationOgrn').setValue(data.ogrn);
                                 $$('organizationAddressJur').setValue(data.jurAddress);
                             }
                         }
@@ -436,12 +457,12 @@ function loadData(type, inn) {
                     });
                     $$('selectOrg').refresh();
                     $$('selectOrg').show();
+                    $$('selectIP').hide();
                     $$('form').setValues({
                         egripId: '',
                         searchInn: inn,
-                        organizationName: result.name,
-                        organizationShortName: (result.shortName ? result.shortName : result.name),
-                        organizationInn: result.inn,
+                        isSelfEmployed: false,
+                        organizationInn: inn,
                     });
                 } else {
                     $$('organizationShortName').define('label', 'Наименование организации');
@@ -469,29 +490,54 @@ function loadData(type, inn) {
             }
         } else {
             if (response.finded == true){
-                const result = response.data;
-                $$('organizationShortName').define('label', 'ФИО ИП');
-                $$('organizationShortName').define('readonly', true);
-                $$('organizationShortName').refresh();
-                $$('organizationShortName').show();
-                $$('selectOrg').hide();
                 $$('organizationOgrn').show();
                 $$('organizationKpp').hide();
-                $$('form').setValues({
-                    egrulId: '',
-                    egripId: result.id,
-                    filialId: '',
-                    organizationType: '2',
-                    searchInn: inn,
-                    isSelfEmployed: false,
-                    organizationName: result.name,
-                    organizationShortName: (result.shortName ? result.shortName : result.name),
-                    organizationInn: result.inn,
-                    organizationOgrn: result.ogrn,
-                    organizationKpp: '',
-                    organizationAddressJur: result.jurAddress,
-                    organizationEmail: result.email
-                });
+                const result = response.data;
+                if (result.length > 1) {
+                    $$('organizationShortName').hide();
+                    organizations = result.map(egrip => {
+                        return {id: egrip.id, data: egrip}
+                    })
+                    $$('selectIP').define('options', {
+                        body: {
+                            template: '<div>#data.name#</div><div>#data.jurAddress#</div>',
+                        },
+                        data: organizations,
+                    });
+                    $$('selectOrg').hide();
+                    $$('selectIP').refresh();
+                    $$('selectIP').show();
+                    $$('form').setValues({
+                        egrulId: '',
+                        filialId: '',
+                        searchInn: inn,
+                        isSelfEmployed: false,
+                        organizationInn: inn,
+                        organizationKpp: '',
+                    });
+                } else {
+                    $$('organizationShortName').define('label', 'ФИО ИП');
+                    $$('organizationShortName').define('readonly', true);
+                    $$('organizationShortName').refresh();
+                    $$('organizationShortName').show();
+                    $$('selectOrg').hide();
+                    $$('selectIP').hide();
+                    $$('form').setValues({
+                        egrulId: '',
+                        egripId: result[0].id,
+                        filialId: '',
+                        organizationType: '2',
+                        searchInn: inn,
+                        isSelfEmployed: false,
+                        organizationName: result.name,
+                        organizationShortName: result[0].name,
+                        organizationInn: result[0].inn,
+                        organizationOgrn: result[0].ogrn,
+                        organizationKpp: '',
+                        organizationAddressJur: result[0].jurAddress,
+                        organizationEmail: result[0].email
+                    });
+                }
                 doNext = true;
             }else if (response.possiblySelfEmployed == true){
                 $$('organizationShortName').define('label', 'ФИО cамозанятого');
@@ -499,6 +545,7 @@ function loadData(type, inn) {
                 $$('organizationShortName').refresh();
                 $$('organizationShortName').show();
                 $$('selectOrg').hide();
+                $$('selectIP').hide();
                 $$('organizationOgrn').hide();
                 $$('organizationKpp').hide();
                 $$('form').setValues({

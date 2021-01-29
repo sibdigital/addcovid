@@ -11,7 +11,8 @@ import java.util.List;
 @Repository
 public interface RegEgripRepo extends JpaRepository<RegEgrip, Long> {
 
-    RegEgrip findByInn(String inn);
+    List<RegEgrip> findByInnAndActiveStatus(String inn, int status);
+
     @Query("select r from RegEgrip r where inn in :inns")
     List<RegEgrip> findAllByInnList(@Param("inns") List<String> inn);
 }

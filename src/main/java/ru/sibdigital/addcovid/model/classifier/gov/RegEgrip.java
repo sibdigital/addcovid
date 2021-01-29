@@ -6,6 +6,7 @@ import ru.sibdigital.addcovid.model.Jsonb;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 
@@ -26,14 +27,26 @@ public class RegEgrip {
     @Column(name = "inn", nullable = true, length = 12)
     private String inn;
     @Basic
+    @Column(name = "ogrn", nullable = false, length = 15)
+    private String ogrn;
+    @Basic
+    @Column(name = "iogrn")
+    private Long iogrn;
+    @Basic
     @Column(name = "data", nullable = true, columnDefinition = "jsonb")
     @Type(type = "Jsonb")
     private String data;
     @Basic
     @Column(name = "id_migration")
     private Long idMigration;
+    @Basic
+    @Column(name = "date_actual")
+    private Date dateActual;
+    @Basic
+    @Column(name = "active_status")
+    private Integer activeStatus;
 
-    @OneToMany(mappedBy = "regEgrip")
+    @OneToMany(mappedBy = "regEgrip", fetch = FetchType.LAZY)
     private Set<RegEgripOkved> regEgripOkveds;
 
     public Long getId() {
@@ -60,6 +73,22 @@ public class RegEgrip {
         this.inn = inn;
     }
 
+    public String getOgrn() {
+        return ogrn;
+    }
+
+    public void setOgrn(String ogrn) {
+        this.ogrn = ogrn;
+    }
+
+    public Long getIogrn() {
+        return iogrn;
+    }
+
+    public void setIogrn(Long iogrn) {
+        this.iogrn = iogrn;
+    }
+
     public String getData() {
         return data;
     }
@@ -84,18 +113,32 @@ public class RegEgrip {
         this.idMigration = idMigration;
     }
 
+    public Date getDateActual() {
+        return dateActual;
+    }
+
+    public void setDateActual(Date dateActual) {
+        this.dateActual = dateActual;
+    }
+
+    public Integer getActiveStatus() {
+        return activeStatus;
+    }
+
+    public void setActiveStatus(Integer activeStatus) {
+        this.activeStatus = activeStatus;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegEgrip regEgrip = (RegEgrip) o;
-        return Objects.equals(inn, regEgrip.inn);
+        return Objects.equals(ogrn, regEgrip.ogrn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(inn);
+        return Objects.hash(ogrn);
     }
-
-
 }

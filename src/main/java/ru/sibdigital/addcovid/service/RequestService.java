@@ -496,7 +496,7 @@ public class RequestService {
                         .regFilial(regFilial)
                         .build();
             }
-        } else if (typeOrganization == OrganizationTypes.PHYSICAL.getValue()) {
+        } else if (typeOrganization == OrganizationTypes.IP.getValue() || typeOrganization == OrganizationTypes.KFH.getValue()) {
             regEgrip = regEgripRepo.findById(organizationDto.getEgripId()).orElse(null);
             if (regEgrip != null) {
                 regOrganizationClassifier = RegOrganizationClassifier.builder()
@@ -550,7 +550,8 @@ public class RequestService {
             clsOrganizationContactRepo.save(clsOrganizationContact);
         }
 
-        if (typeOrganization == OrganizationTypes.JURIDICAL.getValue()) {
+        if (typeOrganization == OrganizationTypes.JURIDICAL.getValue() || typeOrganization == OrganizationTypes.FILIATION.getValue()
+                || typeOrganization == OrganizationTypes.REPRESENTATION.getValue() || typeOrganization == OrganizationTypes.DETACHED.getValue()) {
             for (RegEgrulOkved regEgrulOkved: regEgrul.getRegEgrulOkveds()) {
                 Okved okved = okvedRepo.findOkvedByIdSerial(regEgrulOkved.getIdOkved());
                 RegOrganizationOkvedId regOrganizationOkvedId = RegOrganizationOkvedId.builder()
@@ -563,7 +564,7 @@ public class RequestService {
                         .build();
                 regOrganizationOkvedRepo.save(regOrganizationOkved);
             }
-        } else if (typeOrganization == OrganizationTypes.PHYSICAL.getValue()) {
+        } else if (typeOrganization == OrganizationTypes.IP.getValue() || typeOrganization == OrganizationTypes.KFH.getValue()) {
             for (RegEgripOkved regEgripOkved: regEgrip.getRegEgripOkveds()) {
                 Okved okved = okvedRepo.findOkvedByIdSerial(regEgripOkved.getIdOkved());
                 RegOrganizationOkvedId regOrganizationOkvedId = RegOrganizationOkvedId.builder()
