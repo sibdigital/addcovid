@@ -231,7 +231,7 @@ let step2 = {
                                 $$('egripId').setValue(data.id);
                                 $$('organizationType').setValue(data.type);
                                 $$('organizationName').setValue(data.name);
-                                $$('organizationShortName').setValue(data.shortName);
+                                $$('organizationShortName').setValue(data.name);
                                 $$('organizationOgrn').setValue(data.ogrn);
                                 $$('organizationAddressJur').setValue(data.jurAddress);
                             }
@@ -474,7 +474,7 @@ function loadData(type, inn) {
                         egrulId: result.id,
                         egripId: '',
                         filialId: '',
-                        organizationType: '1',
+                        organizationType: result.type,
                         searchInn: inn,
                         isSelfEmployed: false,
                         organizationName: result.name,
@@ -526,10 +526,10 @@ function loadData(type, inn) {
                         egrulId: '',
                         egripId: result[0].id,
                         filialId: '',
-                        organizationType: '2',
+                        organizationType: result[0].type,
                         searchInn: inn,
                         isSelfEmployed: false,
-                        organizationName: result.name,
+                        organizationName: result[0].name,
                         organizationShortName: result[0].name,
                         organizationInn: result[0].inn,
                         organizationOgrn: result[0].ogrn,
@@ -601,6 +601,7 @@ function next(page, mail) {
         }
 
         $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 2</span>`)
+        $$('invalidMessagesStep2').setValue('');
         $$("description").setHTML(descrStep2)
     }else{
         if (document.body.clientWidth < 480) {
@@ -619,7 +620,7 @@ function next(page, mail) {
 function registrate() {
     $$('send_btn').disable();
 
-    $$("invalidMessagesStep2").config.height = 19;
+    $$("invalidMessagesStep2").config.height = 35;
     $$("invalidMessagesStep2").resize()
 
     if ($$('form').validate()) {
@@ -637,8 +638,6 @@ function registrate() {
             if (text === 'Ок') {
                 next(2, $$('organizationEmail').getValue());
             } else if (text === 'Не удалось отправить письмо') {
-                $$("invalidMessagesStep2").config.height = 35;
-                $$("invalidMessagesStep2").resize()
                 $$("invalidMessagesStep2").setValue('Не удалось отправить ссылку для активации на указанный адрес электронной почты')
                 //webix.message('Не удалось отправить ссылку для активации на указанный адрес электронной почты', 'error');
             } else {
@@ -688,32 +687,10 @@ function searchByInn(){
             return;
         }
 
-        webix.ajax().get('checkInn?inn=' + inn).then(function (data) {
-            const result = data.text();
-            if (result == "Данный ИНН уже зарегистрирован в системе"){
-                // var message = 'Ранее вы уже подавали заявки на портале Работающая Бурятия. ' +
-                //     'В настоящее время ведется перенос истории ваших заявок в личный кабинет. ' +
-                //     'Доступ к личному кабинету будет предоставлен в ближайшее время.' +
-                //     'Сейчас вы можете актуализировать заявку по адресу http://rabota.govrb.ru/actualize_form';
-                // webix.alert({
-                //     title: "ВНИМАНИЕ!",
-                //     ok: "Актуализировать",
-                //     text: message
-                // }).then(function () {
-                //     window.location.replace('http://rabota.govrb.ru/actualize_form');
-                // });;
-                $$("invalidMessages").setValue(result);
-                $$('searchInn').hideProgress();
-            } else if (result !== 'ИНН не зарегистрирован') {
-                $$("invalidMessages").setValue(result);
-                //webix.message(result, 'error');
-                $$('searchInn').hideProgress();
-                $$('egrul_load_button').enable();
-            } else {
-                loadData(type, inn);
-                $$('egrul_load_button').enable();
-            }
-        })
+        loadData(type, inn);
+
+        $$('searchInn').hideProgress();
+        $$('egrul_load_button').enable();
     }, 500);
 
 }

@@ -21,6 +21,8 @@ import ru.sibdigital.addcovid.repository.classifier.gov.OkvedRepo;
 import ru.sibdigital.addcovid.repository.classifier.gov.RegEgripRepo;
 import ru.sibdigital.addcovid.repository.classifier.gov.RegEgrulRepo;
 import ru.sibdigital.addcovid.repository.classifier.gov.RegFilialRepo;
+import ru.sibdigital.addcovid.repository.specification.ClsOrganizationSearchCriteria;
+import ru.sibdigital.addcovid.repository.specification.ClsOrganizationSpecification;
 import ru.sibdigital.addcovid.utils.PasswordGenerator;
 import ru.sibdigital.addcovid.utils.SHA256Generator;
 
@@ -466,6 +468,12 @@ public class RequestService {
 
     public ClsOrganization findOrganizationByInn(String inn) {
         return clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
+    }
+
+    public List<ClsOrganization> findOrganizations(ClsOrganizationSearchCriteria searchCriteria) {
+        ClsOrganizationSpecification specification = new ClsOrganizationSpecification();
+        specification.setSearchCriteria(searchCriteria);
+        return clsOrganizationRepo.findAll(specification);
     }
 
     @Transactional

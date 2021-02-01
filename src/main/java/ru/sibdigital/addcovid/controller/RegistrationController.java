@@ -12,14 +12,17 @@ import ru.sibdigital.addcovid.dto.EgrulResponse;
 import ru.sibdigital.addcovid.dto.OrganizationDto;
 import ru.sibdigital.addcovid.model.ClsOrganization;
 import ru.sibdigital.addcovid.model.OrganizationTypes;
+import ru.sibdigital.addcovid.model.RegOrganizationClassifier;
 import ru.sibdigital.addcovid.model.classifier.gov.RegEgrip;
 import ru.sibdigital.addcovid.model.classifier.gov.RegEgrul;
+import ru.sibdigital.addcovid.repository.specification.ClsOrganizationSearchCriteria;
 import ru.sibdigital.addcovid.service.EmailService;
 import ru.sibdigital.addcovid.service.RequestService;
 import ru.sibdigital.addcovid.service.SettingService;
 import ru.sibdigital.addcovid.service.crassifier.EgrulService;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Controller
@@ -54,22 +57,24 @@ public class RegistrationController {
         return "registration";
     }
 
-    @GetMapping("/checkInn")
-    public @ResponseBody String checkInn(@RequestParam(value = "inn") String inn) {
-        ClsOrganization clsOrganization = requestService.findOrganizationByInn(inn);
-        if (clsOrganization != null) {
-            return "Данный ИНН уже зарегистрирован в системе";
-        }
-        return "ИНН не зарегистрирован";
-    }
-
     @PostMapping("/registration")
     public @ResponseBody String postRegistration(@RequestBody OrganizationDto organizationDto) {
         try {
-            ClsOrganization clsOrganization = requestService.findOrganizationByInn(organizationDto.getOrganizationInn());
+            List<ClsOrganization> organizations = findOrganizationsByInn(organizationDto.getOrganizationInn());
+            ClsOrganization clsOrganization = findExistOrganization(organizationDto, organizations);
             if (clsOrganization != null) {
-                return "Данный ИНН уже зарегистрирован в системе";
+                return "Данная организация уже зарегистрирована";
             }
+            // проверим email
+            if (organizations != null && organizations.size() > 0) {
+                clsOrganization = organizations.stream()
+                        .filter(organization -> organization.getEmail().equals(organizationDto.getOrganizationEmail()))
+                        .findFirst().orElse(null);
+                if (clsOrganization != null) {
+                    return "Данный адрес электронной почты уже привязан к другой организации с таким ИНН";
+                }
+            }
+
             clsOrganization = requestService.saveClsOrganization(organizationDto);
             // отправим письмо со ссылкой на активацию
             String activateUrl = settingService.findActualByKey("activationUrl", "");
@@ -89,6 +94,41 @@ public class RegistrationController {
             log.error(e.getMessage(), e);
             return "Не удалось зарегистрировать";
         }
+    }
+
+    private ClsOrganization findExistOrganization(OrganizationDto dto, List<ClsOrganization> organizations) {
+        if (organizations == null) {
+            return null;
+        }
+        ClsOrganization clsOrganization = null;
+        for (ClsOrganization organization: organizations) {
+            if (!Objects.equals(organization.getIdTypeOrganization(), dto.getOrganizationType())) {
+                continue;
+            }
+            RegOrganizationClassifier regOrganizationClassifier = organization.getRegOrganizationClassifier();
+            Long regEgrulId = regOrganizationClassifier == null ? null : regOrganizationClassifier.getRegEgrul() == null ? null : regOrganizationClassifier.getRegEgrul().getId();
+            if (!Objects.equals(regEgrulId, dto.getEgrulId())) {
+                continue;
+            }
+            Long regEgripId = regOrganizationClassifier == null ? null : regOrganizationClassifier.getRegEgrip() == null ? null : regOrganizationClassifier.getRegEgrip().getId();
+            if (!Objects.equals(regEgripId, dto.getEgripId())) {
+                continue;
+            }
+            Long regFilialId = regOrganizationClassifier == null ? null : regOrganizationClassifier.getRegFilial() == null ? null : regOrganizationClassifier.getRegFilial().getId();
+            if (!Objects.equals(regFilialId, dto.getFilialId())) {
+                continue;
+            }
+            clsOrganization = organization;
+            break;
+        }
+        return clsOrganization;
+    }
+
+    private List<ClsOrganization> findOrganizationsByInn(String inn) {
+        ClsOrganizationSearchCriteria searchCriteria = new ClsOrganizationSearchCriteria();
+        searchCriteria.setInn(inn);
+
+        return requestService.findOrganizations(searchCriteria);
     }
 
     @GetMapping("/activate")
