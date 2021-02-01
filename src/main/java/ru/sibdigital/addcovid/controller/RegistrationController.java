@@ -23,6 +23,7 @@ import ru.sibdigital.addcovid.service.crassifier.EgrulService;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Controller
@@ -147,33 +148,29 @@ public class RegistrationController {
     }
 
     @PostMapping("/recovery")
-    public @ResponseBody String recovery(@RequestBody OrganizationDto dto) {
-        // TODO переделать, тк по инн могут быть несколько организаций
-        ClsOrganization clsOrganization = requestService.findOrganizationByInn(dto.getOrganizationInn());
-        if (clsOrganization != null) {
-            String inn = dto.getOrganizationInn();
-            if (inn == null || inn.isBlank()) {
-                return "ИНН не указан";
+    public @ResponseBody String recovery(@RequestBody OrganizationDto organizationDto) {
+        List<ClsOrganization> clsOrganizations = findOrganizationsByInn(organizationDto.getOrganizationInn()).stream()
+                .filter(org -> org.getActivated()).collect(Collectors.toList());
+        if (clsOrganizations != null && clsOrganizations.size() > 0) {
+            ClsOrganization organization = null;
+            for (ClsOrganization clsOrganization: clsOrganizations) {
+                boolean emailLinked = false;
+                try {
+                    emailLinked = isEmailLinked(clsOrganization, organizationDto.getOrganizationEmail());
+                } catch (Exception e) {
+                    log.info(e.getMessage(), e);
+                }
+                if (emailLinked) {
+                    organization = clsOrganization;
+                    break;
+                }
             }
-            String email = dto.getOrganizationEmail();
-            if (email == null || email.isBlank()) {
-                return "Адрес электронной почты не указан";
-            }
-
-            boolean emailLinked;
-            try {
-                emailLinked = isEmailLinked(clsOrganization, email);
-            } catch (Exception e) {
-                e.getMessage();
-                return "Не удалось проверить адрес электронной почты";
-            }
-
-            if (emailLinked) {
-                String newPassword = requestService.changeOrganizationPassword(dto.getOrganizationInn());
-                boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(),
+            if (organization != null) {
+                String newPassword = requestService.changeOrganizationPassword(organization);
+                boolean emailSent = emailService.sendSimpleMessageNoAsync(organization.getEmail(),
                         applicationConstants.getApplicationName() + ". Восстановление пароля",
-                        "По ИНН " + clsOrganization.getInn() + " произведена смена пароля. " +
-                                "Ваш новый пароль от личного кабинета на портале Работающая Бурятия: " + newPassword);
+                        "По ИНН " + organization.getInn() + " произведена смена пароля. " +
+                                "Ваш новый пароль от личного кабинета на портале " + applicationConstants.getApplicationName() + ":" + newPassword);
                 if (!emailSent) {
                     return "Не удалось отправить письмо";
                 }
@@ -182,10 +179,10 @@ public class RegistrationController {
                 return "Адрес электронной почты не привязан к учетной записи";
             }
         }
-        return "ИНН не найден";
+        return "Организация не найдена";
     }
 
-    private boolean isEmailLinked(ClsOrganization organization, String email) throws Exception {
+    private boolean isEmailLinked(ClsOrganization organization, String email) {
         boolean emailLinked = false;
         if (email.equals(organization.getEmail())) {
             emailLinked = true;

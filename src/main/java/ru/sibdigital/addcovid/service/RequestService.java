@@ -591,9 +591,7 @@ public class RequestService {
     }
 
     @Transactional
-    public String changeOrganizationPassword(String inn) {
-
-        ClsOrganization clsOrganization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
+    public String changeOrganizationPassword(ClsOrganization clsOrganization) {
         if (clsOrganization != null) {
             ClsPrincipal clsPrincipal = clsOrganization.getPrincipal();
             if (clsPrincipal == null) {

@@ -224,6 +224,7 @@ function next(page, mail) {
         }
 
         $$("step").setValue(`<span style="font-size: 1rem; color: #fff6f6">Шаг 2</span>`)
+        $$('invalidMessagesStep2').setValue('');
         $$("description").setHTML(descrStep2)
     }else{
         if (document.body.clientWidth < 480) {
@@ -255,17 +256,8 @@ function checkInn() {
         return;
     }
 
-    webix.ajax().get('checkInn?inn=' + inn).then(function (data) {
-        const result = data.text();
-        if (result === 'ИНН не зарегистрирован') {
-            $$("invalidMessagesStep1").setValue(result);
-            $$('searchInn').hideProgress();
-            $$('next_button').enable();
-        } else {
-            $$('next_button').enable();
-            next(1);
-        }
-    })
+    $$('next_button').enable();
+    next(1);
 }
 
 function recovery() {
