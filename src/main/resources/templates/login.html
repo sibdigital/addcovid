@@ -24,6 +24,10 @@
         webix.message("Введен неверный логин или пароль", "error")
     }
 
+    const descLogin = '<span style="font-size: 0.8rem; color: #6e6e6e">Если зарегистированная организация является ' +
+        'подразделением (филиал, представительство, обособленное подразделение) или КФХ, то для входа вместо ИНН ' +
+        'необходимо указать адрес электронной почты</span>';
+
     webix.ui(
         {
             type:"form",
@@ -95,6 +99,13 @@
                                     {
                                         view:"label",
                                         label:`<span style="font-size: 1.1rem; color: #6e6e6e">Вход</span>`
+                                    },
+                                    {
+                                        view: 'template',
+                                        id: 'descriptionStep3',
+                                        borderless: true,
+                                        autoheight: true,
+                                        template: descLogin,
                                     },
                                     {
                                         view: "text",
