@@ -195,7 +195,37 @@ let step2 = {
                     required: true
                 },
                 {
-                    view: 'combo',
+                    view: 'checkbox',
+                    id: 'detached',
+                    labelPosition: 'top',
+                    labelRight: 'Обособленное подразделение',
+                    value: false,
+                    hidden: true,
+                    on: {
+                        onChange(newVal, oldVal) {
+                            if (newVal === 1) {
+                                $$('selectOrg').setValue('');
+                                $$('selectOrg').hide();
+                                $$('organizationShortName').define('readonly', false);
+                                $$('organizationShortName').refresh();
+                                $$('organizationShortName').show();
+                                $$('organizationShortName').define('readonly', false);
+                                $$('organizationType').setValue('6');
+                            } else {
+                                $$('selectOrg').setValue('');
+                                $$('selectOrg').show();
+                                $$('organizationShortName').define('readonly', true);
+                                $$('organizationShortName').refresh();
+                                $$('organizationShortName').hide();
+                                $$('organizationShortName').define('readonly', true);
+                                $$('organizationType').setValue('');
+                            }
+                            $$('organizationShortName').refresh();
+                        }
+                    }
+                },
+                {
+                    view: 'richselect',
                     id: 'selectOrg',
                     label: 'Выберите организацию',
                     labelPosition: 'top',
@@ -218,7 +248,7 @@ let step2 = {
                     }
                 },
                 {
-                    view: 'combo',
+                    view: 'richselect',
                     id: 'selectIP',
                     label: 'Выберите ИП/КФХ',
                     labelPosition: 'top',
@@ -283,10 +313,11 @@ let step2 = {
                     id: 'organizationKpp',
                     name: 'organizationKpp',
                     label: 'КПП',
-                    validate: webix.rules.isNumber,
+                    // validate: webix.rules.isNumber,
                     labelPosition: 'top',
                     hidden: true,
-                    required: true
+                    readonly: true,
+                    // required: true
                 },
                 {
                     view: 'textarea',
@@ -436,33 +467,41 @@ function loadData(type, inn) {
         if (type === 'egrul') {
             if (response.finded == false){
                 $$("invalidMessages").setValue('Введеный ИНН не найден в ЕГРЮЛ. \nВозможно, вы ввели неправильный ИНН.');
-                $$('searchInn').hideProgress();
             } else {
                 $$('organizationOgrn').show();
                 $$('organizationKpp').show();
+                $$('detached').show();
                 const result = response.data;
                 if (result.filials && result.filials.length > 0) {
                     $$('organizationShortName').hide();
                     organizations = [];
-                    organizations.push({id: result.id + '', /*value: result.shortName + '\n' + result.jurAddress, */data: result});
+                    organizations.push({id: result.id + '', data: result});
                     const filials = result.filials.map(filial => {
-                        return {id: filial.id + '_' + filial.filialId, /*value: filial.shortName+ '\n' + result.jurAddress, */data: filial}
+                        return {id: filial.id + '_' + filial.filialId, data: filial}
                     })
                     organizations = organizations.concat(filials);
                     $$('selectOrg').define('options', {
                         body: {
-                            template: '<div>#data.shortName#</div><div>#data.jurAddress#</div>',
+                            template: '<div style="line-height: 1em">#data.shortName#</div><div style="font-size: 0.65em; line-height: 1em">#data.jurAddress#</div>',
+                            data: organizations,
+                            type: {
+                                height: 80,
+                            }
                         },
-                        data: organizations,
                     });
                     $$('selectOrg').refresh();
                     $$('selectOrg').show();
                     $$('selectIP').hide();
                     $$('form').setValues({
+                        egrulId: result.id,
                         egripId: '',
+                        filialId: '',
                         searchInn: inn,
                         isSelfEmployed: false,
                         organizationInn: inn,
+                        organizationShortName: result.shortName,
+                        organizationOgrn: result.ogrn,
+                        organizationKpp: result.kpp,
                     });
                 } else {
                     $$('organizationShortName').define('label', 'Наименование организации');
@@ -492,6 +531,7 @@ function loadData(type, inn) {
             if (response.finded == true){
                 $$('organizationOgrn').show();
                 $$('organizationKpp').hide();
+                $$('detached').hide();
                 const result = response.data;
                 if (result.length > 1) {
                     $$('organizationShortName').hide();
@@ -500,9 +540,12 @@ function loadData(type, inn) {
                     })
                     $$('selectIP').define('options', {
                         body: {
-                            template: '<div>#data.name#</div><div>#data.jurAddress#</div>',
+                            template: '<div style="line-height: 1em">#data.name#</div><div style="font-size: 0.65em; line-height: 1em">#data.jurAddress#</div>',
+                            data: organizations,
+                            type: {
+                                height: 65
+                            }
                         },
-                        data: organizations,
                     });
                     $$('selectOrg').hide();
                     $$('selectIP').refresh();
@@ -516,7 +559,7 @@ function loadData(type, inn) {
                         organizationKpp: '',
                     });
                 } else {
-                    $$('organizationShortName').define('label', 'ФИО ИП');
+                    $$('organizationShortName').define('label', 'Наименование ИП');
                     $$('organizationShortName').define('readonly', true);
                     $$('organizationShortName').refresh();
                     $$('organizationShortName').show();
@@ -548,6 +591,7 @@ function loadData(type, inn) {
                 $$('selectIP').hide();
                 $$('organizationOgrn').hide();
                 $$('organizationKpp').hide();
+                $$('detached').hide();
                 $$('form').setValues({
                     egrulId: '',
                     egripId: '',
@@ -565,13 +609,11 @@ function loadData(type, inn) {
                 });
                 doNext = true;
             } else{
-                $$('searchInn').hideProgress();
                 $$("invalidMessages").setValue('Введеный ИНН не найден в ЕГРИП. \nВозможно, вы ввели неправильный ИНН.');
-
             }
         }
+        $$('searchInn').hideProgress();
         if (doNext){
-            $$('searchInn').hideProgress();
             next(1);
         }
     }).catch(function (reason) {
@@ -689,7 +731,6 @@ function searchByInn(){
 
         loadData(type, inn);
 
-        $$('searchInn').hideProgress();
         $$('egrul_load_button').enable();
     }, 500);
 
