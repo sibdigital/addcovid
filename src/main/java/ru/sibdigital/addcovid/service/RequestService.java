@@ -466,9 +466,6 @@ public class RequestService {
         return docRequest;
     }
 
-    public ClsOrganization findOrganizationByInn(String inn) {
-        return clsOrganizationRepo.findByInnAndPrincipalIsNotNull(inn);
-    }
 
     public List<ClsOrganization> findOrganizations(ClsOrganizationSearchCriteria searchCriteria) {
         ClsOrganizationSpecification specification = new ClsOrganizationSpecification();

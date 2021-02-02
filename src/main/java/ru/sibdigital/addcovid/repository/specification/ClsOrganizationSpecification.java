@@ -31,8 +31,8 @@ public class ClsOrganizationSpecification implements Specification<ClsOrganizati
             predicates.add(criteriaBuilder.equal(prescription.get("id"), searchCriteria.getIdPrescription()));
         }
 
-        if (searchCriteria.getTypeOrganization() != null) {
-            predicates.add(criteriaBuilder.equal(root.get("idTypeOrganization"), searchCriteria.getTypeOrganization()));
+        if (searchCriteria.getTypeOrganizations() != null) {
+            predicates.add(criteriaBuilder.in(root.get("idTypeOrganization")).value(searchCriteria.getTypeOrganizations()));
         }
 
         if (searchCriteria.getEmail() != null) {

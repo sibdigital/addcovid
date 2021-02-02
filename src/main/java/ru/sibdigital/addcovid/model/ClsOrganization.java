@@ -47,6 +47,7 @@ public class ClsOrganization {
     @JoinColumn(name = "id_principal", referencedColumnName = "id")
     private ClsPrincipal principal;
 
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_organization_classifier", referencedColumnName = "id")
     private RegOrganizationClassifier regOrganizationClassifier;

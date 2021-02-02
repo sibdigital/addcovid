@@ -21,6 +21,7 @@ import ru.sibdigital.addcovid.service.RequestService;
 import ru.sibdigital.addcovid.service.SettingService;
 import ru.sibdigital.addcovid.service.crassifier.EgrulService;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -66,16 +67,17 @@ public class RegistrationController {
             if (clsOrganization != null) {
                 return "Данная организация уже зарегистрирована";
             }
-            // проверим email
-            if (organizations != null && organizations.size() > 0) {
-                clsOrganization = organizations.stream()
-                        .filter(organization -> organization.getEmail().equals(organizationDto.getOrganizationEmail()))
-                        .findFirst().orElse(null);
+            // проверим email, если это подразделение (филиал, представительство и т.п.)
+            int typeOrganization = organizationDto.getOrganizationType();
+            if (typeOrganization == OrganizationTypes.FILIATION.getValue() || typeOrganization == OrganizationTypes.REPRESENTATION.getValue()
+                    || typeOrganization == OrganizationTypes.DETACHED.getValue() || typeOrganization == OrganizationTypes.KFH.getValue()) {
+                clsOrganization = findOrganizationByEmail(organizationDto.getOrganizationEmail(), OrganizationTypes.FILIATION.getValue(),
+                        OrganizationTypes.REPRESENTATION.getValue(), OrganizationTypes.DETACHED.getValue(), OrganizationTypes.KFH.getValue());
                 if (clsOrganization != null) {
-                    return "Данный адрес электронной почты уже привязан к другой организации с таким ИНН";
+                    return "Указанный адрес электронной почты уже привязан к другой организации";
                 }
             }
-
+            // сохраним организацию
             clsOrganization = requestService.saveClsOrganization(organizationDto);
             // отправим письмо со ссылкой на активацию
             String activateUrl = settingService.findActualByKey("activationUrl", "");
@@ -85,16 +87,26 @@ public class RegistrationController {
                     applicationConstants.getApplicationName() + " перейдите по ссылке: <a href=\"" + activateUrl + "\">Активация учетной записи</a><br/>" +
                     "Если вы не регистрировали личный кабинет на портале " +
                     applicationConstants.getApplicationName() + ", проигнорируйте это сообщение";
-//            boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(),
-//                    "Регистрация на портале " + applicationConstants.getApplicationName(), text);
-//            if (!emailSent) {
-//                return "Не удалось отправить письмо";
-//            }
+            boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(),
+                    "Регистрация на портале " + applicationConstants.getApplicationName(), text);
+            if (!emailSent) {
+                return "Не удалось отправить письмо";
+            }
             return "Ок";
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return "Не удалось зарегистрировать";
         }
+    }
+
+    private ClsOrganization findOrganizationByEmail(String email, Integer... types) {
+        ClsOrganizationSearchCriteria searchCriteria = new ClsOrganizationSearchCriteria();
+        searchCriteria.setEmail(email);
+        searchCriteria.setTypeOrganizations(Arrays.asList(types));
+
+        ClsOrganization organization = requestService.findOrganizations(searchCriteria).stream().findFirst().orElse(null);
+
+        return organization;
     }
 
     private ClsOrganization findExistOrganization(OrganizationDto dto, List<ClsOrganization> organizations) {

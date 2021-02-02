@@ -92,7 +92,7 @@ public class CabinetController {
     public String cabinet(HttpSession session, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User principal = (User) auth.getPrincipal();
-        ClsOrganization organization = requestService.findOrganizationByInn(principal.getUsername());
+        ClsOrganization organization = clsOrganizationRepo.findById(Long.valueOf(principal.getUsername())).orElse(null);
         session.setAttribute("id_organization", organization.getId());
         model.addAttribute("application_name", applicationConstants.getApplicationName());
         model.addAttribute("id_organization", organization.getId());

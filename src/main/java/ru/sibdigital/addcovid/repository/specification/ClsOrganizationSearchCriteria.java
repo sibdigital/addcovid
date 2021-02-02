@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -11,7 +13,7 @@ public class ClsOrganizationSearchCriteria {
 
     private String inn;
     private Long idPrescription;
-    private Integer typeOrganization;
+    private List<Integer> typeOrganizations;
     private String email;
     private Boolean isActivated;
 
