@@ -115,19 +115,22 @@ public class RegistrationController {
         }
         ClsOrganization clsOrganization = null;
         for (ClsOrganization organization: organizations) {
+            RegOrganizationClassifier regOrganizationClassifier = organization.getRegOrganizationClassifier();
+            if (regOrganizationClassifier == null) {
+                return organization;
+            }
             if (!Objects.equals(organization.getIdTypeOrganization(), dto.getOrganizationType())) {
                 continue;
             }
-            RegOrganizationClassifier regOrganizationClassifier = organization.getRegOrganizationClassifier();
-            Long regEgrulId = regOrganizationClassifier == null ? null : regOrganizationClassifier.getRegEgrul() == null ? null : regOrganizationClassifier.getRegEgrul().getId();
+            Long regEgrulId = regOrganizationClassifier.getRegEgrul() == null ? null : regOrganizationClassifier.getRegEgrul().getId();
             if (!Objects.equals(regEgrulId, dto.getEgrulId())) {
                 continue;
             }
-            Long regEgripId = regOrganizationClassifier == null ? null : regOrganizationClassifier.getRegEgrip() == null ? null : regOrganizationClassifier.getRegEgrip().getId();
+            Long regEgripId = regOrganizationClassifier.getRegEgrip() == null ? null : regOrganizationClassifier.getRegEgrip().getId();
             if (!Objects.equals(regEgripId, dto.getEgripId())) {
                 continue;
             }
-            Long regFilialId = regOrganizationClassifier == null ? null : regOrganizationClassifier.getRegFilial() == null ? null : regOrganizationClassifier.getRegFilial().getId();
+            Long regFilialId = regOrganizationClassifier.getRegFilial() == null ? null : regOrganizationClassifier.getRegFilial().getId();
             if (!Objects.equals(regFilialId, dto.getFilialId())) {
                 continue;
             }

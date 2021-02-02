@@ -107,8 +107,8 @@ public class EgripResponse {
                 СвИП sved = mapper.readValue(egrip.getData(), EGRIP.СвИП.class);
 
                 Long id = egrip.getId();
-                String inn = sved.getИННФЛ();
-                String ogrn = sved.getОГРНИП();
+                String inn = egrip.getInn();
+                String ogrn = egrip.getOgrn();
                 String name = "";
                 int type = 0;
                 if (sved.getКодВидИП().equals("1")) {

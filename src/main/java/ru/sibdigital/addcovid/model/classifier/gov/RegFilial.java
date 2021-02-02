@@ -23,8 +23,8 @@ public class RegFilial {
 
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_reg_egrul_pk")
-    @SequenceGenerator(name="seq_reg_filial_pk", sequenceName = "seq_reg_egrul_pk", allocationSize=1)
+    @SequenceGenerator(name = "REG_FILIAL_GEN", sequenceName = "reg_filial_id_seq", allocationSize = 1, schema = "public")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "REG_FILIAL_GEN")
     private Long id;
     @Basic
     @Column(name = "inn", nullable = true, length = 10)
@@ -46,15 +46,14 @@ public class RegFilial {
     @Column(name = "type")
     private Integer type;
     @Basic
-    @Column(name = "kladr_address")
-    private String kladrAddress;
-    @Basic
-    @Column(name = "kladr_address_hash")
-    private Integer kladrAddressHash;
+    @Column(name = "address")
+    private String address;
     @Basic
     @Column(name = "kladr_code")
     private String kladrCode;
-
+    @Basic
+    @Column(name = "active_status")
+    private Integer activeStatus;
 
     public Long getId() {
         return id;
@@ -110,20 +109,12 @@ public class RegFilial {
         this.type = type;
     }
 
-    public String getKladrAddress() {
-        return kladrAddress;
+    public String getAddress() {
+        return address;
     }
 
-    public void setKladrAddress(String kladrAddress) {
-        this.kladrAddress = kladrAddress;
-    }
-
-    public Integer getKladrAddressHash() {
-        return kladrAddressHash;
-    }
-
-    public void setKladrAddressHash(Integer kladrAddressHash) {
-        this.kladrAddressHash = kladrAddressHash;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getKladrCode() {
@@ -134,20 +125,32 @@ public class RegFilial {
         this.kladrCode = kladrCode;
     }
 
+    public Integer getActiveStatus() {
+        return activeStatus;
+    }
+    public void setActiveStatus(Integer activeStatus) {
+        this.activeStatus = activeStatus;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegFilial regFilial = (RegFilial) o;
         return Objects.equals(id, regFilial.id) &&
+                Objects.equals(inn, regFilial.inn) &&
+                Objects.equals(kpp, regFilial.kpp) &&
+                Objects.equals(fullName, regFilial.fullName) &&
+                Objects.equals(data, regFilial.data) &&
                 Objects.equals(egrul, regFilial.egrul) &&
                 Objects.equals(type, regFilial.type) &&
-                Objects.equals(kladrAddressHash, regFilial.kladrAddressHash) ;
+                Objects.equals(address, regFilial.address) &&
+                Objects.equals(kladrCode, regFilial.kladrCode) &&
+                Objects.equals(activeStatus, regFilial.activeStatus);
     }
-
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, egrul, type, kladrAddressHash);
+        return Objects.hash(id, inn, kpp, fullName, data, egrul, type, address, kladrCode, activeStatus);
     }
 }

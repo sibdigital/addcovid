@@ -2,6 +2,7 @@ package ru.sibdigital.addcovid.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 import ru.sibdigital.addcovid.dto.egrul.EGRUL;
 import ru.sibdigital.addcovid.model.OrganizationTypes;
 import ru.sibdigital.addcovid.model.classifier.gov.RegEgrul;
@@ -125,9 +126,9 @@ public class EgrulResponse {
             EGRUL.СвЮЛ sved = mapper.readValue(egrul.getData(), EGRUL.СвЮЛ.class);
 
             Long id = egrul.getId();
-            String inn = sved.getИНН();
-            String ogrn = sved.getОГРН();
-            String kpp = sved.getКПП();
+            String inn = egrul.getInn();
+            String ogrn = egrul.getOgrn();
+            String kpp = egrul.getKpp();
             String name = sved.getСвНаимЮЛ() != null ? sved.getСвНаимЮЛ().getНаимЮЛПолн() : "";
             String shortName = sved.getСвНаимЮЛ() != null ? sved.getСвНаимЮЛ().getНаимЮЛСокр() : "";
             String email = sved.getСвАдрЭлПочты() != null ? sved.getСвАдрЭлПочты().getEMail() : "";
@@ -136,29 +137,23 @@ public class EgrulResponse {
             List<Data> filials = new ArrayList<>();
             if (egrul.getRegFilials() != null) {
                 for (RegFilial regFilial: egrul.getRegFilials()) {
+                    String kppFilial = regFilial.getKpp();
+                    String nameFilial = !StringUtils.isEmpty(regFilial.getFullName()) ? regFilial.getFullName() : name;
+                    String shortNameFilial = nameFilial;
+                    int type = 0;
+                    jurAddress = "";
                     if (regFilial.getType().equals(EgrFilialTypes.FILIAL.getValue())) {
+                        type = OrganizationTypes.FILIATION.getValue();
                         EGRUL.СвЮЛ.СвПодразд.СвФилиал svedFilial = mapper.readValue(regFilial.getData(), EGRUL.СвЮЛ.СвПодразд.СвФилиал.class);
-                        String kppFilial = svedFilial.getСвУчетНОФилиал().getКПП();
-                        String nameFilial = svedFilial.getСвНаим() != null ? svedFilial.getСвНаим().getНаимПолн() : name;
-                        nameFilial = "Филиал " + nameFilial;
-                        String shortNameFilial = svedFilial.getСвНаим() != null ? svedFilial.getСвНаим().getНаимПолн() : shortName;
-                        shortNameFilial = "Филиал " + shortNameFilial;
-                        String jurAddressFilial = JuridicalUtils.constructAddress(svedFilial.getАдрМНРФ());
-                        Data data = new Data(id, inn, ogrn, kppFilial, nameFilial, shortNameFilial, "", jurAddressFilial, OrganizationTypes.FILIATION.getValue());
-                        data.setFilialId(regFilial.getId());
-                        filials.add(data);
+                        jurAddress = JuridicalUtils.constructAddress(svedFilial.getАдрМНРФ());
                     } else if (regFilial.getType().equals(EgrFilialTypes.REPRESENTATION.getValue())) {
+                        type = OrganizationTypes.REPRESENTATION.getValue();
                         EGRUL.СвЮЛ.СвПодразд.СвПредстав svedPredstav = mapper.readValue(regFilial.getData(), EGRUL.СвЮЛ.СвПодразд.СвПредстав.class);
-                        String kppPredstav = svedPredstav.getСвУчетНОПредстав().getКПП();
-                        String namePredstav = svedPredstav.getСвНаим() != null ? svedPredstav.getСвНаим().getНаимПолн() : name;
-                        namePredstav = "Представительство " + namePredstav;
-                        String shortNamePredstav = svedPredstav.getСвНаим() != null ? svedPredstav.getСвНаим().getНаимПолн() : shortName;
-                        shortNamePredstav = "Представительство " + shortNamePredstav;
-                        String jurAddressPredstav = JuridicalUtils.constructAddress(svedPredstav.getАдрМНРФ());
-                        Data data = new Data(id, inn, ogrn, kppPredstav, namePredstav, shortNamePredstav, "", jurAddressPredstav, OrganizationTypes.REPRESENTATION.getValue());
-                        data.setFilialId(regFilial.getId());
-                        filials.add(data);
+                        jurAddress = JuridicalUtils.constructAddress(svedPredstav.getАдрМНРФ());
                     }
+                    Data data = new Data(id, inn, ogrn, kppFilial, nameFilial, shortNameFilial, "", jurAddress, type);
+                    data.setFilialId(regFilial.getId());
+                    filials.add(data);
                 }
             }
 
