@@ -12,6 +12,7 @@ import ru.sibdigital.addcovid.repository.ClsControlAuthorityRepo;
 import ru.sibdigital.addcovid.repository.ClsInspectionResultRepo;
 import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
 import ru.sibdigital.addcovid.repository.RegOrganizationInspectionRepo;
+import ru.sibdigital.addcovid.service.file.InspectionFileService;
 
 @Service
 @Slf4j
@@ -28,6 +29,9 @@ public class InspectionServiceImpl implements InspectionService {
 
     @Autowired
     RegOrganizationInspectionRepo regOrganizationInspectionRepo;
+
+    @Autowired
+    InspectionFileService inspectionFileService;
 
     @Override
     public RegOrganizationInspection saveInspection(RegOrganizationInspectionDto inspectionDto) {

@@ -430,6 +430,7 @@ let smallMainForm = {
                                     view: 'icon',
                                     icon: 'mdi mdi-account-circle',
                                     tooltip: 'Профиль',
+                                    css: 'topMenuIcon',
                                     click: function () {
                                         webix.ui({
                                             id: 'content',
@@ -445,6 +446,7 @@ let smallMainForm = {
                                     view: 'icon',
                                     icon: 'mdi mdi-format-list-checks',
                                     tooltip: 'Мои проверки',
+                                    css: 'topMenuIcon',
                                     click: function () {
                                         webix.ui({
                                             id: 'content',
