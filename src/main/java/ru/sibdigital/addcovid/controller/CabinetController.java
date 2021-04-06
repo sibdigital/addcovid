@@ -89,17 +89,6 @@ public class CabinetController {
     @Autowired
     private ClsDepartmentContactRepo clsDepartmentContactRepo;
 
-    @Autowired
-    private RegOrganizationInspectionRepo regOrganizationInspectionRepo;
-
-    @Autowired
-    private ClsControlAuthorityRepo clsControlAuthorityRepo;
-
-    @Autowired
-    private ClsInspectionResultRepo clsInspectionResultRepo;
-
-    @Autowired
-    private InspectionService inspectionService;
 
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
@@ -900,53 +889,4 @@ public class CabinetController {
         return responseEntity;
     }
 
-    @GetMapping("/org_inspections")
-    public @ResponseBody List<RegOrganizationInspection> getInspections(HttpSession session) {
-        Long id = (Long) session.getAttribute("id_organization");
-        if (id == null) {
-            return null;
-        }
-        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
-        if (organization == null) {
-            return null;
-        }
-        List<RegOrganizationInspection> inspections = regOrganizationInspectionRepo.findRegOrganizationInspectionsByOrganization(organization).orElse(null);
-
-        return inspections;
-    }
-
-    @GetMapping("/control_authorities_list_short")
-    public @ResponseBody List<KeyValue> getControlAuthoritiesForRichselect() {
-        List<KeyValue> list = clsControlAuthorityRepo.findAll().stream()
-                              .map(ctr -> new KeyValue(ctr.getClass().getSimpleName(), ctr.getId(), ctr.getName()))
-                              .collect(Collectors.toList());
-
-        return list;
-    }
-
-    @GetMapping("/inspection_results_list_short")
-    public @ResponseBody List<KeyValue> getInspectionResultsForRichselect() {
-        List<KeyValue> list = clsInspectionResultRepo.findAll().stream()
-                .map(ctr -> new KeyValue(ctr.getClass().getSimpleName(), ctr.getId(), ctr.getName()))
-                .collect(Collectors.toList());
-
-        return list;
-    }
-
-    @PostMapping("/save_inspection")
-    public @ResponseBody String saveInspection(@RequestBody RegOrganizationInspectionDto inspectionDto, HttpSession session) {
-        RegOrganizationInspection inspection = null;
-
-        Long idOrganization = (Long) session.getAttribute("id_organization");
-        inspectionDto.setOrganizationId(idOrganization);
-
-        try {
-            inspectionService.saveInspection(inspectionDto);
-            return "Сохранено";
-
-        } catch (Exception e) {
-            return "Не удалось сохранить";
-        }
-
-    }
 }
