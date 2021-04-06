@@ -326,6 +326,23 @@ let bigMainForm = {
                                 },
                                 {
                                     view: 'icon',
+                                    icon: 'mdi mdi-format-list-checks',
+                                    css: 'topMenuIcon',
+                                    tooltip: 'Мои проверки',
+                                    click: function () {
+                                        webix.ui({
+                                            id: 'content',
+                                            rows: [
+                                                inspectionList
+                                            ]
+                                        }, $$('content'));
+                                        $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Мои проверки" + "</span>");
+                                        $$('menu').unselectAll();
+                                        hideBtnBack();
+                                    },
+                                },
+                                {
+                                    view: 'icon',
                                     id: 'bigHelpId',
                                     css: 'topMenuIcon',
                                     icon: 'mdi mdi-help-circle',
@@ -418,6 +435,21 @@ let smallMainForm = {
                                             id: 'content',
                                             rows: [
                                                 profile
+                                            ]
+                                        }, $$('content'));
+                                        $$('menu').unselectAll();
+                                        hideBtnBack();
+                                    },
+                                },
+                                {
+                                    view: 'icon',
+                                    icon: 'mdi mdi-format-list-checks',
+                                    tooltip: 'Мои проверки',
+                                    click: function () {
+                                        webix.ui({
+                                            id: 'content',
+                                            rows: [
+                                                inspectionList
                                             ]
                                         }, $$('content'));
                                         $$('menu').unselectAll();

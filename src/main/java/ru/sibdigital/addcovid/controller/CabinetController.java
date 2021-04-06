@@ -16,6 +16,7 @@ import ru.sibdigital.addcovid.dto.*;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 import ru.sibdigital.addcovid.repository.*;
+import ru.sibdigital.addcovid.service.InspectionService;
 import ru.sibdigital.addcovid.service.RequestService;
 import ru.sibdigital.addcovid.service.SettingServiceImpl;
 
@@ -87,6 +88,7 @@ public class CabinetController {
 
     @Autowired
     private ClsDepartmentContactRepo clsDepartmentContactRepo;
+
 
     @GetMapping("/cabinet")
     public String cabinet(HttpSession session, Model model) {
@@ -886,4 +888,5 @@ public class CabinetController {
                         "\"status\": \"server\"}");
         return responseEntity;
     }
+
 }
