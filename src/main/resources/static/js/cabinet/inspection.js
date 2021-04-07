@@ -19,6 +19,7 @@ const inspectionTable = {
             adjust: true,
             fillspace: true,
             readonly: true,
+            format: dateFormatWOTime,
             sort: 'date',
         },
         {
@@ -28,6 +29,7 @@ const inspectionTable = {
             fillspace: true,
             adjust: true,
             readonly: true,
+            sort: 'text',
         },
         {
             header: "Результат проверки",
@@ -36,8 +38,20 @@ const inspectionTable = {
             // adjust: true,
             minWidth: 150,
             readonly: true,
+            sort: 'text',
         },
     ],
+    scheme: {
+        $init: function (obj) {
+            obj.dateOfInspection = obj.dateOfInspection.replace("T", " ");
+            obj.dateOfInspection = xml_format(obj.dateOfInspection);
+        },
+        $update:function (obj) {
+            obj.dateOfInspection = obj.dateOfInspection.replace("T", " ");
+            obj.dateOfInspection = xml_format(obj.dateOfInspection);
+        },
+
+    },
     on: {
         'data->onStoreUpdated': function(){
             this.data.each(function(obj, i){
@@ -52,6 +66,7 @@ const inspectionTable = {
             item.controlAuthorityId = item.controlAuthority.id;
             item.inspectionResultId = item.inspectionResult.id;
             $$('inspectionForm').parse(item);
+            showBtnBack(inspectionList, 'inspections_table');
         }
     },
     url: 'org_inspections'
@@ -104,7 +119,21 @@ function inspectionFormElements(inspectionId) {
                 labelPosition: 'top',
                 name: 'controlAuthorityId',
                 required: true,
-                options: 'control_authorities_list_short',
+                // options: 'control_authorities_list_short',
+                options: {
+                    view: 'suggest',
+                    body: {
+                        view: 'list',
+                        css: 'multiline', // чтобы в моб версии было понятны, что за службы
+                        type: {
+                            autoheight: true,
+                        },
+                        url: 'control_authorities_list_short',
+                        // ready: function() {
+                        //     this.adjustRowHeight();
+                        // }
+                    }
+                },
             },
             {
                 view: 'richselect',
@@ -138,6 +167,7 @@ const inspectionFormPanel = {
             value: 'Отменить',
             click: () => {
                 changeContentView(inspectionList);
+                hideBtnBack();
             }
         },
         {
@@ -184,6 +214,7 @@ function saveInspection() {
         if (successfullyUploaded) {
             webix.message({text: 'Сохранено', type: 'success'});
             changeContentView(inspectionList);
+            hideBtnBack();
         } else {
             webix.message({text: 'Не удалось сохранить', type: 'error'});
         }

@@ -330,12 +330,10 @@ let bigMainForm = {
                                     css: 'topMenuIcon',
                                     tooltip: 'Мои проверки',
                                     click: function () {
-                                        webix.ui({
-                                            id: 'content',
-                                            rows: [
-                                                inspectionList
-                                            ]
-                                        }, $$('content'));
+                                        if ($$('inspections_table') != null) {
+                                            $$('inspections_table').destructor();
+                                        }
+                                        changeContentView(inspectionList);
                                         $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Мои проверки" + "</span>");
                                         $$('menu').unselectAll();
                                         hideBtnBack();
@@ -448,12 +446,10 @@ let smallMainForm = {
                                     tooltip: 'Мои проверки',
                                     css: 'topMenuIcon',
                                     click: function () {
-                                        webix.ui({
-                                            id: 'content',
-                                            rows: [
-                                                inspectionList
-                                            ]
-                                        }, $$('content'));
+                                        if ($$('inspections_table') != null) {
+                                            $$('inspections_table').destructor();
+                                        }
+                                        changeContentView(inspectionList);
                                         $$('menu').unselectAll();
                                         hideBtnBack();
                                     },
