@@ -12,13 +12,8 @@ function file_upload_view(name_for_id, upload_url, list_url, delete_url) {
                 minHeight: 200,
                 select: 1,
                 template: function (obj) {
-                    let docImg;
+                    let docImg = getFileIcon(obj.fileExtension);
                     let downloadTime = obj.timeCreate.substr(11, 8) + ', ' + obj.timeCreate.substr(0, 10)
-                    if (obj.fileExtension == ".zip") {
-                        docImg = "zip.png"
-                    } else {
-                        docImg = "pdf.png"
-                    }
                     let result = "<div class='overall'>" +
                         "<div>" +
                         "<img style='position: absolute' src = " + docImg + "> " +
@@ -68,7 +63,7 @@ function file_upload_view(name_for_id, upload_url, list_url, delete_url) {
                         upload: upload_url,
                         autosend: false,
                         align: 'left',
-                        accept: 'application/pdf, application/zip, application/msword',
+                        accept: 'application/pdf, application/zip, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/jpeg' ,
                         multiple: true,
                         link: name_for_id + '_list',
                     },
@@ -129,4 +124,32 @@ function delete_file(id = null, name_for_id, delete_url){
                 }
             });
     })
+}
+
+function getFileIcon(fileExtension) {
+    let docImg;
+    switch (fileExtension) {
+        case '.zip':
+            docImg = 'zip.png';
+            break;
+        case '.pdf':
+            docImg = 'pdf.png';
+            break;
+        case '.jpeg':
+            docImg = 'jpg.png';
+            break;
+        case '.jpg':
+            docImg = 'jpg.png';
+            break;
+        case '.doc':
+            docImg = 'doc.png';
+            break;
+        case '.docx':
+            docImg = 'doc.png';
+            break;
+        default:
+            docImg = 'file.png';
+            break;
+    }
+    return docImg;
 }

@@ -326,7 +326,7 @@ let bigMainForm = {
                                 },
                                 {
                                     view: 'icon',
-                                    icon: 'mdi mdi-format-list-checks',
+                                    icon: 'mdi mdi-clipboard-text-multiple',
                                     css: 'topMenuIcon',
                                     tooltip: 'Мои проверки',
                                     click: function () {
@@ -442,7 +442,7 @@ let smallMainForm = {
                                 },
                                 {
                                     view: 'icon',
-                                    icon: 'mdi mdi-format-list-checks',
+                                    icon: 'mdi mdi-clipboard-text-multiple',
                                     tooltip: 'Мои проверки',
                                     css: 'topMenuIcon',
                                     click: function () {

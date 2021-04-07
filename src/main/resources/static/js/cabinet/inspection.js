@@ -92,6 +92,7 @@ const inspectionList = {
                         value: 'Добавить',
                         click: function () {
                             changeContentView(inspectionForm(-1));
+                            showBtnBack(inspectionList, 'inspections_table');
                         }
                     }
                 ]
@@ -119,7 +120,6 @@ function inspectionFormElements(inspectionId) {
                 labelPosition: 'top',
                 name: 'controlAuthorityId',
                 required: true,
-                // options: 'control_authorities_list_short',
                 options: {
                     view: 'suggest',
                     body: {
@@ -129,9 +129,6 @@ function inspectionFormElements(inspectionId) {
                             autoheight: true,
                         },
                         url: 'control_authorities_list_short',
-                        // ready: function() {
-                        //     this.adjustRowHeight();
-                        // }
                     }
                 },
             },
