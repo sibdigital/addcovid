@@ -17,7 +17,6 @@ const inspectionTable = {
             id: 'dateOfInspection',
             minWidth: 150,
             adjust: true,
-            fillspace: true,
             readonly: true,
             format: dateFormatWOTime,
             sort: 'date',
@@ -34,8 +33,8 @@ const inspectionTable = {
         {
             header: "Результат проверки",
             template: '#inspectionResult.name#',
+            adjust: true,
             fillspace: true,
-            // adjust: true,
             minWidth: 150,
             readonly: true,
             sort: 'text',
@@ -60,11 +59,10 @@ const inspectionTable = {
         },
         onItemDblClick: function (id) {
             let item = this.getItem(id);
-            // let inspectionForm1 = inspectionForm(item.id));
-            // webix.ui(inspectionForm1, $$('inspectionListFormId'));
             changeContentView(inspectionForm(item.id));
             item.controlAuthorityId = item.controlAuthority.id;
             item.inspectionResultId = item.inspectionResult.id;
+            item.formDataForUpload = {idInspection: item.id};
             $$('inspectionForm').parse(item);
             showBtnBack(inspectionList, 'inspections_table');
         }
@@ -73,11 +71,11 @@ const inspectionTable = {
 }
 
 const inspectionList = {
-    view: 'scrollview',
-    id: 'inspectionListFormId',
-    scroll: 'xy',
-    body: {
-        type: 'space',
+    // view: 'scrollview',
+    // id: 'inspectionListFormId',
+    // scroll: 'xy',
+    // body: {
+        // type: 'space',
         rows: [
             inspectionTable,
             {
@@ -98,21 +96,33 @@ const inspectionList = {
                 ]
             }
         ],
-    }
+    // }
 }
 
 function inspectionFormElements(inspectionId) {
     return {
         view: 'form',
         id: 'inspectionForm',
-        elements: [
+        rows: [
             {
-                view: 'datepicker',
-                label: 'Дата проведения контрольно-надзорного мероприятия',
-                labelPosition: 'top',
-                name: 'dateOfInspection',
-                required: true,
-                timepicker: false,
+                cols: [
+                    {
+                        view: 'datepicker',
+                        label: 'Дата проведения контрольно-надзорного мероприятия',
+                        labelPosition: 'top',
+                        name: 'dateOfInspection',
+                        required: true,
+                        timepicker: false,
+                    },
+                    {
+                        view: 'richselect',
+                        label: 'Результат контрольно-надзорного мероприятия',
+                        labelPosition: 'top',
+                        name: 'inspectionResultId',
+                        required: true,
+                        options: 'inspection_results_list_short',
+                    },
+                ]
             },
             {
                 view: 'richselect',
@@ -133,21 +143,13 @@ function inspectionFormElements(inspectionId) {
                 },
             },
             {
-                view: 'richselect',
-                label: 'Результат контрольно-надзорного мероприятия',
-                labelPosition: 'top',
-                name: 'inspectionResultId',
-                required: true,
-                options: 'inspection_results_list_short',
-            },
-            {
                 view: 'textarea',
                 label: 'Комментарий',
                 labelPosition: 'top',
                 name: 'comment',
                 minHeight: 200,
             },
-            file_upload_view('inspection', 'upload_inspection_file', 'inspection_files/' + inspectionId, 'delete_inspection_file'),
+            file_upload_view('inspectionForm','inspection', 'upload_inspection_file','inspection_files/' + inspectionId),
         ]
     }
 }
@@ -185,19 +187,19 @@ const inspectionFormPanel = {
 
 function inspectionForm(inspectionId) {
     return {
-        view: 'scrollview',
-        scroll: 'y',
-        id: 'inspectionFormId',
-        autowidth: true,
-        autoheight: true,
-        body: {
-            type: 'space',
+        // view: 'scrollview',
+        // scroll: 'y',
+        // id: 'inspectionFormId',
+        // autowidth: true,
+        // autoheight: true,
+        // body: {
+        //     type: 'space',
             rows: [
                 inspectionFormElements(inspectionId),
                 inspectionFormPanel
             ]
         }
-    }
+    // }
 }
 
 function saveInspection() {
@@ -207,33 +209,30 @@ function saveInspection() {
     }).post('save_inspection',
         JSON.stringify(params)
     ).then(function (data) {
-        let successfullyUploaded = saveFiles('inspection', data.json(), {idInspection: data.json().id});
-        if (successfullyUploaded) {
-            webix.message({text: 'Сохранено', type: 'success'});
-            changeContentView(inspectionList);
-            hideBtnBack();
+        let savedInspection = data.json();
+        if (savedInspection.id) {
+            saveInspectionFiles(savedInspection);
         } else {
-            webix.message({text: 'Не удалось сохранить', type: 'error'});
+            return webix.message({text: 'Не удалось сохранить', type: 'error'});
         }
     })
 }
 
-function saveInspectionFiles(data) {
-    let savedInspection = data.json();
-    let successfullyUploaded = false;
-    if (data.id) {
-        let uploader = $$('inspection_upload');
-        if (uploader) {
-            successfullyUploaded = true
-            uploader.define('formData', {idInspection: savedInspection.id})
-            uploader.send(function (response) {
-                if (response) {
-                    console.log(response.cause);
-                    if (response.cause != 'Файл успешно загружен') {
-                        successfullyUploaded = false
-                    }
-                }
-            })
-        }
-    }
+function saveInspectionFiles(savedInspection) {
+    let params = $$('inspection_docs_grid').serialize();
+    params.forEach((el) => {el.idInspection = savedInspection.id;});
+
+    webix.ajax()
+        .headers({'Content-type': 'application/json'})
+        .post('save_inspection_files', JSON.stringify(params))
+        .then(function (data) {
+            if (data.json() == true) { //  if (data.json()). what if data.json() return not boolean
+                webix.message({text: 'Сохранено', type: 'success'});
+                changeContentView(inspectionList);
+                hideBtnBack();
+            } else  {
+                webix.message({text: 'Не удалось сохранить', type: 'error'});
+            }
+        });
 }
+

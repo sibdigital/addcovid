@@ -1,4 +1,4 @@
-function file_upload_view(name_for_id, upload_url, list_url, delete_url) {
+function file_upload_view(form_id, name_for_id, upload_url, list_url) {
     return {
         rows: [
             {
@@ -6,6 +6,7 @@ function file_upload_view(name_for_id, upload_url, list_url, delete_url) {
                 label: 'Прикрепленные файлы',
                 labelPosition: 'top',
                 id: name_for_id + '_docs_grid',
+                type: 'uploader',
                 css: 'contacts',
                 scroll: 'y',
                 minWidth: 320,
@@ -18,7 +19,7 @@ function file_upload_view(name_for_id, upload_url, list_url, delete_url) {
                         "<div>" +
                         "<img style='position: absolute' src = " + docImg + "> " +
                         "<div class='doc_title'>" + obj.originalFileName.slice(0, -4) + "</div>";
-                    result += "<div id='del_button' style='position: absolute;top: 0; right: 5px;' onclick='delete_file("+obj.id+", \"" + name_for_id + "\", \"" + delete_url + "\")' class='mdi mdi-close-thick'></div>"
+                    result += "<div id='del_button' style='position: absolute;top: 0; right: 5px;' onclick='delete_file("+obj.id+", \"" + name_for_id + "\")' class='mdi mdi-close-thick'></div>"
                     result += "<div class='doc_time_create'>" + downloadTime + "</div>" +
                         "<div class='download_docs'>" +
                         "<a style='text-decoration: none; color: #1ca1c1' href=uploads/" + obj.fileName + obj.fileExtension + " download>Скачать файл</a>" +
@@ -61,68 +62,45 @@ function file_upload_view(name_for_id, upload_url, list_url, delete_url) {
                         minWidth: 200,
                         maxWidth: 350,
                         upload: upload_url,
-                        autosend: false,
+                        autosend: true,
                         align: 'left',
                         accept: 'application/pdf, application/zip, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/jpeg' ,
                         multiple: true,
-                        link: name_for_id + '_list',
+                        on: {
+                            onBeforeFileAdd: () => {
+                                $$(name_for_id + '_upload').define("formData", $$('inspectionForm').getValues().formDataForUpload);
+                            },
+
+                            onFileUpload: (response) => {
+                                if (response.id) {
+                                    webix.message("Файл успешно загружен: " + response.originalFileName, "success")
+                                    $$(name_for_id + '_docs_grid').show();
+                                    $$(name_for_id + '_docs_grid').add(response);
+                                } else  {
+                                    webix.message("Ошибка сохранения", "error")
+                                }
+                            }
+                        }
                     },
                     {}
                 ]
             },
             {
-                view: 'list',
-                label: 'Новые файлы',
-                labelPosition: 'top',
-                id: name_for_id + '_list',
-                type: 'uploader',
-                autoheight: true,
-                borderless:true
-            },
+                id: 'formDataForUpload',
+                hidden: true,
+            }
         ]
     }
 }
 
-// Указывать такое же name_for_id, что и для функции file_upload_view
-function saveFiles(name_for_id, obj, formDataValues) {
-    let successfullyUploaded = false;
-    if (obj.id) {
-        let uploader = $$(name_for_id + '_upload');
-        if (uploader) {
-            successfullyUploaded = true
-            uploader.define('formData', formDataValues)
-            uploader.send(function (response) {
-                if (response) {
-                    console.log(response.cause);
-                    if (response.cause != 'Файл успешно загружен') {
-                        successfullyUploaded = false
-                    }
-                }
-            })
-        }
-    }
-    return successfullyUploaded;
-}
-
-function delete_file(id = null, name_for_id, delete_url){
-    let param = id === null ? $$(name_for_id + '_docs_grid').getSelectedItem() : $$(name_for_id + '_docs_grid').getItem(id)
+function delete_file(id = null, name_for_id){
     webix.confirm({
         title:"Подтверждение",
         type:"confirm-warning",
         ok:"Да", cancel:"Нет",
-        text:"Вы уверены, что хотите удалить файл? Данное действие невозможно будет отменить."
+        text:"Вы уверены, что хотите удалить файл?"
     }).then(function(){
-        webix.ajax()
-            .headers({'Content-type': 'application/json'})
-            .post(delete_url, JSON.stringify(param.id))
-            .then(function (data) {
-                if (data !== null) {
-                    $$(name_for_id + '_docs_grid').remove($$(name_for_id + '_docs_grid').getSelectedId());
-                    webix.message("Файл удалён", 'success');
-                } else {
-                    webix.message("Не удалось удалить файл", 'error');
-                }
-            });
+        $$(name_for_id + '_docs_grid').remove($$(name_for_id + '_docs_grid').getSelectedId());
     })
 }
 

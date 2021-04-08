@@ -1,16 +1,12 @@
 package ru.sibdigital.addcovid.service.file;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.dto.InspectionFileDto;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.RegOrganizationInspectionFileRepo;
 import ru.sibdigital.addcovid.repository.RegOrganizationInspectionRepo;
@@ -20,9 +16,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -45,17 +40,20 @@ public class InspectionFileServiceImpl extends FileServiceImpl implements Inspec
     }
 
     @Override
-    public RegOrganizationInspectionFile saveInspectionFile(MultipartFile file, Long idInspection) {
-        RegOrganizationInspection inspection = regOrganizationInspectionRepo.findById(idInspection).orElse(null);
+    public RegOrganizationInspectionFile uploadInspectionFile(MultipartFile file, Long idInspection) {
+        RegOrganizationInspection inspection = null;
+        if (idInspection != null) {
+            inspection = regOrganizationInspectionRepo.findById(idInspection).orElse(null);
+        }
 
         RegOrganizationInspectionFile inspectionFile = construct(file, inspection);
         if (inspectionFile != null) {
+            inspectionFile.setDeleted(true); // На случай если человек загрузит новый файл, но не сохранит документ Проверки.
             regOrganizationInspectionFileRepo.save(inspectionFile);
         }
 
         return inspectionFile;
     }
-
 
     private RegOrganizationInspectionFile construct(MultipartFile multipartFile, RegOrganizationInspection inspection) {
         RegOrganizationInspectionFile rnf = null;
@@ -67,7 +65,7 @@ public class InspectionFileServiceImpl extends FileServiceImpl implements Inspec
                 directory.mkdir();
             }
 
-            final String filename = inspection.getId().toString() + "n_" + UUID.randomUUID();
+            final String filename = (inspection == null ? "0" : inspection.getId().toString())  + "n_" + UUID.randomUUID();
             final String originalFilename = multipartFile.getOriginalFilename();
             String extension = getFileExtension(originalFilename);
             File file = new File(String.format("%s/%s%s", absolutePath, filename, extension));
@@ -86,7 +84,7 @@ public class InspectionFileServiceImpl extends FileServiceImpl implements Inspec
                         .attachmentPath(String.format("%s/%s", uploadingDir, filename))
                         .fileName(filename)
                         .originalFileName(originalFilename)
-                        .isDeleted(false)
+//                        .isDeleted(false)
                         .fileExtension(extension)
                         .fileSize(size)
                         .hash(fileHash)
@@ -102,12 +100,41 @@ public class InspectionFileServiceImpl extends FileServiceImpl implements Inspec
     }
 
     @Override
-    public RegOrganizationInspectionFile markInspectionFileAsDeletedById(Long inspectionFileId) {
-        RegOrganizationInspectionFile inspectionFile = regOrganizationInspectionFileRepo.findById(inspectionFileId).orElse(null);
-        if (inspectionFile != null) {
-            inspectionFile.setDeleted(true);
-            regOrganizationInspectionFileRepo.save(inspectionFile);
+    public Boolean saveInspectionFiles(List<Long> inspectionFileIds, Long idInspection) {
+        try {
+            RegOrganizationInspection inspection = regOrganizationInspectionRepo.findById(idInspection).orElse(null);
+            Set<Long> newActiveFileIds = inspectionFileIds.stream().collect(Collectors.toSet());
+
+            List<RegOrganizationInspectionFile> oldFiles = regOrganizationInspectionFileRepo.findRegOrganizationInspectionFilesByOrganizationInspectionAndIsDeleted(inspection, false).orElse(null);
+            if (oldFiles != null) {
+                Set<Long> oldActiveFileIds = oldFiles.stream()
+                                            .map(ctr -> ctr.getId())
+                                            .collect(Collectors.toSet());
+                Set<Long> deletedFileIds = getDifferences(oldActiveFileIds, newActiveFileIds);
+                markInspectionFilesAsDeleted(deletedFileIds);
+            }
+
+            saveNewInspectionFiles(newActiveFileIds, idInspection);
+        } catch (Exception e) {
+            log.error(e);
+            return false;
         }
-        return inspectionFile;
+
+        return true;
+    }
+
+    private <T> Set<T> getDifferences(Set<T> decreasing, Set<T> substruction) {// уменьшаемое, вычитаемое
+        Set<T> difference = new HashSet<T>();
+        difference.addAll(decreasing);
+        difference.removeAll(substruction);
+        return difference;
+    }
+
+    private void markInspectionFilesAsDeleted(Set<Long> deletedFileIds) {
+        regOrganizationInspectionFileRepo.updateFilesAsDeleted(deletedFileIds);
+    }
+
+    private void saveNewInspectionFiles(Set<Long> newActiveFileIds, Long idInspection) {
+        regOrganizationInspectionFileRepo.updateFilesAsNotDeletedAndSetIdInspection(newActiveFileIds, idInspection);
     }
 }

@@ -2,12 +2,10 @@ package ru.sibdigital.addcovid.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.dto.InspectionFileDto;
 import ru.sibdigital.addcovid.dto.KeyValue;
 import ru.sibdigital.addcovid.dto.RegOrganizationInspectionDto;
 import ru.sibdigital.addcovid.model.*;
@@ -98,33 +96,27 @@ public class InspectionController {
             return null;
     }
 
-    @PostMapping(value = "/upload_inspection_file", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/upload_inspection_file")
     @ResponseBody
-    public ResponseEntity<Object> uploadInspectionFile(@RequestParam(value = "upload") MultipartFile part,
-                                             @RequestParam(required = true) Long idInspection){
+    public RegOrganizationInspectionFile uploadInspectionFile(@RequestParam(value = "upload") MultipartFile part,
+                                             @RequestParam(required = false) Long idInspection){
+        RegOrganizationInspectionFile inspectionFile = inspectionFileService.uploadInspectionFile(part, idInspection);
 
-        RegOrganizationInspectionFile inspectionFile = inspectionFileService.saveInspectionFile(part, idInspection);
-        if (inspectionFile != null) {
-            return ResponseEntity.ok()
-                    .body("{\"cause\": \"Файл успешно загружен\"," +
-                            "\"status\": \"server\"," +
-                            "\"sname\": \"" + inspectionFile.getOriginalFileName() + "\"}");
-
-        }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("{\"status\": \"server\"," +
-                        "\"cause\":\"Ошибка сохранения\"}" +
-                        "\"sname\": \"" + inspectionFile.getOriginalFileName() + "\"}");
+        return inspectionFile;
     }
 
-    @PostMapping("/delete_inspection_file")
-    public @ResponseBody
-    RegOrganizationInspectionFile deleteInspectionFile(@RequestBody Long id){
-        try{
-            return inspectionFileService.markInspectionFileAsDeletedById(id);
-        }catch (Exception e){
-            log.error(e.getMessage(), e);
-            return null;
+    @PostMapping("/save_inspection_files")
+    public @ResponseBody Boolean saveInspectionFiles(@RequestBody List<InspectionFileDto> inspectionFileDtoList){
+        Boolean success = true;
+        if (inspectionFileDtoList != null && !inspectionFileDtoList.isEmpty()) {
+            List<Long> inspectionFileIds = inspectionFileDtoList.stream()
+                    .map(ctr -> ctr.getId())
+                    .collect(Collectors.toList());
+
+            Long idInspection = inspectionFileDtoList.get(0).getIdInspection();
+            success = inspectionFileService.saveInspectionFiles(inspectionFileIds, idInspection);
         }
+        return success;
     }
+
 }
