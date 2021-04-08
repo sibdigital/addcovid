@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.dto.RegOrganizationInspectionFileDto;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.RegOrganizationInspectionFileRepo;
 import ru.sibdigital.addcovid.repository.RegOrganizationInspectionRepo;
@@ -98,21 +99,32 @@ public class InspectionFileServiceImpl extends FileServiceImpl implements Inspec
     }
 
     @Override
-    public Boolean saveInspectionFiles(List<Long> inspectionFileIds, Long idInspection) {
+    public Boolean saveInspectionFiles(List<RegOrganizationInspectionFileDto> orgInspectionFileDtos, Long idInspection) {
         try {
             RegOrganizationInspection inspection = regOrganizationInspectionRepo.findById(idInspection).orElse(null);
-            Set<Long> newActiveFileIds = inspectionFileIds.stream().collect(Collectors.toSet());
+
+            Set<Long> newActiveFileIds = null;
+            if (!orgInspectionFileDtos.isEmpty()) {
+                newActiveFileIds = orgInspectionFileDtos.stream()
+                                    .map(ctr -> ctr.getId())
+                                    .collect(Collectors.toSet());
+
+                saveNewInspectionFiles(newActiveFileIds, idInspection);
+            }
 
             List<RegOrganizationInspectionFile> oldFiles = regOrganizationInspectionFileRepo.findRegOrganizationInspectionFilesByOrganizationInspectionAndIsDeleted(inspection, false).orElse(null);
             if (oldFiles != null) {
                 Set<Long> oldActiveFileIds = oldFiles.stream()
                                             .map(ctr -> ctr.getId())
                                             .collect(Collectors.toSet());
-                Set<Long> deletedFileIds = getDifferences(oldActiveFileIds, newActiveFileIds);
-                markInspectionFilesAsDeleted(deletedFileIds);
+                if (newActiveFileIds == null) {
+                    markInspectionFilesAsDeleted(oldActiveFileIds);
+                } else {
+                    Set<Long> deletedFileIds = getDifferences(oldActiveFileIds, newActiveFileIds);
+                    markInspectionFilesAsDeleted(deletedFileIds);
+                }
             }
 
-            saveNewInspectionFiles(newActiveFileIds, idInspection);
         } catch (Exception e) {
             log.error(e);
             return false;
@@ -135,4 +147,5 @@ public class InspectionFileServiceImpl extends FileServiceImpl implements Inspec
     private void saveNewInspectionFiles(Set<Long> newActiveFileIds, Long idInspection) {
         regOrganizationInspectionFileRepo.updateFilesAsNotDeletedAndSetIdInspection(newActiveFileIds, idInspection);
     }
+
 }

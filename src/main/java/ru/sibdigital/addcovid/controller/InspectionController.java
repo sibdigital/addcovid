@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.dto.InspectionFileDto;
 import ru.sibdigital.addcovid.dto.KeyValue;
 import ru.sibdigital.addcovid.dto.RegOrganizationInspectionDto;
+import ru.sibdigital.addcovid.dto.RegOrganizationInspectionFileDto;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.InspectionService;
@@ -106,15 +107,12 @@ public class InspectionController {
     }
 
     @PostMapping("/save_inspection_files")
-    public @ResponseBody Boolean saveInspectionFiles(@RequestBody List<InspectionFileDto> inspectionFileDtoList){
-        Boolean success = true;
-        if (inspectionFileDtoList != null && !inspectionFileDtoList.isEmpty()) {
-            List<Long> inspectionFileIds = inspectionFileDtoList.stream()
-                    .map(ctr -> ctr.getId())
-                    .collect(Collectors.toList());
-
-            Long idInspection = inspectionFileDtoList.get(0).getIdInspection();
-            success = inspectionFileService.saveInspectionFiles(inspectionFileIds, idInspection);
+    public @ResponseBody Boolean saveInspectionFiles(@RequestBody InspectionFileDto inspectionFileDto){
+        Boolean success = false;
+        if (inspectionFileDto != null) {
+            List<RegOrganizationInspectionFileDto> roifds = inspectionFileDto.getInspectionFileList();
+            Long idInspection = inspectionFileDto.getIdInspection();
+            success = inspectionFileService.saveInspectionFiles(roifds, idInspection);
         }
         return success;
     }

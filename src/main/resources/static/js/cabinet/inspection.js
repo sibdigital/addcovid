@@ -219,8 +219,10 @@ function saveInspection() {
 }
 
 function saveInspectionFiles(savedInspection) {
-    let params = $$('inspection_docs_grid').serialize();
-    params.forEach((el) => {el.idInspection = savedInspection.id;});
+    let params = {
+        'inspectionFileList': $$('inspection_docs_grid').serialize(),
+        'idInspection': savedInspection.id
+    };
 
     webix.ajax()
         .headers({'Content-type': 'application/json'})
