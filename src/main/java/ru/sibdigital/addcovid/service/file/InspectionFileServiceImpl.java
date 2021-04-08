@@ -1,12 +1,10 @@
 package ru.sibdigital.addcovid.service.file;
 
 import lombok.extern.log4j.Log4j2;
-import org.apache.poi.ss.formula.functions.T;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.sibdigital.addcovid.dto.InspectionFileDto;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.repository.RegOrganizationInspectionFileRepo;
 import ru.sibdigital.addcovid.repository.RegOrganizationInspectionRepo;
