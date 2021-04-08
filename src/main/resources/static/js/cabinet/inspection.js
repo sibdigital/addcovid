@@ -163,7 +163,7 @@ const inspectionFormPanel = {
             minWidth: 200,
             maxWidth: 300,
             css: 'webix_secondary',
-            value: 'Отменить',
+            value: 'Отмена',
             click: () => {
                 changeContentView(inspectionList);
                 hideBtnBack();
