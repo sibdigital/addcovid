@@ -65,7 +65,7 @@ const documents = {
                 }
                 result += "<div class='doc_time_create'>" + downloadTime + "</div>" +
                     "<div class='download_docs'>" +
-                    "<a style='text-decoration: none; color: #1ca1c1' href=uploads/" + obj.fileName + obj.fileExtension + " download>Скачать файл</a>" +
+                    "<a style='text-decoration: none; color: #1ca1c1' href=" + LINK_PREFIX + file.fileName + LINK_SUFFIX + " download>Скачать файл</a>" +
                     "<span style='padding-left: 10px; color: #389a0d; font-weight: 400'>" + acceptionStatus + "</span>" +
                     "</div>" +
                     "</div>" +
