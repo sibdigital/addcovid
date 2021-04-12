@@ -318,3 +318,8 @@ body {margin: 0}
     background: #f3f3f3;
     padding: 2px;
 }
+
+.webix_list.multiline .webix_list_item{
+    line-height: normal;
+    padding: 0px;
+}

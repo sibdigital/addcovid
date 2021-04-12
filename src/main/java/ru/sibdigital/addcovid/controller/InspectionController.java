@@ -3,19 +3,16 @@ package ru.sibdigital.addcovid.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import ru.sibdigital.addcovid.dto.InspectionFileDto;
 import ru.sibdigital.addcovid.dto.KeyValue;
 import ru.sibdigital.addcovid.dto.RegOrganizationInspectionDto;
-import ru.sibdigital.addcovid.model.ClsOrganization;
-import ru.sibdigital.addcovid.model.RegOrganizationInspection;
-import ru.sibdigital.addcovid.repository.ClsControlAuthorityRepo;
-import ru.sibdigital.addcovid.repository.ClsInspectionResultRepo;
-import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
-import ru.sibdigital.addcovid.repository.RegOrganizationInspectionRepo;
+import ru.sibdigital.addcovid.dto.RegOrganizationInspectionFileDto;
+import ru.sibdigital.addcovid.model.*;
+import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.InspectionService;
+import ru.sibdigital.addcovid.service.file.InspectionFileService;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -39,6 +36,9 @@ public class InspectionController {
 
     @Autowired
     private InspectionService inspectionService;
+
+    @Autowired
+    private InspectionFileService inspectionFileService;
 
     @GetMapping("/org_inspections")
     public @ResponseBody
@@ -75,19 +75,46 @@ public class InspectionController {
     }
 
     @PostMapping("/save_inspection")
-    public @ResponseBody String saveInspection(@RequestBody RegOrganizationInspectionDto inspectionDto, HttpSession session) {
+    public @ResponseBody RegOrganizationInspection saveInspection(@RequestBody RegOrganizationInspectionDto inspectionDto, HttpSession session) {
         RegOrganizationInspection inspection = null;
 
         Long idOrganization = (Long) session.getAttribute("id_organization");
         inspectionDto.setOrganizationId(idOrganization);
 
         try {
-            inspectionService.saveInspection(inspectionDto);
-            return "Сохранено";
-
+            inspection = inspectionService.saveInspection(inspectionDto);
         } catch (Exception e) {
-            return "Не удалось сохранить";
+            log.error(e.getMessage());
         }
-
+        return inspection;
     }
+
+    @GetMapping("/inspection_files/{id_inspection}")
+    public @ResponseBody List<RegOrganizationInspectionFile> getRegOrgInspectionFiles(@PathVariable("id_inspection") Long inspectionId) {
+        if (inspectionId != -1) {
+            return inspectionFileService.getInspectionFilesByInspectionId(inspectionId);
+        } else
+            return null;
+    }
+
+    @PostMapping(value = "/upload_inspection_file")
+    @ResponseBody
+    public RegOrganizationInspectionFile uploadInspectionFile(@RequestParam(value = "upload") MultipartFile part,
+                                             @RequestParam(required = false) Long idInspection){
+        RegOrganizationInspectionFile inspectionFile = inspectionFileService.uploadInspectionFile(part, idInspection);
+
+        return inspectionFile;
+    }
+
+    @PostMapping("/save_inspection_files")
+    public @ResponseBody Boolean saveInspectionFiles(@RequestBody InspectionFileDto inspectionFileDto){
+        Boolean success = false;
+        if (inspectionFileDto != null) {
+            List<RegOrganizationInspectionFileDto> roifds = inspectionFileDto.getInspectionFileList();
+            Long idInspection = inspectionFileDto.getIdInspection();
+            success = inspectionFileService.saveInspectionFiles(roifds, idInspection);
+        }
+        return success;
+    }
+
 }
