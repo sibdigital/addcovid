@@ -273,7 +273,7 @@ const requestWizard = {
                                                                         //"<div id='del_button' style='position: absolute;top: 0; right: 5px;' ondblclick='del_file()' class='mdi mdi-close-thick'></div>" +
                                                                         //"<div id='plus_button' style='position: absolute;top: 0; right: 20px;'  ondblclick='' class='mdi mdi-plus-thick'></div>" +
                                                                         "<div class='doc_time_create'>" + downloadTime + "</div>" +
-                                                                        "<div class='download_docs'><a style='text-decoration: none; color: #1ca1c1' href=uploads/" + obj.fileName + obj.fileExtension + " download>Скачать файл</a></div>" +
+                                                                        "<div class='download_docs'><a style='text-decoration: none; color: #1ca1c1' href=" + LINK_PREFIX + obj.fileName + LINK_SUFFIX + " download>Скачать файл</a></div>" +
                                                                         //"<div id='"+obj.id+"' style='right: 0'></div> "+
                                                                         "</div>" +
                                                                         "</div>"
