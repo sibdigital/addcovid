@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${application_name}">. Личный кабинет</title>
+    <link type="text/css" rel="stylesheet" th:href="@{/libs/webix.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/libs/materialdesignicons.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/css/cabinet/cabinet.css}">
+
+    <script th:src="@{/libs/webix.min.js}"></script>
+    <script th:src="@{/libs/routie.min.js}"></script>
+    <script th:src="@{/libs/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{/js/consentPersonalData.js}"></script>
+</head>
+<body>
+<script th:inline="javascript">
+    webix.i18n.setLocale("ru-RU");
+
+    webix.ui({
+        type: 'form',
+        id: 'mainForm',
+        css: {
+            'background':"#ccd7e6 !important" //#323B55"#ccd7e6
+        },
+        rows:[
+            {
+                gravity: 0.9,
+            },
+            {
+                view: "align",
+                align: "middle,center",
+                body: {
+                    cols: [
+                        {
+                            id: "leftLayout",
+                            margin:0,
+                            padding:{
+                                top:55, bottom:25
+                            },
+                            width: 350,
+                            css: {
+                                "background":"#475466 !important" //#2b334a
+                            },
+                            rows: [
+                                {
+                                    view: "label",
+                                    height: 200,
+                                    id: "logo",
+                                    align: "center",
+                                    template: "<img src = \"logo.png\">"
+                                },
+                                { view:"label", label:`<span style="font-size: 1.5rem; color: #ccd7e6">Добро пожаловать!</span>`,height:50, align:"center" },
+                                { view:"label", label:`<span style="font-size: 1rem; color: #fff6f6">Информационная система</span>`,  height:50, align:"center" },
+                                { view:"label", label:`<span style="font-size: 1rem; color: #fff6f6">Работающая Бурятия</span>`,height:50, align:"center"},
+                                { view:"label", label:`<span style="font-size: 0.8rem; color: #fff6f6">©2020</span>`,height:50, align:"center" },
+                            ]
+
+                        },
+                        {
+                            id: 'form',
+                            view: 'form',
+                            width: 350,
+                            complexData: true,
+                            elements: [
+                                {
+                                    view: 'label',
+                                    label: 'Выберите организацию для продолжения',
+                                },
+                                {
+                                    view: 'list',
+                                    id: 'organizations',
+                                    scroll: true,
+                                    select: 1,
+                                    data: [[${organizations}]],
+                                    type: {
+                                        height: 65,
+                                        width: 'auto',
+                                        template: '<div style="line-height: 1em">#organizationShortName#</div><div>ИНН: #organizationInn#</div>'
+                                    },
+                                    on: {
+                                        onItemClick: function (id) {
+                                            $$('continue_button').enable();
+                                        }
+                                    }
+                                },
+                                {
+                                    view: 'button',
+                                    id: 'continue_button',
+                                    css: 'myClass',
+                                    value: 'Продолжить',
+                                    disabled: true,
+                                    click: () => {
+                                        const item = $$('organizations').getSelectedItem();
+                                        window.location.href = 'esia/' + item.esiaId;
+                                    }
+                                },
+                            ]
+                        }
+                    ]
+                }
+            },
+            {}
+        ]
+    })
+</script>
+</body>
+</html>

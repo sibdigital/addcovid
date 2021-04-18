@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -8,11 +9,20 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import ru.sibdigital.addcovid.config.oauth2.CustomAuthorizationRequestResolver;
 import ru.sibdigital.addcovid.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity()
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private ClientRegistrationRepository clientRegistrationRepository;
+
+    @Autowired
+    private OAuth2AccessTokenResponseClient accessTokenResponseClient;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -52,6 +62,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/cabinet", true)
                 .failureUrl("/login?error=true")
                 .and()
+                .oauth2Login(oauth2Login -> oauth2Login
+                        .authorizationEndpoint(authorizationEndpoint ->
+                                authorizationEndpoint.authorizationRequestResolver(
+                                        new CustomAuthorizationRequestResolver(this.clientRegistrationRepository)
+                                )
+                        )
+                        .tokenEndpoint(tokenEndpoint ->
+                                tokenEndpoint.accessTokenResponseClient(this.accessTokenResponseClient)
+                        )
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/cabinet")
+                )
                 .logout()
                 .logoutUrl("/logout")
                 .deleteCookies("JSESSIONID")

@@ -127,11 +127,21 @@
                                         rows:[]
                                     },
                                     {
-                                        cols: [
+                                        rows: [
                                             {
-                                                margin: 5, cols: [
-                                                    {view: "button", id: "btn", align: "center", value: "Войти", maxWidth: 100, css: 'myClass', click: submit},
-                                                    //{ view:"button", value:"Cancel"}
+                                                cols: [
+                                                    {
+                                                        margin: 5, cols: [
+                                                            {view: "button", id: "btn", align: "center", value: "Войти", maxWidth: 100, css: 'myClass', click: submit},
+                                                            //{ view:"button", value:"Cancel"}
+                                                        ]
+                                                    },
+                                                    {
+                                                        view: 'label',
+                                                        id: 'lbl',
+                                                        align: 'center',
+                                                        label: '<a href="oauth2/authorization/esia" style="margin-right: 10px; color: #6e6e6e">Войти через ЕСИА</a>',
+                                                    },
                                                 ]
                                             },
                                             {
