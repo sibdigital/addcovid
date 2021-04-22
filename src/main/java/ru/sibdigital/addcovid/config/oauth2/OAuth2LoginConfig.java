@@ -1,7 +1,7 @@
 package ru.sibdigital.addcovid.config.oauth2;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -14,19 +14,24 @@ import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCo
 import org.springframework.security.oauth2.client.http.OAuth2ErrorResponseErrorHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AccessTokenResponse;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames;
 import org.springframework.security.oauth2.core.http.converter.OAuth2AccessTokenResponseHttpMessageConverter;
 import org.springframework.security.oauth2.jwt.JwtDecoderFactory;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import ru.sibdigital.addcovid.service.SettingService;
+import ru.sibdigital.addcovid.utils.ConstantNames;
 import ru.sibdigital.addcovid.utils.EsiaUtil;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -35,36 +40,82 @@ import java.util.stream.Stream;
 @Slf4j
 public class OAuth2LoginConfig {
 
-    @Value("${esia.client-id}")
-    private String esiaClientId;
+    @Autowired
+    private ClientRegistrationRepository clientRegistrationRepository;
 
-    @Value("${esia.authorization.url}")
-    private String esiaAuthorizationUrl;
-
-    @Value("${esia.token.url}")
-    private String esiaTokenUrl;
-
-    @Value("${esia.user.scopes}")
-    private String userScopes;
+    @Autowired
+    private SettingService settingService;
 
     @Bean
-    public ClientRegistrationRepository clientRegistrationRepository() {
-        return new InMemoryClientRegistrationRepository(this.esiaClientRegistration());
+    public OAuth2AuthorizationRequestResolver customAuthorizationRequestResolver() {
+        CustomAuthorizationRequestResolver customAuthorizationRequestResolver =
+                new CustomAuthorizationRequestResolver(this.clientRegistrationRepository, this.settingService);
+        return customAuthorizationRequestResolver;
     }
 
-    private ClientRegistration esiaClientRegistration() {
-        String scopes = userScopes != null && !userScopes.isBlank() ? "openid " + userScopes : "openid";
-        return ClientRegistration.withRegistrationId("esia")
-                .clientId(esiaClientId)
-                .clientAuthenticationMethod(ClientAuthenticationMethod.POST)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUriTemplate("{baseUrl}/login/oauth2/code/{registrationId}")
-                .scope(StringUtils.delimitedListToStringArray(scopes, " "))
-                .authorizationUri(esiaAuthorizationUrl)
-                .tokenUri(esiaTokenUrl)
-//                .userInfoUri("")
-                .clientName("ЕСИА")
-                .build();
+    public final class CustomAuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
+
+        private final OAuth2AuthorizationRequestResolver defaultAuthorizationRequestResolver;
+        private final SettingService settingService;
+
+        public CustomAuthorizationRequestResolver(ClientRegistrationRepository clientRegistrationRepository,
+                                                  SettingService settingService) {
+            this.defaultAuthorizationRequestResolver =
+                    new DefaultOAuth2AuthorizationRequestResolver(
+                            clientRegistrationRepository, "/oauth2/authorization");
+            this.settingService = settingService;
+        }
+
+        @Override
+        public OAuth2AuthorizationRequest resolve(HttpServletRequest request) {
+            OAuth2AuthorizationRequest authorizationRequest =
+                    this.defaultAuthorizationRequestResolver.resolve(request);
+
+            return authorizationRequest != null ?
+                    customAuthorizationRequest(authorizationRequest) :
+                    null;
+        }
+
+        @Override
+        public OAuth2AuthorizationRequest resolve(HttpServletRequest request, String clientRegistrationId) {
+            OAuth2AuthorizationRequest authorizationRequest =
+                    this.defaultAuthorizationRequestResolver.resolve(
+                            request, clientRegistrationId);
+
+            return authorizationRequest != null ?
+                    customAuthorizationRequest(authorizationRequest) :
+                    null;
+        }
+
+        private OAuth2AuthorizationRequest customAuthorizationRequest(OAuth2AuthorizationRequest authorizationRequest) {
+            String clientId = authorizationRequest.getClientId();
+            String scope = StringUtils.collectionToDelimitedString(authorizationRequest.getScopes(), " ");
+            String timestamp = EsiaUtil.getTimestamp();
+            String state = EsiaUtil.getState();
+
+            String alias = this.settingService.findActualByKey(ConstantNames.SETTING_ESIA_KEYSTORE_ALIAS, "");
+            String password = this.settingService.findActualByKey(ConstantNames.SETTING_ESIA_KEYSTORE_PASSWORD, "");
+            String clientSecret = EsiaUtil.getClientSecret(scope + timestamp + clientId + state, alias, password);
+
+            String params = "?"
+                    .concat("client_id=" + authorizationRequest.getClientId() + "&")
+                    .concat("scope=" + scope + "&")
+                    .concat("state=" + state + "&")
+                    .concat("timestamp=" + URLEncoder.encode(timestamp, StandardCharsets.UTF_8) + "&")
+                    .concat("response_type=" + authorizationRequest.getResponseType().getValue() + "&")
+                    .concat("redirect_uri=" + URLEncoder.encode(authorizationRequest.getRedirectUri(), StandardCharsets.UTF_8) + "&")
+                    .concat("client_secret=" + URLEncoder.encode(clientSecret, StandardCharsets.UTF_8));
+
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.put("registration_id", authorizationRequest.getAttribute("registration_id"));
+
+            return OAuth2AuthorizationRequest.from(authorizationRequest)
+                    .authorizationRequestUri(authorizationRequest.getAuthorizationUri() + params)
+                    .state(state)
+                    .scope(scope.split(" "))
+                    .attributes(attributes)
+                    .build();
+        }
     }
 
     @Bean
@@ -77,7 +128,7 @@ public class OAuth2LoginConfig {
     public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
         DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient =
                 new DefaultAuthorizationCodeTokenResponseClient();
-        accessTokenResponseClient.setRequestEntityConverter(new CustomRequestEntityConverter());
+        accessTokenResponseClient.setRequestEntityConverter(new CustomRequestEntityConverter(this.settingService));
 
         OAuth2AccessTokenResponseHttpMessageConverter tokenResponseHttpMessageConverter =
                 new OAuth2AccessTokenResponseHttpMessageConverter();
@@ -94,9 +145,11 @@ public class OAuth2LoginConfig {
             Converter<OAuth2AuthorizationCodeGrantRequest, RequestEntity<?>> {
 
         private OAuth2AuthorizationCodeGrantRequestEntityConverter defaultConverter;
+        private SettingService settingService;
 
-        public CustomRequestEntityConverter() {
-            defaultConverter = new OAuth2AuthorizationCodeGrantRequestEntityConverter();
+        public CustomRequestEntityConverter(SettingService settingService) {
+            this.defaultConverter = new OAuth2AuthorizationCodeGrantRequestEntityConverter();
+            this.settingService = settingService;
         }
 
         @Override
@@ -105,15 +158,13 @@ public class OAuth2LoginConfig {
             MultiValueMap<String, String> formParameters = (MultiValueMap<String,String>) entity.getBody();
 
             String clientId = formParameters.getFirst("client_id");
-            String scope = "openid " + userScopes;
+            String scope = "openid " + settingService.findActualByKey(ConstantNames.SETTING_ESIA_USER_SCOPES, "");
             String state = EsiaUtil.getState();
             String timestamp = EsiaUtil.getTimestamp();
-            String clientSecret = "";
-            try {
-                clientSecret = EsiaUtil.getClientSecret(clientId, scope, state, timestamp);
-            } catch (Exception e) {
-                log.error("Client secret not generated", e);
-            }
+
+            String alias = settingService.findActualByKey(ConstantNames.SETTING_ESIA_KEYSTORE_ALIAS, "");
+            String password = settingService.findActualByKey(ConstantNames.SETTING_ESIA_KEYSTORE_PASSWORD, "");
+            String clientSecret = EsiaUtil.getClientSecret(scope + timestamp + clientId + state, alias, password);
 
             formParameters.add("scope", scope);
             formParameters.add("state", state);

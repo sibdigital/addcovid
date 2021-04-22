@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import ru.sibdigital.addcovid.model.ClsSettings;
 import ru.sibdigital.addcovid.repository.ClsSettingsRepo;
 
+import java.util.List;
+
 
 @Service
 public class SettingServiceImpl implements SettingService {
@@ -24,6 +26,11 @@ public class SettingServiceImpl implements SettingService {
         ClsSettings settings = findActualByKey(key);
         String ret = settings != null ? settings.getStringValue() : defaultValue;
         return ret;
+    }
+
+    @Override
+    public List<ClsSettings> findAllActual() {
+        return clsSettingsRepo.findAll();
     }
 
     public ClsSettings getRequestsStatusStyle(){

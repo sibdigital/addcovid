@@ -2,7 +2,6 @@ package ru.sibdigital.addcovid.service.esia;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -15,6 +14,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import ru.sibdigital.addcovid.dto.esia.*;
+import ru.sibdigital.addcovid.service.SettingService;
+import ru.sibdigital.addcovid.utils.ConstantNames;
 import ru.sibdigital.addcovid.utils.EsiaUtil;
 
 import java.util.ArrayList;
@@ -26,20 +27,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class EsiaServiceImpl implements EsiaService {
 
-    @Value("${esia.client-id}")
-    private String clientId;
-
-    @Value("${esia.token.url}")
-    private String tokenUri;
-
-    @Value("${esia.api.url}")
-    private String apiUrl;
-
-    @Value("${esia.organization.scopes}")
-    private String organizationScopes;
-
     @Autowired
     private OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
+
+    @Autowired
+    private SettingService settingService;
 
     private static OAuth2AuthenticationToken getAuthentication() {
         return (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -52,16 +44,15 @@ public class EsiaServiceImpl implements EsiaService {
      * @return Token
      */
     public Token getAccessToken(List<String> scopes) {
+        String clientId = settingService.findActualByKey("esia.client-id", "");
+        String alias = settingService.findActualByKey("esia.keystore.alias", "");
+        String password = settingService.findActualByKey("esia.keystore.password", "");
+        String tokenUri = settingService.findActualByKey("esia.token.url", "");
+
         String scope = StringUtils.collectionToDelimitedString(scopes, " ");
         String state = EsiaUtil.getState();
         String timestamp = EsiaUtil.getTimestamp();
-        String clientSecret;
-        try {
-            clientSecret = EsiaUtil.getClientSecret(clientId, scope, state, timestamp);
-        } catch (Exception e) {
-            log.error("Client secret not generated", e);
-            return null;
-        }
+        String clientSecret = EsiaUtil.getClientSecret(scope + timestamp + clientId + state, alias, password);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("client_id", clientId);
@@ -103,7 +94,8 @@ public class EsiaServiceImpl implements EsiaService {
         headers.set("Authorization", "Bearer " + client.getAccessToken().getTokenValue());
         HttpEntity request = new HttpEntity(headers);
         try {
-            ResponseEntity<User> response = restTemplate.exchange(apiUrl + "/prns/{id}", HttpMethod.GET, request, User.class, userId);
+            String url = settingService.findActualByKey(ConstantNames.SETTING_ESIA_API_URL, "") + "/prns/{id}";
+            ResponseEntity<User> response = restTemplate.exchange(url, HttpMethod.GET, request, User.class, userId);
             return response.getBody();
         } catch (Exception e) {
             log.error("User not received: " + e.getMessage(), e);
@@ -128,7 +120,8 @@ public class EsiaServiceImpl implements EsiaService {
         headers.set("Authorization", "Bearer " + client.getAccessToken().getTokenValue());
         HttpEntity request = new HttpEntity(headers);
         try {
-            ResponseEntity<Roles> response = restTemplate.exchange(apiUrl + "/prns/{id}/roles", HttpMethod.GET, request, Roles.class, userId);
+            String url = settingService.findActualByKey(ConstantNames.SETTING_ESIA_API_URL, "") + "/prns/{id}/roles";
+            ResponseEntity<Roles> response = restTemplate.exchange(url, HttpMethod.GET, request, Roles.class, userId);
             return response.getBody();
         } catch (Exception e) {
             log.error("Roles not received: " + e.getMessage(), e);
@@ -151,7 +144,8 @@ public class EsiaServiceImpl implements EsiaService {
 
         List<Long> orgIds = userOrganizations.stream().map(o -> o.getOid()).collect(Collectors.toList());
 
-        List<String> scopes = Arrays.asList(StringUtils.delimitedListToStringArray(organizationScopes, " "));
+        List<String> scopes = Arrays.asList(StringUtils.delimitedListToStringArray(settingService
+                .findActualByKey(ConstantNames.SETTING_ESIA_ORGANIZATION_SCOPES, ""), " "));
         List<String> scopeLinks = new ArrayList<>();
         scopes.forEach(scope -> {
             orgIds.forEach(id -> {
@@ -183,7 +177,8 @@ public class EsiaServiceImpl implements EsiaService {
         headers.set("Authorization", token.getTokenType() + " " + token.getAccessToken());
         HttpEntity request = new HttpEntity(headers);
         try {
-            ResponseEntity<Organization> response = restTemplate.exchange(apiUrl + "/orgs/{id}", HttpMethod.GET, request, Organization.class, orgId);
+            String url = settingService.findActualByKey(ConstantNames.SETTING_ESIA_API_URL, "") + "/orgs/{id}";
+            ResponseEntity<Organization> response = restTemplate.exchange(url, HttpMethod.GET, request, Organization.class, orgId);
             return response.getBody();
         } catch (Exception e) {
             log.error("Organization not received: " + e.getMessage(), e);
