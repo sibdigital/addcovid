@@ -85,8 +85,9 @@ public class RegistrationController {
             String text = "Здравствуйте! <br/>" +
                     "Для активации учетной записи " + clsOrganization.getName()+ " в личном кабинете на портале " +
                     applicationConstants.getApplicationName() + " перейдите по ссылке: <a href=\"" + activateUrl + "\">Активация учетной записи</a><br/>" +
+                    "Если ссылка не открывается, скопируйте текстовую ссылку и вставьте её в адресную строку браузера: " + activateUrl + "<br/>" +
                     "Если вы не регистрировали личный кабинет на портале " +
-                    applicationConstants.getApplicationName() + ", проигнорируйте это сообщение";
+                    applicationConstants.getApplicationName() + ", проигнорируйте это сообщение.";
             boolean emailSent = emailService.sendSimpleMessageNoAsync(clsOrganization.getEmail(),
                     "Регистрация на портале " + applicationConstants.getApplicationName(), text);
             if (!emailSent) {
