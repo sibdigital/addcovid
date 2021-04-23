@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,15 +16,13 @@ import ru.sibdigital.addcovid.dto.*;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 import ru.sibdigital.addcovid.repository.*;
-import ru.sibdigital.addcovid.service.InspectionService;
+import ru.sibdigital.addcovid.service.OrganizationService;
 import ru.sibdigital.addcovid.service.RequestService;
 import ru.sibdigital.addcovid.service.SettingServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import java.sql.Timestamp;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -89,18 +87,79 @@ public class CabinetController {
     @Autowired
     private ClsDepartmentContactRepo clsDepartmentContactRepo;
 
+    @Autowired
+    private OrganizationService organizationService;
 
-    @GetMapping("/cabinet")
-    public String cabinet(HttpSession session, Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User principal = (User) auth.getPrincipal();
-        ClsOrganization organization = clsOrganizationRepo.findById(Long.valueOf(principal.getUsername())).orElse(null);
-        session.setAttribute("id_organization", organization.getId());
+    @ModelAttribute
+    public void addAttributes(Model model) {
         model.addAttribute("application_name", applicationConstants.getApplicationName());
-        model.addAttribute("id_organization", organization.getId());
         model.addAttribute("link_prefix", applicationConstants.getLinkPrefix());
         model.addAttribute("link_suffix", applicationConstants.getLinkSuffix());
+    }
+
+    @GetMapping("/cabinet")
+    public String cabinet(Authentication authentication, HttpSession session) {
+        Long id;
+        if (authentication.getPrincipal() instanceof OidcUser) {
+            id = (Long) session.getAttribute("id_organization");
+            if (id == null) {
+                return "redirect:/esia";
+            }
+        } else {
+            User principal = (User) authentication.getPrincipal();
+            id = Long.valueOf(principal.getUsername());
+            session.setAttribute("id_organization", id);
+        }
         return "cabinet/main";
+    }
+
+    @GetMapping("/esia")
+    public String esia(Model model, HttpSession session) {
+        try {
+            List<OrganizationDto> organizations = organizationService.getOrganizationsByEsia();
+            if (organizations.isEmpty()) {
+                return "redirect:/logout";
+            }
+            if (organizations.size() == 1) {
+                OrganizationDto esiaOrg = organizations.get(0);
+                ClsOrganization organization = organizationService.findByInnAndPrincipalIsNotNull(esiaOrg.getOrganizationInn(),
+                        Arrays.asList(esiaOrg.getOrganizationType()));
+                if (organization == null) {
+                    organization = organizationService.saveNewClsOrganizationAsActivated(esiaOrg);
+                }
+                session.setAttribute("id_organization", organization.getId());
+                return "redirect:/cabinet";
+            }
+            model.addAttribute("organizations", organizations);
+            session.setAttribute("organizations", organizations);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "redirect:/logout";
+        }
+        return "cabinet/esia";
+    }
+
+    @GetMapping("/esia/{id}")
+    public String esia(@PathVariable(name = "id") Long id,
+                       @SessionAttribute(name = "id_organization", required = false) Long idOrganization,
+                       @SessionAttribute(name = "organizations") List<OrganizationDto> organizations,
+                       HttpSession session) {
+        if (idOrganization != null) {
+            return "redirect:/cabinet";
+        }
+        try {
+            OrganizationDto esiaOrg = organizations.stream().filter(o -> o.getEsiaId().equals(id)).findFirst().get();
+            ClsOrganization organization = organizationService.findByInnAndPrincipalIsNotNull(esiaOrg.getOrganizationInn(),
+                    Arrays.asList(esiaOrg.getOrganizationType()));
+            if (organization == null) {
+                organization = organizationService.saveNewClsOrganizationAsActivated(esiaOrg);
+            }
+            session.setAttribute("id_organization", organization.getId());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return "redirect:/logout";
+        }
+        return "redirect:/cabinet";
     }
 
     @GetMapping("/check_consent")
@@ -121,7 +180,7 @@ public class CabinetController {
     @GetMapping("/getConsentPersonalData")
     public @ResponseBody String getConsentPersonalData() {
         ClsSettings settings = settingServiceImpl.getConsentPersonalData();
-        return settings.getStringValue();
+        return settings != null ? settings.getStringValue() : "";
     }
 
     @GetMapping("/saveConsentPersonalData")
@@ -537,9 +596,6 @@ public class CabinetController {
     @GetMapping("/news")
     public String getNewsById( @RequestParam("hash_id") String hash_id, Model model){
         model.addAttribute("hash_id", hash_id);
-        model.addAttribute("link_prefix", applicationConstants.getLinkPrefix());
-        model.addAttribute("link_suffix", applicationConstants.getLinkSuffix());
-        model.addAttribute("application_name", applicationConstants.getApplicationName());
         return "news_form";
     }
 

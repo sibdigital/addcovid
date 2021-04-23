@@ -127,11 +127,22 @@
                                         rows:[]
                                     },
                                     {
-                                        cols: [
+                                        rows: [
                                             {
-                                                margin: 5, cols: [
-                                                    {view: "button", id: "btn", align: "center", value: "Войти", maxWidth: 100, css: 'myClass', click: submit},
-                                                    //{ view:"button", value:"Cancel"}
+                                                cols: [
+                                                    {
+                                                        margin: 5, cols: [
+                                                            {view: "button", id: "btn", align: "center", value: "Войти", maxWidth: 100, css: 'myClass', click: submit},
+                                                            //{ view:"button", value:"Cancel"}
+                                                        ]
+                                                    },
+                                                    {
+                                                        view: 'label',
+                                                        id: 'esia_label',
+                                                        align: 'center',
+                                                        label: '<a href="oauth2/authorization/esia" style="margin-right: 10px; color: #6e6e6e">Войти через ЕСИА</a>',
+                                                        hidden: true,
+                                                    },
                                                 ]
                                             },
                                             {
@@ -191,6 +202,13 @@
             $$("btn").config.maxWidth = 750; $$("btn").resize();
             $$("firstRow").addView($$("logo"),0);
         }
+
+        webix.ajax().get('check_esia').then(function (result) {
+            result = result.text();
+            if (result === 'true') {
+                $$('esia_label').show();
+            }
+        })
     })
 </script>
 </body>

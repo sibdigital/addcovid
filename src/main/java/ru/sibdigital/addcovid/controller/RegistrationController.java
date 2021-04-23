@@ -17,6 +17,7 @@ import ru.sibdigital.addcovid.model.classifier.gov.RegEgrip;
 import ru.sibdigital.addcovid.model.classifier.gov.RegEgrul;
 import ru.sibdigital.addcovid.repository.specification.ClsOrganizationSearchCriteria;
 import ru.sibdigital.addcovid.service.EmailService;
+import ru.sibdigital.addcovid.service.OrganizationService;
 import ru.sibdigital.addcovid.service.RequestService;
 import ru.sibdigital.addcovid.service.SettingService;
 import ru.sibdigital.addcovid.service.crassifier.EgrulService;
@@ -35,6 +36,9 @@ public class RegistrationController {
 
     @Autowired
     private RequestService requestService;
+
+    @Autowired
+    private OrganizationService organizationService;
 
     @Autowired
     private ApplicationConstants applicationConstants;
@@ -78,7 +82,7 @@ public class RegistrationController {
                 }
             }
             // сохраним организацию
-            clsOrganization = requestService.saveClsOrganization(organizationDto);
+            clsOrganization = organizationService.saveNewClsOrganization(organizationDto);
             // отправим письмо со ссылкой на активацию
             String activateUrl = settingService.findActualByKey("activationUrl", "");
             activateUrl += "/activate?inn=" + clsOrganization.getInn() + "&code=" + clsOrganization.getHashCode();
