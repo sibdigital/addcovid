@@ -1,4 +1,4 @@
-function file_upload_view(form_id, name_for_id, upload_url, list_url) {
+function file_upload_view(form_id, name_for_id, upload_url, list_url, form_data, accept_formats) {
     return {
         rows: [
             {
@@ -22,7 +22,7 @@ function file_upload_view(form_id, name_for_id, upload_url, list_url) {
                     result += "<div id='del_button' style='position: absolute;top: 0; right: 5px;' onclick='delete_file("+obj.id+", \"" + name_for_id + "\")' class='mdi mdi-close-thick'></div>"
                     result += "<div class='doc_time_create'>" + downloadTime + "</div>" +
                         "<div class='download_docs'>" +
-                        "<a style='text-decoration: none; color: #1ca1c1' href=uploads/" + obj.fileName + obj.fileExtension + " download>Скачать файл</a>" +
+                        "<a style='text-decoration: none; color: #1ca1c1' href=" + LINK_PREFIX + obj.fileName + LINK_SUFFIX + obj.fileExtension + " download>Скачать файл</a>" +
                         "</div>" +
                         "</div>" +
                         "</div>"
@@ -64,11 +64,11 @@ function file_upload_view(form_id, name_for_id, upload_url, list_url) {
                         upload: upload_url,
                         autosend: true,
                         align: 'left',
-                        accept: 'application/pdf, application/zip, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/jpeg' ,
+                        accept: accept_formats,
                         multiple: true,
                         on: {
                             onBeforeFileAdd: () => {
-                                $$(name_for_id + '_upload').define("formData", $$('inspectionForm').getValues().formDataForUpload);
+                                $$(name_for_id + '_upload').define("formData", form_data);
                             },
 
                             onFileUpload: (response) => {
@@ -84,10 +84,6 @@ function file_upload_view(form_id, name_for_id, upload_url, list_url) {
                     },
                     {}
                 ]
-            },
-            {
-                id: 'formDataForUpload',
-                hidden: true,
             }
         ]
     }

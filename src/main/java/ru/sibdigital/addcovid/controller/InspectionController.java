@@ -15,6 +15,7 @@ import ru.sibdigital.addcovid.service.InspectionService;
 import ru.sibdigital.addcovid.service.file.InspectionFileService;
 
 import javax.servlet.http.HttpSession;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,14 +52,17 @@ public class InspectionController {
         if (organization == null) {
             return null;
         }
-        List<RegOrganizationInspection> inspections = regOrganizationInspectionRepo.findRegOrganizationInspectionsByOrganization(organization).orElse(null);
+        List<RegOrganizationInspection> inspections = regOrganizationInspectionRepo
+                .findRegOrganizationInspectionsByOrganization(organization).orElse(null);
+        inspections.sort(Comparator.comparing(RegOrganizationInspection::getDateOfInspection).reversed());
 
         return inspections;
     }
 
     @GetMapping("/control_authorities_list_short")
     public @ResponseBody List<KeyValue> getControlAuthoritiesForRichselect() {
-        List<KeyValue> list = clsControlAuthorityRepo.findAll().stream()
+        List<KeyValue> list = clsControlAuthorityRepo.findAllByIsDeleted(false).stream()
+                .sorted(Comparator.comparing(ClsControlAuthority::getWeight, Comparator.nullsLast(Comparator.reverseOrder())))
                 .map(ctr -> new KeyValue(ctr.getClass().getSimpleName(), ctr.getId(), ctr.getName()))
                 .collect(Collectors.toList());
 

@@ -1,3 +1,6 @@
+webix.Date.startOnMonday = true;
+webix.i18n.setLocale("ru-RU");
+
 const inspectionTable = {
     view: 'datatable',
     id: "inspections_table",
@@ -32,11 +35,17 @@ const inspectionTable = {
         },
         {
             header: "Результат проверки",
-            template: '#inspectionResult.name#',
+            // template: '#inspectionResult.name#',
+            template: function (obj) {
+                if (obj.inspectionResult) {
+                    return obj.inspectionResult.name;
+                } else {
+                    return "";
+                }
+            },
             adjust: true,
             fillspace: true,
             minWidth: 150,
-            readonly: true,
             sort: 'text',
         },
     ],
@@ -59,10 +68,12 @@ const inspectionTable = {
         },
         onItemDblClick: function (id) {
             let item = this.getItem(id);
+
             changeContentView(inspectionForm(item.id));
             item.controlAuthorityId = item.controlAuthority.id;
-            item.inspectionResultId = item.inspectionResult.id;
-            item.formDataForUpload = {idInspection: item.id};
+            if (item.inspectionResult != null) {
+                item.inspectionResultId = item.inspectionResult.id;
+            }
             $$('inspectionForm').parse(item);
             showBtnBack(inspectionList, 'inspections_table');
         }
@@ -71,35 +82,30 @@ const inspectionTable = {
 }
 
 const inspectionList = {
-    // view: 'scrollview',
-    // id: 'inspectionListFormId',
-    // scroll: 'xy',
-    // body: {
-        // type: 'space',
-        rows: [
-            inspectionTable,
-            {
-                cols: [
-                    {},
-                    {
-                        view: 'button',
-                        align: 'right',
-                        minWidth: 220,
-                        maxWidth: 350,
-                        css: 'webix_primary',
-                        value: 'Добавить',
-                        click: function () {
-                            changeContentView(inspectionForm(-1));
-                            showBtnBack(inspectionList, 'inspections_table');
-                        }
+    rows: [
+        inspectionTable,
+        {
+            cols: [
+                {},
+                {
+                    view: 'button',
+                    align: 'right',
+                    minWidth: 220,
+                    maxWidth: 350,
+                    css: 'webix_primary',
+                    value: 'Добавить',
+                    click: function () {
+                        changeContentView(inspectionForm(-1));
+                        showBtnBack(inspectionList, 'inspections_table');
                     }
-                ]
-            }
-        ],
-    // }
+                }
+            ]
+        }
+    ],
 }
 
 function inspectionFormElements(inspectionId) {
+    var formData = {idInspection: inspectionId};
     return {
         view: 'form',
         id: 'inspectionForm',
@@ -119,7 +125,7 @@ function inspectionFormElements(inspectionId) {
                         label: 'Результат контрольно-надзорного мероприятия',
                         labelPosition: 'top',
                         name: 'inspectionResultId',
-                        required: true,
+                        // required: true,
                         options: 'inspection_results_list_short',
                     },
                 ]
@@ -149,7 +155,11 @@ function inspectionFormElements(inspectionId) {
                 name: 'comment',
                 minHeight: 200,
             },
-            file_upload_view('inspectionForm','inspection', 'upload_inspection_file','inspection_files/' + inspectionId),
+            {
+                id: 'formDataForUpload',
+                hidden: true,
+            },
+            file_upload_view('inspectionForm','inspection', 'upload_inspection_file','inspection_files/' + inspectionId, formData, 'application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, image/jpeg'),
         ]
     }
 }
@@ -187,19 +197,13 @@ const inspectionFormPanel = {
 
 function inspectionForm(inspectionId) {
     return {
-        // view: 'scrollview',
-        // scroll: 'y',
-        // id: 'inspectionFormId',
-        // autowidth: true,
-        // autoheight: true,
-        // body: {
-        //     type: 'space',
-            rows: [
-                inspectionFormElements(inspectionId),
-                inspectionFormPanel
-            ]
-        }
-    // }
+        view: 'form',
+        id: 'inspectionId',
+        rows: [
+            inspectionFormElements(inspectionId),
+            inspectionFormPanel
+        ]
+    }
 }
 
 function saveInspection() {

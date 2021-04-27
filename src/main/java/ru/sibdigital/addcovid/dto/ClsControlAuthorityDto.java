@@ -15,4 +15,6 @@ public class ClsControlAuthorityDto {
     private Long idParent;
     private String name;
     private String shortName;
+    private Integer weight;
+    private Boolean deleted;
 }
