@@ -33,4 +33,9 @@ public class OrganizationDto {
     private String egrulOkved;
     private String[] egrulOkvedAdd;
 
+    private Long esiaId;
+
+    public boolean hasEgrulOrEgrip() {
+        return this.egrulId != null || this.egripId != null;
+    }
 }

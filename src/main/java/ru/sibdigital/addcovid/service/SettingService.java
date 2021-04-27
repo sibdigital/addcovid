@@ -2,6 +2,8 @@ package ru.sibdigital.addcovid.service;
 
 import ru.sibdigital.addcovid.model.ClsSettings;
 
+import java.util.List;
+
 public interface SettingService {
 
     ClsSettings findActual();
@@ -9,4 +11,6 @@ public interface SettingService {
     ClsSettings findActualByKey(String key);
 
     String findActualByKey(String key, String defaultValue);
+
+    List<ClsSettings> findAllActual();
 }
