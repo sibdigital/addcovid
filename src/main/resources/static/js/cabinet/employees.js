@@ -314,7 +314,6 @@ const employees = {
                                 {
                                     view: 'datatable',
                                     id: "employees_table",
-                                    height: userWindowHeight - 263,
                                     minWidth: 220,
                                     select: "row",
                                     navigation: true,
@@ -468,6 +467,7 @@ const employees = {
                                                 }
                                             }
                                         },
+                                        {}
                                     ]
                                 }
                             ]
