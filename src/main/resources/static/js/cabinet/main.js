@@ -207,6 +207,7 @@ let bigMainForm = {
                         {id: "Requests", icon: "wxi-file", value: 'Заявки',
                             // badge: setRequestsBadge()
                         },
+                        {id: 'Inspections', icon: 'mdi mdi-clipboard-text-multiple', value: 'Мои проверки'},
                         {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
                         {id: "Mailing", icon: "mdi mdi-email", value: 'Рассылки',},
                         {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Доп.контакты'}
@@ -249,6 +250,8 @@ let bigMainForm = {
                                 if ($$('prescriptions_table') != null) {
                                     $$('prescriptions_table').destructor();
                                 }
+                            } else if (id == 'Inspections'){
+                                view = inspectionList;
                             } else if (id == 'News') {
                                 view = news;
                             } else if (id == 'Contacts') {
