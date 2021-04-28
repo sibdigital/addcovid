@@ -21,6 +21,8 @@ public class ClsControlAuthority {
     private Long idParent;
     private String name;
     private String shortName;
+    private Boolean isDeleted;
+    private Integer weight;
 
     public void setId(Long id) { this.id = id; }
 
@@ -43,4 +45,25 @@ public class ClsControlAuthority {
     @Basic
     @Column(name = "short_name")
     public String getShortName() { return shortName; }
+
+
+    @Basic
+    @Column(name = "is_deleted")
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    @Basic
+    @Column(name = "weight")
+    public Integer getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Integer weight) {
+        this.weight = weight;
+    }
 }

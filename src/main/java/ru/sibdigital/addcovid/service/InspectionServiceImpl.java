@@ -38,7 +38,11 @@ public class InspectionServiceImpl implements InspectionService {
 
         ClsOrganization organization = clsOrganizationRepo.findById(inspectionDto.getOrganizationId()).orElse(null);
         ClsControlAuthority authority = clsControlAuthorityRepo.findById(inspectionDto.getControlAuthorityId()).orElse(null);
-        ClsInspectionResult result = clsInspectionResultRepo.findById(inspectionDto.getInspectionResultId()).orElse(null);
+
+        ClsInspectionResult result = null;
+        if (inspectionDto.getInspectionResultId() != null) {
+            result = clsInspectionResultRepo.findById(inspectionDto.getInspectionResultId()).orElse(null);
+        }
 
         RegOrganizationInspection inspection = RegOrganizationInspection.builder()
                     .id(inspectionDto.getId())
