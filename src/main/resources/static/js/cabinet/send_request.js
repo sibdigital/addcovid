@@ -638,7 +638,7 @@ function multiviewHeader(title, previous, nextNumber) {
                     }
                 }
             },
-            {type: 'header'He, template: title, borderless: true},
+            {type: 'header', template: title, borderless: true},
         ]
     }
 }
