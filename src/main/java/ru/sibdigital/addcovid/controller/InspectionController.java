@@ -53,7 +53,7 @@ public class InspectionController {
             return null;
         }
         List<RegOrganizationInspection> inspections = regOrganizationInspectionRepo
-                .findRegOrganizationInspectionsByOrganization(organization).orElse(null);
+                .findRegOrganizationInspectionsByOrganizationAndControlAuthority_IsDeleted(organization, false).orElse(null);
         inspections.sort(Comparator.comparing(RegOrganizationInspection::getDateOfInspection).reversed());
 
         return inspections;
