@@ -132,6 +132,43 @@ const profile = {
                             readonly: true,
                             required: true
                         },
+                        {
+                            cols:[
+                                {},
+                                {
+                                    view: "richselect",
+                                    id: "organizationTypeCombo",
+                                    name: "idTypeOrganization",
+                                    label: "Тип организации",
+                                    labelWidth: 130,
+                                    options: {
+                                        body: {
+                                            on: {
+                                                onItemClick:(val) => {
+                                                    let prevValue = $$('organizationTypeCombo').getValue();
+                                                    webix.confirm({
+                                                        title: "Изменение типа организации",
+                                                        ok: "Да", cancel: "Нет",
+                                                        text: "Вы уверены что хотите изменить тип организации?"
+                                                    }).then(() => {
+                                                        webix.ajax().get("update_org_type",{ "type": val }).then((answer) => {
+                                                            if(answer.json() != null){
+                                                                webix.message("Тип успешно изменён","success");
+                                                            } else {
+                                                                webix.message("Не удалось изменить тип", "error");
+                                                            }
+                                                        })
+                                                    }).fail(() => {
+                                                        $$('organizationTypeCombo').setValue(prevValue);
+                                                    })
+                                                }
+                                            }
+                                        }
+                                    },
+
+                                }
+                            ]
+                        }
                     ]
                 },
                 {
@@ -174,6 +211,33 @@ const profile = {
                                     css: "chip",
                                     height: 'auto'
                                 },
+                            },
+                            {
+                                cols: [
+                                    {},
+                                    {
+                                        view: 'button',
+                                        id: 'updByEgrulBtn',
+                                        css: 'webix_primary',
+                                        width: 270,
+                                        value: 'Обновить данные по ЕГРЮЛ',
+                                        click:() => {
+                                            let inn = $$('inn').getValue();
+                                            let param = {"inn":inn}
+                                            webix.ajax().get('update_org_by_egrul',param).then((answer) => {
+                                                let data = answer.json();
+                                                console.log(data);
+                                                if(data !== null) {
+                                                    webix.message("Данные успешно обновлены","success");
+                                                    $$('common_info_form').parse(data);
+                                                } else {
+                                                    webix.message("По данному ИНН не найдено юр. лицо","error");
+                                                }
+                                            })
+                                        }
+
+                                    }
+                                ]
                             }
                         ]
                 },
@@ -298,7 +362,30 @@ const profile = {
             ]
         }
     ],
-    url: 'organization'
+    url:() => {
+        webix.ajax().get("org_types").then((data) => {
+            data = data.json();
+            let selects = [
+                {id: data[0], value: "Самозанятый"},
+                {id: data[1], value: "ИП"},
+                {id: data[2], value: "КФХ"}
+            ]
+            $$('organizationTypeCombo').getPopup().getList().parse(selects);
+            $$('organizationTypeCombo').refresh();
+            console.log(list);
+        })
+        return webix.ajax().get("organization").then((data) => {
+            console.log(data.json());
+            let typeOrg = data.json().idTypeOrganization;
+            console.log(typeOrg)
+            if(typeOrg !== 3 && typeOrg !== 7 && typeOrg !== 8){
+                $$('organizationTypeCombo').hide();
+            } else {
+                $$('updByEgrulBtn').hide();
+            }
+            return data;
+        })
+    }
 }
 
 
