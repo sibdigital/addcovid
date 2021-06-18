@@ -56,9 +56,9 @@ const documents = {
                     "<div>" +
                     "<img style='position: absolute' src = " + docImg + "> " +
                     "<div class='doc_title'>" + obj.originalFileName.slice(0, -4) + "</div>";
-                let acceptionStatus = "Не прикреплен";
+                let acceptionStatus = "Не связан с заявкой";
                 if (obj.docRequestByIdRequest !== null) {
-                    acceptionStatus = "Прикреплен"
+                    acceptionStatus = "Связан с заявкой"
                 } else {
                     result += "<div id='del_button' style='position: absolute;top: 0; right: 5px;' onclick='del_file("+obj.id+")' class='mdi mdi-close-thick'></div>"
 
