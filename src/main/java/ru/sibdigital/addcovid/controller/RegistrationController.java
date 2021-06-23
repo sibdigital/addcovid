@@ -204,7 +204,7 @@ public class RegistrationController {
 
     private boolean isEmailLinked(ClsOrganization organization, String email) {
         boolean emailLinked = false;
-        if (email.equals(organization.getEmail())) {
+        if (email.equalsIgnoreCase(organization.getEmail())) {
             emailLinked = true;
         } else {
             int typeOrganization = organization.getIdTypeOrganization().intValue();
@@ -215,7 +215,7 @@ public class RegistrationController {
                     EgrulResponse response = new EgrulResponse();
                     response.build(egrul);
                     if (response.getData().getEmail() != null && !response.getData().getEmail().isBlank()
-                            && email.equals(response.getData().getEmail())) {
+                            && email.equalsIgnoreCase(response.getData().getEmail())) {
                         emailLinked = true;
                     }
                 }
@@ -226,7 +226,7 @@ public class RegistrationController {
                     response.build(egrips);
                     for (EgripResponse.Data data: response.getData()) {
                         if (data.getEmail() != null && !data.getEmail().isBlank()
-                                && email.equals(data.getEmail())) {
+                                && email.equalsIgnoreCase(data.getEmail())) {
                             emailLinked = true;
                         }
                     }
