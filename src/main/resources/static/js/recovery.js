@@ -117,7 +117,7 @@ const step2 = {
             view: 'text',
             id: 'email',
             name: 'email',
-            label: 'Введите адрес электронной почты',
+            label: 'Введите эл. почту указанную при регистрации',
             labelPosition: 'top',
         },
         {

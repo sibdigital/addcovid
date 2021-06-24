@@ -505,9 +505,16 @@ function loadData(type, inn) {
                     });
                 } else {
                     $$('organizationShortName').define('label', 'Наименование организации');
-                    $$('organizationShortName').define('readonly', true);
+                    var osnIsReadonly = (result.shortName ? result.shortName : result.name) != '';
+                    $$('organizationShortName').define('readonly', osnIsReadonly);
                     $$('organizationShortName').refresh();
                     $$('organizationShortName').show();
+
+                    var osnIsReadonly = result.kpp != '';
+                    $$('organizationKpp').define('readonly', osnIsReadonly);
+                    $$('organizationKpp').refresh();
+                    $$('organizationKpp').show();
+
                     $$('selectOrg').hide();
                     $$('form').setValues({
                         egrulId: result.id,
@@ -560,7 +567,8 @@ function loadData(type, inn) {
                     });
                 } else {
                     $$('organizationShortName').define('label', 'Наименование ИП');
-                    $$('organizationShortName').define('readonly', true);
+                    var osnIsReadonly = result[0].name != '';
+                    $$('organizationShortName').define('readonly', osnIsReadonly);
                     $$('organizationShortName').refresh();
                     $$('organizationShortName').show();
                     $$('selectOrg').hide();

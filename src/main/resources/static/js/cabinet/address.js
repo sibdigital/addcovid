@@ -191,7 +191,7 @@ const Streets = {
             id: 'fiasObjectGuid',
             name: 'fiasStreetObjectId',
             maxWidth: 850,
-            width: 850,
+            width: 600,
             css: { 'margin-inline-end': '10px' },
             label: "Улица<span style='color: red;'>*</span>",
             labelPosition: 'left',
@@ -228,7 +228,7 @@ const Streets = {
                     name: 'house_hand',
                     label: "Дом",
                     labelPosition: 'left',
-                    labelWidth: 45,
+                    labelWidth: 25,
                     maxWidth: 305,
                     css: { 'margin-inline-end': '10px' },
                     placeholder: 'Введите номер дома',
@@ -246,7 +246,7 @@ const Streets = {
                     name: 'apartment_hand',
                     label: "Помещение",
                     labelPosition: 'left',
-                    labelWidth: 100,
+                    labelWidth: 25,
                     maxWidth: 305,
                     tooltip: 'Помещение',
                     placeholder: 'Введите номер помещения/офиса'
@@ -292,8 +292,8 @@ const address = {
                         {
                             cols: [
                                 Streets,
-                                {
-                                    cols: [
+                                // {
+                                //     cols: [
                                         {
                                             view: 'button',
                                             id: 'add_contact',
@@ -306,8 +306,8 @@ const address = {
                                                 $$('regions').setValue(60635); //60635 = Респ. Бурятия
                                             }
                                         }
-                                    ]
-                                }
+                                //     ]
+                                // }
                             ]
                         },
                     ],

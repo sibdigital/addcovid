@@ -190,7 +190,7 @@ public class RegistrationController {
                 boolean emailSent = emailService.sendSimpleMessageNoAsync(organization.getEmail(),
                         applicationConstants.getApplicationName() + ". Восстановление пароля",
                         "По ИНН " + organization.getInn() + " произведена смена пароля. " +
-                                "Ваш новый пароль от личного кабинета на портале " + applicationConstants.getApplicationName() + ":" + newPassword);
+                                "Ваш новый пароль от личного кабинета на портале " + applicationConstants.getApplicationName() + " " + newPassword);
                 if (!emailSent) {
                     return "Не удалось отправить письмо";
                 }

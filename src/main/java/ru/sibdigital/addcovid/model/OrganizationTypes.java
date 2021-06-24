@@ -5,8 +5,8 @@ public enum OrganizationTypes {
     PHYSICAL(2),
     SELF_EMPLOYED(3),
     FILIATION(4),
-    REPRESENTATION(5),
-    DETACHED(6),
+    REPRESENTATION(5), //представительство
+    DETACHED(6), //оболенное подразделение
     IP(7),
     KFH(8);
 
