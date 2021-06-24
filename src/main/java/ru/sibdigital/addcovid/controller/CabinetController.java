@@ -15,10 +15,12 @@ import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.dto.*;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.model.classifier.gov.Okved;
+import ru.sibdigital.addcovid.model.classifier.gov.RegEgrul;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.OrganizationService;
 import ru.sibdigital.addcovid.service.RequestService;
 import ru.sibdigital.addcovid.service.SettingServiceImpl;
+import ru.sibdigital.addcovid.service.crassifier.EgrulService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -89,6 +91,9 @@ public class CabinetController {
 
     @Autowired
     private OrganizationService organizationService;
+
+    @Autowired
+    private EgrulService egrulService;
 
     @ModelAttribute
     public void addAttributes(Model model) {
@@ -945,4 +950,45 @@ public class CabinetController {
         return responseEntity;
     }
 
+    @GetMapping("/update_org_by_egrul")
+    public @ResponseBody ClsOrganization updateOrganizationByEgrul(@RequestParam ("inn") String inn, HttpSession session){
+        Long id_organization = (Long) session.getAttribute("id_organization");
+        if (id_organization == null) { return null; }
+
+        EgrulResponse egrulResponse = new EgrulResponse();
+        RegEgrul regEgrul = egrulService.getEgrul(inn);
+        if(regEgrul != null) {
+            egrulResponse.build(regEgrul);
+        }else{
+            egrulResponse.empty("По введенному ИНН не найдено юр. лицо");
+        }
+
+        ClsOrganization clsOrganization = null;
+        if(egrulResponse.isFinded()){
+            EgrulResponse.Data data = egrulResponse.getData();
+            clsOrganization = organizationService.updateClsOrganizationByEgrul(data, id_organization);
+        }
+        return clsOrganization;
+    }
+
+    @GetMapping("/update_org_type")
+    public @ResponseBody ClsOrganization updateOrganizationType(@RequestParam ("type") int type, HttpSession session){
+        Long id_organization = (Long) session.getAttribute("id_organization");
+        if (id_organization == null) { return null; }
+
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(id_organization).orElse(null);
+        clsOrganization.setIdTypeOrganization(type);
+        clsOrganizationRepo.save(clsOrganization);
+        return clsOrganization;
+    }
+
+    @GetMapping("/org_types")
+    public @ResponseBody List<Integer> getOrganizationTypes(){
+        List<Integer> types = Arrays.asList(
+                OrganizationTypes.SELF_EMPLOYED.getValue(),
+                OrganizationTypes.IP.getValue(),
+                OrganizationTypes.KFH.getValue()
+                );
+        return types;
+    }
 }

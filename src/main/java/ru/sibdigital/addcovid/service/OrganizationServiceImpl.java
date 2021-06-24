@@ -300,4 +300,19 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
         return organizations;
     }
+
+    public ClsOrganization updateClsOrganizationByEgrul(EgrulResponse.Data egrulData, Long id_organization){
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(id_organization).orElse(null);
+
+        clsOrganization.setName(egrulData.getName());
+        clsOrganization.setShortName(egrulData.getShortName());
+        //clsOrganization.setInn(egrulData.getInn());
+        clsOrganization.setOgrn(egrulData.getOgrn());
+        clsOrganization.setAddressJur(egrulData.getJurAddress());
+        clsOrganization.setKpp(egrulData.getKpp());
+        clsOrganization.setIdTypeOrganization(egrulData.getType());
+
+        clsOrganizationRepo.save(clsOrganization);
+        return clsOrganization;
+    }
 }
