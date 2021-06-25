@@ -56,17 +56,17 @@ const documents = {
                     "<div>" +
                     "<img style='position: absolute' src = " + docImg + "> " +
                     "<div class='doc_title'>" + obj.originalFileName.slice(0, -4) + "</div>";
-                // let acceptionStatus = "Не связан с заявкой";
-                // if (obj.docRequestByIdRequest !== null) {
-                //     acceptionStatus = "Связан с заявкой"
-                // } else {
-                //     result += "<div id='del_button' style='position: absolute;top: 0; right: 5px;' onclick='del_file("+obj.id+")' class='mdi mdi-close-thick'></div>"
-                //
-                // }
+                let acceptionStatus = "Не связан с заявкой";
+                if (obj.docRequestByIdRequest !== null) {
+                    acceptionStatus = "Связан с заявкой"
+                } else {
+                    result += "<div id='del_button' style='position: absolute;top: 0; right: 5px;' onclick='del_file("+obj.id+")' class='mdi mdi-close-thick'></div>"
+
+                }
                 result += "<div class='doc_time_create'>" + downloadTime + "</div>" +
                     "<div class='download_docs'>" +
                     "<a style='text-decoration: none; color: #1ca1c1' href=" + LINK_PREFIX + obj.fileName + LINK_SUFFIX + " download>Скачать файл</a>" +
-                    "<span style='padding-left: 10px; color: #389a0d; font-weight: 400'>" + acceptionStatus + "</span>" +
+                    "<span style='padding-left: 10px; color: #389a0d; font-weight: 400'>" +  "</span>" +
                     "</div>" +
                     "</div>" +
                     "</div>"
