@@ -292,24 +292,20 @@ const address = {
                         {
                             cols: [
                                 Streets,
-                                // {
-                                //     cols: [
-                                        {
-                                            view: 'button',
-                                            id: 'add_contact',
-                                            css: 'webix_primary',
-                                            maxWidth: 150,
-                                            label: "<span class='mdi mdi-plus-circle' style='padding-right: 5px'></span><span class='text'>Сохранить</span>",
-                                            hotkey: 'enter',
-                                            click: () => {
-                                                addAddress()
-                                                $$('regions').setValue(60635); //60635 = Респ. Бурятия
-                                            }
-                                        }
-                                //     ]
-                                // }
                             ]
                         },
+                        {
+                            view: 'button',
+                            id: 'add_contact',
+                            css: 'webix_primary',
+                            maxWidth: 150,
+                            label: "<span class='mdi mdi-plus-circle' style='padding-right: 5px'></span><span class='text'>Сохранить</span>",
+                            hotkey: 'enter',
+                            click: () => {
+                                addAddress()
+                                $$('regions').setValue(60635); //60635 = Респ. Бурятия
+                            }
+                        }
                     ],
                     elementsConfig: {
                         on: {
