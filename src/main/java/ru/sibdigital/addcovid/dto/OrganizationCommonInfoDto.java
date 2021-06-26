@@ -14,4 +14,8 @@ public class OrganizationCommonInfoDto {
     private String organizationEmail;
     private String organizationPhone;
     private String newPass;
+    private String shortOrganizationName;
+    private String organizationName;
+    private String addressJur;
+
 }

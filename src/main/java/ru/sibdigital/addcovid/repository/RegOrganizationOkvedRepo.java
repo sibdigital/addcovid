@@ -16,4 +16,6 @@ public interface RegOrganizationOkvedRepo extends JpaRepository<RegOrganizationO
     @Query(nativeQuery = true, value = "select * from reg_organization_okved where (id_organization = :id and is_main = true)")
     Optional<RegOrganizationOkved> findAllByIdOrganizationIsMain(Long id);
 
+    @Query(nativeQuery = true, value = "select * from reg_organization_okved where (id_organization = :id)")
+    Optional<List<RegOrganizationOkved>> findAllByIdOrganization(Long id);
 }

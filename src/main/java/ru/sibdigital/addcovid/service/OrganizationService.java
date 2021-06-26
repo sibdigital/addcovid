@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.service;
 
+import ru.sibdigital.addcovid.dto.EgripResponse;
 import ru.sibdigital.addcovid.dto.EgrulResponse;
 import ru.sibdigital.addcovid.dto.OrganizationDto;
 import ru.sibdigital.addcovid.model.ClsOrganization;
@@ -15,6 +16,8 @@ public interface OrganizationService {
     ClsOrganization saveClsOrganization(ClsOrganization organization);
 
     ClsOrganization updateClsOrganizationByEgrul(EgrulResponse.Data egrulData, Long id_organization);
+
+    ClsOrganization updateClsOrganizationByEgrip(EgripResponse.Data egripData, Long id_organization);
 
     ClsOrganization findById(Long id);
 

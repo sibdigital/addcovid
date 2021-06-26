@@ -68,6 +68,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private EgrulService egrulService;
 
+    @Autowired
+    private DBActualizeService dbActualizeService;
+
     @Transactional
     public ClsOrganization saveNewClsOrganization(OrganizationDto organizationDto) {
         RegEgrul regEgrul = null;
@@ -311,6 +314,23 @@ public class OrganizationServiceImpl implements OrganizationService {
         clsOrganization.setAddressJur(egrulData.getJurAddress());
         clsOrganization.setKpp(egrulData.getKpp());
         clsOrganization.setIdTypeOrganization(egrulData.getType());
+
+        dbActualizeService.addDataFromEgrul(clsOrganization);
+
+        clsOrganizationRepo.save(clsOrganization);
+        return clsOrganization;
+    }
+
+    public ClsOrganization updateClsOrganizationByEgrip(EgripResponse.Data egripData, Long id_organization){
+        ClsOrganization clsOrganization = clsOrganizationRepo.findById(id_organization).orElse(null);
+
+        clsOrganization.setName(egripData.getName());
+        clsOrganization.setShortName(egripData.getName());
+        clsOrganization.setOgrn(egripData.getOgrn());
+        clsOrganization.setAddressJur(egripData.getJurAddress());
+        clsOrganization.setIdTypeOrganization(egripData.getType());
+
+        dbActualizeService.addDataFromEgrul(clsOrganization);
 
         clsOrganizationRepo.save(clsOrganization);
         return clsOrganization;

@@ -126,6 +126,7 @@ const profile = {
                         {
                             view: 'textarea',
                             name: 'addressJur',
+                            id: 'addressJur',
                             label: 'Юридический адрес',
                             labelPosition: 'top',
                             height: 80,
@@ -220,7 +221,7 @@ const profile = {
                                         id: 'updByEgrulBtn',
                                         css: 'webix_primary',
                                         width: 270,
-                                        value: 'Обновить данные по ЕГРЮЛ',
+                                        value: 'Обновить по ЕГРЮЛ/ЕГРИП',
                                         click:() => {
                                             let inn = $$('inn').getValue();
                                             let param = {"inn":inn}
@@ -318,7 +319,14 @@ const profile = {
                                         $$("save_org_data_changes").disable();
                                         $$("invalidMessages").setValue("Введен неверный текущий пароль")
                                     }else{
-                                        $$("invalidMessages").setValue("")
+                                        $$("invalidMessages").setValue("");
+                                        $$("shortOrganizationName").config.readonly = false;
+                                        $$("organizationName").config.readonly = false;
+                                        $$("addressJur").config.readonly = false;
+                                        $$("shortOrganizationName").refresh();
+                                        $$("organizationName").refresh();
+                                        $$("addressJur").refresh();
+
                                         $$("save_org_data_changes").enable();
                                     }
                                 });
@@ -346,6 +354,9 @@ const profile = {
                             let params = {
                                 "organizationEmail": $$("email").getValue(),
                                 "organizationPhone": $$("phone").getValue(),
+                                "shortOrganizationName": $$("shortOrganizationName").getValue(),
+                                "organizationName": $$("organizationName").getValue(),
+                                "addressJur": $$("addressJur").getValue(),
                                 "newPass": $$("retry_pass").getValue()
                             }
                             webix.ajax().headers({'Content-Type': 'application/json'})
@@ -378,11 +389,11 @@ const profile = {
             console.log(data.json());
             let typeOrg = data.json().idTypeOrganization;
             console.log(typeOrg)
-            if(typeOrg !== 3 && typeOrg !== 7 && typeOrg !== 8){
-                $$('organizationTypeCombo').hide();
-            } else {
-                $$('updByEgrulBtn').hide();
-            }
+            // if(typeOrg !== 3 && typeOrg !== 7 && typeOrg !== 8){
+            //     $$('organizationTypeCombo').hide();
+            // } else {
+            //     $$('updByEgrulBtn').hide();
+            // }
             return data;
         })
     }

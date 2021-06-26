@@ -15,6 +15,7 @@ import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.dto.*;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.model.classifier.gov.Okved;
+import ru.sibdigital.addcovid.model.classifier.gov.RegEgrip;
 import ru.sibdigital.addcovid.model.classifier.gov.RegEgrul;
 import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.service.OrganizationService;
@@ -938,7 +939,30 @@ public class CabinetController {
             organization.setPhone(phone);
             clsOrganizationRepo.save(organization);
         }
-        String newPass = organizationCommonInfoDto.getNewPass();
+
+        String shortOrganizationName = organizationCommonInfoDto.getShortOrganizationName();
+        String organizationName = organizationCommonInfoDto.getOrganizationName();
+        String addressJur = organizationCommonInfoDto.getAddressJur();
+
+        if (shortOrganizationName != null && shortOrganizationName.isBlank() == false
+                && organization.getShortName().equals(shortOrganizationName.trim()) == false){
+            organization.setShortName(shortOrganizationName.trim());
+            clsOrganizationRepo.save(organization);
+        }
+
+        if (organizationName != null && organizationName.isBlank() == false
+                && organization.getName().equals(organizationName.trim()) == false){
+            organization.setName(organizationName.trim());
+            clsOrganizationRepo.save(organization);
+        }
+
+        if (addressJur != null && addressJur.isBlank() == false
+                && organization.getAddressJur().equals(addressJur.trim()) == false){
+            organization.setAddressJur(addressJur.trim());
+            clsOrganizationRepo.save(organization);
+        }
+
+            String newPass = organizationCommonInfoDto.getNewPass();
         if(!newPass.isBlank()){
             PrincipalDto principalDto = new PrincipalDto();
             principalDto.setPassword(newPass);
@@ -953,21 +977,36 @@ public class CabinetController {
     @GetMapping("/update_org_by_egrul")
     public @ResponseBody ClsOrganization updateOrganizationByEgrul(@RequestParam ("inn") String inn, HttpSession session){
         Long id_organization = (Long) session.getAttribute("id_organization");
-        if (id_organization == null) { return null; }
+        if (id_organization == null) {
+            return null;
+        }
 
         EgrulResponse egrulResponse = new EgrulResponse();
+        EgripResponse egripResponse = new EgripResponse();
+        ClsOrganization clsOrganization = null;
+
         RegEgrul regEgrul = egrulService.getEgrul(inn);
         if(regEgrul != null) {
             egrulResponse.build(regEgrul);
+            if(egrulResponse.isFinded()){
+                EgrulResponse.Data data = egrulResponse.getData();
+                clsOrganization = organizationService.updateClsOrganizationByEgrul(data, id_organization);
+            }
         }else{
-            egrulResponse.empty("По введенному ИНН не найдено юр. лицо");
+            final List<RegEgrip> egripList = egrulService.getEgrip(inn);
+
+            if (egripList.isEmpty() == false){
+                egripResponse.build(egripList);
+
+                if(egripResponse.isFinded()){
+                    List<EgripResponse.Data> dataList = egripResponse.getData();
+                    clsOrganization = organizationService.updateClsOrganizationByEgrip(dataList.get(0), id_organization);
+                }
+            }else {
+                egrulResponse.empty("По введенному ИНН не найдено юр. лицо");
+            }
         }
 
-        ClsOrganization clsOrganization = null;
-        if(egrulResponse.isFinded()){
-            EgrulResponse.Data data = egrulResponse.getData();
-            clsOrganization = organizationService.updateClsOrganizationByEgrul(data, id_organization);
-        }
         return clsOrganization;
     }
 
