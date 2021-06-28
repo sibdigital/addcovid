@@ -1,6 +1,7 @@
 package ru.sibdigital.addcovid.dto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.log4j.Log4j2;
 import ru.sibdigital.addcovid.dto.egrip.EGRIP;
 import ru.sibdigital.addcovid.dto.egrip.EGRIP.СвИП;
 import ru.sibdigital.addcovid.model.OrganizationTypes;
@@ -10,6 +11,7 @@ import ru.sibdigital.addcovid.utils.JuridicalUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+@Log4j2
 public class EgripResponse {
 
     private static ObjectMapper mapper = new ObjectMapper();
@@ -111,10 +113,10 @@ public class EgripResponse {
                 String ogrn = egrip.getOgrn();
                 String name = "";
                 int type = 0;
-                if (sved.getКодВидИП().equals("1")) {
+                if (sved.getКодВидИП() != null && "1".equals(sved.getКодВидИП())) {
                     type = OrganizationTypes.IP.getValue();
                     name += "ИП ";
-                } else if (sved.getКодВидИП().equals("2")) {
+                } else if (sved.getКодВидИП() != null && "2".equals(sved.getКодВидИП())) {
                     type = OrganizationTypes.KFH.getValue();
                     name += "КФХ ";
                 }
@@ -131,7 +133,8 @@ public class EgripResponse {
 
             isFinded = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            //e.printStackTrace();
         }
     }
 

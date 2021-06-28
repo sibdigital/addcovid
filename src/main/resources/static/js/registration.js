@@ -534,7 +534,7 @@ function loadData(type, inn) {
                 }
                 doNext = true;
             }
-        } else {
+        } else { //egrip
             if (response.finded == true){
                 $$('organizationOgrn').show();
                 $$('organizationKpp').hide();
