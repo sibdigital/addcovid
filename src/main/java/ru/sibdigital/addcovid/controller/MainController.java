@@ -50,24 +50,24 @@ public class MainController {
 
     @GetMapping
     public String greeting(Map<String, Object> model) throws JsonProcessingException {
-
-        List<ListItemDto> listDepartment =  clsDepartmentRepo.findAll()
-                .stream()
-                .map(clsDepartment -> new ListItemDto(Long.valueOf(clsDepartment.getId()), clsDepartment.getName()))
-                .collect(Collectors.toList());
-
-        model.put("listDepartment", listDepartment);
-        model.put("application_name", applicationConstants.getApplicationName());
-        model.put("subdomain_form", applicationConstants.getSubdomainForm());
-        model.put("subdomain_work", applicationConstants.getSubdomainWork());
-
-        return "index";
+//
+//        List<ListItemDto> listDepartment =  clsDepartmentRepo.findAll()
+//                .stream()
+//                .map(clsDepartment -> new ListItemDto(Long.valueOf(clsDepartment.getId()), clsDepartment.getName()))
+//                .collect(Collectors.toList());
+//
+//        model.put("listDepartment", listDepartment);
+//        model.put("application_name", applicationConstants.getApplicationName());
+//        model.put("subdomain_form", applicationConstants.getSubdomainForm());
+//        model.put("subdomain_work", applicationConstants.getSubdomainWork());
+//
+        return "404";
     }
-
-    @GetMapping("/index_list")
-    public String greetingIndexList(Map<String, Object> model) throws JsonProcessingException {
-        return greeting(model);
-    }
+//
+//    @GetMapping("/index_list")
+//    public String greetingIndexList(Map<String, Object> model) throws JsonProcessingException {
+//        return greeting(model);
+//    }
 
     @PostMapping(value = "/uploadpart", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> uploadFile(@RequestParam(value = "upload") MultipartFile file){
@@ -170,18 +170,18 @@ public class MainController {
         return "barber";
     }
 
-    @GetMapping("/form")
-    public String form(Map<String, Object> model) throws JsonProcessingException {
-        model.put("application_name", applicationConstants.getApplicationName());
-        model.put("ref_hot_line", applicationConstants.getRefHotLine());
-        model.put("ref_form_fill_instruction", applicationConstants.getRefFormFillInstruction());
-        model.put("ref_faq", applicationConstants.getRefFaq());
-        model.put("ref_download_xlsx_template", applicationConstants.getRefDownloadXlsxTemplate());
-        model.put("ref_xlsx_fill_instruction", applicationConstants.getRefXlsxFillInstruction());
-        model.put("subdomain_form", applicationConstants.getSubdomainForm());
-        model.put("ref_working_portal", applicationConstants.getWorkingPortal());
-        return "form";
-    }
+//    @GetMapping("/form")
+//    public String form(Map<String, Object> model) throws JsonProcessingException {
+//        model.put("application_name", applicationConstants.getApplicationName());
+//        model.put("ref_hot_line", applicationConstants.getRefHotLine());
+//        model.put("ref_form_fill_instruction", applicationConstants.getRefFormFillInstruction());
+//        model.put("ref_faq", applicationConstants.getRefFaq());
+//        model.put("ref_download_xlsx_template", applicationConstants.getRefDownloadXlsxTemplate());
+//        model.put("ref_xlsx_fill_instruction", applicationConstants.getRefXlsxFillInstruction());
+//        model.put("subdomain_form", applicationConstants.getSubdomainForm());
+//        model.put("ref_working_portal", applicationConstants.getWorkingPortal());
+//        return "form";
+//    }
 
     @PostMapping("/form")
     public @ResponseBody
