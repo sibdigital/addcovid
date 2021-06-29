@@ -2,6 +2,8 @@ package ru.sibdigital.addcovid.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -43,8 +45,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                         OrganizationTypes.KFH.getValue());
                 organization = clsOrganizationRepo.findByEmailAndPrincipalIsNotNull(login, typeOrganizations);
             }
-        } catch (NonUniqueResultException ex){
+        } catch (NonUniqueResultException | IncorrectResultSizeDataAccessException | InternalAuthenticationServiceException ex){
             log.warn("Too many organizations found found for login " + login + " is inn entered " + isInnEntered);
+            log.error(ex.getMessage(), ex);
             throw new UsernameNotFoundException("Too many organizations found.");
         }
 
