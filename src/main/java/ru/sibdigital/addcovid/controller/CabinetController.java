@@ -503,11 +503,12 @@ public class CabinetController {
     @GetMapping("/employees")
     public @ResponseBody List<DocEmployee> getEmployees(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
+        List<DocEmployee> employees = new ArrayList<>();
         if (id == null) {
-            return null;
+            return employees;
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
-        List<DocEmployee> employees = requestService.getEmployeesByOrganizationIdAndIsDeletedStatus(organization.getId());
+        employees = requestService.getEmployeesByOrganizationIdAndIsDeletedStatus(organization.getId());
         return employees;
     }
 

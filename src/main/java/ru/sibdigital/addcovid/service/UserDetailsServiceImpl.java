@@ -50,7 +50,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 //                builder.password(passwordEncoder.encode(principal.getPassword()));
                 builder.password(principal.getPassword());
                 builder.roles("USER");
-                log.warn(" User FOUND for login " + login + " is inn entered " + isInnEntered + "id org: " + organization.getId());
+                log.warn(" User FOUND for login " + login + " is inn entered " + isInnEntered + " id org: " + organization.getId());
             } else {
                 log.warn(" User no found for login " + login + " is inn entered " + isInnEntered);
                 throw new UsernameNotFoundException("User no found.");
