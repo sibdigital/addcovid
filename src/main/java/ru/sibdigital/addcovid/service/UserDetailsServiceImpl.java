@@ -13,6 +13,7 @@ import ru.sibdigital.addcovid.model.ClsPrincipal;
 import ru.sibdigital.addcovid.model.OrganizationTypes;
 import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
 
+import javax.persistence.NonUniqueResultException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,16 +31,21 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         ClsOrganization organization = null;
         boolean isInnEntered = true;
-        if (login.matches("^([0-9]{10}|[0-9]{12})$")) {
-            List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.JURIDICAL.getValue(),
-                    OrganizationTypes.IP.getValue(), OrganizationTypes.SELF_EMPLOYED.getValue());
-            organization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(login, typeOrganizations);
-        } else {
-            isInnEntered = false;
-            List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.FILIATION.getValue(),
-                    OrganizationTypes.REPRESENTATION.getValue(), OrganizationTypes.DETACHED.getValue(),
-                    OrganizationTypes.KFH.getValue());
-            organization = clsOrganizationRepo.findByEmailAndPrincipalIsNotNull(login, typeOrganizations);
+        try {
+            if (login.matches("^([0-9]{10}|[0-9]{12})$")) {
+                List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.JURIDICAL.getValue(),
+                        OrganizationTypes.IP.getValue(), OrganizationTypes.SELF_EMPLOYED.getValue());
+                organization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(login, typeOrganizations);
+            } else {
+                isInnEntered = false;
+                List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.FILIATION.getValue(),
+                        OrganizationTypes.REPRESENTATION.getValue(), OrganizationTypes.DETACHED.getValue(),
+                        OrganizationTypes.KFH.getValue());
+                organization = clsOrganizationRepo.findByEmailAndPrincipalIsNotNull(login, typeOrganizations);
+            }
+        } catch (NonUniqueResultException ex){
+            log.warn("Too many organizations found found for login " + login + " is inn entered " + isInnEntered);
+            throw new UsernameNotFoundException("Too many organizations found.");
         }
 
         User.UserBuilder builder = null;

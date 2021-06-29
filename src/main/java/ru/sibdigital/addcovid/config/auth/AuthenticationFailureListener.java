@@ -25,11 +25,14 @@ public class AuthenticationFailureListener implements ApplicationListener<Authen
             final Object principal = upat.getPrincipal();
 
             final Object details = upat.getDetails();
-            String sdet = "";
+            String sdet = message + " ";
             if (details != null && details instanceof WebAuthenticationDetails){
                 WebAuthenticationDetails wad = (WebAuthenticationDetails) details;
                 final String remoteAddress = wad.getRemoteAddress();
                 sdet += remoteAddress;
+            }else{
+                String sd = details != null ? details.toString() : " no detail";
+                sdet += (" " + sd);
             }
             //final Object credentials = upat.getCredentials();
             log.warn(" User " + principal + " fail " + sdet);
