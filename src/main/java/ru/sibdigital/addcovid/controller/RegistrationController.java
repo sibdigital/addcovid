@@ -66,6 +66,9 @@ public class RegistrationController {
     @PostMapping("/registration")
     public @ResponseBody String postRegistration(@RequestBody OrganizationDto organizationDto) {
         try {
+            if (organizationDto == null) {
+                return "Не удалось зарегистрировать т.к выходные параметры пусты";
+            }
             List<ClsOrganization> organizations = findOrganizationsByInn(organizationDto.getOrganizationInn());
             ClsOrganization clsOrganization = findExistOrganization(organizationDto, organizations);
             if (clsOrganization != null) {
