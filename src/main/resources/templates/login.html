@@ -120,6 +120,7 @@
                                         view: "text",
                                         type: "password",
                                         placeholder: "Пароль",
+                                        id: "password",
                                         name: "password",
                                     },
                                     {
@@ -188,6 +189,18 @@
         });
 
     function submit() {
+        const pwd = $$('password').getValue();
+        const inn = $$('inn').getValue();
+        if (inn.trim() == '') {
+            $$('inn').focus();
+            webix.message('Для входа введите логин!', 'error');
+            return;
+        }
+        if (pwd.trim() == '') {
+            $$('password').focus();
+            webix.message('Для входа введите пароль!', 'error');
+            return;
+        }
         //webix.message(JSON.stringify($$("log_form").getValues(), null, 2));
         webix.send("perform_login", $$("log_form").getValues());
     }
