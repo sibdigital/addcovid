@@ -313,7 +313,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         clsOrganization.setOgrn(egrulData.getOgrn());
         clsOrganization.setAddressJur(egrulData.getJurAddress());
         clsOrganization.setKpp(egrulData.getKpp());
-        clsOrganization.setIdTypeOrganization(egrulData.getType());
+        //clsOrganization.setIdTypeOrganization(egrulData.getType());
 
         dbActualizeService.addDataFromEgrul(clsOrganization);
 
@@ -328,7 +328,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         clsOrganization.setShortName(egripData.getName());
         clsOrganization.setOgrn(egripData.getOgrn());
         clsOrganization.setAddressJur(egripData.getJurAddress());
-        clsOrganization.setIdTypeOrganization(egripData.getType());
+        //clsOrganization.setIdTypeOrganization(egripData.getType());
 
         dbActualizeService.addDataFromEgrul(clsOrganization);
 

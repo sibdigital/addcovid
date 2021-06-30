@@ -141,28 +141,30 @@ const profile = {
                                     id: "organizationTypeCombo",
                                     name: "idTypeOrganization",
                                     label: "Тип организации",
+                                    readonly: true,
+                                    visible: false,
                                     labelWidth: 130,
                                     options: {
                                         body: {
                                             on: {
-                                                onItemClick:(val) => {
-                                                    let prevValue = $$('organizationTypeCombo').getValue();
-                                                    webix.confirm({
-                                                        title: "Изменение типа организации",
-                                                        ok: "Да", cancel: "Нет",
-                                                        text: "Вы уверены что хотите изменить тип организации?"
-                                                    }).then(() => {
-                                                        webix.ajax().get("update_org_type",{ "type": val }).then((answer) => {
-                                                            if(answer.json() != null){
-                                                                webix.message("Тип успешно изменён","success");
-                                                            } else {
-                                                                webix.message("Не удалось изменить тип", "error");
-                                                            }
-                                                        })
-                                                    }).fail(() => {
-                                                        $$('organizationTypeCombo').setValue(prevValue);
-                                                    })
-                                                }
+                                                // onItemClick:(val) => {
+                                                //     let prevValue = $$('organizationTypeCombo').getValue();
+                                                //     webix.confirm({
+                                                //         title: "Изменение типа организации",
+                                                //         ok: "Да", cancel: "Нет",
+                                                //         text: "Вы уверены что хотите изменить тип организации?"
+                                                //     }).then(() => {
+                                                //         webix.ajax().get("update_org_type",{ "type": val }).then((answer) => {
+                                                //             if(answer.json() != null){
+                                                //                 webix.message("Тип успешно изменён","success");
+                                                //             } else {
+                                                //                 webix.message("Не удалось изменить тип", "error");
+                                                //             }
+                                                //         })
+                                                //     }).fail(() => {
+                                                //         $$('organizationTypeCombo').setValue(prevValue);
+                                                //     })
+                                                // }
                                             }
                                         }
                                     },
@@ -381,9 +383,9 @@ const profile = {
                 {id: data[1], value: "ИП"},
                 {id: data[2], value: "КФХ"}
             ]
-            $$('organizationTypeCombo').getPopup().getList().parse(selects);
-            $$('organizationTypeCombo').refresh();
-            console.log(list);
+            //$$('organizationTypeCombo').getPopup().getList().parse(selects);
+            //$$('organizationTypeCombo').refresh();
+            //console.log(list);
         })
         return webix.ajax().get("organization").then((data) => {
             console.log(data.json());

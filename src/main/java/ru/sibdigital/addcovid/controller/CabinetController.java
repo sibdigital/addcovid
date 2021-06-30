@@ -315,7 +315,11 @@ public class CabinetController {
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         if (organization != null && organization.getPrincipal() != null) {
             ClsPrincipal principal = organization.getPrincipal();
-            principal.setPassword(passwordEncoder.encode(principalDto.getPassword()));
+            if (principalDto.getPassword() != null && !principalDto.getPassword().isBlank()) {
+                principal.setPassword(passwordEncoder.encode(principalDto.getPassword()));
+            }else{
+                return "Невозможно установить пустой пароль!";
+            }
             clsPrincipalRepo.save(principal);
             return "Пароль обновлен";
         }
