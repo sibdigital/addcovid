@@ -127,6 +127,10 @@ public class RegistrationController {
             if (regOrganizationClassifier == null) {
                 return organization;
             }
+            if (dto.getOrganizationType().equals(OrganizationTypes.SELF_EMPLOYED.getValue())
+                    && organization.getIdTypeOrganization().equals(OrganizationTypes.IP.getValue())) {
+                return organization;
+            }
             if (!Objects.equals(organization.getIdTypeOrganization(), dto.getOrganizationType())) {
                 continue;
             }
