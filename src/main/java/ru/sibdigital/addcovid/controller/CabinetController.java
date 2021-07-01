@@ -310,13 +310,15 @@ public class CabinetController {
     public @ResponseBody String savePassword(@RequestBody PrincipalDto principalDto, HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
-            return "Пароль не обновлен";
+            return " Перезагрузите страницу!";
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         if (organization != null && organization.getPrincipal() != null) {
             ClsPrincipal principal = organization.getPrincipal();
             if (principalDto.getPassword() != null && !principalDto.getPassword().isBlank()) {
-                principal.setPassword(passwordEncoder.encode(principalDto.getPassword()));
+                final String encodedPwd = passwordEncoder.encode(principalDto.getPassword());
+                log.warn("org: " + id + " encodedPwd " + encodedPwd);
+                principal.setPassword(encodedPwd);
             }else{
                 return "Невозможно установить пустой пароль!";
             }

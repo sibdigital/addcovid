@@ -194,6 +194,9 @@ public class RegistrationController {
             }
             if (organization != null) {
                 String newPassword = requestService.changeOrganizationPassword(organization);
+                if (newPassword == null){
+                    return "Невозможно установить пустой пароль, попробуйте еще раз.";
+                }
                 boolean emailSent = emailService.sendSimpleMessageNoAsync(organization.getEmail(),
                         applicationConstants.getApplicationName() + ". Восстановление пароля",
                         "По ИНН " + organization.getInn() + " произведена смена пароля. " +

@@ -484,7 +484,10 @@ public class RequestService {
 
             String newPassword = PasswordGenerator.generatePassword(8);
 
-            clsPrincipal.setPassword(passwordEncoder.encode(newPassword));
+            final String encodedPwd = passwordEncoder.encode(newPassword);
+            log.warn("org: " + clsOrganization.getId() + " encodedPwd " + encodedPwd);
+
+            clsPrincipal.setPassword(encodedPwd);
             clsPrincipalRepo.save(clsPrincipal);
 
             clsOrganization.setPrincipal(clsPrincipal);
@@ -497,7 +500,7 @@ public class RequestService {
     }
 
     public List<DocEmployee> getEmployeesByOrganizationIdAndIsDeletedStatus(Long id) {
-        return docEmployeeRepo.findAllByOrganizationAndIsDeletedStatus(id).orElse(null);
+        return docEmployeeRepo.findAllByOrganizationAndIsDeletedStatus(id).orElse(new ArrayList<>());
     }
 
     public List<RegOrganizationOkved> getRegOrganizationOkvedAddByIdOrganization(Long id) {

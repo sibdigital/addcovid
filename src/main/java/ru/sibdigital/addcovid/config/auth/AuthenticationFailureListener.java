@@ -35,9 +35,10 @@ public class AuthenticationFailureListener implements ApplicationListener<Authen
                 sdet += (" " + sd);
             }
             //final Object credentials = upat.getCredentials();
-            log.warn(" User " + principal + " fail " + sdet);
+            log.warn(" Auth for " + principal + " fail " + sdet + " "
+                    + (upat.getCredentials() != null ? ( "pwd: " + upat.getCredentials()) : "null pwd " ));
         }else{
-            log.warn(" User fail " + message);
+            log.warn(" Auth unknown fail " + message);
         }
 
     }
