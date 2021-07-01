@@ -2,6 +2,7 @@ package ru.sibdigital.addcovid.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -9,12 +10,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
+import ru.sibdigital.addcovid.config.auth.OrganizationAuthenticationProvider;
 import ru.sibdigital.addcovid.service.UserDetailsServiceImpl;
 
 @Configuration
 @EnableWebSecurity()
+@ComponentScan({"ru.sibdigital.addcovid.service"})
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
@@ -23,19 +27,37 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private OAuth2AccessTokenResponseClient accessTokenResponseClient;
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new UserDetailsServiceImpl();
-    }
+    @Autowired
+    UserDetailsService userDetailsService;
 
+//    @Autowired
+//    PasswordEncoder passwordEncoder;
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        return new UserDetailsServiceImpl();
+//    }
+//
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public OrganizationAuthenticationProvider authenticationProvider() {
+        OrganizationAuthenticationProvider oap = new OrganizationAuthenticationProvider();
+        oap.setUserDetailsService(userDetailsService);
+        oap.setPasswordEncoder(passwordEncoder());
+
+        return oap;
+    }
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
+        auth
+           //.userDetailsService(userDetailsService())
+           //.passwordEncoder(passwordEncoder())
+           .authenticationProvider(authenticationProvider())
+        .build();
     }
 
     @Override

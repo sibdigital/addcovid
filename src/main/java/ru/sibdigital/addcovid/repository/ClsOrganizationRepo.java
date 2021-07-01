@@ -21,7 +21,7 @@ public interface ClsOrganizationRepo extends JpaRepository<ClsOrganization, Long
 
     @Query(nativeQuery = true, value = "select * " +
             "from cls_organization " +
-            "where email = :email and id_principal is not null " +
+            "where lower(email) = lower(:email) and id_principal is not null " +
             "   and id_type_organization in (:typeOrganizations) " +
             "   and not is_deleted " +
             "   and is_activated")
