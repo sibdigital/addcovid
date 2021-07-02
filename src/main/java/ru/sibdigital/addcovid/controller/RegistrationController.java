@@ -178,6 +178,7 @@ public class RegistrationController {
     public @ResponseBody String recovery(@RequestBody OrganizationDto organizationDto) {
         List<ClsOrganization> clsOrganizations = findOrganizationsByInn(organizationDto.getOrganizationInn()).stream()
                 .filter(org -> org.getActivated()).collect(Collectors.toList());
+        log.warn("begin recovery from DTO inn" + organizationDto.getOrganizationInn() + " email = " + organizationDto.getOrganizationEmail());
         if (clsOrganizations != null && clsOrganizations.size() > 0) {
             ClsOrganization organization = null;
             for (ClsOrganization clsOrganization: clsOrganizations) {
@@ -185,7 +186,7 @@ public class RegistrationController {
                 try {
                     emailLinked = isEmailLinked(clsOrganization, organizationDto.getOrganizationEmail());
                 } catch (Exception e) {
-                    log.info(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
                 if (emailLinked) {
                     organization = clsOrganization;
@@ -194,6 +195,9 @@ public class RegistrationController {
             }
             if (organization != null) {
                 String newPassword = requestService.changeOrganizationPassword(organization);
+
+                log.warn("change pwd fro org " + organization.getId() + " inn " + organization.getInn());
+
                 if (newPassword == null){
                     return "Невозможно установить пустой пароль, попробуйте еще раз.";
                 }
@@ -204,11 +208,14 @@ public class RegistrationController {
                 if (!emailSent) {
                     return "Не удалось отправить письмо";
                 }
+                log.warn("end success recovery for " + organization.getId() + " inn " + organization.getInn());
                 return "Ок";
             } else {
+                log.warn("end email not found " + organization.getId() + " inn " + organization.getInn());
                 return "Адрес электронной почты не привязан к учетной записи";
             }
         }
+        log.warn("end org not found for DTO inn" + organizationDto.getOrganizationInn() + " email = " + organizationDto.getOrganizationEmail());
         return "Организация не найдена";
     }
 

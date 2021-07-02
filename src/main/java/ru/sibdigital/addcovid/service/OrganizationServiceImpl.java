@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class OrganizationServiceImpl implements OrganizationService {
 
     @Autowired
@@ -306,6 +308,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     public ClsOrganization updateClsOrganizationByEgrul(EgrulResponse.Data egrulData, Long id_organization){
         ClsOrganization clsOrganization = clsOrganizationRepo.findById(id_organization).orElse(null);
+        int oldOrgType = clsOrganization.getIdTypeOrganization();
 
         clsOrganization.setName(egrulData.getName());
         clsOrganization.setShortName(egrulData.getShortName());
@@ -318,11 +321,16 @@ public class OrganizationServiceImpl implements OrganizationService {
         dbActualizeService.addDataFromEgrul(clsOrganization);
 
         clsOrganizationRepo.save(clsOrganization);
+        log.warn("Refresh from EGRUL: " + clsOrganization.getId()
+                + "inn " + clsOrganization.getInn() + " type org: " + clsOrganization.getIdTypeOrganization()
+                + " old type org: " + oldOrgType);
+
         return clsOrganization;
     }
 
     public ClsOrganization updateClsOrganizationByEgrip(EgripResponse.Data egripData, Long id_organization){
         ClsOrganization clsOrganization = clsOrganizationRepo.findById(id_organization).orElse(null);
+        int oldOrgType = clsOrganization.getIdTypeOrganization();
 
         clsOrganization.setName(egripData.getName());
         clsOrganization.setShortName(egripData.getName());
@@ -333,6 +341,10 @@ public class OrganizationServiceImpl implements OrganizationService {
         dbActualizeService.addDataFromEgrul(clsOrganization);
 
         clsOrganizationRepo.save(clsOrganization);
+        log.warn("Refresh from EGRIP: " + clsOrganization.getId()
+                + "inn " + clsOrganization.getInn() + " type org: " + clsOrganization.getIdTypeOrganization()
+                + " old type org: " + oldOrgType);
+
         return clsOrganization;
     }
 }
