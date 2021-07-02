@@ -21,13 +21,33 @@
     console.log(message)
 
     if (window.location.search === "?error=true") {
-        webix.message("Введен неверный логин или пароль", "error")
+        webix.message(
+            {
+                text : "Введен неверный логин или пароль",
+                type: "error",
+                expire: -1
+            });
     } else if (window.location.search === "?error=inn") {
-        webix.message("Неправильный пользователь. Для входа юр. лиц, ИП, самозанятых необходимо ввести ИНН в качестве логина", "error")
+        webix.message(
+            {
+                text : "Неправильный пользователь. Для входа юр. лиц, ИП, самозанятых необходимо ввести ИНН в качестве логина",
+                type: "error",
+                expire: -1
+            });
     } else if (window.location.search === "?error=email") {
-        webix.message("Неправильный пользователь. Для входа филиалов, представительств, обособленных подразделений и КФХ вместо ИНН необходимо указать адрес электронной почты", "error")
+        webix.message(
+            {
+                text : "Неправильный пользователь. Для входа филиалов, представительств, обособленных подразделений и КФХ вместо ИНН необходимо указать адрес электронной почты",
+                type: "error",
+                expire: -1
+            });
     } else if (window.location.search === "?error=inn_or_email") {
-        webix.message("Неправильный пользователь. Логином для входа могут быть только ИНН или адрес электронной почты", "error")
+        webix.message(
+            {
+                text : "Неправильный пользователь. Логином для входа могут быть только ИНН или адрес электронной почты",
+                type: "error",
+                expire: -1
+            });
     }
 
     const descLogin = '<span style="font-size: 0.9rem; color: red">' +

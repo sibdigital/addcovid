@@ -39,11 +39,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         ClsOrganization organization = null;
         boolean isInnEntered = true;
-
-        HttpServletRequest request  = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-                        .getRequest();
-        request.setAttribute("ISRB_AUTH_ERR_MSG", "hello +++");
-
         try {
             if (login.matches("^([0-9]{10}|[0-9]{12})$")) {
                 List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.JURIDICAL.getValue(),

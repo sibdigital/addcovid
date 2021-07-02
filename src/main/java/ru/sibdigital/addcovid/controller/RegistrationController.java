@@ -178,7 +178,7 @@ public class RegistrationController {
     public @ResponseBody String recovery(@RequestBody OrganizationDto organizationDto) {
         List<ClsOrganization> clsOrganizations = findOrganizationsByInn(organizationDto.getOrganizationInn()).stream()
                 .filter(org -> org.getActivated()).collect(Collectors.toList());
-        log.warn("begin recovery from DTO inn" + organizationDto.getOrganizationInn() + " email = " + organizationDto.getOrganizationEmail());
+        log.warn("begin recovery from DTO inn " + organizationDto.getOrganizationInn() + " email = " + organizationDto.getOrganizationEmail());
         if (clsOrganizations != null && clsOrganizations.size() > 0) {
             ClsOrganization organization = null;
             for (ClsOrganization clsOrganization: clsOrganizations) {
@@ -201,10 +201,9 @@ public class RegistrationController {
                 if (newPassword == null){
                     return "Невозможно установить пустой пароль, попробуйте еще раз.";
                 }
+                String message = createChangePasswordMessage(organization, newPassword);
                 boolean emailSent = emailService.sendSimpleMessageNoAsync(organization.getEmail(),
-                        applicationConstants.getApplicationName() + ". Восстановление пароля",
-                        "По ИНН " + organization.getInn() + " произведена смена пароля. " +
-                                "Ваш новый пароль от личного кабинета на портале " + applicationConstants.getApplicationName() + " " + newPassword);
+                        applicationConstants.getApplicationName() + ". Восстановление пароля", message);
                 if (!emailSent) {
                     return "Не удалось отправить письмо";
                 }
@@ -217,6 +216,20 @@ public class RegistrationController {
         }
         log.warn("end org not found for DTO inn" + organizationDto.getOrganizationInn() + " email = " + organizationDto.getOrganizationEmail());
         return "Организация не найдена";
+    }
+
+    private String createChangePasswordMessage(ClsOrganization organization, String newPassword){
+
+        String recommendation = "Для входа на портал используйте ИНН в качестве логина и пароль из данного письма.";
+        if (OrganizationTypes.FILIATION.getValue() == organization.getIdTypeOrganization() ||
+            OrganizationTypes.REPRESENTATION.getValue() == organization.getIdTypeOrganization() ||
+            OrganizationTypes.DETACHED.getValue() == organization.getIdTypeOrganization() ||
+            OrganizationTypes.KFH.getValue() == organization.getIdTypeOrganization()){
+            recommendation = "Для входа на портал используйте ЭТОТ АДРЕС ЭЛЕКТРОННОЙ ПОЧТЫ в качестве логина и пароль из данного письма.";
+        }
+        String msg = "По ИНН " + organization.getInn() + " произведена смена пароля. " + recommendation +
+                " Ваш новый пароль от личного кабинета на портале " + applicationConstants.getApplicationName() + " " + newPassword;
+        return msg;
     }
 
     private boolean isEmailLinked(ClsOrganization organization, String email) {
