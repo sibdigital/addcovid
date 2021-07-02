@@ -38,12 +38,32 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.JURIDICAL.getValue(),
                         OrganizationTypes.IP.getValue(), OrganizationTypes.SELF_EMPLOYED.getValue());
                 organization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(login, typeOrganizations);
+                if (organization == null) {
+                    typeOrganizations = Arrays.asList(OrganizationTypes.FILIATION.getValue(),
+                            OrganizationTypes.REPRESENTATION.getValue(), OrganizationTypes.DETACHED.getValue(),
+                            OrganizationTypes.KFH.getValue());
+                    organization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(login, typeOrganizations);
+                    if (organization != null) {
+                        throw new UsernameNotFoundException("Need to enter email");
+                    }
+                }
             } else {
                 isInnEntered = false;
+                if (!login.contains(".")) {
+                    throw new UsernameNotFoundException("Need to enter inn or email");
+                }
                 List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.FILIATION.getValue(),
                         OrganizationTypes.REPRESENTATION.getValue(), OrganizationTypes.DETACHED.getValue(),
                         OrganizationTypes.KFH.getValue());
                 organization = clsOrganizationRepo.findByEmailAndPrincipalIsNotNull(login, typeOrganizations);
+                if (organization == null) {
+                    typeOrganizations = Arrays.asList(OrganizationTypes.JURIDICAL.getValue(),
+                            OrganizationTypes.IP.getValue(), OrganizationTypes.SELF_EMPLOYED.getValue());
+                    organization = clsOrganizationRepo.findByEmailAndPrincipalIsNotNull(login, typeOrganizations);
+                    if (organization != null) {
+                        throw new UsernameNotFoundException("Need to enter inn");
+                    }
+                }
             }
         } catch (NonUniqueResultException | IncorrectResultSizeDataAccessException | InternalAuthenticationServiceException ex){
             log.warn("Too many organizations found found for login " + login + " is inn entered " + isInnEntered);
