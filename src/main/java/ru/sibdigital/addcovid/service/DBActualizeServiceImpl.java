@@ -284,7 +284,7 @@ public class DBActualizeServiceImpl implements DBActualizeService {
                             .build();
                     regOrganizationOkvedRepo.save(regOrganizationOkved);
                 }
-                if (regEgrip.getTypeEgrip().equals(EgripTypes.INDIVIDUAL_ENTREPRENEUR)) {
+                if (regEgrip.getTypeEgrip().equals(EgripTypes.INDIVIDUAL_ENTREPRENEUR.getValue())) {
                     organization.setIdTypeOrganization(OrganizationTypes.IP.getValue());
                 } else {
                     organization.setIdTypeOrganization(OrganizationTypes.KFH.getValue());

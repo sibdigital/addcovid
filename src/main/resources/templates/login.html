@@ -203,6 +203,7 @@
         }
 
         $$('password').setValue($$('password').getValue().trim());
+        $$('inn').setValue($$('inn').getValue().trim());
         //webix.message(JSON.stringify($$("log_form").getValues(), null, 2));
         webix.send("perform_login", $$("log_form").getValues());
     }
