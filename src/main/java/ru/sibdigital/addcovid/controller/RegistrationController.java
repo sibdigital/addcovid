@@ -210,7 +210,7 @@ public class RegistrationController {
                 log.warn("end success recovery for " + organization.getId() + " inn " + organization.getInn());
                 return "Ок";
             } else {
-                log.warn("end email not found " + organization.getId() + " inn " + organization.getInn());
+                log.warn("end email not found " + organizationDto.getOrganizationEmail() + " inn " + organizationDto.getOrganizationInn());
                 return "Адрес электронной почты не привязан к учетной записи";
             }
         }
