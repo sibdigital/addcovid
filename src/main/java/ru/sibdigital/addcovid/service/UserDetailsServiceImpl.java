@@ -2,6 +2,7 @@ package ru.sibdigital.addcovid.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.userdetails.User;
@@ -10,12 +11,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.RequestContextListener;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import ru.sibdigital.addcovid.model.ClsOrganization;
 import ru.sibdigital.addcovid.model.ClsPrincipal;
 import ru.sibdigital.addcovid.model.OrganizationTypes;
 import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
 
 import javax.persistence.NonUniqueResultException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,6 +39,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         ClsOrganization organization = null;
         boolean isInnEntered = true;
+
+        HttpServletRequest request  = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+                        .getRequest();
+        request.setAttribute("ISRB_AUTH_ERR_MSG", "hello +++");
+
         try {
             if (login.matches("^([0-9]{10}|[0-9]{12})$")) {
                 List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.JURIDICAL.getValue(),
