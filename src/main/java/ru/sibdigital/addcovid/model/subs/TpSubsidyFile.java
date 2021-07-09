@@ -14,7 +14,14 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class TpSubsidyFile {
-    private int id;
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @SequenceGenerator(name = "tp_subsidy_file_id_seq", sequenceName = "tp_subsidy_file_id_seq",
+            allocationSize = 1, schema = "subs"
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tp_subsidy_file_id_seq")
+    private Long id;
     private Boolean isDeleted;
     private Timestamp timeCreate;
     private String attachmentPath;
@@ -23,15 +30,16 @@ public class TpSubsidyFile {
     private String fileExtension;
     private String hash;
     private Integer fileSize;
-    private ClsSubsidy clsSubsidyByIdSubsidy;
 
-    @Id
-    @Column(name = "id")
-    public int getId() {
+    @ManyToOne
+    @JoinColumn(name = "id_subsidy", referencedColumnName = "id", nullable = false)
+    private ClsSubsidy subsidy;
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -128,13 +136,11 @@ public class TpSubsidyFile {
         return Objects.hash(id, isDeleted, timeCreate, attachmentPath, fileName, originalFileName, fileExtension, hash, fileSize);
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_subsidy", referencedColumnName = "id", nullable = false)
-    public ClsSubsidy getClsSubsidyByIdSubsidy() {
-        return clsSubsidyByIdSubsidy;
+    public ClsSubsidy getSubsidy() {
+        return subsidy;
     }
 
-    public void setClsSubsidyByIdSubsidy(ClsSubsidy clsSubsidyByIdSubsidy) {
-        this.clsSubsidyByIdSubsidy = clsSubsidyByIdSubsidy;
+    public void setSubsidy(ClsSubsidy clsSubsidyByIdSubsidy) {
+        this.subsidy = clsSubsidyByIdSubsidy;
     }
 }

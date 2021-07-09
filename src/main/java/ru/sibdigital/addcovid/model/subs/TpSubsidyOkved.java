@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import ru.sibdigital.addcovid.model.classifier.gov.Okved;
 
-
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -16,20 +15,29 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class TpSubsidyOkved {
-    private int id;
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @SequenceGenerator(name = "tp_subsidy_okved_id_seq", sequenceName = "tp_subsidy_okved_id_seq",
+            allocationSize = 1, schema = "subs"
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tp_subsidy_okved_id_seq")
+    private Long id;
     private Boolean isDeleted;
     private Timestamp timeCreate;
     private Integer idTypeOrganization;
+
     private ClsSubsidy subsidy;
+
     private Okved okved;
 
     @Id
     @Column(name = "id")
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

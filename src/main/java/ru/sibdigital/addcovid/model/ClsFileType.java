@@ -1,4 +1,4 @@
-package ru.sibdigital.addcovid.model.subs;
+package ru.sibdigital.addcovid.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,27 +9,24 @@ import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
-@Table(name = "cls_subsidy_request_status", schema = "subs")
+@Table(name = "cls_file_type", schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class ClsSubsidyRequestStatus {
+public class ClsFileType {
 
     @Id
     @Column(name = "id", nullable = false)
-    @SequenceGenerator(name = "cls_subsidy_request_status_id_seq",
-            sequenceName = "cls_subsidy_request_status_id_seq", allocationSize = 1, schema = "subs"
+    @SequenceGenerator(name = "cls_file_type_id_seq", sequenceName = "cls_file_type_id_seq",
+            allocationSize = 1, schema = "subs"
     )
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cls_subsidy_request_status_id_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cls_file_type_id_seq")
     private Long id;
     private Boolean isDeleted;
     private Timestamp timeCreate;
     private String name;
     private String shortName;
     private String code;
-    @ManyToOne
-    @JoinColumn(name = "id_subsidy", referencedColumnName = "id")
-    private ClsSubsidy subsidy;
 
     public Long getId() {
         return id;
@@ -93,20 +90,12 @@ public class ClsSubsidyRequestStatus {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ClsSubsidyRequestStatus that = (ClsSubsidyRequestStatus) o;
+        ClsFileType that = (ClsFileType) o;
         return id == that.id && Objects.equals(isDeleted, that.isDeleted) && Objects.equals(timeCreate, that.timeCreate) && Objects.equals(name, that.name) && Objects.equals(shortName, that.shortName) && Objects.equals(code, that.code);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id, isDeleted, timeCreate, name, shortName, code);
-    }
-
-    public ClsSubsidy getSubsidy() {
-        return subsidy;
-    }
-
-    public void setSubsidy(ClsSubsidy subsidy) {
-        this.subsidy = subsidy;
     }
 }

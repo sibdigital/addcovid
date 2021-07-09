@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import ru.sibdigital.addcovid.model.ClsDepartment;
+import ru.sibdigital.addcovid.model.ClsFileType;
 import ru.sibdigital.addcovid.model.ClsOrganization;
 import ru.sibdigital.addcovid.model.ClsUser;
 
@@ -17,7 +18,14 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class TpRequestSubsidyFile {
-    private int id;
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @SequenceGenerator(name = "tp_request_subsidy_file_id_seq", sequenceName = "tp_request_subsidy_file_id_seq",
+            allocationSize = 1, schema = "subs"
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tp_request_subsidy_file_id_seq")
+    private Long id;
     private Boolean isDeleted;
     private Timestamp timeCreate;
     private String attachmentPath;
@@ -27,24 +35,43 @@ public class TpRequestSubsidyFile {
     private String hash;
     private Integer fileSize;
     private Boolean isSignature;
+    @ManyToOne
+    @JoinColumn(name = "id_request", referencedColumnName = "id", nullable = false)
+    @Access(AccessType.FIELD)
     private DocRequestSubsidy requestSubsidy;
+    @ManyToOne
+    @JoinColumn(name = "id_organization", referencedColumnName = "id", nullable = false)
+    @Access(AccessType.FIELD)
     private ClsOrganization organization;
+    @ManyToOne
+    @JoinColumn(name = "id_department", referencedColumnName = "id", nullable = false)
+    @Access(AccessType.FIELD)
     private ClsDepartment department;
+    @ManyToOne
+    @JoinColumn(name = "id_processed_user", referencedColumnName = "id")
+    @Access(AccessType.FIELD)
     private ClsUser processedUser;
+    @ManyToOne
+    @JoinColumn(name = "id_subsidy_request_file", referencedColumnName = "id")
+    @Access(AccessType.FIELD)
     private TpRequestSubsidyFile requestSubsidyFile;
+    @ManyToOne
+    @JoinColumn(name = "id_file_type", referencedColumnName = "id", nullable = false)
+    @Access(AccessType.FIELD)
+    private ClsFileType fileType;
 
     @Id
-    @Column(name = "id")
-    public int getId() {
+    @Column(name = "id", nullable = false)
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     @Basic
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", nullable = true)
     public Boolean getDeleted() {
         return isDeleted;
     }
@@ -54,7 +81,7 @@ public class TpRequestSubsidyFile {
     }
 
     @Basic
-    @Column(name = "time_create")
+    @Column(name = "time_create", nullable = false)
     public Timestamp getTimeCreate() {
         return timeCreate;
     }
@@ -64,7 +91,7 @@ public class TpRequestSubsidyFile {
     }
 
     @Basic
-    @Column(name = "attachment_path")
+    @Column(name = "attachment_path", nullable = true, length = -1)
     public String getAttachmentPath() {
         return attachmentPath;
     }
@@ -74,7 +101,7 @@ public class TpRequestSubsidyFile {
     }
 
     @Basic
-    @Column(name = "file_name")
+    @Column(name = "file_name", nullable = true, length = -1)
     public String getFileName() {
         return fileName;
     }
@@ -84,7 +111,7 @@ public class TpRequestSubsidyFile {
     }
 
     @Basic
-    @Column(name = "original_file_name")
+    @Column(name = "original_file_name", nullable = true, length = -1)
     public String getOriginalFileName() {
         return originalFileName;
     }
@@ -94,7 +121,7 @@ public class TpRequestSubsidyFile {
     }
 
     @Basic
-    @Column(name = "file_extension")
+    @Column(name = "file_extension", nullable = true, length = 16)
     public String getFileExtension() {
         return fileExtension;
     }
@@ -104,7 +131,7 @@ public class TpRequestSubsidyFile {
     }
 
     @Basic
-    @Column(name = "hash")
+    @Column(name = "hash", nullable = true, length = -1)
     public String getHash() {
         return hash;
     }
@@ -114,7 +141,7 @@ public class TpRequestSubsidyFile {
     }
 
     @Basic
-    @Column(name = "file_size")
+    @Column(name = "file_size", nullable = true)
     public Integer getFileSize() {
         return fileSize;
     }
@@ -124,7 +151,7 @@ public class TpRequestSubsidyFile {
     }
 
     @Basic
-    @Column(name = "is_signature")
+    @Column(name = "is_signature", nullable = true)
     public Boolean getSignature() {
         return isSignature;
     }
@@ -146,8 +173,6 @@ public class TpRequestSubsidyFile {
         return Objects.hash(id, isDeleted, timeCreate, attachmentPath, fileName, originalFileName, fileExtension, hash, fileSize, isSignature);
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_request", referencedColumnName = "id", nullable = false)
     public DocRequestSubsidy getRequestSubsidy() {
         return requestSubsidy;
     }
@@ -156,8 +181,6 @@ public class TpRequestSubsidyFile {
         this.requestSubsidy = requestSubsidy;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_organization", referencedColumnName = "id", nullable = false)
     public ClsOrganization getOrganization() {
         return organization;
     }
@@ -176,8 +199,6 @@ public class TpRequestSubsidyFile {
         this.department = department;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_processed_user", referencedColumnName = "id")
     public ClsUser getProcessedUser() {
         return processedUser;
     }
@@ -186,8 +207,6 @@ public class TpRequestSubsidyFile {
         this.processedUser = processedUser;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_subsidy_request_file", referencedColumnName = "id")
     public TpRequestSubsidyFile getRequestSubsidyFile() {
         return requestSubsidyFile;
     }
@@ -195,4 +214,13 @@ public class TpRequestSubsidyFile {
     public void setRequestSubsidyFile(TpRequestSubsidyFile requestSubsidyFile) {
         this.requestSubsidyFile = requestSubsidyFile;
     }
+
+    public ClsFileType getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(ClsFileType clsFileTypeByIdFileType) {
+        this.fileType = clsFileTypeByIdFileType;
+    }
+
 }

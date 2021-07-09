@@ -1,12 +1,15 @@
 package ru.sibdigital.addcovid.model.subs;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
-import ru.sibdigital.addcovid.model.ClsDepartment;
-import ru.sibdigital.addcovid.model.ClsDistrict;
-import ru.sibdigital.addcovid.model.ClsOrganization;
-import ru.sibdigital.addcovid.model.ClsUser;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
+import ru.sibdigital.addcovid.model.*;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -17,37 +20,64 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
+@TypeDefs({
+        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+})
 public class DocRequestSubsidy {
-    private int id;
+    @Id
+    @Column(name = "id", nullable = false)
+    @SequenceGenerator(name = "doc_request_subsidy_id_seq", sequenceName = "doc_request_subsidy_id_seq",
+            allocationSize = 1, schema = "subs"
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "doc_request_subsidy_id_seq")
+    private Long id;
     private String attachmentPath;
     private Timestamp timeCreate;
     private Timestamp timeUpdate;
     private Timestamp timeReview;
     private String reqBasis;
     private String resolutionComment;
-    private Integer oldDepartmentId;
-    private Object additionalAttributes;
+    private Long oldDepartmentId;
+    @Type(type = "jsonb")
+    @Column(columnDefinition = "jsonb")
+    private AdditionalAttributes additionalAttributes;
     private Integer statusActivity;
+    @ManyToOne
+    @JoinColumn(name = "id_organization", referencedColumnName = "id", nullable = false)
     private ClsOrganization organization;
+    @ManyToOne
+    @JoinColumn(name = "id_department", referencedColumnName = "id", nullable = false)
     private ClsDepartment department;
+    @ManyToOne
+    @JoinColumn(name = "id_subsidy_request_status", referencedColumnName = "id", nullable = false)
     private ClsSubsidyRequestStatus subsidyRequestStatus;
+    @ManyToOne
+    @JoinColumn(name = "id_processed_user", referencedColumnName = "id")
     private ClsUser processedUser;
+    @ManyToOne
+    @JoinColumn(name = "id_reassigned_user", referencedColumnName = "id")
     private ClsUser reassignedUser;
+    @ManyToOne
+    @JoinColumn(name = "id_subsidy", referencedColumnName = "id", nullable = false)
     private ClsSubsidy subsidy;
+    @ManyToOne
+    @JoinColumn(name = "id_district", referencedColumnName = "id")
     private ClsDistrict district;
 
-    @Id
-    @Column(name = "id")
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     @Basic
-    @Column(name = "attachment_path")
+    @Column(name = "attachment_path", nullable = true, length = -1)
     public String getAttachmentPath() {
         return attachmentPath;
     }
@@ -57,7 +87,7 @@ public class DocRequestSubsidy {
     }
 
     @Basic
-    @Column(name = "time_create")
+    @Column(name = "time_create", nullable = false)
     public Timestamp getTimeCreate() {
         return timeCreate;
     }
@@ -67,7 +97,7 @@ public class DocRequestSubsidy {
     }
 
     @Basic
-    @Column(name = "time_update")
+    @Column(name = "time_update", nullable = true)
     public Timestamp getTimeUpdate() {
         return timeUpdate;
     }
@@ -77,7 +107,7 @@ public class DocRequestSubsidy {
     }
 
     @Basic
-    @Column(name = "time_review")
+    @Column(name = "time_review", nullable = true)
     public Timestamp getTimeReview() {
         return timeReview;
     }
@@ -87,7 +117,7 @@ public class DocRequestSubsidy {
     }
 
     @Basic
-    @Column(name = "req_basis")
+    @Column(name = "req_basis", nullable = true, length = -1)
     public String getReqBasis() {
         return reqBasis;
     }
@@ -97,7 +127,7 @@ public class DocRequestSubsidy {
     }
 
     @Basic
-    @Column(name = "resolution_comment")
+    @Column(name = "resolution_comment", nullable = true, length = -1)
     public String getResolutionComment() {
         return resolutionComment;
     }
@@ -107,27 +137,27 @@ public class DocRequestSubsidy {
     }
 
     @Basic
-    @Column(name = "old_department_id")
-    public Integer getOldDepartmentId() {
+    @Column(name = "old_department_id", nullable = true)
+    public Long getOldDepartmentId() {
         return oldDepartmentId;
     }
 
-    public void setOldDepartmentId(Integer oldDepartmentId) {
+    public void setOldDepartmentId(Long oldDepartmentId) {
         this.oldDepartmentId = oldDepartmentId;
     }
 
-    @Basic
-    @Column(name = "additional_attributes")
-    public Object getAdditionalAttributes() {
+    //@Basic
+    @Column(name = "additional_attributes", nullable = true)
+    public AdditionalAttributes getAdditionalAttributes() {
         return additionalAttributes;
     }
 
-    public void setAdditionalAttributes(Object additionalAttributes) {
+    public void setAdditionalAttributes(AdditionalAttributes additionalAttributes) {
         this.additionalAttributes = additionalAttributes;
     }
 
     @Basic
-    @Column(name = "status_activity")
+    @Column(name = "status_activity", nullable = true)
     public Integer getStatusActivity() {
         return statusActivity;
     }
@@ -149,8 +179,6 @@ public class DocRequestSubsidy {
         return Objects.hash(id, attachmentPath, timeCreate, timeUpdate, timeReview, reqBasis, resolutionComment, oldDepartmentId, additionalAttributes, statusActivity);
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_organization", referencedColumnName = "id", nullable = false)
     public ClsOrganization getOrganization() {
         return organization;
     }
@@ -159,8 +187,7 @@ public class DocRequestSubsidy {
         this.organization = organization;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_department", referencedColumnName = "id", nullable = false)
+
     public ClsDepartment getDepartment() {
         return department;
     }
@@ -169,8 +196,7 @@ public class DocRequestSubsidy {
         this.department = department;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_subsidy_request_status", referencedColumnName = "id", nullable = false)
+
     public ClsSubsidyRequestStatus getSubsidyRequestStatus() {
         return subsidyRequestStatus;
     }
@@ -179,8 +205,7 @@ public class DocRequestSubsidy {
         this.subsidyRequestStatus = subsidyRequestStatus;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_processed_user", referencedColumnName = "id")
+
     public ClsUser getProcessedUser() {
         return processedUser;
     }
@@ -189,8 +214,6 @@ public class DocRequestSubsidy {
         this.processedUser = processedUser;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_reassigned_user", referencedColumnName = "id")
     public ClsUser getReassignedUser() {
         return reassignedUser;
     }
@@ -199,8 +222,6 @@ public class DocRequestSubsidy {
         this.reassignedUser = reassignedUser;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_subsidy", referencedColumnName = "id", nullable = false)
     public ClsSubsidy getSubsidy() {
         return subsidy;
     }
@@ -209,8 +230,7 @@ public class DocRequestSubsidy {
         this.subsidy = subsidy;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_district", referencedColumnName = "id")
+
     public ClsDistrict getDistrict() {
         return district;
     }

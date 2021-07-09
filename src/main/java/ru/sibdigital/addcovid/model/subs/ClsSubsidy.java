@@ -1,8 +1,13 @@
 package ru.sibdigital.addcovid.model.subs;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 import ru.sibdigital.addcovid.model.ClsDepartment;
 
 import javax.persistence.*;
@@ -14,8 +19,22 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
+@TypeDefs({
+        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+})
 public class ClsSubsidy {
-    private int id;
+
+    @Id
+    @Column(name = "id", nullable = false)
+    @SequenceGenerator(name = "cls_subsidy_id_seq", sequenceName = "cls_subsidy_id_seq", allocationSize = 1,
+            schema = "subs"
+    )
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cls_subsidy_id_seq")
+    private Long id;
     private String name;
     private String shortName;
     private Boolean isDeleted;
@@ -27,21 +46,21 @@ public class ClsSubsidy {
     private Timestamp beginVisible;
     private Timestamp endVisible;
     private Integer sortWeight;
-    private Object additionalFields;
+    //private Object additionalFields;
     private Integer statusPublication;
     private Timestamp timePublication;
     private Timestamp timeCreate;
     private Integer calendarDayToResolution;
     private Integer workDayToResolution;
+    @ManyToOne
+    @JoinColumn(name = "id_department", referencedColumnName = "id")
     private ClsDepartment department;
 
-    @Id
-    @Column(name = "id")
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -155,15 +174,15 @@ public class ClsSubsidy {
         this.sortWeight = sortWeight;
     }
 
-    @Basic
-    @Column(name = "additional_fields")
-    public Object getAdditionalFields() {
-        return additionalFields;
-    }
-
-    public void setAdditionalFields(Object additionalFields) {
-        this.additionalFields = additionalFields;
-    }
+//    @Basic
+//    @Column(name = "additional_fields")
+//    public Object getAdditionalFields() {
+//        return additionalFields;
+//    }
+//
+//    public void setAdditionalFields(Object additionalFields) {
+//        this.additionalFields = additionalFields;
+//    }
 
     @Basic
     @Column(name = "status_publication")
@@ -220,16 +239,16 @@ public class ClsSubsidy {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ClsSubsidy that = (ClsSubsidy) o;
-        return id == that.id && statusRegistration == that.statusRegistration && Objects.equals(name, that.name) && Objects.equals(shortName, that.shortName) && Objects.equals(isDeleted, that.isDeleted) && Objects.equals(settings, that.settings) && Objects.equals(statusVisible, that.statusVisible) && Objects.equals(beginRegistration, that.beginRegistration) && Objects.equals(endRegistration, that.endRegistration) && Objects.equals(beginVisible, that.beginVisible) && Objects.equals(endVisible, that.endVisible) && Objects.equals(sortWeight, that.sortWeight) && Objects.equals(additionalFields, that.additionalFields) && Objects.equals(statusPublication, that.statusPublication) && Objects.equals(timePublication, that.timePublication) && Objects.equals(timeCreate, that.timeCreate) && Objects.equals(calendarDayToResolution, that.calendarDayToResolution) && Objects.equals(workDayToResolution, that.workDayToResolution);
+        return id == that.id && statusRegistration == that.statusRegistration && Objects.equals(name, that.name) && Objects.equals(shortName, that.shortName) && Objects.equals(isDeleted, that.isDeleted) && Objects.equals(settings, that.settings) && Objects.equals(statusVisible, that.statusVisible) && Objects.equals(beginRegistration, that.beginRegistration) && Objects.equals(endRegistration, that.endRegistration) && Objects.equals(beginVisible, that.beginVisible) && Objects.equals(endVisible, that.endVisible) && Objects.equals(sortWeight, that.sortWeight) && Objects.equals(statusPublication, that.statusPublication) && Objects.equals(timePublication, that.timePublication) && Objects.equals(timeCreate, that.timeCreate) && Objects.equals(calendarDayToResolution, that.calendarDayToResolution) && Objects.equals(workDayToResolution, that.workDayToResolution);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, shortName, isDeleted, settings, statusRegistration, statusVisible, beginRegistration, endRegistration, beginVisible, endVisible, sortWeight, additionalFields, statusPublication, timePublication, timeCreate, calendarDayToResolution, workDayToResolution);
+        return Objects.hash(id, name, shortName, isDeleted, settings, statusRegistration, statusVisible,
+                beginRegistration, endRegistration, beginVisible, endVisible, sortWeight, statusPublication,
+                timePublication, timeCreate, calendarDayToResolution, workDayToResolution);
     }
 
-    @ManyToOne
-    @JoinColumn(name = "id_department", referencedColumnName = "id")
     public ClsDepartment getDepartment() {
         return department;
     }
