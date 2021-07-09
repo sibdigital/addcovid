@@ -39,6 +39,7 @@ public class DocRequestSubsidy {
     private Timestamp timeCreate;
     private Timestamp timeUpdate;
     private Timestamp timeReview;
+    private Timestamp timeSend;
     private String reqBasis;
     private String resolutionComment;
     private Long oldDepartmentId;
@@ -237,5 +238,15 @@ public class DocRequestSubsidy {
 
     public void setDistrict(ClsDistrict district) {
         this.district = district;
+    }
+
+    @Basic
+    @Column(name = "time_send", nullable = true)
+    public Timestamp getTimeSend() {
+        return timeSend;
+    }
+
+    public void setTimeSend(Timestamp timeSend) {
+        this.timeSend = timeSend;
     }
 }
