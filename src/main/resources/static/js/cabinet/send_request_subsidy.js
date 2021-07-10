@@ -11,8 +11,12 @@ function showRequestSubsidyCreateForm(data) {
 
         if (data != null) {
             $$('requestSubsidyId').setValue(data.id);
-            $$('subsidyId').setValue(data.subsidyId);
-            $$('subsidyName').setValue(data.subsidyName);
+            let availableSubsidiesIds = availableSubsidies.map(a => a.id);
+
+            if (availableSubsidiesIds.includes(data.subsidyId)) {
+                $$('subsidyId').setValue(data.subsidyId);
+                $$('subsidyName').setValue(data.subsidyName);
+            }
 
             $$('reqBasis').setValue(data.reqBasis);
             $$('reqBasisFinal').setValue(data.reqBasis);
@@ -74,7 +78,6 @@ const requestSubsidyStep1 = {
         {
             view: 'textarea',
             id: 'reqBasis',
-            name: 'reqBasis',
             label: 'Обоснование заявки',
             labelPosition: 'top',
             height: 150,
@@ -218,7 +221,6 @@ const requestSubsidyStep3 = {
         {
             view: 'textarea',
             id: 'reqBasisFinal',
-            name: 'reqBasisFinal',
             label: 'Обоснование заявки',
             labelPosition: 'top',
             height: 150,
