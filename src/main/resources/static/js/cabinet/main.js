@@ -126,7 +126,9 @@ function getRequestStyles(){
 }
 
 function hideBtnBack() {
-    $$('btnBackMainId').hide();
+    if ($$('btnBackMainId')) {
+        $$('btnBackMainId').hide();
+    }
 }
 
 let btnBack = {
@@ -145,35 +147,37 @@ let btnBack = {
 }
 
 function showBtnBack(view, tableId) {
-    $$('btnBackMainId').show();
-    if (btnBackHandler != null) {
-        $$('btnBackMainId').detachEvent(btnBackHandler);
-    }
-    btnBackHandler = $$('btnBackMainId').attachEvent("onItemClick", function(id, e) {
-        if ($$(tableId) != null) {
-            $$(tableId).destructor();
+    if ($$('btnBackMainId')) {
+        $$('btnBackMainId').show();
+        if (btnBackHandler != null) {
+            $$('btnBackMainId').detachEvent(btnBackHandler);
         }
-
-        webix.ui({
-            id: 'content',
-            rows: [
-                view
-            ]
-        }, $$('content'));
-
-        if (view != archiveNews) {
-            $$('btnBackMainId').hide();
-            if (view == news) {
-                $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Новости" + "</span>");
+        btnBackHandler = $$('btnBackMainId').attachEvent("onItemClick", function(id, e) {
+            if ($$(tableId) != null) {
+                $$(tableId).destructor();
             }
-        } else {
-            showBtnBack(news,)
-            $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Архив новостей" + "</span>");
-        }
+
+            webix.ui({
+                id: 'content',
+                rows: [
+                    view
+                ]
+            }, $$('content'));
+
+            if (view != archiveNews) {
+                $$('btnBackMainId').hide();
+                if (view == news) {
+                    $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Новости" + "</span>");
+                }
+            } else {
+                showBtnBack(news,)
+                $$("labelLK").setValue("Личный кабинет > " + "<span style='color: #1ca1c1'>" + "Архив новостей" + "</span>");
+            }
 
 
-        return false;
-    });
+            return false;
+        });
+    }
 }
 
 let bigMainForm = {
@@ -207,6 +211,7 @@ let bigMainForm = {
                         {id: "Requests", icon: "wxi-file", value: 'Заявки',
                             // badge: setRequestsBadge()
                         },
+                        {id: "RequestSubsidy", icon: "mdi mdi-file-document-multiple", value: "Меры поддержки"},
                         {id: 'Inspections', icon: 'mdi mdi-clipboard-text-multiple', value: 'Мои проверки'},
                         {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
                         {id: "Mailing", icon: "mdi mdi-email", value: 'Рассылки',},
@@ -262,6 +267,8 @@ let bigMainForm = {
                                 if ($$('my_mailing_table') != null) {
                                     $$('my_mailing_table').destructor();
                                 }
+                            } else if (id == 'RequestSubsidy') {
+                                view = request_subsidy();
                             } else {
                                 helpUrl = 'helps';
                             }
@@ -535,6 +542,7 @@ let smallMainForm = {
                                     value: 'Заявки',
                                     // badge: setRequestsBadge()
                                 },
+                                {id: "RequestSubsidy", icon: "mdi mdi-file-document-multiple", value: "Меры поддержки"},
                                 {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
                                 {id: "Mailing", icon: "mdi mdi-email", value: 'Рассылки',},
                                 {
@@ -582,6 +590,8 @@ let smallMainForm = {
                                 }
                             } else if (id == 'Contacts') {
                                 view = contacts;
+                            } else if (id == 'RequestSubsidy') {
+                                view = request_subsidy();
                             }
                             if (view != null) {
                                 webix.ui({
