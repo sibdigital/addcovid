@@ -36,10 +36,7 @@ public interface ClsSubsidyRepo extends JpaRepository<ClsSubsidy, Long> {
             "             INNER JOIN subs.tp_subsidy_okved stso\n" +
             "                        ON roo.id_organization = :id_organization AND roo.id_okved = stso.id_okved AND stso.is_deleted = false\n" +
             "                            AND\n" +
-            "                           CASE\n" +
-            "                               WHEN stso.id_type_organization is null OR stso.id_type_organization = :id_type_organization\n" +
-            "                                   THEN true\n" +
-            "                               ELSE false END\n" +
+            "                            (stso.id_type_organization is null OR stso.id_type_organization = :id_type_organization)\n" +
             "    GROUP BY stso.id_subsidy\n" +
             "),\n" +
             "filled_subs_ids AS (\n" +
