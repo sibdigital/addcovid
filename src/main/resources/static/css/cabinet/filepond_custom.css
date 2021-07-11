@@ -1,0 +1,11 @@
+.filepond--drop-label {
+    background-color: #efefef;
+}
+
+[data-filepond-item-state='processing-complete'] .filepond--item-panel {
+    background-color: darkgoldenrod;
+}
+
+.filepond--credits {
+    display: none;
+}

@@ -210,7 +210,8 @@ let bigMainForm = {
                         {id: 'Inspections', icon: 'mdi mdi-clipboard-text-multiple', value: 'Мои проверки'},
                         {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
                         {id: "Mailing", icon: "mdi mdi-email", value: 'Рассылки',},
-                        {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Доп.контакты'}
+                        {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Доп.контакты'},
+                        {id: "Subsidy_Files", value: 'Файлы заявки'}
                     ],
                     type: {
                         css: 'my_menubar_item',
@@ -262,6 +263,8 @@ let bigMainForm = {
                                 if ($$('my_mailing_table') != null) {
                                     $$('my_mailing_table').destructor();
                                 }
+                            } else if (id == 'Subsidy_Files') {
+                                view = subsidy_files_upload();
                             } else {
                                 helpUrl = 'helps';
                             }
