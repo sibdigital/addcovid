@@ -1,4 +1,4 @@
-package ru.sibdigital.addcovid.utils;
+package ru.sibdigital.addcovid.cms;
 
 public class CMSVerifyException extends Exception{
     public CMSVerifyException(String errorMessage) {

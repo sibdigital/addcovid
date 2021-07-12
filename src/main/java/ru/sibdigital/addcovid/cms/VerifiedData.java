@@ -1,4 +1,4 @@
-package ru.sibdigital.addcovid.utils;
+package ru.sibdigital.addcovid.cms;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,9 +25,16 @@ public class VerifiedData {
     }
 
     public boolean prepare(){
-        prepared = signaturePath != null && dataPath != null &&
-                Files.exists(Path.of(signaturePath)) && Files.exists(Path.of(dataPath));
+        prepared = !isEmptyData() && !isEmptySignature();
         return prepared;
+    }
+
+    public boolean isEmptyData(){
+        return !(dataPath != null && Files.exists(Path.of(dataPath)));
+    }
+
+    public boolean isEmptySignature(){
+        return !(signaturePath != null && Files.exists(Path.of(signaturePath)));
     }
 
     public byte[] getSignature(boolean refresh){

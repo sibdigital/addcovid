@@ -1,4 +1,4 @@
-package ru.sibdigital.addcovid.utils;
+package ru.sibdigital.addcovid.cms;
 
 import com.objsys.asn1j.runtime.*;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +31,9 @@ public class CMSVerifier {
     public static final String STR_CMS_OID_SIGN_TYM_ATTR = "1.2.840.113549.1.9.5";
 
     private List<Certificate> certificates = new ArrayList<>();
+    private List<Certificate> rootCertificates = new ArrayList<>();
+    private List<CertificateInfo> certificateInfos = new ArrayList<>();
+    private Certificate rootCertificatesInPath = null;
     private String providerName = JCP.PROVIDER_NAME;
 
     private SignedData cms;
@@ -42,6 +45,17 @@ public class CMSVerifier {
     private DigestAlgorithmIdentifier digestAlgorithmIdentifier = null;
     int validsign = 0;
 
+    private String rootCertPath = "";
+
+    private boolean isDataPresent = false;
+    private boolean isSignaturePresent = false;
+    private boolean isDigestReadable = false;
+    private boolean isMessageDigestValid = false;
+    private boolean isCertificateReadable = false;
+    private boolean certificatePathBuild = false;
+    private boolean certificatePathNotContainsRevocationCertificate = false;
+    private boolean isAlgorithmSupported = false;
+
     private List<String> errors = new ArrayList<>();
 
     private List<String> addError(String error){
@@ -51,81 +65,25 @@ public class CMSVerifier {
 
     private VerifiedData verifiedData;
 
-    public void checkCertPath() throws FileNotFoundException, CertificateException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, CertPathBuilderException, CertPathValidatorException {
+    private boolean verifyCertPath() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException{
+        boolean result = false;
 
-        String rootCertPAth = "/home/bulat/IdeaProjects/mvn_project/addcovid/libs/cryptopro/samples-sources/guts_2012.cer";
-        String failedCertPath = "/home/bulat/IdeaProjects/mvn_project/addcovid/libs/cryptopro/samples-sources/sibd2019_12_17der.cer";
-        //String failedCertPath = "/home/bulat/IdeaProjects/mvn_project/addcovid/libs/cryptopro/samples-sources/sibd2021_12_10der.cer";
+        for (Certificate rootCert :rootCertificates){
 
-
-        System.setProperty("com.sun.security.enableCRLDP", "true"); // для проверки по CRL DP
-        System.setProperty("com.sun.security.enableAIAcaIssuers", "true"); // для загрузки сертификатов по AIA из сети
-        System.setProperty("ru.CryptoPro.reprov.enableAIAcaIssuers", "true"); // для загрузки сертификатов по AIA из сети
-
-        JCPInit.initProviders(false);
-        final CertificateFactory cf = CertificateFactory.getInstance("X509");
-
-        final Certificate user = certificates.get(0);//cf.generateCertificate(new FileInputStream(PATH + "user.cer"));
-        Certificate root = cf.generateCertificate(new FileInputStream(rootCertPAth));
-        Certificate failedCert = cf.generateCertificate(new FileInputStream(failedCertPath));
-
-        final Certificate[] certs = new Certificate[2];
-        certs[0] = failedCert;//user;
-        certs[1] = root;
-
-        final Set<TrustAnchor> trust = new HashSet<TrustAnchor>(1);
-        trust.add(new TrustAnchor((X509Certificate) root, null));
-
-        final List cert = new ArrayList(0);
-        for (int i = 0; i < certs.length; i++) {
-            cert.add(certs[i]);
+            result = CertificatePathVerifier.verifyAll(rootCert, certificates);
+            if (result){
+                rootCertificatesInPath = rootCert;
+                break;
+            }
         }
-
-        final PKIXBuilderParameters cpp = new PKIXBuilderParameters(trust, null);
-        cpp.setSigProvider(null);
-
-        final CollectionCertStoreParameters par = new CollectionCertStoreParameters(cert);
-
-        final CertStore store = CertStore.getInstance("Collection", par);
-        cpp.addCertStore(store);
-
-        final X509CertSelector selector = new X509CertSelector();
-        selector.setCertificate((X509Certificate) user);
-
-        cpp.setTargetCertConstraints(selector);
-        cpp.setRevocationEnabled(false);
-
-        // Построение цепочки.
-
-        final PKIXCertPathBuilderResult res = (PKIXCertPathBuilderResult) CertPathBuilder.
-                        getInstance("CPPKIX", "RevCheck").build(cpp);
-
-        final CertPath cp = res.getCertPath();
-
-        System.out.println("%%% SIZE: " + cp.getCertificates().size());
-        //System.out.println("%%% PATH:\n" + cp);
-        System.out.println("OK-1");
-
-        // Проверка цепочки.
-
-        final CertPathValidator cpv = CertPathValidator.getInstance("CPPKIX", "RevCheck");
-        cpp.setRevocationEnabled(true);
-
-        final CertPathValidatorResult validate = cpv.validate(cp, cpp);
-        System.out.println("OK-2");
-        //System.out.println(validate);
-
+        certificatePathBuild = result;
+        certificatePathNotContainsRevocationCertificate = result;
+        return result;
     }
 
     public boolean verify(){
         JCPInit.initProviders(false);
-        //Security.addProvider(new CryptoProvider()); //<--
-        //Security.addProvider(new RevCheck());
 
-        Provider[] sp = Security.getProviders();
-        for(Provider i : sp){
-            //log.warn(i.getName());
-        }
         boolean result = false;
         try {
             readCMS();
@@ -139,6 +97,7 @@ public class CMSVerifier {
             }
 
             processCertificates();
+            verifyCertPath();
 
             if (validsign == 0) {
                 throw new CMSVerifyException("Signatures are invalid: ");
@@ -217,12 +176,12 @@ public class CMSVerifier {
                         if (digestOidList.get(n).equals(currentDigestOid)) {
                             expectedDigestOid = currentDigestOid;
                             break;
-                        } // if
+                        }
                     }
                 }
                 if (expectedDigestOid == null) {
-                    throw new CMSVerifyException("Not signed on certificate.");
-                } // if
+                    throw new CMSVerifyException("Отсутствует подпись в сертификате!");
+                }
 
                 SignatureAlgorithmIdentifier expectedSignId = info.signatureAlgorithm;
                 String expectedSignAlg;
@@ -235,15 +194,14 @@ public class CMSVerifier {
                 }
 
                 expectedSignAlg = validateSignatureAlgorithm(expectedSignAlg);
-                final boolean checkResult = verifyOnCert(cert, cms.signerInfos.elements[j],
-                        true, currentDigestOid, expectedSignAlg, providerName);
+                final boolean checkResult = verifyOnCert(cert, cms.signerInfos.elements[j],true, currentDigestOid, expectedSignAlg, providerName);
 
                 if (checkResult) {
                     validsign++;
-                } // if
-
-            } // for
-
+                }
+                CertificateInfo ci = new CertificateInfo(cert, checkResult);
+                certificateInfos.add(ci);
+            }
         }
     }
 
@@ -254,8 +212,7 @@ public class CMSVerifier {
             cms.certificates.elements[i].encode(encBuf);
 
             final CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            final X509Certificate cert = (X509Certificate) cf
-                    .generateCertificate(encBuf.getInputStream());
+            final X509Certificate cert = (X509Certificate) cf.generateCertificate(encBuf.getInputStream());
             list.add(cert);
         }
         return list;
@@ -288,9 +245,8 @@ public class CMSVerifier {
      * @return верна ли подпись
      * @throws Exception ошибки
      */
-    private boolean verifyOnCert(X509Certificate cert, SignerInfo info,
-                           boolean needSortSignedAttributes, OID digestAlgOid, String signAlgOid, String providerName)
-            throws Exception {
+    private boolean verifyOnCert(X509Certificate cert, SignerInfo info, boolean needSortSignedAttributes, OID digestAlgOid,
+                                 String signAlgOid, String providerName) throws Exception {
         byte[] text = verifiedData.getData();
         // подпись
         final byte[] sign = info.signature.value;
@@ -468,8 +424,7 @@ public class CMSVerifier {
      * @return digest
      * @throws Exception e
      */
-    public static byte[] digestm(byte[] bytes, String digestAlgorithmName,
-                                 String providerName) throws Exception {
+    public static byte[] digestm(byte[] bytes, String digestAlgorithmName, String providerName) throws Exception {
 
         // calculation messageDigest
         final ByteArrayInputStream stream = new ByteArrayInputStream(bytes);
