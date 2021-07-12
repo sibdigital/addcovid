@@ -88,7 +88,7 @@ public class CMS {
         byte[] sign = null;
         FileInputStream fis = null;
         try {
-            fis = new FileInputStream("/home/sergey/pkcs7/Заявление_№351573-Заявление о включении сведений в единый реестр.pdf.p7s");
+            fis = new FileInputStream("/home/bulat/pkcs7/Заявление_№351573-Заявление о включении сведений в единый реестр.pdf.p7s");
             sign = fis.readAllBytes();
         } catch (Exception e) {
             e.printStackTrace();
@@ -101,7 +101,7 @@ public class CMS {
         byte[] data = null;
         fis = null;
         try {
-            fis = new FileInputStream("/home/sergey/pkcs7/Заявление_№351573-Заявление о включении сведений в единый реестр.pdf");
+            fis = new FileInputStream("/home/bulat/pkcs7/Заявление_№351573-Заявление о включении сведений в единый реестр.pdf");
             data = fis.readAllBytes();
         } catch (Exception e) {
             //
