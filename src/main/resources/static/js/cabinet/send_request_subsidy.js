@@ -277,7 +277,24 @@ const requestSubsidyWizard = {
                                                 if (($$('request_subsidy_step1').validate() === false || $$('subsidyId').validate() === false)) {
                                                     webix.message('Выберите меру поддержки', 'error');
                                                 } else  {
-                                                    nextRS(1);
+                                                    if ($$('requestSubsidyId').getValue()=='') {
+                                                        let params = {
+                                                            subsidyId: $$('subsidyId').getValue(),
+                                                            reqBasis: $$('reqBasis').getValue(),
+                                                        }
+                                                        webix.ajax()
+                                                            .headers({'Content-type': 'application/json'})
+                                                            .post('save_request_subsidy_draft', JSON.stringify(params)).then(function (data) {
+                                                            data = data.json();
+                                                            $$('requestSubsidyId').setValue(data.id);
+                                                            nextRS(1);
+                                                        }).catch(function () {
+                                                                webix.message('Не удалось сохранить черновик', 'error');
+                                                            }
+                                                        )
+                                                    } else {
+                                                        nextRS(1);
+                                                    }
                                                 }
                                             }
                                         }

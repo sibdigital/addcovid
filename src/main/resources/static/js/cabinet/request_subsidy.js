@@ -9,10 +9,6 @@ function request_subsidy() {
 }
 
 const request_subsidy_list = {
-    // view: 'scrollview',
-    // scroll: 'xy',
-    // body: {
-    //     type: 'space',
     rows: [
         {
             autowidth: true,
@@ -176,7 +172,6 @@ const request_subsidy_list = {
             ]
         }
     ]
-    // }
 }
 
 const no_right_form = {
@@ -276,116 +271,4 @@ function showRequestSubsidyViewForm(data) {
         $$('resolutionComment').show();
     }
 
-    // webix.ajax('org_request_subsidies/' + data.id).then(function (data) {
-    //     data = data.json();
-    //
-    //     $$('departmentId').setValue(data.department.name);
-    //     $$('reqBasis').setValue(data.reqBasis);
-    //
-    //     if (data.docRequestFiles && data.docRequestFiles.length > 0) {
-    //         let fileList = []
-    //         data.docRequestFiles.forEach((drf, index) => {
-    //             const file = drf.organizationFile;
-    //             const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
-    //                 + file.originalFileName + '</a>'
-    //             fileList.push({id: index, value: filename})
-    //         })
-    //         if (fileList.length > 0) {
-    //             $$('filename').parse(fileList)
-    //         } else {
-    //             $$('filename_label').hide()
-    //             $$('filename').hide()
-    //         }
-    //     }
-    //
-    //     if (data.docRequestPrescriptions && data.docRequestPrescriptions.length > 0) {
-    //         data.docRequestPrescriptions.forEach((drp, index) => {
-    //             const prescription = drp.prescription;
-    //
-    //             $$('prescriptions').addView({
-    //                 id: 'prescription' + prescription.id,
-    //                 rows: [
-    //                     {
-    //                         view: 'label',
-    //                         label: prescription.name,
-    //                         align: 'center'
-    //                     },
-    //                     {
-    //                         id: 'prescriptionTexts' + prescription.id,
-    //                         rows: []
-    //                     }
-    //                 ]
-    //             })
-    //
-    //             if (prescription.prescriptionTexts && prescription.prescriptionTexts.length > 0) {
-    //                 prescription.prescriptionTexts.forEach((pt, ptIndex) => {
-    //                     const files = [];
-    //                     if (pt.prescriptionTextFiles && pt.prescriptionTextFiles.length > 0) {
-    //                         pt.prescriptionTextFiles.forEach((file) => {
-    //                             const filename = '<a href="' + LINK_PREFIX + file.fileName + LINK_SUFFIX + '" target="_blank">'
-    //                                 + file.originalFileName + '</a>'
-    //                             files.push({id: file.id, value: filename})
-    //                         })
-    //                     }
-    //
-    //                     let consentPrescriptionChecked = false;
-    //                     if (drp.additionalAttributes && drp.additionalAttributes.consentPrescriptions) {
-    //                         const consentPrescription = drp.additionalAttributes.consentPrescriptions.find(c => c.id == pt.id);
-    //                         if (consentPrescription) {
-    //                             consentPrescriptionChecked = consentPrescription.isAgree;
-    //                         }
-    //                     }
-    //
-    //                     $$('prescriptionTexts' + prescription.id).addView({
-    //                         rows: [
-    //                             {
-    //                                 cols: [
-    //                                     {
-    //                                         view: 'label',
-    //                                         label: 'Текст №' + (ptIndex + 1),
-    //                                         align: 'center'
-    //                                     },
-    //                                 ]
-    //                             },
-    //                             {
-    //                                 view: 'template',
-    //                                 height: 550,
-    //                                 readonly: true,
-    //                                 scroll: true,
-    //                                 template: pt.content
-    //                             },
-    //                             {
-    //                                 view: 'list',
-    //                                 autoheight: true,
-    //                                 template: '#value#',
-    //                                 data: files,
-    //                             },
-    //                             {
-    //                                 view: 'checkbox',
-    //                                 name: 'agree',
-    //                                 labelPosition: 'top',
-    //                                 readonly: true,
-    //                                 labelRight: 'Подтверждено обязательное выполнение',
-    //                                 value: consentPrescriptionChecked
-    //                             },
-    //                         ]
-    //                     });
-    //                 })
-    //             }
-    //         })
-    //     } else {
-    //         $$('prescriptions').addView({
-    //             view: 'label',
-    //             label: 'Отсутствуют предписания'
-    //         });
-    //     }
-    //
-    //     if (data.statusReview === 1 || data.statusReview === 2) {
-    //         $$('reject_comment').show();
-    //     }
-    //
-    //     const typeRequest = data.typeRequest;
-    //
-    //     $$('activityKind').setValue(typeRequest.activityKind);
-    // });
 }
