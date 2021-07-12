@@ -188,10 +188,14 @@ const no_right_form = {
                 {
                     view: 'template',
                     id: 'noRightFormId',
-                    name: 'noRightFormId',
+                    // name: 'noRightFormId',
                     autoheight: true,
                     borderless: true,
-                    url: 'no_right_to_apply_request_subsidy_message'
+                    url: function () {
+                       let xhr = webix.ajax().sync().get('no_right_to_apply_request_subsidy_message');
+                       // return xhr.responseText;
+                        $$('noRightFormId').setHTML(xhr.responseText);
+                    }
                 },
                 {}
             ]
@@ -268,7 +272,7 @@ function showRequestSubsidyViewForm(data) {
         ]
     }, $$('content'));
 
-    if (data.subsidyRequestStatusCode != 'NEW' && data.subsidyRequestStatusCode != 'SUBMIT') {
+    if (data.subsidyRequestStatusCode !== 'NEW' && data.subsidyRequestStatusCode !== 'SUBMIT') {
         $$('resolutionComment').show();
     }
 
