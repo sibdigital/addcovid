@@ -27,6 +27,7 @@ public class ClsSubsidyRequestStatus {
     private String name;
     private String shortName;
     private String code;
+    private Boolean isBlockRequest;
     @ManyToOne
     @JoinColumn(name = "id_subsidy", referencedColumnName = "id")
     private ClsSubsidy subsidy;
@@ -87,6 +88,16 @@ public class ClsSubsidyRequestStatus {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    @Basic
+    @Column(name = "is_block_request")
+    public Boolean getBlockRequest() {
+        return isBlockRequest;
+    }
+
+    public void setBlockRequest(Boolean blockRequest) {
+        isBlockRequest = blockRequest;
     }
 
     @Override
