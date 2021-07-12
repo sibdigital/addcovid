@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.model.ClsFileType;
-import ru.sibdigital.addcovid.model.ClsOrganization;
 import ru.sibdigital.addcovid.model.subs.DocRequestSubsidy;
 import ru.sibdigital.addcovid.model.subs.TpRequestSubsidyFile;
 import ru.sibdigital.addcovid.model.subs.TpRequiredSubsidyFile;
@@ -21,7 +20,6 @@ import ru.sibdigital.addcovid.repository.subs.DocRequestSubsidyRepo;
 import ru.sibdigital.addcovid.repository.subs.TpRequestSubsidyFileRepo;
 import ru.sibdigital.addcovid.service.subs.RequestSubsidyService;
 
-import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.IOException;
@@ -56,40 +54,54 @@ public class SubsidyController {
 
     @GetMapping(value = "/required_subsidy_files")
     public @ResponseBody List<TpRequiredSubsidyFile> getListTpRequiredSubsidyFiles() {
-        List<TpRequiredSubsidyFile> tpRequiredSubsidyFiles = requestSubsidyService.findAllRequiredSubsidyFiles(1L);
+        DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(1L).orElse(null);
+        List<TpRequiredSubsidyFile> tpRequiredSubsidyFiles = requestSubsidyService.findAllRequiredSubsidyFiles(docRequestSubsidy.getSubsidy().getId());
         return tpRequiredSubsidyFiles;
     }
 
     @PostMapping(value = "/upload_subsidy_files")
-    public ResponseEntity<String> addEmployeeFromExcel(
-            @RequestParam MultipartFile[] files,
-            @RequestParam("id_file_type") Long id_file_type,
-            HttpSession session){
-        Long id_organization = (Long) session.getAttribute("id_organization");
-        ClsOrganization clsOrganization = clsOrganizationRepo.findById(id_organization).orElse(null);
+    public ResponseEntity<String> uploadRequiredSubsidyFiles(
+            @RequestParam("files") MultipartFile[] files,
+            @RequestParam("id_file_type") Long id_file_type) {
         ClsFileType clsFileType = clsFileTypeRepo.findById(id_file_type).orElse(null);
-        Long doc_request_subsidy_id = 1L;
-        DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(doc_request_subsidy_id).orElse(null);
-        Arrays.stream(files).forEach(file -> {
-            saveFile(file, clsOrganization, docRequestSubsidy, clsFileType);
+        DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(1L).orElse(null);
+
+        MultipartFile[] sortedFiles = new MultipartFile[2];
+        for (MultipartFile multipartFile : files) {
+            if (!getFileExtension(multipartFile.getOriginalFilename()).equals(".p7s")) {
+                sortedFiles[0] = multipartFile;
+            } else {
+                sortedFiles[1] = multipartFile;
+            }
+        }
+        Arrays.stream(sortedFiles).forEach(file -> {
+           saveFile(file, docRequestSubsidy, clsFileType);
         });
+
         return ResponseEntity.ok().body("{ \"status\": \"server\", \"sname\": \"check\" }");
     }
 
-    private File saveFile(MultipartFile file, ClsOrganization clsOrganization, DocRequestSubsidy docRequestSubsidy, ClsFileType clsFileType){
+    //File writer
+    private TpRequestSubsidyFile saveFile(MultipartFile file, DocRequestSubsidy docRequestSubsidy, ClsFileType clsFileType){
         File f = null;
+        TpRequestSubsidyFile savedRequestSubsidyFile = null;
         try {
             String name = file.getOriginalFilename();
             String extension = getFileExtension(name);
+            Boolean isSignature = extension.equals(".p7s");
+            Long idLastRequestSubsidyFile = tpRequestSubsidyFileRepo.findLastSubsidyFile();
+            TpRequestSubsidyFile parentDocSubsidyFile = tpRequestSubsidyFileRepo.findById(idLastRequestSubsidyFile).orElse(null);
 
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(docRequestSubsidy.getTimeCreate().getTime());
 
-            File innIdFolder = new File(uploadingAttachmentDir + "/subsidy_files/" +
+            String filepath = uploadingAttachmentDir + "/subsidy_files/" +
                     cal.get(Calendar.YEAR) + "/" +
                     cal.get(Calendar.MONTH) + "/" +
-                    clsOrganization.getInn() + "_" +
-                    docRequestSubsidy.getId());
+                    docRequestSubsidy.getOrganization().getInn() + "_" +
+                    docRequestSubsidy.getId();
+
+            File innIdFolder = new File(filepath);
 
             if (!innIdFolder.exists()) {
                 innIdFolder.mkdirs();
@@ -99,37 +111,35 @@ public class SubsidyController {
 
             f = new File(inputFilename);
             file.transferTo(f);
+
             final int size = (int) Files.size(f.toPath());
             final String fileHash = getFileHash(f);
-            TpRequestSubsidyFile tpRequestSubsidyFile =
-                    TpRequestSubsidyFile.builder()
-                            .fileSize(size)
-                            .requestSubsidy(docRequestSubsidy)
-                            .department(docRequestSubsidy.getDepartment())
-                            .organization(clsOrganization)
-                            .fileType(clsFileType)
-                            .attachmentPath(String.format("%s/%s", uploadingAttachmentDir + "/subsidy_files/" + cal.get(Calendar.YEAR) + "/" + cal.get(Calendar.MONTH) + "/" + clsOrganization.getInn() + "_" + docRequestSubsidy.getId(), f.getName()))
-                            .isDeleted(false)
-                            .fileName(f.getName())
-                            .originalFileName(name)
-                            .fileExtension(extension)
-                            .hash(fileHash)
-                            .timeCreate(new Timestamp(System.currentTimeMillis()))
-                            .isSignature(extension.equals(".p7s"))
-                            .build();
 
-            tpRequestSubsidyFileRepo.save(tpRequestSubsidyFile);
+            TpRequestSubsidyFile tpRequestSubsidyFile = TpRequestSubsidyFile.builder()
+                    .fileSize(size)
+                    .requestSubsidy(docRequestSubsidy)
+                    .department(docRequestSubsidy.getDepartment())
+                    .organization(docRequestSubsidy.getOrganization())
+                    .fileType(clsFileType)
+                    .attachmentPath(String.format("%s/%s", filepath, f.getName()))
+                    .isDeleted(false)
+                    .fileName(f.getName())
+                    .originalFileName(name)
+                    .fileExtension(extension)
+                    .hash(fileHash)
+                    .timeCreate(new Timestamp(System.currentTimeMillis()))
+                    .isSignature(isSignature)
+                    .requestSubsidyFile(isSignature ? parentDocSubsidyFile : null)
+                    .build();
 
-        } catch (IOException ex) {
-            //importStatus = ImportStatuses.FILE_ERROR.getValue();
-            log.error("saveFile(): xls file was not saved cause:", ex);
+            savedRequestSubsidyFile = tpRequestSubsidyFileRepo.save(tpRequestSubsidyFile);
         } catch (Exception ex) {
-            //importStatus = ImportStatuses.FILE_ERROR.getValue();
-            log.error("saveFile(): xls file was not saved cause:", ex);
+            log.error("saveFile(): file was not saved cause:", ex);
         }
-        return f;
+        return savedRequestSubsidyFile;
     }
 
+    //Files hash
     private String getFileHash(File file){
         String result = "NOT";
         try {
@@ -144,6 +154,7 @@ public class SubsidyController {
         return result;
     }
 
+    //Files extension
     private String getFileExtension(String name) {
          int lastIndexOf = name.lastIndexOf(".");
         if (lastIndexOf == -1) {

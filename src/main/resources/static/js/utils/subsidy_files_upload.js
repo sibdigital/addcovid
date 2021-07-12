@@ -12,8 +12,6 @@ function subsidy_files_upload() {
     }
 
     setTimeout(() => {
-        // console.log(document.querySelector('input[name=filepond]'))
-        // console.log(a[0].getFiles());
         const filepondElems = document.querySelectorAll('input.filepond');
 
         Array.from(filepondElems).forEach(inputElement => {
@@ -21,7 +19,6 @@ function subsidy_files_upload() {
                 labelIdle:`<div style="width:100%;height:100%;">
                     <p>
                     Drag &amp; Drop your files or <span class="filepond--label-action" tabindex="0">Browse</span><br>
-                    Some samples to give you an idea :
                   </p>
                 </div>`
             });
@@ -41,7 +38,6 @@ function subsidy_files_upload() {
                 },
                 onaddfile: (file) => {
                     console.log(1)
-                    // console.log($('#file_type_3 input[type=file]'))
                 },
                 server: {
                     process: (fieldName, file, metadata, load, error, progress, abort) => {
