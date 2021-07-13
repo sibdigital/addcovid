@@ -16,7 +16,9 @@ import java.io.*;
 import java.security.*;
 import java.security.cert.*;
 import java.security.cert.Certificate;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ru.sibdigital.addcovid.utils.CMS.digestm;
 
@@ -35,6 +37,7 @@ public class CMSVerifier {
     private List<CertificateInfo> certificateInfos = new ArrayList<>();
     private Certificate rootCertificatesInPath = null;
     private String providerName = JCP.PROVIDER_NAME;
+    private Date verifyDate = new Date();
 
     private SignedData cms;
     private String certDigestOid = null;
@@ -45,30 +48,25 @@ public class CMSVerifier {
     private DigestAlgorithmIdentifier digestAlgorithmIdentifier = null;
     int validsign = 0;
 
-    private String rootCertPath = "";
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-    private boolean isDataPresent = false;
-    private boolean isSignaturePresent = false;
-    private boolean isDigestReadable = false;
-    private boolean isMessageDigestValid = false;
-    private boolean isCertificateReadable = false;
-    private boolean certificatePathBuild = false;
-    private boolean certificatePathNotContainsRevocationCertificate = false;
-    private boolean isAlgorithmSupported = false;
-
-    private List<String> errors = new ArrayList<>();
-
-    private List<String> addError(String error){
-        errors.add(error);
-        return errors;
-    }
+    private boolean dataPresent = false; // присуствуют подписанные данные
+    private boolean signaturePresent = false; // присутствует подпись
+    private boolean signedDataReadable = false; // подписанные данные прочитан
+    private boolean messageDigestVerify = false; // проверка подписи завершилась успешно
+//    private boolean isCertificateReadable = false;
+    private boolean certificatePathBuild = false; // Цепочка сертификатов до корневого сертификата успешно построена
+    private boolean certificatePathNotContainsRevocationCertificate = false; // цепочка сертификатов не содержит отозванных сертификатов из СОС
+    //private boolean certificateSignaturesValid = false; //открытый ключ подписи прошел проверку - много случаев если не прошел
+    private boolean algorithmSupported = false; //поддерживаемый алгоритм подписи ГОСТ 2021 256, 512
+    private boolean allCerificateValid = false; //все сертификаты действуют на дату
 
     private VerifiedData verifiedData;
 
     private boolean verifyCertPath() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException{
         boolean result = false;
 
-        for (Certificate rootCert :rootCertificates){
+        for (Certificate rootCert : getRootCertificates()){
 
             result = CertificatePathVerifier.verifyAll(rootCert, certificates);
             if (result){
@@ -81,49 +79,92 @@ public class CMSVerifier {
         return result;
     }
 
+    private void checkCertificateValid(){
+        boolean result = true;
+        boolean current = true;
+        for (Certificate cert :certificates){
+            X509Certificate xcert  = (X509Certificate) cert;
+            try {
+                xcert.checkValidity(getVerifyDate());
+                current = true;
+            } catch (CertificateExpiredException | CertificateNotYetValidException ex) {
+                current = false;
+                CertificateInfo ci = new CertificateInfo(xcert);
+                log.error("false validity: " + ci.toString() + " exception: " + ex.getMessage(), ex);
+            }
+            result &= current;
+        }
+        allCerificateValid = result;
+    }
+
     public boolean verify(){
+
+        dataPresent = !verifiedData.isEmptyData();
+        signaturePresent = !verifiedData.isEmptySignature();
+        if (!dataPresent || !signaturePresent){
+            log.error("empty data or signature");
+            return false;
+        }
+
         JCPInit.initProviders(false);
 
         boolean result = false;
         try {
             readCMS();
+            signedDataReadable = true;
 
             readAlgorithms();
+            algorithmSupported = true;
 
             if (cms.certificates != null) {
                 final List<X509Certificate> cmsSerificates = getCMSSerificates(cms);
                 certificates.clear();
                 certificates.addAll(cmsSerificates);
+                certificateInfos.addAll(cmsSerificates.stream()
+                        .map(c -> new CertificateInfo(c))
+                        .collect(Collectors.toList()));
             }
 
-            processCertificates();
-            verifyCertPath();
+            try {
+                processSignatures();//проверяем подпись
+            }catch (CMSVerifyException ex){
+                log.error(ex.getMessage(), ex);
+            }catch (SignatureException ex) {
+                log.error(ex.getMessage(), ex);
+            }
 
             if (validsign == 0) {
-                throw new CMSVerifyException("Signatures are invalid: ");
-            } // if
-
-            if (cms.signerInfos.elements.length > validsign) {
-                throw new CMSVerifyException("Some signatures are invalid: ");
+                messageDigestVerify = false;
+                log.error("Signatures are invalid");
+            } else if (cms.signerInfos.elements.length > validsign) {
+                messageDigestVerify = false;
+                log.error("Some signatures are invalid");
+            }else{
+                messageDigestVerify = true;
+                //certificateSignaturesValid = true;
             }
+
+            checkCertificateValid(); //проверяем даты сертифкатов
+            verifyCertPath(); //проверяем цепочку
 
             result = true;
 
         }catch (CMSVerifyException ex){
             log.error(ex.getMessage(), ex);
-            addError(ex.getMessage());
         }catch (Asn1Exception ex){
             log.error(ex.getMessage(), ex);
-            addError("Невозможно прочитать подпись!");
         }catch (IOException ex){
             log.error(ex.getMessage(), ex);
-            addError("Невозможно прочитать подпись!");
         } catch (CertificateException ex) {
             log.error(ex.getMessage(), ex);
-            addError("Невозможно прочитать сертификат!");
-        } catch (Exception ex) {
+        } catch (NoSuchAlgorithmException ex) {
             log.error(ex.getMessage(), ex);
-            addError("Неизвестная ошибка!");
+        } catch (InvalidKeyException ex) {
+            log.error(ex.getMessage(), ex);
+        } catch (InvalidAlgorithmParameterException ex) {
+            log.error(ex.getMessage(), ex);
+        } catch (NoSuchProviderException ex) {
+            log.error(ex.getMessage(), ex);
         }
         return result;
     }
@@ -135,7 +176,7 @@ public class CMSVerifier {
         all.decode(asnBuf);
 
         if (!new OID(STR_CMS_OID_SIGNED).eq(all.contentType.value)) {
-            throw new CMSVerifyException("Not supported");
+            throw new CMSVerifyException("Not supported ");
         } // if
 
         cms = (SignedData) all.content;
@@ -160,7 +201,8 @@ public class CMSVerifier {
         eContTypeOID = new OID(cms.encapContentInfo.eContentType.value);
     }
 
-    private void processCertificates() throws Exception {
+    private void processSignatures() throws CMSVerifyException, Asn1Exception, NoSuchAlgorithmException,
+            CertificateEncodingException, SignatureException, NoSuchProviderException, InvalidKeyException, IOException {
         for (Certificate certElem : certificates) {
             final X509Certificate cert = (X509Certificate) certElem;
             for (int j = 0; j < cms.signerInfos.elements.length; j++) {
@@ -194,13 +236,17 @@ public class CMSVerifier {
                 }
 
                 expectedSignAlg = validateSignatureAlgorithm(expectedSignAlg);
-                final boolean checkResult = verifyOnCert(cert, cms.signerInfos.elements[j],true, currentDigestOid, expectedSignAlg, providerName);
+                final boolean checkResult = verifyOnCert(cert, cms.signerInfos.elements[j], true, currentDigestOid, expectedSignAlg, providerName);
 
                 if (checkResult) {
                     validsign++;
+                    CertificateInfo ci = new CertificateInfo(cert);
+                    log.warn("VALID signature on cert: " + ci.toString());
+                }else{
+                    CertificateInfo ci = new CertificateInfo(cert);
+                    log.warn("invalid signature on cert: " + ci.toString());
                 }
-                CertificateInfo ci = new CertificateInfo(cert, checkResult);
-                certificateInfos.add(ci);
+
             }
         }
     }
@@ -246,13 +292,18 @@ public class CMSVerifier {
      * @throws Exception ошибки
      */
     private boolean verifyOnCert(X509Certificate cert, SignerInfo info, boolean needSortSignedAttributes, OID digestAlgOid,
-                                 String signAlgOid, String providerName) throws Exception {
+                                 String signAlgOid, String providerName)
+            throws Asn1Exception, CertificateEncodingException, IOException, CMSVerifyException, NoSuchProviderException,
+            NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        //см. rfc 5652 раздел 5.3
         byte[] text = verifiedData.getData();
         // подпись
         final byte[] sign = info.signature.value;
 
         // данные для проверки подписи
         final byte[] data;
+
+        CertificateInfo ci = new CertificateInfo(cert);
 
         if (info.signedAttrs == null) {
             // аттрибуты подписи не присутствуют
@@ -311,7 +362,7 @@ public class CMSVerifier {
                     if ( !(Arrays.equals(actualCertHash.value, expectedCertHash.value) &&
                             Arrays.equals(encodedActualIssuerSerial.getMsgCopy(), encodedActualIssuerSerial.getMsgCopy())) ) {
 
-                        addError("Certificate stored in signing-certificateV2 is not equal to " + cert.getSubjectDN());
+                        log.error("Certificate stored in signing-certificateV2 is not equal to " + ci.toString());
                         return false;
                     } // if
 
@@ -320,8 +371,7 @@ public class CMSVerifier {
             } // if
 
             // проверка аттрибута content-type
-            final Asn1ObjectIdentifier contentTypeOid = new Asn1ObjectIdentifier(
-                    (new OID(STR_CMS_OID_CONT_TYP_ATTR)).value);
+            final Asn1ObjectIdentifier contentTypeOid = new Asn1ObjectIdentifier((new OID(STR_CMS_OID_CONT_TYP_ATTR)).value);
             Attribute contentTypeAttr = null;
 
             for (int r = 0; r < signAttrElem.length; r++) {
@@ -332,17 +382,15 @@ public class CMSVerifier {
             } // for
 
             if (contentTypeAttr == null) {
-                throw new CMSVerifyException("content-type attribute not present");
+                throw new CMSVerifyException("content-type attribute not present on cert \n" + ci.toString());
             } // if
 
-            if (!contentTypeAttr.values.elements[0]
-                    .equals(new Asn1ObjectIdentifier(eContTypeOID.value))) {
-                throw new CMSVerifyException("content-type attribute OID not equal eContentType OID");
+            if (!contentTypeAttr.values.elements[0].equals(new Asn1ObjectIdentifier(eContTypeOID.value))) {
+                throw new CMSVerifyException("content-type attribute OID not equal eContentType OID on cert \n" + ci.toString());
             } // if
 
             // проверка аттрибута message-digest
-            final Asn1ObjectIdentifier messageDigestOid = new Asn1ObjectIdentifier(
-                    (new OID(STR_CMS_OID_DIGEST_ATTR)).value);
+            final Asn1ObjectIdentifier messageDigestOid = new Asn1ObjectIdentifier((new OID(STR_CMS_OID_DIGEST_ATTR)).value);
 
             Attribute messageDigestAttr = null;
 
@@ -354,7 +402,7 @@ public class CMSVerifier {
             } // for
 
             if (messageDigestAttr == null) {
-                throw new CMSVerifyException("message-digest attribute not present");
+                throw new CMSVerifyException("message-digest attribute not present on cert \n" + ci.toString());
             } // if
 
             final Asn1Type open = messageDigestAttr.values.elements[0];
@@ -365,12 +413,11 @@ public class CMSVerifier {
             final byte[] dm = digestm(text, digestAlgOid.toString(), providerName);
 
             if (!Array.toHexString(dm).equals(Array.toHexString(md))) {
-                throw new CMSVerifyException("message-digest attribute verify failed");
+                throw new CMSVerifyException("message-digest attribute verify failed on cert \n" + ci.toString());
             } // if
 
             // проверка аттрибута signing-time
-            final Asn1ObjectIdentifier signTimeOid = new Asn1ObjectIdentifier(
-                    (new OID(STR_CMS_OID_SIGN_TYM_ATTR)).value);
+            final Asn1ObjectIdentifier signTimeOid = new Asn1ObjectIdentifier((new OID(STR_CMS_OID_SIGN_TYM_ATTR)).value);
 
             Attribute signTimeAttr = null;
 
@@ -385,7 +432,12 @@ public class CMSVerifier {
                 // проверка (необязательно)
                 Time sigTime = (Time)signTimeAttr.values.elements[0];
                 Asn1UTCTime time = (Asn1UTCTime) sigTime.getElement();
-                log.warn("Signing Time: " + time);
+                if (time != null){
+                    final Calendar cldr = time.getTime();
+                    log.warn("Signing Time: " + dateFormat.format(cldr.getTime()));
+                }else {
+                    log.warn("Signing Time: " + time);
+                }
             } // if
 
             // данные для проверки подписи
@@ -424,7 +476,7 @@ public class CMSVerifier {
      * @return digest
      * @throws Exception e
      */
-    public static byte[] digestm(byte[] bytes, String digestAlgorithmName, String providerName) throws Exception {
+    public static byte[] digestm(byte[] bytes, String digestAlgorithmName, String providerName) throws NoSuchProviderException, NoSuchAlgorithmException, IOException {
 
         // calculation messageDigest
         final ByteArrayInputStream stream = new ByteArrayInputStream(bytes);
@@ -488,4 +540,19 @@ public class CMSVerifier {
     }
 
 
+    public List<Certificate> getRootCertificates() {
+        return rootCertificates;
+    }
+
+    public void setRootCertificates(List<Certificate> rootCertificates) {
+        this.rootCertificates = rootCertificates;
+    }
+
+    public Date getVerifyDate() {
+        return verifyDate;
+    }
+
+    public void setVerifyDate(Date verifyDate) {
+        this.verifyDate = verifyDate;
+    }
 }
