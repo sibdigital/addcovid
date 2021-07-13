@@ -38,9 +38,6 @@ public class SubsidyController {
     private RequestSubsidyService requestSubsidyService;
 
     @Autowired
-    private ClsOrganizationRepo clsOrganizationRepo;
-
-    @Autowired
     private DocRequestSubsidyRepo docRequestSubsidyRepo;
 
     @Autowired
@@ -59,26 +56,72 @@ public class SubsidyController {
         return tpRequiredSubsidyFiles;
     }
 
+    @GetMapping(value = "/request_subsidy_files")
+    public @ResponseBody List<TpRequestSubsidyFile> uploadRequiredSubsidyFiles(
+            @RequestParam("doc_request_subsidy_id") Long request_subsidy_id,
+            @RequestParam("id_file_type") Long id_file_type) {
+        List<TpRequestSubsidyFile> tpRequestSubsidyFiles = requestSubsidyService.findAllRequestSubsidyFilesByRequestAndFileType(request_subsidy_id, id_file_type);
+        return tpRequestSubsidyFiles;
+    }
+
     @PostMapping(value = "/upload_subsidy_files")
     public ResponseEntity<String> uploadRequiredSubsidyFiles(
             @RequestParam("files") MultipartFile[] files,
             @RequestParam("id_file_type") Long id_file_type) {
-        ClsFileType clsFileType = clsFileTypeRepo.findById(id_file_type).orElse(null);
-        DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(1L).orElse(null);
 
-        MultipartFile[] sortedFiles = new MultipartFile[2];
-        for (MultipartFile multipartFile : files) {
-            if (!getFileExtension(multipartFile.getOriginalFilename()).equals(".p7s")) {
-                sortedFiles[0] = multipartFile;
-            } else {
-                sortedFiles[1] = multipartFile;
+        if (files.length != 2) {
+            return ResponseEntity.ok()
+                    .body("{\"cause\": \"Ошибка при загрузке\"," +
+                            "\"status\": \"server\"," +
+                            "\"sname\": \"Ожидалось 2 файла\"}");
+        } else {
+            ClsFileType clsFileType = clsFileTypeRepo.findById(id_file_type).orElse(null);
+            DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(1L).orElse(null);
+
+            MultipartFile[] sortedFiles = new MultipartFile[2];
+            for (MultipartFile multipartFile : files) {
+                if (!getFileExtension(multipartFile.getOriginalFilename()).equals(".p7s")) {
+                    sortedFiles[0] = multipartFile;
+                } else {
+                    sortedFiles[1] = multipartFile;
+                }
             }
-        }
-        Arrays.stream(sortedFiles).forEach(file -> {
-           saveFile(file, docRequestSubsidy, clsFileType);
-        });
+            if (sortedFiles[1] == null) {
+                return ResponseEntity.ok()
+                        .body("{\"cause\": \"Ошибка при загрузке подписи\"," +
+                            "\"status\": \"server\"," +
+                            "\"sname\": \"Файл с электронной подписью не найден\"}");
+            }
+            Arrays.stream(sortedFiles).forEach(file -> {
+               saveFile(file, docRequestSubsidy, clsFileType);
+            });
 
-        return ResponseEntity.ok().body("{ \"status\": \"server\", \"sname\": \"check\" }");
+            return ResponseEntity.ok().body("{ \"status\": \"server\", \"sname\": \"Документ успешно загружен\" }");
+        }
+    }
+
+    @PostMapping(value = "/set_subsidy_file_view_name")
+    public ResponseEntity<String> setSubsidyFileViewName(
+            @RequestParam("id_subsidy_file") Long id,
+            @RequestParam("view_name") String viewName) {
+        TpRequestSubsidyFile tpRequestSubsidyFile = tpRequestSubsidyFileRepo.findById(id).orElse(null);
+        tpRequestSubsidyFile.setViewFileName(viewName);
+        tpRequestSubsidyFileRepo.save(tpRequestSubsidyFile);
+        return ResponseEntity.ok()
+                .body("\"status\": \"server\"," +
+                        "\"sname\": \"" + tpRequestSubsidyFile + "\"}");
+    }
+
+    @PostMapping(value = "/del_request_subsidy_file")
+    public ResponseEntity<String> delRequestSubsidyFile(
+            @RequestParam("id_subsidy_file") Long id) {
+        TpRequestSubsidyFile tpRequestSubsidyFile = tpRequestSubsidyFileRepo.findById(id).orElse(null);
+        TpRequestSubsidyFile tpRequestSubsidyFileSignature = requestSubsidyService.findSignatureFile(tpRequestSubsidyFile.getId());
+        tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFileSignature);
+        tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFile);
+        return ResponseEntity.ok()
+                .body("\"status\": \"server\"," +
+                        "\"sname\": \"" + tpRequestSubsidyFile + "\"}");
     }
 
     //File writer
@@ -88,9 +131,14 @@ public class SubsidyController {
         try {
             String name = file.getOriginalFilename();
             String extension = getFileExtension(name);
-            Boolean isSignature = extension.equals(".p7s");
-            Long idLastRequestSubsidyFile = tpRequestSubsidyFileRepo.findLastSubsidyFile();
-            TpRequestSubsidyFile parentDocSubsidyFile = tpRequestSubsidyFileRepo.findById(idLastRequestSubsidyFile).orElse(null);
+
+            TpRequestSubsidyFile parentDocSubsidyFile = null;
+            Boolean isSignature = false;
+            if (extension.equals(".p7s")) {
+                Long idLastRequestSubsidyFile = requestSubsidyService.findLastRequestSubsidyFile();
+                parentDocSubsidyFile = tpRequestSubsidyFileRepo.findById(idLastRequestSubsidyFile).orElse(null);
+                isSignature = true;
+            }
 
             Calendar cal = Calendar.getInstance();
             cal.setTimeInMillis(docRequestSubsidy.getTimeCreate().getTime());
@@ -129,7 +177,7 @@ public class SubsidyController {
                     .hash(fileHash)
                     .timeCreate(new Timestamp(System.currentTimeMillis()))
                     .isSignature(isSignature)
-                    .requestSubsidyFile(isSignature ? parentDocSubsidyFile : null)
+                    .requestSubsidyFile(parentDocSubsidyFile)
                     .build();
 
             savedRequestSubsidyFile = tpRequestSubsidyFileRepo.save(tpRequestSubsidyFile);
