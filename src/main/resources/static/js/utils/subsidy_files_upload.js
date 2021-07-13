@@ -30,9 +30,6 @@ function subsidy_files_upload() {
                 allowRevert: true,
                 allowReorder: true,
                 maxParallelUploads: 2,
-                fileRenameFunction: (file) => {
-                    return `my_new_name${file.extension}`;
-                },
                 onupdatefiles: (files) => {
                     console.log(files.length)
                 },
@@ -67,27 +64,4 @@ function subsidy_files_upload() {
 
     }, 150)
     return a;
-}
-
-function view_subsidy_files_section(title, required) {
-    let req_status = required === true ? "Обязательно" : "Не обязательно"
-    return {
-        view: 'template',
-        type: 'section',
-        template: title + ` (<span style="color: red">` + req_status + `</span>)`
-    }
-}
-
-const showRequiredSubsidyFiles = (required_subsidy_files) => {
-    Array.from(required_subsidy_files).forEach(required_subsidy_file => {
-        $$('required_subsidy_files_templates').addView(
-            view_subsidy_files_section(required_subsidy_file.clsFileType.name, required_subsidy_file.required)
-        );
-
-        $$('required_subsidy_files_templates').addView({
-            scroll: "auto",
-            height: 350,
-            template: '<div class="filepond-wrapper"><input id="$' + required_subsidy_file.clsFileType.id + '" type="file" class="filepond" name="file"/></div>'
-        });
-    })
 }

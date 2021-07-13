@@ -211,7 +211,8 @@ let bigMainForm = {
                         {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
                         {id: "Mailing", icon: "mdi mdi-email", value: 'Рассылки',},
                         {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Доп.контакты'},
-                        {id: "Subsidy_Files", value: 'Файлы заявки'}
+                        {id: "Subsidy_Files", value: 'Файлы заявки'},
+                        {id: "subs", value: 'Файлы заявки webix'}
                     ],
                     type: {
                         css: 'my_menubar_item',
@@ -265,6 +266,8 @@ let bigMainForm = {
                                 }
                             } else if (id == 'Subsidy_Files') {
                                 view = subsidy_files_upload();
+                            } else if (id == 'subs') {
+                                view = subs();
                             } else {
                                 helpUrl = 'helps';
                             }
