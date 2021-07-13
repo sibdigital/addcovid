@@ -2,6 +2,8 @@ package ru.sibdigital.addcovid.cms;
 
 import com.objsys.asn1j.runtime.*;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.CryptoPro.JCP.ASN.CertificateExtensions.GeneralName;
 import ru.CryptoPro.JCP.ASN.CertificateExtensions.GeneralNames;
 import ru.CryptoPro.JCP.ASN.CryptographicMessageSyntax.*;
@@ -31,6 +33,8 @@ public class CMSVerifier {
     public static final String STR_CMS_OID_CONT_TYP_ATTR = "1.2.840.113549.1.9.3";
     public static final String STR_CMS_OID_DIGEST_ATTR = "1.2.840.113549.1.9.4";
     public static final String STR_CMS_OID_SIGN_TYM_ATTR = "1.2.840.113549.1.9.5";
+
+    private final static Logger verificationLog = LoggerFactory.getLogger("VerificationLogger");
 
     private List<Certificate> certificates = new ArrayList<>();
     private List<Certificate> rootCertificates = new ArrayList<>();
@@ -91,7 +95,7 @@ public class CMSVerifier {
             } catch (CertificateExpiredException | CertificateNotYetValidException ex) {
                 current = false;
                 CertificateInfo ci = new CertificateInfo(xcert);
-                log.error("false validity: " + ci.toString() + " exception: " + ex.getMessage(), ex);
+                verificationLog.error("false validity: " + ci.toString() + " exception: " + ex.getMessage(), ex);
             }
             result &= current;
         }
@@ -100,10 +104,11 @@ public class CMSVerifier {
 
     public boolean verify(){
 
+        verificationLog.info("start verify: " + verifiedData);
         dataPresent = !verifiedData.isEmptyData();
         signaturePresent = !verifiedData.isEmptySignature();
         if (!isDataPresent() || !isSignaturePresent()){
-            log.error("empty data or signature");
+            verificationLog.info("empty data or signature");
             return false;
         }
 
@@ -130,17 +135,17 @@ public class CMSVerifier {
             try {
                 processSignatures();//проверяем подпись
             }catch (CMSVerifyException ex){
-                log.error(ex.getMessage(), ex);
+                verificationLog.error(ex.getMessage(), ex);
             }catch (SignatureException ex) {
-                log.error(ex.getMessage(), ex);
+                verificationLog.error(ex.getMessage(), ex);
             }
 
             if (validsign == 0) {
                 messageDigestVerify = false;
-                log.error("Signatures are invalid");
+                verificationLog.error("Signatures are invalid");
             } else if (cms.signerInfos.elements.length > validsign) {
                 messageDigestVerify = false;
-                log.error("Some signatures are invalid");
+                verificationLog.error("Some signatures are invalid");
             }else{
                 messageDigestVerify = true;
                 //certificateSignaturesValid = true;
@@ -152,22 +157,23 @@ public class CMSVerifier {
             result = true;
 
         }catch (CMSVerifyException ex){
-            log.error(ex.getMessage(), ex);
+            verificationLog.error(ex.getMessage(), ex);
         }catch (Asn1Exception ex){
-            log.error(ex.getMessage(), ex);
+            verificationLog.error(ex.getMessage(), ex);
         }catch (IOException ex){
-            log.error(ex.getMessage(), ex);
+            verificationLog.error(ex.getMessage(), ex);
         } catch (CertificateException ex) {
-            log.error(ex.getMessage(), ex);
+            verificationLog.error(ex.getMessage(), ex);
         } catch (NoSuchAlgorithmException ex) {
-            log.error(ex.getMessage(), ex);
+            verificationLog.error(ex.getMessage(), ex);
         } catch (InvalidKeyException ex) {
-            log.error(ex.getMessage(), ex);
+            verificationLog.error(ex.getMessage(), ex);
         } catch (InvalidAlgorithmParameterException ex) {
-            log.error(ex.getMessage(), ex);
+            verificationLog.error(ex.getMessage(), ex);
         } catch (NoSuchProviderException ex) {
-            log.error(ex.getMessage(), ex);
+            verificationLog.error(ex.getMessage(), ex);
         }
+        verificationLog.info("end verify: " + verifiedData + " results: " + createVerifyInfo());
         return result;
     }
 
@@ -243,10 +249,10 @@ public class CMSVerifier {
                 if (checkResult) {
                     validsign++;
                     CertificateInfo ci = new CertificateInfo(cert);
-                    log.warn("VALID signature on cert: " + ci.toString());
+                    verificationLog.warn("VALID signature on cert: " + ci.toString());
                 }else{
                     CertificateInfo ci = new CertificateInfo(cert);
-                    log.warn("invalid signature on cert: " + ci.toString());
+                    verificationLog.warn("invalid signature on cert: " + ci.toString());
                 }
 
             }
@@ -364,7 +370,7 @@ public class CMSVerifier {
                     if ( !(Arrays.equals(actualCertHash.value, expectedCertHash.value) &&
                             Arrays.equals(encodedActualIssuerSerial.getMsgCopy(), encodedActualIssuerSerial.getMsgCopy())) ) {
 
-                        log.error("Certificate stored in signing-certificateV2 is not equal to " + ci.toString());
+                        verificationLog.error("Certificate stored in signing-certificateV2 is not equal to " + ci.toString());
                         return false;
                     } // if
 
@@ -436,9 +442,9 @@ public class CMSVerifier {
                 Asn1UTCTime time = (Asn1UTCTime) sigTime.getElement();
                 if (time != null){
                     final Calendar cldr = time.getTime();
-                    log.warn("Signing Time: " + dateFormat.format(cldr.getTime()));
+                    verificationLog.warn("Signing Time: " + dateFormat.format(cldr.getTime()));
                 }else {
-                    log.warn("Signing Time: " + time);
+                    verificationLog.warn("Signing Time: " + time);
                 }
             } // if
 
@@ -539,6 +545,20 @@ public class CMSVerifier {
 
         return signAlg;
 
+    }
+
+    private String createVerifyInfo(){
+        String result = "";
+        result += " isAlgorithmSupported=" + isAlgorithmSupported();
+        result += " isAllCerificateValid=" +  isAllCerificateValid();
+        result += " isMessageDigestVerify=" +  isMessageDigestVerify();
+        result += " isCertificatePathBuild=" +  isCertificatePathBuild();
+        result += " isCertificatePathNotContainsRevocationCertificate=" +  isCertificatePathNotContainsRevocationCertificate();
+        result += " isDataPresent=" +  isDataPresent();
+        result += " isSignaturePresent=" +  isSignaturePresent();
+        result += " isSignedDataReadable=" +  isSignedDataReadable();
+        result += " isCertificatePresent=" +  isCertificatePresent();
+        return result;
     }
 
 

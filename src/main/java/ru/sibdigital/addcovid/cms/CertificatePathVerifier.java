@@ -1,6 +1,8 @@
 package ru.sibdigital.addcovid.cms;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.CryptoPro.JCP.Util.JCPInit;
 
 import java.security.InvalidAlgorithmParameterException;
@@ -14,6 +16,9 @@ import java.util.Set;
 
 @Slf4j
 public class CertificatePathVerifier {
+
+    private final static Logger verificationLog = LoggerFactory.getLogger("VerificationLogger");
+
     private Certificate anchor;
     private Certificate verifableCertificate;
 
@@ -66,9 +71,9 @@ public class CertificatePathVerifier {
 
         final CertPath cp = res.getCertPath();
 
-        log.warn("%%% SIZE: " + cp.getCertificates().size());
+        //verificationLog.warn("%%% SIZE: " + cp.getCertificates().size());
         //System.out.println("%%% PATH:\n" + cp);
-        log.warn("OK-1");
+        verificationLog.warn("Построение цепочки - успешно SIZE: " + cp.getCertificates().size() );
         pathBuild = true;
 
         // Проверка цепочки.
@@ -77,7 +82,7 @@ public class CertificatePathVerifier {
         cpp.setRevocationEnabled(true);
 
         final CertPathValidatorResult validate = cpv.validate(cp, cpp);
-        log.warn("OK-2");
+        verificationLog.warn("Проверка цепочки - успешно");
         result = true;
         //System.out.println(validate);
         pathNotContainsRevocationCertificate = true;
@@ -102,7 +107,7 @@ public class CertificatePathVerifier {
             try {
                 isVerify = cpv.verify();
             } catch (CertPathBuilderException | CertPathValidatorException ex) {
-                log.warn(ex.getMessage(),ex);
+                verificationLog.warn(ex.getMessage(),ex);
             }
             if (isVerify){
                 result = cpv;
@@ -121,7 +126,7 @@ public class CertificatePathVerifier {
             try {
                 isVerify = cpv.verify();
             } catch (CertPathBuilderException | CertPathValidatorException ex) {
-                log.warn(ex.getMessage(),ex);
+                verificationLog.warn(ex.getMessage(),ex);
             }
             result &= isVerify;
         }

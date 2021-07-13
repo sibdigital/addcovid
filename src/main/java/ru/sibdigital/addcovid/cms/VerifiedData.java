@@ -13,6 +13,9 @@ public class VerifiedData {
 
     private String signaturePath;
     private String dataPath;
+    private String identificator;
+    private String signatureIdentificator;
+    private String group;
 
     private byte[] signature;
     private byte[] data;
@@ -22,6 +25,23 @@ public class VerifiedData {
     public VerifiedData(String signaturePath, String dataPath){
         this.dataPath = dataPath;
         this.signaturePath = signaturePath;
+    }
+
+    public VerifiedData(String signaturePath, String dataPath, String identificator, String signatureIdentificator){
+        this(signaturePath, dataPath);
+        this.identificator = identificator;
+        this.signatureIdentificator = signatureIdentificator;
+    }
+
+    public VerifiedData(String signaturePath, String dataPath, long identificator, long signatureIdentificator){
+        this(signaturePath, dataPath);
+        this.identificator = String.valueOf(identificator);
+        this.signatureIdentificator = String.valueOf(signatureIdentificator);
+    }
+
+    public VerifiedData(String signaturePath, String dataPath, long identificator, long signatureIdentificator, long group){
+        this(signaturePath, dataPath, identificator, signatureIdentificator);
+        this.group = String.valueOf(group);
     }
 
     public boolean prepare(){
@@ -93,5 +113,33 @@ public class VerifiedData {
             }
         }
         return data;
+    }
+
+    public String toString(){
+        return String.format("id: %s, gr: %s, data: %s, sign: %s", identificator, group, data, signaturePath);
+    }
+
+    public String getIdentificator() {
+        return identificator;
+    }
+
+    public void setIdentificator(String identificator) {
+        this.identificator = identificator;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public String getSignatureIdentificator() {
+        return signatureIdentificator;
+    }
+
+    public void setSignatureIdentificator(String signatureIdentificator) {
+        this.signatureIdentificator = signatureIdentificator;
     }
 }
