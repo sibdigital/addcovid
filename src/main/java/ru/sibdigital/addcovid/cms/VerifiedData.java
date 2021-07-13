@@ -2,11 +2,11 @@ package ru.sibdigital.addcovid.cms;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Slf4j
 public class VerifiedData {
@@ -30,11 +30,26 @@ public class VerifiedData {
     }
 
     public boolean isEmptyData(){
-        return !(dataPath != null && Files.exists(Path.of(dataPath)));
+        boolean exists = dataPath != null && Files.exists(Path.of(dataPath));
+        boolean result = !exists && isEmptyFile(dataPath);
+        return result;
     }
 
     public boolean isEmptySignature(){
-        return !(signaturePath != null && Files.exists(Path.of(signaturePath)));
+        boolean exists = signaturePath != null && Files.exists(Path.of(signaturePath));
+        boolean result = !exists && isEmptyFile(signaturePath);
+        return result;
+    }
+
+    private boolean isEmptyFile(String path){
+        boolean result = true;
+        try {
+            File file = new File(path);
+            result = file.length() == 0L;
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+        }
+        return result;
     }
 
     public byte[] getSignature(boolean refresh){

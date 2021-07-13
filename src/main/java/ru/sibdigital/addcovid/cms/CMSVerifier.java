@@ -60,6 +60,7 @@ public class CMSVerifier {
     //private boolean certificateSignaturesValid = false; //открытый ключ подписи прошел проверку - много случаев если не прошел
     private boolean algorithmSupported = false; //поддерживаемый алгоритм подписи ГОСТ 2021 256, 512
     private boolean allCerificateValid = false; //все сертификаты действуют на дату
+    private boolean certificatePresent = false; //в файле подписи есть сертификаты
 
     private VerifiedData verifiedData;
 
@@ -68,7 +69,7 @@ public class CMSVerifier {
 
         for (Certificate rootCert : getRootCertificates()){
 
-            result = CertificatePathVerifier.verifyAll(rootCert, certificates);
+            result = CertificatePathVerifier.verifyAll(rootCert, getCertificates());
             if (result){
                 rootCertificatesInPath = rootCert;
                 break;
@@ -82,7 +83,7 @@ public class CMSVerifier {
     private void checkCertificateValid(){
         boolean result = true;
         boolean current = true;
-        for (Certificate cert :certificates){
+        for (Certificate cert : getCertificates()){
             X509Certificate xcert  = (X509Certificate) cert;
             try {
                 xcert.checkValidity(getVerifyDate());
@@ -101,7 +102,7 @@ public class CMSVerifier {
 
         dataPresent = !verifiedData.isEmptyData();
         signaturePresent = !verifiedData.isEmptySignature();
-        if (!dataPresent || !signaturePresent){
+        if (!isDataPresent() || !isSignaturePresent()){
             log.error("empty data or signature");
             return false;
         }
@@ -117,10 +118,11 @@ public class CMSVerifier {
             algorithmSupported = true;
 
             if (cms.certificates != null) {
-                final List<X509Certificate> cmsSerificates = getCMSSerificates(cms);
-                certificates.clear();
-                certificates.addAll(cmsSerificates);
-                certificateInfos.addAll(cmsSerificates.stream()
+                final List<X509Certificate> cmsSerificates = getCMSSertificates(cms);
+                certificatePresent = !cmsSerificates.isEmpty();
+                getCertificates().clear();
+                getCertificates().addAll(cmsSerificates);
+                getCertificateInfos().addAll(cmsSerificates.stream()
                         .map(c -> new CertificateInfo(c))
                         .collect(Collectors.toList()));
             }
@@ -203,7 +205,7 @@ public class CMSVerifier {
 
     private void processSignatures() throws CMSVerifyException, Asn1Exception, NoSuchAlgorithmException,
             CertificateEncodingException, SignatureException, NoSuchProviderException, InvalidKeyException, IOException {
-        for (Certificate certElem : certificates) {
+        for (Certificate certElem : getCertificates()) {
             final X509Certificate cert = (X509Certificate) certElem;
             for (int j = 0; j < cms.signerInfos.elements.length; j++) {
 
@@ -251,7 +253,7 @@ public class CMSVerifier {
         }
     }
 
-    private List<X509Certificate> getCMSSerificates(SignedData cms) throws Asn1Exception, CertificateException {
+    private List<X509Certificate> getCMSSertificates(SignedData cms) throws Asn1Exception, CertificateException {
         List<X509Certificate> list = new ArrayList<>();
         for (int i = 0; i < cms.certificates.elements.length; i++) {
             final Asn1BerEncodeBuffer encBuf = new Asn1BerEncodeBuffer();
@@ -554,5 +556,49 @@ public class CMSVerifier {
 
     public void setVerifyDate(Date verifyDate) {
         this.verifyDate = verifyDate;
+    }
+
+    public List<Certificate> getCertificates() {
+        return certificates;
+    }
+
+    public List<CertificateInfo> getCertificateInfos() {
+        return certificateInfos;
+    }
+
+    public boolean isDataPresent() {
+        return dataPresent;
+    }
+
+    public boolean isSignaturePresent() {
+        return signaturePresent;
+    }
+
+    public boolean isSignedDataReadable() {
+        return signedDataReadable;
+    }
+
+    public boolean isMessageDigestVerify() {
+        return messageDigestVerify;
+    }
+
+    public boolean isCertificatePathBuild() {
+        return certificatePathBuild;
+    }
+
+    public boolean isCertificatePathNotContainsRevocationCertificate() {
+        return certificatePathNotContainsRevocationCertificate;
+    }
+
+    public boolean isAlgorithmSupported() {
+        return algorithmSupported;
+    }
+
+    public boolean isAllCerificateValid() {
+        return allCerificateValid;
+    }
+
+    public boolean isCertificatePresent() {
+        return certificatePresent;
     }
 }

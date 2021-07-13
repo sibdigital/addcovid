@@ -20,10 +20,20 @@ public class CMSTest {
         cmsVerifier.getRootCertificates().add(root);
         cmsVerifier.getRootCertificates().add(root2);
 
-        VerifiedData verifiedData =  new VerifiedData(
-                "/home/bulat/pkcs7/Заявление_№351573-Заявление о включении сведений в единый реестр.pdf.p7s",
-                "/home/bulat/pkcs7/Заявление_№351573-Заявление о включении сведений в единый реестр.pdf"
+//        VerifiedData verifiedData =  new VerifiedData(
+//                "/home/bulat/pkcs7/Заявление_№351573-Заявление о включении сведений в единый реестр.pdf.p7s",
+//                "/home/bulat/pkcs7/Заявление_№351573-Заявление о включении сведений в единый реестр.pdf"
+//            );
+
+           VerifiedData verifiedData =  new VerifiedData(
+                "/home/bulat/pkcs7/inn.sgn",
+                "/home/bulat/pkcs7/inn.PDF"
             );
+
+//        VerifiedData verifiedData =  new VerifiedData(
+//                "/home/bulat/pkcs7/test.test",
+//                "/home/bulat/pkcs7/Заявление_№351573-Заявление о включении сведений в единый реестр.pdf"
+//        );
 
 //        VerifiedData verifiedData =  new VerifiedData(
 //                "/home/bulat/pkcs7/response_2017-2-3_11-13-14_688.zip.p7s",
