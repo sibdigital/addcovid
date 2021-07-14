@@ -1,13 +1,17 @@
 package ru.sibdigital.addcovid.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import ru.sibdigital.addcovid.cms.CMSVerifier;
 import ru.sibdigital.addcovid.cms.VerifiedData;
 import ru.sibdigital.addcovid.model.ClsDepartment;
 import ru.sibdigital.addcovid.model.ClsDepartmentContact;
+import ru.sibdigital.addcovid.service.queue.CustomQueueService;
+import ru.sibdigital.addcovid.service.subs.VerifyMessageService;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,6 +26,11 @@ import java.util.Map;
 @Slf4j
 @Controller
 public class TestController {
+    @Autowired
+    private CustomQueueService customQueueService;
+
+    @Autowired
+    private VerifyMessageService  verifyMessageService;
 
     @GetMapping("/test_verify_process")
     @ResponseBody
@@ -56,6 +65,26 @@ public class TestController {
         result += "\n isCertificatePresent=" +  cmsVerifier.isCertificatePresent();
         result += "\n" + cmsVerifier.getCertificateInfos()
                 .stream().map(ci -> ci.toString() + "\n").reduce((s1, s2) -> s1 + s2);
+
+        result += "\n\n\n\n<br/>" + verifyMessageService.getVerifyResult(cmsVerifier);
         return result;
+    }
+
+    @GetMapping("/test_queue_task")
+    @ResponseBody
+    public String testQueueTask(@RequestParam(value = "id_request", required = true) Long idRequest,
+                                @RequestParam(value = "id_request_subsidy_file", required = true) Long idRequestSubsidyFile,
+                                @RequestParam(value = "id_request_subsidy_signature_file", required = true) Long idRequestSubsidySignatureFile) {
+        List<VerifiedData> list = new ArrayList<>();
+
+        VerifiedData verifiedData1 = new VerifiedData("signaturePath", "dataPath1");
+        verifiedData1.setIdentificator(String.valueOf(idRequestSubsidyFile));
+        verifiedData1.setSignatureIdentificator(String.valueOf(idRequestSubsidySignatureFile));
+        verifiedData1.setGroup(String.valueOf(idRequest));
+        list.add(verifiedData1);
+        verifiedData1.prepare();
+
+        customQueueService.testMethod(list);
+        return "Запущено";
     }
 }

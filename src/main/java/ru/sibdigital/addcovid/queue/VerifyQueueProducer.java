@@ -31,6 +31,6 @@ public class VerifyQueueProducer implements QueueProducer<VerifiedData> {
 
     @Override
     public TaskPayloadTransformer<VerifiedData> getPayloadTransformer() {
-        return null;
+        return new VerifyTaskPayloadTransformer();
     }
 }
