@@ -1,7 +1,11 @@
 package ru.sibdigital.addcovid;
 
+import org.junit.Assert;
 import org.junit.Test;
+import org.junit.platform.commons.logging.Logger;
+import org.junit.platform.commons.logging.LoggerFactory;
 import org.junit.runner.RunWith;
+import org.postgresql.ds.PGSimpleDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.ConfigFileApplicationContextInitializer;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,18 +30,12 @@ import ru.yoomoney.tech.dbqueue.settings.QueueLocation;
 import ru.yoomoney.tech.dbqueue.settings.QueueSettings;
 import ru.yoomoney.tech.dbqueue.spring.dao.SpringDatabaseAccessLayer;
 
+import javax.annotation.Nonnull;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = AddcovidApplication.class)
-@ContextConfiguration(
-        classes = { ApplicationConstants.class}//,
-        //initializers = {ConfigFileApplicationContextInitializer.class}
-        )
-@TestPropertySource(locations = "../../../constants.yml")
-//properties = { "spring.config.location=classpath:constants.yml" }
 public class QueueTest {
 
     @Autowired
@@ -46,21 +44,12 @@ public class QueueTest {
     @Autowired
     private PlatformTransactionManager transactionManager;
 
+    @Autowired
     private TransactionTemplate transactionTemplate;
 
-    @Test
-    public void enqueue() {
-//        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-//        dataSource.setDriverClassName("org.postgresql.Driver");
-//        dataSource.setUrl("jdbc:postgresql://localhost:5432/cov_prod_copy");
-//        dataSource.setUsername("postgres");
-//        dataSource.setPassword("postgres");
-//
-//        jdbcTemplate = new JdbcTemplate();
-//        jdbcTemplate.setDataSource(dataSource);
-//
-//        transactionManager = new DataSourceTransactionManager();
 
+    @Test
+    public void example_config() throws InterruptedException {
         AtomicBoolean isTaskConsumed = new AtomicBoolean(false);
         transactionTemplate = new TransactionTemplate(transactionManager);
         final QueueTableSchema.Builder builder = QueueTableSchema.builder();
@@ -72,7 +61,7 @@ public class QueueTest {
         QueueShard<SpringDatabaseAccessLayer> shard = new QueueShard<>(new QueueShardId("verify_shard"), databaseAccessLayer);
 
         QueueConfig config = new QueueConfig(QueueLocation.builder().withTableName("reg_queue_tasks")
-                .withQueueId(new QueueId("verify_queue")).build(),
+                .withQueueId(new QueueId("verify_shard")).build(),
                 QueueSettings.builder()
                         .withBetweenTaskTimeout(Duration.ofMillis(100))
                         .withNoTaskTimeout(Duration.ofMillis(100))
@@ -80,10 +69,9 @@ public class QueueTest {
 
         StringQueueProducer producer = new StringQueueProducer(config, shard);
         StringQueueConsumer consumer = new StringQueueConsumer(config) {
-
             @Override
-            public TaskExecutionResult execute(Task<String> task) {
-                //log.info("payload={}", task.getPayloadOrThrow());
+            public TaskExecutionResult execute(@Nonnull Task<String> task) {
+//                log.info("payload={}", task.getPayloadOrThrow());
                 isTaskConsumed.set(true);
                 return TaskExecutionResult.finish();
             }
@@ -94,13 +82,9 @@ public class QueueTest {
         queueService.registerQueue(consumer);
         queueService.start();
         producer.enqueue(EnqueueParams.create("example task"));
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(1000);
         queueService.shutdown();
         queueService.awaitTermination(Duration.ofSeconds(10));
-        //Assert.assertTrue(isTaskConsumed.get());
+        Assert.assertTrue(isTaskConsumed.get());
     }
 }
