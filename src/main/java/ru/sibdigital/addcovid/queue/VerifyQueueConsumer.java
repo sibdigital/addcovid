@@ -70,8 +70,9 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
     }
 
     private CMSVerifier process(TpRequestSubsidyFile dataFile, TpRequestSubsidyFile signatureFile){
-        String dataFileName = uploadingAttachmentDir + File.separator + dataFile.getAttachmentPath();
-        String signatureFileName = uploadingAttachmentDir + File.separator + signatureFile.getAttachmentPath();
+        final String absolutePath = Paths.get(uploadingAttachmentDir).toFile().getAbsolutePath();
+        String dataFileName = absolutePath + File.separator + dataFile.getAttachmentPath();
+        String signatureFileName = absolutePath + File.separator + signatureFile.getAttachmentPath();
 
         File file = new File(dataFileName);
         File signature = new File(signatureFileName);

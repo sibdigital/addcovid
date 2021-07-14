@@ -369,7 +369,8 @@ public class RequestSubsidyController {
                 parentDocSubsidyFile = tpRequestSubsidyFileRepo.findById(idLastRequestSubsidyFile).orElse(null);
                 isSignature = true;
             }
-            File innIdFolder = getSavingDirectory(docRequestSubsidy);
+            String directory = getSavedDirectoryPath(docRequestSubsidy);
+            File innIdFolder = getSavingDirectory(directory);
 
             String prefix = String.valueOf(System.currentTimeMillis());
             if (docRequestSubsidy.getOrganization() != null){
@@ -377,7 +378,7 @@ public class RequestSubsidyController {
             }
             final String filename = prefix + "_" + UUID.randomUUID() + extension;
             String absoluteFilename = innIdFolder.getAbsolutePath() + File.separator + filename;
-            String relFilename = innIdFolder.getName() + File.separator + filename;
+            String relFilename = directory + File.separator + filename;
 
             f = new File(absoluteFilename);
             file.transferTo(f);
@@ -411,15 +412,19 @@ public class RequestSubsidyController {
         return savedRequestSubsidyFile;
     }
 
-    private File getSavingDirectory(DocRequestSubsidy docRequestSubsidy){
+    private String getSavedDirectoryPath(DocRequestSubsidy docRequestSubsidy){
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(docRequestSubsidy.getTimeCreate().getTime());
-        String filepath = uploadingAttachmentDir + File.separator + "subsidy_files"+ File.separator +
+        String dir = "subsidy_files"+ File.separator +
                 cal.get(Calendar.YEAR) + File.separator +
                 cal.get(Calendar.MONTH) + File.separator +
                 docRequestSubsidy.getOrganization().getInn() + "_" +
                 docRequestSubsidy.getId();
+        return dir;
+    }
 
+    private File getSavingDirectory(String directory){
+        String filepath = uploadingAttachmentDir + File.separator + directory;
         File innIdFolder = new File(filepath);
 
         if (!innIdFolder.exists()) {
