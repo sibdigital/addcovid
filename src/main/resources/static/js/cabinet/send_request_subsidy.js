@@ -451,7 +451,9 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                     } else if (nextNumber === 1 && $$('required_subsidy_files_templates').getChildViews().length === 0) {
                         createDataView();
                         nextRS(nextNumber);
-                    } else if (nextNumber === 2) {
+                    } else if (nextNumber === 1) {
+                        nextRS(nextNumber);
+                    }  else if (nextNumber === 2) {
                         let valid = checkRequiredFiles();
                         if (valid) {
                             nextRS(nextNumber);
