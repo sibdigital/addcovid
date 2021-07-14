@@ -1,6 +1,8 @@
 package ru.sibdigital.addcovid.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -28,6 +30,8 @@ import java.util.List;
 @Service
 @Slf4j
 public class UserDetailsServiceImpl implements UserDetailsService {
+
+    private final static Logger authLog = LoggerFactory.getLogger("AuthLogger");
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -72,8 +76,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 }
             }
         } catch (NonUniqueResultException | IncorrectResultSizeDataAccessException | InternalAuthenticationServiceException ex){
-            log.warn("Too many organizations found found for login " + login + " is inn entered " + isInnEntered);
-            log.error(ex.getMessage(), ex);
+            authLog.warn("Too many organizations found found for login " + login + " is inn entered " + isInnEntered);
+            authLog.error(ex.getMessage(), ex);
             throw new UsernameNotFoundException("Too many organizations found.");
         }
 
@@ -85,13 +89,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 //                builder.password(passwordEncoder.encode(principal.getPassword()));
                 builder.password(principal.getPassword());
                 builder.roles("USER");
-                log.warn(" User FOUND for login " + login + " is inn entered " + isInnEntered + " id org: " + organization.getId());
+                authLog.warn(" User FOUND for login " + login + " is inn entered " + isInnEntered + " id org: " + organization.getId());
             } else {
-                log.warn(" User no found for login " + login + " is inn entered " + isInnEntered);
+                authLog.warn(" User no found for login " + login + " is inn entered " + isInnEntered);
                 throw new UsernameNotFoundException("User no found.");
             }
         } else {
-            log.warn("Organization no found. " + login + " is inn entered " + isInnEntered);
+            authLog.warn("Organization no found. " + login + " is inn entered " + isInnEntered);
             throw new UsernameNotFoundException("Organization no found." );
         }
 
