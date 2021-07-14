@@ -70,4 +70,18 @@ public class CertificateInfo {
         }
         return result;
     }
+
+    public String toHtmlString(){
+        String result = "Ошибка при преобразовании";
+        try {
+            String dateBefore = getNotBefore() != null ? getNotBefore().format(formatter) : "Неизвестно";
+            String dateAfter = getNotAfter() != null ? getNotAfter().format(formatter) : "Неизвестно";
+            result = "<b>Владелец:</b> <i>" + getSubject() + "</i><br/>"
+                    + "<b>Издатетель:</b> <i>" + getIssuer() + "</i><br/>"
+                    + "<b>Действителен:</b> <i>" + dateBefore + " - " + dateAfter + "</i>";
+        }catch (Exception ex){
+            exception = true;
+        }
+        return result;
+    }
 }

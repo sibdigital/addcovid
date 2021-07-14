@@ -12,6 +12,7 @@ import ru.sibdigital.addcovid.model.ClsDepartment;
 import ru.sibdigital.addcovid.model.ClsDepartmentContact;
 import ru.sibdigital.addcovid.service.queue.CustomQueueService;
 import ru.sibdigital.addcovid.service.subs.VerifyMessageService;
+import ru.sibdigital.addcovid.service.subs.VerifyMessageService;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -28,6 +29,9 @@ import java.util.Map;
 public class TestController {
     @Autowired
     private CustomQueueService customQueueService;
+
+    @Autowired
+    private VerifyMessageService  verifyMessageService;
 
     @Autowired
     private VerifyMessageService  verifyMessageService;
