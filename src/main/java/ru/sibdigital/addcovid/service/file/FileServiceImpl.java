@@ -2,6 +2,7 @@ package ru.sibdigital.addcovid.service.file;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import ru.sibdigital.addcovid.utils.FileUtils;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.File;
@@ -17,17 +18,18 @@ public class FileServiceImpl implements FileService{
 
     @Override
     public String getFileHash(File file){
-        String result = "NOT";
-        try {
-            final byte[] bytes = Files.readAllBytes(file.toPath());
-            byte[] hash = MessageDigest.getInstance("MD5").digest(bytes);
-            result = DatatypeConverter.printHexBinary(hash);
-        } catch (IOException ex) {
-            log.error(ex.getMessage());
-        } catch (NoSuchAlgorithmException ex) {
-            log.error(ex.getMessage());
-        }
-        return result;
+        return FileUtils.getFileHash(file);
+//        String result = "NOT";
+//        try {
+//            final byte[] bytes = Files.readAllBytes(file.toPath());
+//            byte[] hash = MessageDigest.getInstance("MD5").digest(bytes);
+//            result = DatatypeConverter.printHexBinary(hash);
+//        } catch (IOException ex) {
+//            log.error(ex.getMessage());
+//        } catch (NoSuchAlgorithmException ex) {
+//            log.error(ex.getMessage());
+//        }
+//        return result;
     }
 
     @Override

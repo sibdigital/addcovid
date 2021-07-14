@@ -27,6 +27,8 @@ import ru.sibdigital.addcovid.repository.subs.DocRequestSubsidyRepo;
 import ru.sibdigital.addcovid.repository.subs.RegVerificationSignatureFileRepo;
 import ru.sibdigital.addcovid.repository.subs.TpRequestSubsidyFileRepo;
 import ru.sibdigital.addcovid.service.subs.RequestSubsidyService;
+import ru.sibdigital.addcovid.utils.DataFormatUtils;
+import ru.sibdigital.addcovid.utils.FileUtils;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
@@ -305,13 +307,15 @@ public class RequestSubsidyController {
     @GetMapping(value = "/check_request_subsidy_files_signatures")
     public ResponseEntity<String> checkRequestSubsidyFilesSignatures(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
-        if (id == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("{\"cause\": \"Не найден id организации\"," +
-                            "\"status\": \"server\"," +
-                            "\"sname\": \"" + "" + "\"}");
+        ClsOrganization clsOrganization = null;
+        if (id != null){
+            clsOrganization = clsOrganizationRepo.findById(id).orElse(null);
         }
-        ClsOrganization clsOrganization = clsOrganizationRepo.findById(id).orElse(null);
+        if (id == null || clsOrganization == null) {
+            return DataFormatUtils.buildResponse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR),
+                    Map.of("cause", "Не найден id организации","status", "server", "sname", ""));
+        }
+
         List<TpRequestSubsidyFile> signatureFiles = tpRequestSubsidyFileRepo.getSignatureFiles().orElse(null);
         List<VerifiedData> verifiedDataList = new ArrayList<>();
          for(TpRequestSubsidyFile signatureFile : signatureFiles){
@@ -323,12 +327,11 @@ public class RequestSubsidyController {
                      signatureFile.getId(),
                      docFile.getRequestSubsidy().getId()
              );
-             if(!verifiedData.isEmptyData()){
+             //if(!verifiedData.isEmptyData()){
                  RegVerificationSignatureFile regVerificationSignatureFile = RegVerificationSignatureFile.builder()
                          .requestSubsidy(docFile.getRequestSubsidy())
                          .requestSubsidyFile(docFile)
                          .requestSubsidySubsidySignatureFile(signatureFile)
-                         .timeCreate(new Timestamp(System.currentTimeMillis()))
                          .isDeleted(false)
                          .verifyStatus(0)
                          .principal(clsOrganization.getPrincipal())
@@ -339,11 +342,10 @@ public class RequestSubsidyController {
                     regVerificationSignatureFileRepo.save(regVerificationSignatureFile);
                  }
                  verifiedDataList.add(verifiedData);
-             }
+             //}
          }
-        return ResponseEntity.ok()
-                .body("{\"status\":\"server\"," +
-                        "\"sname\":\"check\"}");
+        return DataFormatUtils.buildResponse(ResponseEntity.ok(),
+                Map.of("status", "server","sname", "check"));
     }
 
     //File writer
@@ -383,7 +385,7 @@ public class RequestSubsidyController {
             file.transferTo(f);
 
             final int size = (int) Files.size(f.toPath());
-            final String fileHash = getFileHash(f);
+            final String fileHash = FileUtils.getFileHash(f);
 
             TpRequestSubsidyFile tpRequestSubsidyFile = TpRequestSubsidyFile.builder()
                     .fileSize(size)
@@ -407,21 +409,6 @@ public class RequestSubsidyController {
             log.error("saveFile(): file was not saved cause:", ex);
         }
         return savedRequestSubsidyFile;
-    }
-
-    //Files hash
-    private String getFileHash(File file){
-        String result = "NOT";
-        try {
-            final byte[] bytes = Files.readAllBytes(file.toPath());
-            byte[] hash = MessageDigest.getInstance("MD5").digest(bytes);
-            result = DatatypeConverter.printHexBinary(hash);
-        } catch (IOException ex) {
-            log.error(ex.getMessage());
-        } catch (NoSuchAlgorithmException ex) {
-            log.error(ex.getMessage());
-        }
-        return result;
     }
 
     //Files extension
