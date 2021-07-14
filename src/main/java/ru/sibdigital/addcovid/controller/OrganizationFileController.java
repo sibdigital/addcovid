@@ -17,6 +17,7 @@ import ru.sibdigital.addcovid.repository.DocRequestRepo;
 import ru.sibdigital.addcovid.repository.RegOrganizationFileRepo;
 import ru.sibdigital.addcovid.service.OrganizationFileService;
 import ru.sibdigital.addcovid.service.RequestService;
+import ru.sibdigital.addcovid.utils.FileUtils;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.DatatypeConverter;
@@ -112,7 +113,7 @@ public class OrganizationFileController {
             File file = new File(String.format("%s/%s", absolutePath, filename));
             part.transferTo(file);
 
-            final String fileHash = getFileHash(file);
+            final String fileHash = FileUtils.getFileHash(file);
             final long size = Files.size(file.toPath());
 
             final List<RegOrganizationFile> files= organizationFileRepo.findRegOrganizationFileByOrganizationAndHash(organization, fileHash);
@@ -142,20 +143,6 @@ public class OrganizationFileController {
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         }
         return rof;
-    }
-
-    private String getFileHash(File file){
-        String result = "NOT";
-        try {
-            final byte[] bytes = Files.readAllBytes(file.toPath());
-            byte[] hash = MessageDigest.getInstance("MD5").digest(bytes);
-            result = DatatypeConverter.printHexBinary(hash);
-        } catch (IOException ex) {
-            log.error(ex.getMessage());
-        } catch (NoSuchAlgorithmException ex) {
-            log.error(ex.getMessage());
-        }
-        return result;
     }
 
     private String getFileExtension(String name) {

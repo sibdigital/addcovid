@@ -61,8 +61,6 @@ public class TpRequestSubsidyFile {
     @Access(AccessType.FIELD)
     private ClsFileType fileType;
 
-    @Id
-    @Column(name = "id", nullable = false)
     public Long getId() {
         return id;
     }

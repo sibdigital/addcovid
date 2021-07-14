@@ -3,6 +3,7 @@ package ru.sibdigital.addcovid.model.subs;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import ru.sibdigital.addcovid.model.ClsFileType;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -22,6 +23,7 @@ public class TpRequiredSubsidyFile {
     )
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tp_required_subsidy_file_id_seq")
     private Long id;
+    private Long idSubsidy;
     private Boolean isDeleted;
     private Boolean isRequired;
     private Timestamp timeCreate;
@@ -34,6 +36,23 @@ public class TpRequiredSubsidyFile {
     public void setId(Long id) {
         this.id = id;
     }
+
+    @OneToOne
+    @JoinColumn(name = "id_file_type", referencedColumnName = "id")
+    private ClsFileType clsFileType;
+
+    public ClsFileType getClsFileType() {return clsFileType;}
+
+    public void setClsFileType(ClsFileType clsFileType) {this.clsFileType = clsFileType;}
+
+    @Basic
+    @Column(name = "id_subsidy")
+    public Long getIdSubsidy() {
+        return idSubsidy;
+    }
+
+    public void setIdSubsidy(Long id_subsidy) {this.idSubsidy = id_subsidy;}
+
 
     @Basic
     @Column(name = "is_deleted")
@@ -80,11 +99,11 @@ public class TpRequiredSubsidyFile {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TpRequiredSubsidyFile that = (TpRequiredSubsidyFile) o;
-        return id == that.id && Objects.equals(isDeleted, that.isDeleted) && Objects.equals(isRequired, that.isRequired) && Objects.equals(timeCreate, that.timeCreate) && Objects.equals(comment, that.comment);
+        return id == that.id && idSubsidy == that.idSubsidy && Objects.equals(clsFileType,that.clsFileType) && Objects.equals(isDeleted, that.isDeleted) && Objects.equals(isRequired, that.isRequired) && Objects.equals(timeCreate, that.timeCreate) && Objects.equals(comment, that.comment);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, isDeleted, isRequired, timeCreate, comment);
+        return Objects.hash(id, idSubsidy, clsFileType, isDeleted, isRequired, timeCreate, comment);
     }
 }

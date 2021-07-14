@@ -1,11 +1,19 @@
 package ru.sibdigital.addcovid.model.subs;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import ru.sibdigital.addcovid.model.ClsPrincipal;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
 @Table(name = "reg_verification_signature_file", schema = "subs")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
 public class RegVerificationSignatureFile {
     //cov_prod_copy2.subs.reg_verification_signature_file_id_seq
     @Id
@@ -20,6 +28,7 @@ public class RegVerificationSignatureFile {
     private Timestamp timeEndVerification;
     private Integer verifyStatus;
     private String verifyResult;
+    private Boolean isDeleted;
     @ManyToOne
     @JoinColumn(name = "id_request", referencedColumnName = "id", nullable = false)
     private DocRequestSubsidy requestSubsidy;
@@ -29,6 +38,10 @@ public class RegVerificationSignatureFile {
     @ManyToOne
     @JoinColumn(name = "id_request_subsidy_signature_file", referencedColumnName = "id", nullable = false)
     private TpRequestSubsidyFile requestSubsidySubsidySignatureFile;
+    @ManyToOne
+    @JoinColumn(name = "id_principal", referencedColumnName = "id", nullable = false)
+    private ClsPrincipal principal;
+
 
     public Long getId() {
         return id;
@@ -88,6 +101,12 @@ public class RegVerificationSignatureFile {
         this.verifyResult = verifyResult;
     }
 
+    @Basic
+    @Column(name = "is_deleted")
+    public Boolean getIsDeleted() {return isDeleted;}
+
+    public void setIsDeleted(Boolean deleted) {isDeleted = deleted;}
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -124,4 +143,13 @@ public class RegVerificationSignatureFile {
     public void setRequestSubsidySubsidySignatureFile(TpRequestSubsidyFile requestSubsidySubsidySignatureFile) {
         this.requestSubsidySubsidySignatureFile = requestSubsidySubsidySignatureFile;
     }
+
+    public ClsPrincipal getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(ClsPrincipal principal) {
+        this.principal = principal;
+    }
+
 }

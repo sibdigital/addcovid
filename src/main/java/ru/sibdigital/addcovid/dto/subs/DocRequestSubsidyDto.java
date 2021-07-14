@@ -26,4 +26,5 @@ public class DocRequestSubsidyDto {
     private String resolutionComment;
     private String districtName;
     private String statusActivityName;
+    private Boolean isDeleted;
 }

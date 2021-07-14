@@ -215,7 +215,8 @@ let bigMainForm = {
                         {id: 'Inspections', icon: 'mdi mdi-clipboard-text-multiple', value: 'Мои проверки'},
                         {id: "News", icon: "mdi mdi-message-plus-outline", value: 'Новости'},
                         {id: "Mailing", icon: "mdi mdi-email", value: 'Рассылки',},
-                        {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Доп.контакты'}
+                        {id: "Contacts", icon: "mdi mdi-book-open-blank-variant", value: 'Доп.контакты'}//,
+                        //{id: "subs", value: "files"}
                     ],
                     type: {
                         css: 'my_menubar_item',
@@ -269,6 +270,8 @@ let bigMainForm = {
                                 }
                             } else if (id == 'RequestSubsidy') {
                                 view = request_subsidy();
+                            } else if (id == 'subs') {
+                                view = subs();
                             } else {
                                 helpUrl = 'helps';
                             }
