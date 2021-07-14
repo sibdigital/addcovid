@@ -85,4 +85,6 @@
         <appender-ref ref="Console" />
         <appender-ref ref="RollingFileByDate" />
     </root>
+    <!--<root level="debug"> -->
+    <!--</root> -->
 </configuration>
