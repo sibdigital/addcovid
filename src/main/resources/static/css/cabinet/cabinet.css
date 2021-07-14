@@ -363,3 +363,12 @@ body {
     border-radius: 0.25rem;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
+
+.webix_progress_top {
+    height: 15px !important;
+    border-radius: 4px !important;
+}
+
+.webix_progress_top .webix_progress_state {
+    height: 15px !important;
+}

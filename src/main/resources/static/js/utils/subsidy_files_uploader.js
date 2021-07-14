@@ -1,24 +1,98 @@
 const subs = () => {
-    webix.ajax().get("required_subsidy_files").then((response) => {
-        let required_subsidy_files = response.json();
-        // console.log(required_subsidy_files)
-        showRequiredSubsidyFiles(required_subsidy_files)
-    })
-
+    // webix.ajax().get("required_subsidy_files").then((response) => {
+    //     let required_subsidy_files = response.json();
+    //     // console.log(required_subsidy_files)
+    //     showRequiredSubsidyFiles(required_subsidy_files);
+    // })
     return {
-        id: 'required_subsidy_files_templates',
-        margin: 10,
-        rows: []
+        borderless: true,
+        rows: [
+            {
+                height: 10,
+            },
+            {
+                id: 'header_cols',
+                margin: 10,
+                padding: 10,
+                borderless: true,
+                cols: [
+                    {
+                        id: 'progress_bar',
+                        borderless: true,
+                        hidden: false,
+                        template: "<div id='progress_bar_text'></div>"
+                    },
+                    {
+                        view: "button",
+                        value: "Проверить подписи",
+                        width: 170,
+                        css: "webix_primary",
+                        click: () => {
+                            webix.ajax().get('check_request_subsidy_files_signatures');
+                            //signature_file_verification_window.show();
+                            verify_progress();
+                            webix.extend($$("progress_bar"), webix.ProgressBar);
+                            let timerId = setInterval(() => {
+                                verify_progress(timerId);
+                            }, 3000)
+                        }
+                    },
+                ]
+            },
+            {
+                id: 'required_subsidy_files_templates',
+                margin: 10,
+                padding: 10,
+                borderless: true,
+                autoheight: "true",
+                rows: []
+            }
+        ]
     }
+}
+
+function createDataView() {
+    setTimeout(() => {
+        webix.ajax().get("required_subsidy_files").then((response) => {
+            let required_subsidy_files = response.json();
+            Array.from(required_subsidy_files).forEach(required_subsidy_file => {
+                $$('required_subsidy_files_templates').addView(
+                    view_subsidy_files_section(required_subsidy_file)
+                );
+            })
+        })
+    },200)
+
+}
+
+function verify_progress(timerId) {
+    webix.ajax()
+        .get('check_signature_files_verify_progress', {"id_request": 1})
+        .then((response) => {
+            let data = response.json();
+            let verified = data.verified;
+            let numberOfFiles = data.numberOfFiles;
+            let progress = verified / numberOfFiles;
+            if (progress !== 0) {
+                $$("progress_bar").show();
+                $$("progress_bar").showProgress({type: "top", position: progress})
+                document.getElementById("progress_bar_text").innerHTML = "<span style='position: absolute; margin-top: 16px; right: 0'>Проверено: " + verified + "/" + numberOfFiles + "</span>";
+
+            } else {
+                $$("progress_bar").hideProgress();
+                document.getElementById("progress_bar_text").innerHTML = "<span style='position: absolute; margin-top: 10px; right: 200px'>Файлы добавлены в очередь";
+            }
+
+            numberOfFiles === verified ? clearInterval(timerId) : null;
+        })
 }
 
 function view_subsidy_files_section(required_subsidy_file) {
     let fileTypeName = required_subsidy_file.clsFileType.name;
     let req_status = required_subsidy_file.required === true ? "Обязательный документ" : "Не обязательный документ";
 
-
     return {
-        type: "space",
+        type: "clean",
         rows: [
             {
                 cols: [
@@ -112,23 +186,46 @@ function view_subsidy_files_section(required_subsidy_file) {
     }
 }
 
+let signature_file_verification_window = webix.ui({
+    view: "window",
+    id: "signature_file_verification_window",
+    minWidth: 200,
+    width: 750,
+    position: "center",
+    modal: true,
+    close: true,
+    head: {
+        view: 'toolbar',
+        elements: [
+            {
+                view: 'label',
+                label: 'Проверка подписей',
+                // label: 'Просмотр запроса (id: ' + data.id + ')'
+            },
+            {
+                view: 'icon', icon: 'wxi-close',
+                click: function () {
+                    signature_file_verification_window.hide()
+                }
+            }
+        ]
+    },
+    body: {
+        rows: [
+            {}
+        ]
+    }
+});
+
 const update_file_view_name = (el, idSubsidyFile) => {
     if (event.key === 'Enter') {
         webix.ajax().post('set_subsidy_file_view_name', {"id_subsidy_file": idSubsidyFile, "view_name": el.value});
     }
 }
 
-const del_subsidy_file = async(id, fileType, fileTypeId) => {
+const del_subsidy_file = async (id, fileType, fileTypeId) => {
     await webix.ajax().post('del_request_subsidy_file', {"id_subsidy_file": id});
-    updateDataview(fileType,fileTypeId)
-}
-
-const showRequiredSubsidyFiles = (required_subsidy_files) => {
-    Array.from(required_subsidy_files).forEach(required_subsidy_file => {
-        $$('required_subsidy_files_templates').addView(
-            view_subsidy_files_section(required_subsidy_file)
-        );
-    })
+    updateDataview(fileType, fileTypeId)
 }
 
 const updateDataview = (fileType, fileTypeId) => {

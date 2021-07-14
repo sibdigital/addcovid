@@ -199,8 +199,8 @@ const requestSubsidyStep1 = {
     }
 }
 
-const requestSubsidyStep2 = {
-    // Форма прикрепления документов
+const requestSubsidyStep2 = () => {
+    return subs();
 }
 
 const requestSubsidyStep3 = {
@@ -277,6 +277,9 @@ const requestSubsidyWizard = {
                                                 if (($$('request_subsidy_step1').validate() === false || $$('subsidyId').validate() === false)) {
                                                     webix.message('Выберите меру поддержки', 'error');
                                                 } else  {
+                                                    if ($$('required_subsidy_files_templates').getChildViews().length === 0) {
+                                                        createDataView();
+                                                    }
                                                     nextRS(1);
                                                 }
                                             }
@@ -288,7 +291,7 @@ const requestSubsidyWizard = {
                         {
                             rows: [
                                 multiviewSubsidyHeader('Шаг 2. Прикрепите документы', backRS, 2),
-                                requestSubsidyStep2,
+                                subs(),
                                 {
                                     cols: [
                                         {},
@@ -408,6 +411,9 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                     if (nextNumber === 1 && ($$('request_subsidy_step1').validate() === false || $$('subsidyId').validate() === false)) {
                         webix.message('Выберите меру поддержки', 'error');
                     } else {
+                        if (nextNumber === 1 && $$('required_subsidy_files_templates').getChildViews().length === 0) {
+                            createDataView();
+                        }
                         nextRS(nextNumber);
                     }
                 }
