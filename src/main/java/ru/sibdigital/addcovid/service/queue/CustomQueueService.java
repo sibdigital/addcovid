@@ -6,5 +6,7 @@ import java.util.List;
 
 public interface CustomQueueService {
 
-    void testMethod(List<VerifiedData> verifiedData);
+    List<Long> enqueueAll(List<VerifiedData> verifiedData);
+
+    Long enqueue(VerifiedData verifiedData);
 }

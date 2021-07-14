@@ -15,8 +15,10 @@ import ru.yoomoney.tech.dbqueue.settings.QueueConfig;
 import ru.yoomoney.tech.dbqueue.spring.dao.SpringDatabaseAccessLayer;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomQueueServiceImpl implements CustomQueueService {
@@ -36,14 +38,14 @@ public class CustomQueueServiceImpl implements CustomQueueService {
     QueueService queueService;
 
     @Override
-    public void testMethod(List<VerifiedData> verifiedDataList) {
-        verifiedDataList.forEach(verifiedData -> verifyQueueProducer.enqueue(EnqueueParams.create(verifiedData)));
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        queueService.shutdown();
-        queueService.awaitTermination(Duration.ofSeconds(10));
+    public List<Long> enqueueAll(List<VerifiedData> verifiedDataList) {
+        List<Long> list =  verifiedDataList.stream()
+                .map(this::enqueue).collect(Collectors.toList());
+        return list;
+    }
+
+    @Override
+    public Long enqueue(VerifiedData verifiedData) {
+        return verifyQueueProducer.enqueue(EnqueueParams.create(verifiedData));
     }
 }

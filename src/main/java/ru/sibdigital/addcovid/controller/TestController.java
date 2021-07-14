@@ -33,9 +33,6 @@ public class TestController {
     @Autowired
     private VerifyMessageService  verifyMessageService;
 
-    @Autowired
-    private VerifyMessageService  verifyMessageService;
-
     @GetMapping("/test_verify_process")
     @ResponseBody
     public String testVerifyProcess() {
@@ -78,7 +75,7 @@ public class TestController {
         list.add(verifiedData1);
         verifiedData1.prepare();
 
-        customQueueService.testMethod(list);
+        customQueueService.enqueueAll(list);
         return "Запущено";
     }
 }

@@ -26,6 +26,7 @@ import ru.sibdigital.addcovid.repository.subs.ClsSubsidyRepo;
 import ru.sibdigital.addcovid.repository.subs.DocRequestSubsidyRepo;
 import ru.sibdigital.addcovid.repository.subs.RegVerificationSignatureFileRepo;
 import ru.sibdigital.addcovid.repository.subs.TpRequestSubsidyFileRepo;
+import ru.sibdigital.addcovid.service.queue.CustomQueueService;
 import ru.sibdigital.addcovid.service.subs.RequestSubsidyService;
 import ru.sibdigital.addcovid.utils.DataFormatUtils;
 import ru.sibdigital.addcovid.utils.FileUtils;
@@ -68,6 +69,9 @@ public class RequestSubsidyController {
 
     @Autowired
     private RegVerificationSignatureFileRepo regVerificationSignatureFileRepo;
+
+    @Autowired
+    private CustomQueueService customQueueService;
 
     @Value("${upload.path:/uploads}")
     String uploadingAttachmentDir;
@@ -344,6 +348,7 @@ public class RequestSubsidyController {
                  verifiedDataList.add(verifiedData);
              //}
          }
+        customQueueService.enqueueAll(verifiedDataList);
         return DataFormatUtils.buildResponse(ResponseEntity.ok(),
                 Map.of("status", "server","sname", "check"));
     }

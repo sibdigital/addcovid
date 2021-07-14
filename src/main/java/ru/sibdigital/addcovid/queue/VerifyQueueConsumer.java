@@ -3,6 +3,7 @@ package ru.sibdigital.addcovid.queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import ru.sibdigital.addcovid.cms.CMSVerifier;
 import ru.sibdigital.addcovid.cms.VerifiedData;
 import ru.sibdigital.addcovid.model.subs.DocRequestSubsidy;
@@ -14,6 +15,9 @@ import ru.sibdigital.addcovid.repository.subs.TpRequestSubsidyFileRepo;
 import ru.sibdigital.addcovid.service.subs.VerifyMessageService;
 import ru.yoomoney.tech.dbqueue.api.*;
 import ru.yoomoney.tech.dbqueue.settings.QueueConfig;
+
+import java.io.File;
+import java.nio.file.Paths;
 
 public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
 
@@ -29,6 +33,9 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
     @Autowired
     private VerifyMessageService verifyMessageService;
 
+    @Value("${upload.path:/uploads}")
+    String uploadingAttachmentDir;
+
     private final static Logger verificationLog = LoggerFactory.getLogger("VerificationLogger");
 
     private final QueueConfig queueConfig;
@@ -41,36 +48,60 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
     public TaskExecutionResult execute(Task<VerifiedData> task) {
         try {
             VerifiedData verifiedData = task.getPayloadOrThrow();
-            if (verifiedData != null) {
-                Long idRequestSubsidyFile = Long.valueOf(verifiedData.getIdentificator());
-                Long idRequestSubsidyFileSignature = Long.valueOf(verifiedData.getSignatureIdentificator());
-                Long idRequestSubsidy = Long.valueOf(verifiedData.getGroup());
-//                TpRequestSubsidyFile requestSubsidyFile = tpRequestSubsidyFileRepo.findById(idRequestSubsidyFile).orElse(null);
-//                TpRequestSubsidyFile requestSubsidyFileSignature = tpRequestSubsidyFileRepo.findByIdAndRequestSubsidyFile_IdAndIsSignature(idRequestSubsidyFileSignature,
-//                                                                    idRequestSubsidy, true);
-//                DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(idRequestSubsidy).orElse(null);
+            Long idRequestSubsidyFile = Long.valueOf(verifiedData.getIdentificator());
+            Long idRequestSubsidyFileSignature = Long.valueOf(verifiedData.getSignatureIdentificator());
+            Long idRequestSubsidy = Long.valueOf(verifiedData.getGroup());
 
-                RegVerificationSignatureFile rvsf =
-                        regVerificationSignatureFileRepo.findByRequestSubsidy_IdAndRequestSubsidyFile_IdAndRequestSubsidySubsidySignatureFile_Id(idRequestSubsidy,
-                                                                                    idRequestSubsidyFile, idRequestSubsidyFileSignature);
-                CMSVerifier cmsVerifier = new CMSVerifier();
-                rvsf.setVerifyResult(verifyMessageService.getVerifyResult(cmsVerifier));
-                regVerificationSignatureFileRepo.save(rvsf);
-            } else {
-                verificationLog.error("Не удалось обработать: " + task.toString());
-            }
+            TpRequestSubsidyFile dataFile = tpRequestSubsidyFileRepo.findById(idRequestSubsidyFile).orElse(null);
+            TpRequestSubsidyFile signatureFile = tpRequestSubsidyFileRepo.findById(idRequestSubsidyFileSignature).orElse(null);
+
+            CMSVerifier cmsVerifier = process(dataFile, signatureFile);
+
+            final RegVerificationSignatureFile verificationSignatureFile = saveRegVerificationSignatureFile(cmsVerifier, dataFile, signatureFile);
+
         } catch (Exception e) {
-            verificationLog.error("Не удалось обработать: " + task.toString());
+            verificationLog.error("Не удалось получить задачу из очереди: " + task.toString());
         }
 
-//        String idRequestSubsidyFile = split[0];
-//        String idRequestSubsidyFileSignature = split[1];
-//        String idRequest = split[2];
-//
-//        tpRequestSubsidyFileRepo.findById(idRequestSubsidyFile);
-//        tpRequestSubsidyFileRepo.findById(idRequestSubsidyFileSignature); //id_subsidy_request_file = idRequestSubsidyFile;
-
         return TaskExecutionResult.finish();
+    }
+
+    private CMSVerifier process(TpRequestSubsidyFile dataFile, TpRequestSubsidyFile signatureFile){
+        String dataFileName = uploadingAttachmentDir + File.separator + dataFile.getAttachmentPath();
+        String signatureFileName = uploadingAttachmentDir + File.separator + signatureFile.getAttachmentPath();
+
+        File file = new File(dataFileName);
+        File signature = new File(signatureFileName);
+
+        VerifiedData verifiedData = new VerifiedData(signature.getAbsolutePath(), file.getAbsolutePath(),
+                dataFile.getId(), signatureFile.getId(), dataFile.getRequestSubsidy().getId());
+
+        final CMSVerifier cmsVerifier = verifyMessageService.buildCMSVerifier(verifiedData);
+        cmsVerifier.verify();
+        return cmsVerifier;
+    }
+
+    private RegVerificationSignatureFile saveRegVerificationSignatureFile(CMSVerifier cmsVerifier, TpRequestSubsidyFile dataFile, TpRequestSubsidyFile signatureFile){
+        //но надо будет искать немного по-другому как минимум с учетом принципала и потом еще последний срез у этого принципала
+        RegVerificationSignatureFile rvsf =
+                regVerificationSignatureFileRepo.findByRequestSubsidy_IdAndRequestSubsidyFile_IdAndRequestSubsidySubsidySignatureFile_Id
+                        (dataFile.getRequestSubsidy().getId(), dataFile.getId(), signatureFile.getId());
+
+        rvsf.setVerifyResult(verifyMessageService.getVerifyResult(cmsVerifier));
+        //    -- 1 - проверка прошла успешно
+        //    -- 2 - подпись не соответствует файлу
+        //    -- 3  в сертификате или цепочке сертификатов есть ошибки
+        //    -- 4 в подписи есть ошибки
+        if (cmsVerifier.isSuccess()){
+            rvsf.setVerifyStatus(1);
+        }else if (!cmsVerifier.signatureSuccessVerify()){
+            rvsf.setVerifyStatus(2);
+        }else if (!cmsVerifier.certificateSuccessVerify()){
+            rvsf.setVerifyStatus(3);
+        }else{
+            rvsf.setVerifyStatus(4);
+        }
+        return regVerificationSignatureFileRepo.save(rvsf);
     }
 
     @Override
