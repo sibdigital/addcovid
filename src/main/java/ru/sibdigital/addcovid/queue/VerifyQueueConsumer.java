@@ -18,6 +18,7 @@ import ru.yoomoney.tech.dbqueue.settings.QueueConfig;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.sql.Timestamp;
 
 public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
 
@@ -47,6 +48,7 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
     @Override
     public TaskExecutionResult execute(Task<VerifiedData> task) {
         try {
+            Timestamp beginVerification = new Timestamp(System.currentTimeMillis());
             VerifiedData verifiedData = task.getPayloadOrThrow();
             Long idRequestSubsidyFile = Long.valueOf(verifiedData.getIdentificator());
             Long idRequestSubsidyFileSignature = Long.valueOf(verifiedData.getSignatureIdentificator());
@@ -57,7 +59,8 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
 
             CMSVerifier cmsVerifier = process(dataFile, signatureFile);
 
-            final RegVerificationSignatureFile verificationSignatureFile = saveRegVerificationSignatureFile(cmsVerifier, dataFile, signatureFile);
+            final RegVerificationSignatureFile verificationSignatureFile = saveRegVerificationSignatureFile(cmsVerifier, dataFile,
+                    signatureFile, beginVerification);
 
         } catch (Exception e) {
             verificationLog.error("Не удалось получить задачу из очереди: " + task.toString());
@@ -81,7 +84,8 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
         return cmsVerifier;
     }
 
-    private RegVerificationSignatureFile saveRegVerificationSignatureFile(CMSVerifier cmsVerifier, TpRequestSubsidyFile dataFile, TpRequestSubsidyFile signatureFile){
+    private RegVerificationSignatureFile saveRegVerificationSignatureFile(CMSVerifier cmsVerifier,
+            TpRequestSubsidyFile dataFile, TpRequestSubsidyFile signatureFile, Timestamp beginVerification){
         //но надо будет искать немного по-другому как минимум с учетом принципала и потом еще последний срез у этого принципала
         RegVerificationSignatureFile rvsf =
                 regVerificationSignatureFileRepo.findByRequestSubsidy_IdAndRequestSubsidyFile_IdAndRequestSubsidySubsidySignatureFile_Id
@@ -101,6 +105,8 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
         }else{
             rvsf.setVerifyStatus(4);
         }
+        rvsf.setTimeBeginVerification(beginVerification);
+        rvsf.setTimeEndVerification(new Timestamp(System.currentTimeMillis()));
         return regVerificationSignatureFileRepo.save(rvsf);
     }
 

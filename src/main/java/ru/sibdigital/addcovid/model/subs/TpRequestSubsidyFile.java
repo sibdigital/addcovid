@@ -34,7 +34,7 @@ public class TpRequestSubsidyFile {
     private String originalFileName;
     private String fileExtension;
     private String hash;
-    private Integer fileSize;
+    private Long fileSize;
     private Boolean isSignature;
     @ManyToOne
     @JoinColumn(name = "id_request", referencedColumnName = "id", nullable = false)
@@ -141,11 +141,11 @@ public class TpRequestSubsidyFile {
 
     @Basic
     @Column(name = "file_size", nullable = true)
-    public Integer getFileSize() {
+    public Long getFileSize() {
         return fileSize;
     }
 
-    public void setFileSize(Integer fileSize) {
+    public void setFileSize(Long fileSize) {
         this.fileSize = fileSize;
     }
 

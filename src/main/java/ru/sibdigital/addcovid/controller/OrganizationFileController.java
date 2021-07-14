@@ -108,7 +108,7 @@ public class OrganizationFileController {
 
             final String absolutePath = Paths.get(uploadingDir).toFile().getAbsolutePath();
             final String originalFilename = part.getOriginalFilename();
-            String extension = getFileExtension(originalFilename);
+            String extension = FileUtils.getFileExtension(originalFilename);
             final String filename = organization.getId().toString() + "_" + UUID.randomUUID() + extension;
             File file = new File(String.format("%s/%s", absolutePath, filename));
             part.transferTo(file);
@@ -143,14 +143,6 @@ public class OrganizationFileController {
             log.error(String.format("file was not saved cause: %s", ex.getMessage()));
         }
         return rof;
-    }
-
-    private String getFileExtension(String name) {
-         int lastIndexOf = name.lastIndexOf(".");
-        if (lastIndexOf == -1) {
-            return ""; // empty extension
-        }
-        return name.substring(lastIndexOf);
     }
 
     @GetMapping("/org_files")
