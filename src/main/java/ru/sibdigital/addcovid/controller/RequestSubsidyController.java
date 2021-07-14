@@ -235,6 +235,13 @@ public class RequestSubsidyController {
             ClsFileType clsFileType = clsFileTypeRepo.findById(id_file_type).orElse(null);
             DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(idRequest).orElse(null);
 
+            if (getFileExtension(files[0].getOriginalFilename()).equals(".p7s")
+                    && getFileExtension(files[1].getOriginalFilename()).equals(".p7s") ) {
+                return ResponseEntity.ok()
+                        .body("{\"cause\": \"Ошибка при загрузке подписи\"," +
+                                "\"status\": \"server\"," +
+                                "\"sname\": \"Документ не найден\"}");
+            }
             MultipartFile[] sortedFiles = new MultipartFile[2];
             for (MultipartFile multipartFile : files) {
                 if (!getFileExtension(multipartFile.getOriginalFilename()).equals(".p7s")) {
@@ -246,8 +253,8 @@ public class RequestSubsidyController {
             if (sortedFiles[1] == null) {
                 return ResponseEntity.ok()
                         .body("{\"cause\": \"Ошибка при загрузке подписи\"," +
-                            "\"status\": \"server\"," +
-                            "\"sname\": \"Файл с электронной подписью не найден\"}");
+                                "\"status\": \"server\"," +
+                                "\"sname\": \"Файл с электронной подписью не найден\"}");
             }
             Arrays.stream(sortedFiles).forEach(file -> {
                saveFile(file, docRequestSubsidy, clsFileType);
@@ -274,6 +281,10 @@ public class RequestSubsidyController {
             @RequestParam("id_subsidy_file") Long id) {
         TpRequestSubsidyFile tpRequestSubsidyFile = tpRequestSubsidyFileRepo.findById(id).orElse(null);
         TpRequestSubsidyFile tpRequestSubsidyFileSignature = requestSubsidyService.findSignatureFile(tpRequestSubsidyFile.getId());
+        RegVerificationSignatureFile regVerificationSignatureFile = regVerificationSignatureFileRepo.findByIdFileAndIdSignature(tpRequestSubsidyFile.getId(),tpRequestSubsidyFileSignature.getId()).orElse(null);
+        if(regVerificationSignatureFile != null) {
+            regVerificationSignatureFileRepo.delete(regVerificationSignatureFile);
+        }
         tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFileSignature);
         tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFile);
         return ResponseEntity.ok()
@@ -295,16 +306,20 @@ public class RequestSubsidyController {
                 regVerificationSignatureFileRepo.findByIdRequestAndIdPrincipal(idRequest,
                         organization.getPrincipal()).orElse(null);
 
-        int countVerifySignatures = 0;
-        for(RegVerificationSignatureFile regVerificationSignatureFile : regVerificationSignatureFiles) {
-            if(regVerificationSignatureFile.getVerifyStatus() != 0){
-                countVerifySignatures++;
+        if (regVerificationSignatureFiles == null) {
+            result.put("notFound","Файлы не найдены");
+        } else {
+            int countVerifySignatures = 0;
+            for(RegVerificationSignatureFile regVerificationSignatureFile : regVerificationSignatureFiles) {
+                if(regVerificationSignatureFile.getVerifyStatus() != 0){
+                    countVerifySignatures++;
+                }
             }
-        }
 
-        result.put("files", regVerificationSignatureFiles);
-        result.put("verified", countVerifySignatures);
-        result.put("numberOfFiles", regVerificationSignatureFiles.size());
+            result.put("files", regVerificationSignatureFiles);
+            result.put("verified", countVerifySignatures);
+            result.put("numberOfFiles", regVerificationSignatureFiles.size());
+        }
         return result;
     }
 
@@ -337,6 +352,7 @@ public class RequestSubsidyController {
                          .requestSubsidyFile(docFile)
                          .requestSubsidySubsidySignatureFile(signatureFile)
                          .isDeleted(false)
+                         .timeCreate(new Timestamp(System.currentTimeMillis()))
                          .verifyStatus(0)
                          .principal(clsOrganization.getPrincipal())
                          .build();

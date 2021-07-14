@@ -336,9 +336,10 @@ body {
 
 .custom-form-control {
     height: 16px;
-    width: 450px;
+    width: 300px;
     padding: 0.375rem 0.75rem;
-    font-size: 15px;
+    margin-left: 10px;
+    font-size: 14px;
     font-weight: 400;
     line-height: 1.5;
     color: #495057;
@@ -371,4 +372,19 @@ body {
 
 .webix_progress_top .webix_progress_state {
     height: 15px !important;
+}
+
+.overall-title {
+    left: 10px;
+    position: absolute;
+    line-height: 20px;
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475466;
+    letter-spacing: 0;
+    height: 40px;
+    float: left;
+    padding-left: 5px;
+    width: 100%;
 }

@@ -65,30 +65,40 @@ function createDataView(id) {
 
 }
 
-function verify_progress(timerId) {
+function verify_progress(timerId = null) {
     webix.ajax()
         .get('check_signature_files_verify_progress', {"id_request": $$('requestSubsidyId').getValue()})
         .then((response) => {
             let data = response.json();
-            let verified = data.verified;
-            let numberOfFiles = data.numberOfFiles;
-            let progress = verified / numberOfFiles;
-            if (progress !== 0) {
-                $$("progress_bar").show();
-                $$("progress_bar").showProgress({type: "top", position: progress})
-                document.getElementById("progress_bar_text").innerHTML = "<span style='position: absolute; margin-top: 16px; right: 0'>Проверено: " + verified + "/" + numberOfFiles + "</span>";
-
+            if (data.notFound) {
+                if (timerId == null) {
+                    webix.message(data.notFound,"error", 10000);
+                    $$("progress_bar").hideProgress();
+                    document.getElementById("progress_bar_text").innerHTML = "";
+                }
+                clearInterval(timerId)
             } else {
-                $$("progress_bar").hideProgress();
-                document.getElementById("progress_bar_text").innerHTML = "<span style='position: absolute; margin-top: 10px; right: 200px'>Файлы добавлены в очередь";
-            }
+                let verified = data.verified;
+                let numberOfFiles = data.numberOfFiles;
+                let progress = verified / numberOfFiles;
+                if (progress !== 0) {
+                    $$("progress_bar").show();
+                    $$("progress_bar").showProgress({type: "top", position: progress})
+                    document.getElementById("progress_bar_text").innerHTML = "<span style='position: absolute; margin-top: 16px; right: 0'>Проверено: " + verified + "/" + numberOfFiles + "</span>";
 
-            numberOfFiles === verified ? clearInterval(timerId) : null;
+                } else {
+                    $$("progress_bar").hideProgress();
+                    document.getElementById("progress_bar_text").innerHTML = "<span style='position: absolute; margin-top: 10px; right: 200px'>Файлы добавлены в очередь";
+                }
+
+                numberOfFiles === verified ? clearInterval(timerId) : null;
+            }
         })
 }
 
 function view_subsidy_files_section(required_subsidy_file) {
-    let fileTypeName = required_subsidy_file.clsFileType.name.replace(/\s+/g, '');
+    let fileTypeName = required_subsidy_file.clsFileType.name;
+    let uploaderId = required_subsidy_file.clsFileType.name.replace(/\s+/g, '');
     let req_status = required_subsidy_file.required === true ? "Обязательный документ" : "Не обязательный документ";
 
     return {
@@ -103,7 +113,7 @@ function view_subsidy_files_section(required_subsidy_file) {
                         autoheight: true,
                     },
                     {
-                        id: fileTypeName + '_uploader',
+                        id: uploaderId + '_uploader',
                         view: 'uploader',
                         label: "Загрузить",
                         css: 'backBtnStyle',
@@ -117,7 +127,7 @@ function view_subsidy_files_section(required_subsidy_file) {
                             onAfterFileAdd: () => {
                                 const formData = new FormData();
                                 const request = new XMLHttpRequest();
-                                const uploader = $$(fileTypeName + '_uploader');
+                                const uploader = $$(uploaderId + '_uploader');
                                 let files = [];
                                 for (let i = 0; i < uploader.files.data.order.length; i++) {
                                     files[i] = uploader.files.getItem(uploader.files.data.order[i]);
@@ -136,7 +146,7 @@ function view_subsidy_files_section(required_subsidy_file) {
                                         }
                                     }
                                     request.send(formData);
-                                    updateDataview(fileTypeName, required_subsidy_file.clsFileType.id);
+                                    updateDataview(uploaderId, required_subsidy_file.clsFileType.id);
                                 }
                             }
                         }
@@ -146,7 +156,7 @@ function view_subsidy_files_section(required_subsidy_file) {
             },
             {
                 view: "dataview",
-                id: fileTypeName + '_dataview',
+                id: uploaderId + '_dataview',
                 name: required_subsidy_file.required,
                 css: 'contacts',
                 scroll: 'y',
@@ -158,10 +168,11 @@ function view_subsidy_files_section(required_subsidy_file) {
                     let result =
                         "<div id='overall_" + obj.id + "' class='overall'>" +
                         "<div>" +
-                        "<div class='doc_title'>" + obj.originalFileName.slice(0, -4) + "</div>" +
-                        "<div id='del_button' style='color: red; position: absolute; top: 0; right: 5px;' onclick='del_subsidy_file(" + obj.id + ",\"" + fileTypeName + "\"," + required_subsidy_file.clsFileType.id + ")' class='mdi mdi-close-thick'></div>" +
-                        "<div id='box_" + obj.id + "' style='position: absolute; top: 40px; left: 15px;'>" +
+                        "<div class='overall-title'>" + obj.originalFileName.slice(0, -4) +
                         "<input class='custom-form-control' type='text' value='" + viewName + "' placeholder='Отображаемое имя файла' onkeydown='update_file_view_name(this," + obj.id + ")'>" +
+                        "</div>" +
+                        "<div id='del_button' style='color: red; position: absolute; top: 0; right: 5px;' onclick='del_subsidy_file(" + obj.id + ",\"" + uploaderId + "\"," + required_subsidy_file.clsFileType.id + ")' class='mdi mdi-close-thick'></div>" +
+                        "<div id='box_" + obj.id + "' style='position: absolute; top: 40px; left: 15px;'>" +
                         "<span class='custom-span-control' style='color: green'>Подпись загружена</span>" +
                         "<span class='custom-span-control'>Статус проверки подписи</span>" +
                         "</div>" +
