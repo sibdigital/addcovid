@@ -27,8 +27,8 @@ const subs = () => {
                         value: "Проверить подписи",
                         width: 170,
                         css: "webix_primary",
-                        click: () => {
-                            webix.ajax().get('check_request_subsidy_files_signatures');
+                        click: async () => {
+                            await webix.ajax().get('check_request_subsidy_files_signatures');
                             //signature_file_verification_window.show();
                             verify_progress();
                             webix.extend($$("progress_bar"), webix.ProgressBar);
@@ -51,9 +51,9 @@ const subs = () => {
     }
 }
 
-function createDataView() {
+function createDataView(id) {
     setTimeout(() => {
-        webix.ajax().get("required_subsidy_files").then((response) => {
+        webix.ajax().get("required_subsidy_files", {"idRequest": id}).then((response) => {
             let required_subsidy_files = response.json();
             Array.from(required_subsidy_files).forEach(required_subsidy_file => {
                 $$('required_subsidy_files_templates').addView(
@@ -61,13 +61,13 @@ function createDataView() {
                 );
             })
         })
-    },200)
+    }, 200)
 
 }
 
 function verify_progress(timerId) {
     webix.ajax()
-        .get('check_signature_files_verify_progress', {"id_request": 1})
+        .get('check_signature_files_verify_progress', {"id_request": $$('requestSubsidyId').getValue()})
         .then((response) => {
             let data = response.json();
             let verified = data.verified;
@@ -88,7 +88,7 @@ function verify_progress(timerId) {
 }
 
 function view_subsidy_files_section(required_subsidy_file) {
-    let fileTypeName = required_subsidy_file.clsFileType.name;
+    let fileTypeName = required_subsidy_file.clsFileType.name.replace(/\s+/g, '');
     let req_status = required_subsidy_file.required === true ? "Обязательный документ" : "Не обязательный документ";
 
     return {
@@ -124,6 +124,7 @@ function view_subsidy_files_section(required_subsidy_file) {
                                     formData.append('files', files[i].file)
                                 }
                                 formData.append('id_file_type', required_subsidy_file.clsFileType.id)
+                                formData.append('id_request', $$('requestSubsidyId').getValue())
                                 if (files.length === 2) {
                                     request.open('POST', 'upload_subsidy_files');
                                     request.onload = () => {
@@ -146,6 +147,7 @@ function view_subsidy_files_section(required_subsidy_file) {
             {
                 view: "dataview",
                 id: fileTypeName + '_dataview',
+                name: required_subsidy_file.required,
                 css: 'contacts',
                 scroll: 'y',
                 minWidth: 320,
@@ -170,7 +172,7 @@ function view_subsidy_files_section(required_subsidy_file) {
                 url: () => {
                     return webix.ajax()
                         .get('request_subsidy_files', {
-                            "doc_request_subsidy_id": 1,
+                            "doc_request_subsidy_id": $$('requestSubsidyId').getValue(),
                             "id_file_type": required_subsidy_file.clsFileType.id
                         })
                 },
@@ -234,9 +236,27 @@ const updateDataview = (fileType, fileTypeId) => {
         $$(fileType + '_dataview').load(() => {
             return webix.ajax()
                 .get('request_subsidy_files', {
-                    "doc_request_subsidy_id": 1,
+                    "doc_request_subsidy_id": $$('requestSubsidyId').getValue(),
                     "id_file_type": fileTypeId
                 })
         });
     }, 100)
+}
+
+const checkRequiredFiles = () => {
+    let dataViews = $$('required_subsidy_files_templates').getChildViews()
+    let oneOfDataViewsIsNull = true;
+    dataViews.forEach((dataView) => {
+        let dataViewId = dataView.qf[1].id;
+        let dataViewRequired = dataView.qf[1].name;
+        let itemId = $$(dataViewId).getFirstId();
+        let item = $$(dataViewId).getItem(itemId);
+        // console.log("req:" + dataViewRequired)
+        // console.log("i:" + item)
+        if (dataViewRequired == true && item == undefined) {
+            oneOfDataViewsIsNull = false
+        }
+        // console.log("resStat:" + oneOfDataViewsIsNull)
+    })
+    return oneOfDataViewsIsNull;
 }

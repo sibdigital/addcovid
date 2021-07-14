@@ -217,7 +217,8 @@ public class RequestSubsidyController {
     @PostMapping(value = "/upload_subsidy_files")
     public ResponseEntity<String> uploadRequiredSubsidyFiles(
             @RequestParam("files") MultipartFile[] files,
-            @RequestParam("id_file_type") Long id_file_type) {
+            @RequestParam("id_file_type") Long id_file_type,
+            @RequestParam("id_request") Long idRequest) {
 
         if (files.length != 2) {
             return ResponseEntity.ok()
@@ -226,7 +227,7 @@ public class RequestSubsidyController {
                             "\"sname\": \"Ожидалось 2 файла\"}");
         } else {
             ClsFileType clsFileType = clsFileTypeRepo.findById(id_file_type).orElse(null);
-            DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(1L).orElse(null);
+            DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(idRequest).orElse(null);
 
             MultipartFile[] sortedFiles = new MultipartFile[2];
             for (MultipartFile multipartFile : files) {

@@ -158,7 +158,7 @@ const requestSubsidyStep1 = {
                             {
                                 view: 'list',
                                 layout: 'x',
-                                id:"okved_main",
+                                id: "okved_main",
                                 css: {'white-space': 'normal !important;'},
                                 height: 50,
                                 template: '#kindCode# - #kindName#',
@@ -192,7 +192,7 @@ const requestSubsidyStep1 = {
         },
     ],
     borderless: true,
-    url:() => {
+    url: () => {
         return webix.ajax().get("organization").then((data) => {
             return data;
         })
@@ -276,8 +276,8 @@ const requestSubsidyWizard = {
                                             click: function () {
                                                 if (($$('request_subsidy_step1').validate() === false || $$('subsidyId').validate() === false)) {
                                                     webix.message('Выберите меру поддержки', 'error');
-                                                } else  {
-                                                    if ($$('requestSubsidyId').getValue()=='') {
+                                                } else {
+                                                    if ($$('requestSubsidyId').getValue() == '') {
                                                         let params = {
                                                             subsidyId: $$('subsidyId').getValue(),
                                                             reqBasis: $$('reqBasis').getValue(),
@@ -286,7 +286,9 @@ const requestSubsidyWizard = {
                                                             .headers({'Content-type': 'application/json'})
                                                             .post('save_request_subsidy_draft', JSON.stringify(params)).then(function (data) {
                                                             data = data.json();
+                                                            console.log(data)
                                                             $$('requestSubsidyId').setValue(data.id);
+                                                            createDataView(data.id);
                                                             nextRS(1);
                                                         }).catch(function () {
                                                                 webix.message('Не удалось сохранить черновик', 'error');
@@ -322,7 +324,12 @@ const requestSubsidyWizard = {
                                             maxWidth: 301,
                                             value: 'Продолжить',
                                             click: function () {
-                                                nextRS(2);
+                                                let valid = checkRequiredFiles();
+                                                if (valid) {
+                                                    nextRS(2);
+                                                } else {
+                                                    webix.message("Отсутсвуют обязательные файлы", "error", 10000);
+                                                }
                                             }
                                         }
                                     ]
@@ -424,11 +431,33 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                 click: () => {
                     if (nextNumber === 1 && ($$('request_subsidy_step1').validate() === false || $$('subsidyId').validate() === false)) {
                         webix.message('Выберите меру поддержки', 'error');
-                    } else {
-                        if (nextNumber === 1 && $$('required_subsidy_files_templates').getChildViews().length === 0) {
-                            createDataView();
+                    } else if (nextNumber === 1 && $$('requestSubsidyId').getValue() == '') {
+                        let params = {
+                            subsidyId: $$('subsidyId').getValue(),
+                            reqBasis: $$('reqBasis').getValue(),
                         }
+                        webix.ajax()
+                            .headers({'Content-type': 'application/json'})
+                            .post('save_request_subsidy_draft', JSON.stringify(params)).then(function (data) {
+                            data = data.json();
+                            console.log(data)
+                            $$('requestSubsidyId').setValue(data.id);
+                            createDataView(data.id);
+                            nextRS(nextNumber);
+                        }).catch(function () {
+                                webix.message('Не удалось сохранить черновик', 'error');
+                            }
+                        )
+                    } else if (nextNumber === 1 && $$('required_subsidy_files_templates').getChildViews().length === 0) {
+                        createDataView();
                         nextRS(nextNumber);
+                    } else if (nextNumber === 2) {
+                        let valid = checkRequiredFiles();
+                        if (valid) {
+                            nextRS(nextNumber);
+                        } else {
+                            webix.message("Отсутсвуют обязательные файлы", "error", 10000);
+                        }
                     }
                 }
             },

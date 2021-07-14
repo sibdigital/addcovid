@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import ru.sibdigital.addcovid.model.subs.DocRequestSubsidy;
 import ru.sibdigital.addcovid.model.subs.TpRequiredSubsidyFile;
@@ -24,8 +25,10 @@ public class SubsidyController {
     private DocRequestSubsidyRepo docRequestSubsidyRepo;
 
     @GetMapping(value = "/required_subsidy_files")
-    public @ResponseBody List<TpRequiredSubsidyFile> getListTpRequiredSubsidyFiles() {
-        DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(1L).orElse(null);
+    public @ResponseBody List<TpRequiredSubsidyFile> getListTpRequiredSubsidyFiles(
+            @RequestParam("idRequest") Long idRequest
+    ) {
+        DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(idRequest).orElse(null);
         List<TpRequiredSubsidyFile> tpRequiredSubsidyFiles = requestSubsidyService.findAllRequiredSubsidyFiles(docRequestSubsidy.getSubsidy().getId());
         return tpRequiredSubsidyFiles;
     }
