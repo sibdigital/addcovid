@@ -31,25 +31,15 @@ public class TestController {
     @GetMapping("/test_verify_process")
     @ResponseBody
     public String testVerifyProcess() {
-        String rootCertPAth = "/home/guts_2012.cer";
         String result = "";
-        final CertificateFactory cf;
-        CMSVerifier cmsVerifier = new CMSVerifier();
-        try {
-            cf = CertificateFactory.getInstance("X509");
-            Certificate root = cf.generateCertificate(new FileInputStream(rootCertPAth));
-            cmsVerifier.getRootCertificates().add(root);
+        VerifiedData verifiedData = new VerifiedData(
+            "/home/test_verify.pdf.p7s",
+            "/home/test_verify.pdf"
+        );
+        CMSVerifier cmsVerifier = verifyMessageService.buildCMSVerifier(verifiedData);// CMSVerifier();
+        cmsVerifier.setVerifiedData(verifiedData);
+        cmsVerifier.verify();
 
-            VerifiedData verifiedData = new VerifiedData(
-                 "/home/test_verify.pdf.p7s",
-                 "/home/test_verify.pdf"
-            );
-            cmsVerifier.setVerifiedData(verifiedData);
-            cmsVerifier.verify();
-
-        } catch (CertificateException | FileNotFoundException e) {
-            log.error(e.getMessage(), e);
-        }
         result += " isAlgorithmSupported=" + cmsVerifier.isAlgorithmSupported();
         result += "\n isAllCerificateValid=" +  cmsVerifier.isAllCerificateValid();
         result += "\n isMessageDigestVerify=" +  cmsVerifier.isMessageDigestVerify();

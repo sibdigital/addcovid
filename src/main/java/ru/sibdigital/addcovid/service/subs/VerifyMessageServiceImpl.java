@@ -7,9 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.sibdigital.addcovid.cms.CMSVerifier;
 import ru.sibdigital.addcovid.cms.CertificateInfo;
+import ru.sibdigital.addcovid.cms.VerifiedData;
 import ru.sibdigital.addcovid.model.ClsSettings;
 import ru.sibdigital.addcovid.repository.ClsSettingsRepo;
+import org.springframework.beans.factory.annotation.Value;
+import ru.sibdigital.addcovid.utils.FileUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Log4j2
@@ -18,6 +29,9 @@ public class VerifyMessageServiceImpl implements VerifyMessageService{
 
     private final static Logger verificationLog = LoggerFactory.getLogger("VerificationLogger");
     private static final String prefix = "isNo";
+
+    @Value("${cms.certificate.root-catalog}")
+    private String rootCertificateCatalog;
 
     @Autowired
     private ClsSettingsRepo settingsRepo;
@@ -37,6 +51,39 @@ public class VerifyMessageServiceImpl implements VerifyMessageService{
         verificationLog.info(cmsVerifier.getVerifiedData() + "\n" + result);
 
         return result;
+    }
+
+    @Override
+    public List<Certificate> getAnchorCertificates() {
+        final CertificateFactory cf;
+        List<Certificate> certificates = new ArrayList<>();
+        try {
+            cf = CertificateFactory.getInstance("X509");
+            final List<File> files = FileUtils.getAllInDirectory(rootCertificateCatalog);
+            for (File f : files){
+                try {
+                    final Certificate certificate = cf.generateCertificate(new FileInputStream(f));
+                    certificates.add(certificate);
+                } catch (FileNotFoundException ex) {
+                    verificationLog.error(ex.getMessage(), ex);
+                    log.error(ex.getMessage(), ex);
+                };
+            }
+        } catch (CertificateException ex) {
+            verificationLog.error(ex.getMessage(), ex);
+            log.error(ex.getMessage(), ex);
+        }
+        //verificationLog.info("корневых сертифкатов: " + certificates.size());
+        return certificates;
+    }
+
+    @Override
+    public CMSVerifier buildCMSVerifier(VerifiedData verifiedData) {
+        CMSVerifier cmsVerifier = new CMSVerifier();
+        final List<Certificate> anchorCertificates = getAnchorCertificates();
+        cmsVerifier.setRootCertificates(anchorCertificates);
+        cmsVerifier.setVerifiedData(verifiedData);
+        return cmsVerifier;
     }
 
     private String getSignatureInfo(CMSVerifier cmsVerifier){
