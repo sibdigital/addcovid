@@ -116,7 +116,8 @@ public class VerifiedData {
     }
 
     public String toString(){
-        return String.format("id: %s, gr: %s, data: %s, sign: %s", identificator, group, data, signaturePath);
+        return String.format("id: %s, sigid: %s gr: %s, data: %s, sign: %s",
+                identificator, signatureIdentificator, group, data, signaturePath);
     }
 
     public String getIdentificator() {

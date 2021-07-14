@@ -68,6 +68,21 @@ public class CMSVerifier {
 
     private VerifiedData verifiedData;
 
+    public boolean signatureSuccessVerify(){
+        return dataPresent && signedDataReadable && algorithmSupported &&
+                signaturePresent && messageDigestVerify;
+    }
+
+    public boolean certificateSuccessVerify(){
+        return signaturePresent && signedDataReadable && certificatePathBuild
+                && certificatePathNotContainsRevocationCertificate
+                && allCerificateValid && certificatePresent;
+    }
+
+    public boolean isSuccess(){
+        return signatureSuccessVerify() && certificateSuccessVerify();
+    }
+
     private boolean verifyCertPath() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException{
         boolean result = false;
 
