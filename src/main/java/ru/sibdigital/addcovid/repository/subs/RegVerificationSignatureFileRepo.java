@@ -20,6 +20,7 @@ public interface RegVerificationSignatureFileRepo extends JpaRepository<RegVerif
             "and t.requestSubsidyFile.id = :idFile " +
             "and t.requestSubsidySubsidySignatureFile.id = :idSignature")
     Optional<RegVerificationSignatureFile> findByIdFileAndIdSignature (Long idFile, Long idSignature);
-    RegVerificationSignatureFile findByRequestSubsidy_IdAndRequestSubsidyFile_IdAndRequestSubsidySubsidySignatureFile_Id(Long idRequestSubsidy,
-                                                                                      Long idRequestSubsidyFile, Long idRequestSubsidySubsidySignatureFile);
+
+    RegVerificationSignatureFile findByRequestSubsidy_IdAndRequestSubsidyFile_IdAndRequestSubsidySubsidySignatureFile_Id
+            (Long idRequestSubsidy, Long idRequestSubsidyFile, Long idRequestSubsidySubsidySignatureFile);
 }
