@@ -78,8 +78,8 @@ public class RequestSubsidyController {
             return null;
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
-        List<DocRequestSubsidy> requestSubsidies = docRequestSubsidyRepo.findAllByOrganizationIdAndStatusActivity(organization.getId(),
-                ActivityStatuses.ACTIVE.getValue()).orElse(new ArrayList<>());
+        List<DocRequestSubsidy> requestSubsidies = docRequestSubsidyRepo.findAllByOrganizationIdAndStatusActivityAndIsDeleted(organization.getId(),
+                ActivityStatuses.ACTIVE.getValue(), false).orElse(new ArrayList<>());
         List<DocRequestSubsidyDto> dtos = requestSubsidies.stream()
                 .map(docRequestSubsidy -> DocRequestSubsidyDto.builder()
                                             .id(docRequestSubsidy.getId())
@@ -96,6 +96,7 @@ public class RequestSubsidyController {
                                             .resolutionComment(docRequestSubsidy.getResolutionComment())
                                             .subsidyName(docRequestSubsidy.getSubsidy().getShortName())
                                             .districtName((docRequestSubsidy.getDistrict() != null) ? docRequestSubsidy.getDistrict().getName() : "")
+                                            .isDeleted(docRequestSubsidy.getDeleted())
 //                                            .statusActivityName(docRequestSubsidy.getStatusActivity().toString())
                                             .build())
                 .collect(Collectors.toList());
@@ -142,9 +143,26 @@ public class RequestSubsidyController {
         List<ClsSubsidy> subsidies = clsSubsidyRepo.getAvailableSubsidiesForOrganization(organization.getId(), organization.getIdTypeOrganization());
 
         List<KeyValue> list = subsidies.stream()
-                .map(ctr -> new KeyValue(ctr.getClass().getSimpleName(), ctr.getId(), ctr.getName()))
+                .map(ctr -> new KeyValue(ctr.getClass().getSimpleName(), ctr.getId(), ctr.getShortName()))
                 .collect(Collectors.toList());
         return list;
+    }
+
+    @PostMapping("/save_request_subsidy_draft")
+    public @ResponseBody DocRequestSubsidy saveRequestSubsidyDraft(@RequestBody DocRequestSubsidyPostDto postFormDto, HttpSession session) {
+        try {
+            Long id = (Long) session.getAttribute("id_organization");
+            if (id == null) {
+                return null;
+            }
+
+            postFormDto.setOrganizationId(id);
+
+            DocRequestSubsidy draft = requestSubsidyService.saveDocRequestSubsidyDraft(postFormDto);
+            return draft;
+        } catch (Exception e) {
+           return null;
+        }
     }
 
     @PostMapping("/save_request_subsidy")

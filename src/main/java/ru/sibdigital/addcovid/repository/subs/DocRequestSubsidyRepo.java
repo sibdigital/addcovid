@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface DocRequestSubsidyRepo extends JpaRepository<DocRequestSubsidy, Long> {
     Optional<List<DocRequestSubsidy>> findAllByOrganizationIdAndStatusActivity(Long idOrganization, Integer statusValue);
+    Optional<List<DocRequestSubsidy>> findAllByOrganizationIdAndStatusActivityAndIsDeleted(Long idOrganization, Integer statusValue, Boolean isDeleted);
+
 }

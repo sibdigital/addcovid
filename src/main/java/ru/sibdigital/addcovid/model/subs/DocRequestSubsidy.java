@@ -43,6 +43,7 @@ public class DocRequestSubsidy {
     private String reqBasis;
     private String resolutionComment;
     private Long oldDepartmentId;
+    private Boolean isDeleted;
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
     private AdditionalAttributes additionalAttributes;
@@ -167,17 +168,27 @@ public class DocRequestSubsidy {
         this.statusActivity = statusActivity;
     }
 
+    @Basic
+    @Column(name = "is_deleted")
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DocRequestSubsidy that = (DocRequestSubsidy) o;
-        return id == that.id && Objects.equals(attachmentPath, that.attachmentPath) && Objects.equals(timeCreate, that.timeCreate) && Objects.equals(timeUpdate, that.timeUpdate) && Objects.equals(timeReview, that.timeReview) && Objects.equals(reqBasis, that.reqBasis) && Objects.equals(resolutionComment, that.resolutionComment) && Objects.equals(oldDepartmentId, that.oldDepartmentId) && Objects.equals(additionalAttributes, that.additionalAttributes) && Objects.equals(statusActivity, that.statusActivity);
+        return id == that.id && Objects.equals(attachmentPath, that.attachmentPath) && Objects.equals(timeCreate, that.timeCreate) && Objects.equals(timeUpdate, that.timeUpdate) && Objects.equals(timeReview, that.timeReview) && Objects.equals(reqBasis, that.reqBasis) && Objects.equals(resolutionComment, that.resolutionComment) && Objects.equals(oldDepartmentId, that.oldDepartmentId) && Objects.equals(additionalAttributes, that.additionalAttributes) && Objects.equals(statusActivity, that.statusActivity) && Objects.equals(isDeleted, that.isDeleted);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, attachmentPath, timeCreate, timeUpdate, timeReview, reqBasis, resolutionComment, oldDepartmentId, additionalAttributes, statusActivity);
+        return Objects.hash(id, attachmentPath, timeCreate, timeUpdate, timeReview, reqBasis, resolutionComment, oldDepartmentId, additionalAttributes, statusActivity, isDeleted);
     }
 
     public ClsOrganization getOrganization() {
