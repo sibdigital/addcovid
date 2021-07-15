@@ -20,6 +20,7 @@ function showRequestSubsidyCreateForm(data) {
 
             $$('reqBasis').setValue(data.reqBasis);
             $$('reqBasisFinal').setValue(data.reqBasis);
+            createDataView(data.id);
         }
 
     } else {
@@ -439,7 +440,7 @@ const requestSubsidyWizard = {
                                                     nextRS(2);
                                                     getFilesListByTypeView($$('requestSubsidyId').getValue());
                                                 } else {
-                                                    webix.message("Отсутсвуют обязательные файлы", "error", 10000);
+                                                    webix.message("Отсутствуют обязательные файлы", "error", 10000);
                                                 }
                                             }
                                         }
@@ -570,7 +571,7 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                             nextRS(nextNumber);
                             getFilesListByTypeView($$('requestSubsidyId').getValue());
                         } else {
-                            webix.message("Отсутсвуют обязательные файлы", "error", 10000);
+                            webix.message("Отсутствуют обязательные файлы", "error", 10000);
                         }
                     }
                 }
