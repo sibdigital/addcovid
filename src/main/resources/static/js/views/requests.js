@@ -51,42 +51,6 @@ define(['views/showform'], function(showform) {
                         onItemDblClick: function (id) {
                             let data = $$('requests_table').getItem(id);
 
-                            queryWin = webix.ui({
-                                view: 'window',
-                                id: 'showQueryWin',
-                                head: {
-                                    view: 'toolbar',
-                                    elements: [
-                                        {view: 'label', label: 'Просмотр запроса (id: ' + data.id + ')'},
-                                        {
-                                            view: 'icon', icon: 'wxi-close',
-                                            click: function () {
-                                                $$('showQueryWin').close()
-                                            }
-                                        }
-                                    ]
-                                },
-                                width: 1200,
-                                height: 800,
-                                position: 'center',
-                                item: data,
-                                modal: true,
-                                body: showform(status == 0 ? false : true),
-                                on: {
-                                    'onShow': function () {
-                                        let person_table_data = new webix.DataCollection({
-                                            url: 'doc_persons/' + data.id
-                                        })
-                                        $$('person_table').sync(person_table_data);
-
-                                        let addr_table_data = new webix.DataCollection({
-                                            url: 'doc_address_fact/' + data.id
-                                        })
-                                        $$('addr_table').sync(addr_table_data);
-                                    }
-                                }
-                            });
-
                             data.attachmentFilename = data.attachmentPath.split('\\').pop().split('/').pop()
 
                             if(data.attachmentFilename != null && data.attachmentFilename != '') {

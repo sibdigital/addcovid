@@ -277,7 +277,6 @@ const requestSubsidyWizard = {
                                                 if (($$('request_subsidy_step1').validate() === false || $$('subsidyId').validate() === false)) {
                                                     webix.message('Выберите меру поддержки', 'error');
                                                 } else {
-                                                    if ($$('requestSubsidyId').getValue() == '') {
                                                         let params = {
                                                             subsidyId: $$('subsidyId').getValue(),
                                                             reqBasis: $$('reqBasis').getValue(),
@@ -288,15 +287,12 @@ const requestSubsidyWizard = {
                                                             data = data.json();
                                                             console.log(data)
                                                             $$('requestSubsidyId').setValue(data.id);
-                                                            createDataView(data.id);
+                                                            createDataView();
                                                             nextRS(1);
                                                         }).catch(function () {
                                                                 webix.message('Не удалось сохранить черновик', 'error');
                                                             }
                                                         )
-                                                    } else {
-                                                        nextRS(1);
-                                                    }
                                                 }
                                             }
                                         }
@@ -316,12 +312,17 @@ const requestSubsidyWizard = {
                                             css: 'webix_primary',
                                             maxWidth: 301,
                                             value: 'Назад',
-                                            click: backRS
+                                            click: () => {
+                                                removeChildDataviews();
+                                                backRS();
+                                            }
                                         },
                                         {
                                             view: 'button',
+                                            id: 'step2_continue_btn',
                                             css: 'webix_primary',
                                             maxWidth: 301,
+                                            disabled: true,
                                             value: 'Продолжить',
                                             click: function () {
                                                 let valid = checkRequiredFiles();
@@ -419,6 +420,10 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                 icon: 'mdi mdi-arrow-left',
                 tooltip: 'Назад',
                 click: () => {
+                    console.log(nextNumber)
+                    if (nextNumber === 2) {
+                        removeChildDataviews();
+                    }
                     previous()
                 }
             },
@@ -431,7 +436,7 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                 click: () => {
                     if (nextNumber === 1 && ($$('request_subsidy_step1').validate() === false || $$('subsidyId').validate() === false)) {
                         webix.message('Выберите меру поддержки', 'error');
-                    } else if (nextNumber === 1 && $$('requestSubsidyId').getValue() == '') {
+                    } else if (nextNumber === 1) {
                         let params = {
                             subsidyId: $$('subsidyId').getValue(),
                             reqBasis: $$('reqBasis').getValue(),
@@ -442,7 +447,7 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                             data = data.json();
                             console.log(data)
                             $$('requestSubsidyId').setValue(data.id);
-                            createDataView(data.id);
+                            createDataView();
                             nextRS(nextNumber);
                         }).catch(function () {
                                 webix.message('Не удалось сохранить черновик', 'error');

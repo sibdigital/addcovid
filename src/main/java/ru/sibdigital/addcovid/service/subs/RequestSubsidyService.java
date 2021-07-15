@@ -12,7 +12,6 @@ public interface RequestSubsidyService {
 
     void saveNewDocRequestSubsidy(DocRequestSubsidyPostDto postFormDto);
     List<TpRequiredSubsidyFile> findAllRequiredSubsidyFiles(Long id);
-    Long findLastRequestSubsidyFile();
     List<TpRequestSubsidyFile> findAllRequestSubsidyFilesByRequestAndFileType(Long request_subsidy_id, Long file_type_id);
     TpRequestSubsidyFile findSignatureFile(Long id);
     DocRequestSubsidy saveDocRequestSubsidyDraft(DocRequestSubsidyPostDto postFormDto);
