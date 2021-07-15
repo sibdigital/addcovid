@@ -244,7 +244,7 @@ public class RequestSubsidyController {
             }
             MultipartFile[] sortedFiles = new MultipartFile[2];
             for (MultipartFile multipartFile : files) {
-                if (!getFileExtension(multipartFile.getOriginalFilename()).equals(".p7s")) {
+                if (!FileUtils.getFileExtension(multipartFile.getOriginalFilename()).equals(".p7s")) {
                     sortedFiles[0] = multipartFile;
                 } else {
                     sortedFiles[1] = multipartFile;
@@ -375,7 +375,7 @@ public class RequestSubsidyController {
         TpRequestSubsidyFile savedRequestSubsidyFile = null;
         try {
             String name = file.getOriginalFilename();
-            String extension = getFileExtension(name);
+            String extension = FileUtils.getFileExtension(name);
 
             TpRequestSubsidyFile parentDocSubsidyFile = null;
             Boolean isSignature = false;
@@ -384,39 +384,34 @@ public class RequestSubsidyController {
                 parentDocSubsidyFile = tpRequestSubsidyFileRepo.findById(idLastRequestSubsidyFile).orElse(null);
                 isSignature = true;
             }
+            String directory = getSavedDirectoryPath(docRequestSubsidy);
+            File innIdFolder = getSavingDirectory(directory);
 
-            Calendar cal = Calendar.getInstance();
-            cal.setTimeInMillis(docRequestSubsidy.getTimeCreate().getTime());
-
-            String filepath = uploadingAttachmentDir + "/subsidy_files/" +
-                    cal.get(Calendar.YEAR) + "/" +
-                    cal.get(Calendar.MONTH) + "/" +
-                    docRequestSubsidy.getOrganization().getInn() + "_" +
-                    docRequestSubsidy.getId();
-
-            File innIdFolder = new File(filepath);
-
-            if (!innIdFolder.exists()) {
-                innIdFolder.mkdirs();
+            String prefix = String.valueOf(System.currentTimeMillis());
+            if (docRequestSubsidy.getOrganization() != null){
+                prefix = docRequestSubsidy.getOrganization().getId().toString();
             }
+            final String filename = prefix + "_" + UUID.randomUUID() + extension;
+            String absoluteFilename = innIdFolder.getAbsolutePath() + File.separator + filename;
+            String relFilename = directory + File.separator + filename;
 
-            String inputFilename = String.format("%s/%s_%s", innIdFolder.getAbsolutePath(), String.valueOf(System.currentTimeMillis()), name);
-
-            f = new File(inputFilename);
+            f = new File(absoluteFilename);
             file.transferTo(f);
 
-            final int size = (int) Files.size(f.toPath());
+            final long size = Files.size(f.toPath());
             final String fileHash = FileUtils.getFileHash(f);
 
+            //view file name ???????????????????????????????????
             TpRequestSubsidyFile tpRequestSubsidyFile = TpRequestSubsidyFile.builder()
                     .fileSize(size)
                     .requestSubsidy(docRequestSubsidy)
                     .department(docRequestSubsidy.getDepartment())
                     .organization(docRequestSubsidy.getOrganization())
                     .fileType(clsFileType)
-                    .attachmentPath(String.format("%s/%s", filepath, f.getName()))
+                    .attachmentPath(relFilename)
                     .isDeleted(false)
                     .fileName(f.getName())
+                    .timeCreate(new Timestamp(System.currentTimeMillis()))
                     .originalFileName(name)
                     .fileExtension(extension)
                     .hash(fileHash)
@@ -432,12 +427,25 @@ public class RequestSubsidyController {
         return savedRequestSubsidyFile;
     }
 
-    //Files extension
-    private String getFileExtension(String name) {
-         int lastIndexOf = name.lastIndexOf(".");
-        if (lastIndexOf == -1) {
-            return ""; // empty extension
-        }
-        return name.substring(lastIndexOf);
+    private String getSavedDirectoryPath(DocRequestSubsidy docRequestSubsidy){
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(docRequestSubsidy.getTimeCreate().getTime());
+        String dir = "subsidy_files"+ File.separator +
+                cal.get(Calendar.YEAR) + File.separator +
+                cal.get(Calendar.MONTH) + File.separator +
+                docRequestSubsidy.getOrganization().getInn() + "_" +
+                docRequestSubsidy.getId();
+        return dir;
     }
+
+    private File getSavingDirectory(String directory){
+        String filepath = uploadingAttachmentDir + File.separator + directory;
+        File innIdFolder = new File(filepath);
+
+        if (!innIdFolder.exists()) {
+            innIdFolder.mkdirs();
+        }
+        return innIdFolder;
+    }
+
 }
