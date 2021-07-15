@@ -37,6 +37,114 @@ function findAvailableSubsidies() {
     return JSON.parse(xhr.responseText);
 }
 
+function getFilesListByTypeView(docRequestSubsidyId) {
+    webix.ajax(`request_subsidy_files_verification/${ docRequestSubsidyId }`).then(function (filesVerification) {
+        filesVerification = filesVerification.json();
+
+        filesVerification.map((file) => {
+            switch (file.verify_status) {
+                case 1: file.verify_status = "проверка прошла успешно"; break;
+                case 2: file.verify_status = "подпись не соответствует файлу"; break;
+                case 3: file.verify_status = "в сертификате или цепочке сертификатов есть ошибки"; break;
+                case 4: file.verify_status = "в подписи есть ошибки"; break;
+                default: file.verify_status = "проверка не проводилась"; break;
+            }
+            return file;
+        });
+
+        webix.ajax(`request_subsidy_files/${docRequestSubsidyId}`).then(function (data) {
+            const views = [];
+            data = data.json();
+            console.dir({ data, filesVerification });
+            if (data.length > 0) {
+                const filesTypes = {};
+                const byFileType = data.reduce(function (result, file) {
+                    const fileVerificationStatus = filesVerification.find((fileVerification) => fileVerification.id_request_subsidy_file === file.id);
+                    result[file.fileType.id] = result[file.fileType.id] || [];
+                    result[file.fileType.id].push({ ...file, verificationStatus: fileVerificationStatus ?? { verify_status: 'отсутствует подпись' } });
+
+                    filesTypes[file.fileType.id] = file.fileType.name;
+
+                    return result;
+                }, Object.create(null));
+
+                // console.dir({ byFileType });
+
+                for (const [key, filesArray] of Object.entries(byFileType)) {
+                    // console.dir({ filesArray });
+                    views.push({
+                        rows: [
+                            view_section(filesTypes[key]),
+                            {
+                                id: `request_subsidy_files_table/${key}`,
+                                view: 'datatable',
+                                pager: `Pager/${key}`,
+                                autoheight: true,
+                                header: `id = ${key}`,
+                                select: 'row',
+                                resizeColumn: true,
+                                readonly: true,
+                                data: filesArray,
+                                columns: [
+                                    {
+                                        id: 'viewFileName',
+                                        header: 'Название файла',
+                                        adjust: true,
+                                        fillspace: true,
+                                        sort: 'string',
+                                    },
+                                    {
+                                        id: 'signature',
+                                        template: function (request) {
+                                            let label = '';
+                                            let style = '';
+
+                                            if (request.signature) {
+                                                label = 'Подпись загружена';
+                                                style = 'color: green';
+                                            } else {
+                                                label = 'Подпись не загружена';
+                                                style = 'color: red';
+                                            }
+
+                                            return `<div style="${style}" role="gridcell" aria-rowindex="1" aria-colindex="1" aria-selected="true" tabindex="0" class="webix_cell webix_row_select">${label}</div>`;
+                                        },
+                                        header: 'Подпись',
+                                        adjust: true,
+                                        fillspace: true,
+                                        sort: 'string',
+                                    },
+                                    {
+                                        id: 'verificationStatus',
+                                        header: 'Статус проверки подписи',
+                                        adjust: true,
+                                        sort: 'string',
+                                        template: '#verificationStatus.verify_status#',
+                                    },
+                                ],
+                            },
+                            {
+                                view: 'pager',
+                                id: `Pager/${key}`,
+                                height: 38,
+                                size: 25,
+                                group: 5,
+                                template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
+                            },
+                        ]
+                    })
+                }
+
+                webix.ui({
+                    id: 'filesListViewByType',
+                    rows: views,
+                }, $$('filesListViewByType'));
+            }
+
+        })
+    });
+}
+
 const noAvailableSubsidiesForm = {
     rows: [
         {
@@ -228,7 +336,9 @@ const requestSubsidyStep3 = {
             readonly: true,
         },
         view_section('Прикрепленные файлы'),
-        {}
+        {
+            id: 'filesListViewByType'
+        }
     ]
 }
 
@@ -327,6 +437,7 @@ const requestSubsidyWizard = {
                                                 let valid = checkRequiredFiles();
                                                 if (valid) {
                                                     nextRS(2);
+                                                    getFilesListByTypeView($$('requestSubsidyId').getValue());
                                                 } else {
                                                     webix.message("Отсутсвуют обязательные файлы", "error", 10000);
                                                 }
@@ -457,6 +568,7 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                         let valid = checkRequiredFiles();
                         if (valid) {
                             nextRS(nextNumber);
+                            getFilesListByTypeView($$('requestSubsidyId').getValue());
                         } else {
                             webix.message("Отсутсвуют обязательные файлы", "error", 10000);
                         }

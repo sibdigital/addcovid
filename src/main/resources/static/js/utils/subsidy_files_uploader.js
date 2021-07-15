@@ -161,7 +161,7 @@ function view_subsidy_files_section(required_subsidy_file) {
                         "<div class='doc_title'>" + obj.originalFileName.slice(0, -4) + "</div>" +
                         "<div id='del_button' style='color: red; position: absolute; top: 0; right: 5px;' onclick='del_subsidy_file(" + obj.id + ",\"" + fileTypeName + "\"," + required_subsidy_file.clsFileType.id + ")' class='mdi mdi-close-thick'></div>" +
                         "<div id='box_" + obj.id + "' style='position: absolute; top: 40px; left: 15px;'>" +
-                        "<input class='custom-form-control' type='text' value='" + viewName + "' placeholder='Отображаемое имя файла' onkeydown='update_file_view_name(this," + obj.id + ")'>" +
+                        "<input class='custom-form-control' type='text' value='" + viewName + "' placeholder='Отображаемое имя файла' title='После ввода имени нажмите `Enter`' onkeydown='update_file_view_name(this," + obj.id + ")'>" +
                         "<span class='custom-span-control' style='color: green'>Подпись загружена</span>" +
                         "<span class='custom-span-control'>Статус проверки подписи</span>" +
                         "</div>" +
@@ -222,6 +222,9 @@ let signature_file_verification_window = webix.ui({
 const update_file_view_name = (el, idSubsidyFile) => {
     if (event.key === 'Enter') {
         webix.ajax().post('set_subsidy_file_view_name', {"id_subsidy_file": idSubsidyFile, "view_name": el.value});
+        el.style.color = "#008000";
+    } else {
+        el.style.color = '#808080';
     }
 }
 

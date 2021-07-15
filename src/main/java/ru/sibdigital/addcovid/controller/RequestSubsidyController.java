@@ -433,4 +433,17 @@ public class RequestSubsidyController {
         return innIdFolder;
     }
 
+    @GetMapping("request_subsidy_files/{id_request_subsidy}")
+    public @ResponseBody List<TpRequestSubsidyFile> getTpRequestSubsidyFiles(@PathVariable("id_request_subsidy") Long id_request_subsidy, HttpSession session) {
+        return tpRequestSubsidyFileRepo.getTpRequestSubsidyFilesByDocRequestId(id_request_subsidy);
+    }
+
+    @GetMapping("request_subsidy_files_verification/{id_request_subsidy}")
+    public @ResponseBody List<Map<String, String>> getVerificationTpRequestSubsidyFiles(@PathVariable("id_request_subsidy") Long id_request_subsidy, HttpSession session) {
+
+        List<Map<String, String>> list = tpRequestSubsidyFileRepo.getSignatureVerificationTpRequestSubsidyFile(id_request_subsidy);
+
+        return list;
+    }
+
 }

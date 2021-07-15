@@ -262,10 +262,16 @@ function showRequestSubsidyViewForm(data) {
                             hidden: true,
                             height: 100
                         },
+                        view_section('Прикрепленные файлы'),
+                        {
+                            id: 'filesListViewByType'
+                        }
                     ]
                 }
         ]
     }, $$('content'));
+
+    getFilesListByTypeView(data.id);
 
     if (data.subsidyRequestStatusCode !== 'NEW' && data.subsidyRequestStatusCode !== 'SUBMIT') {
         $$('resolutionComment').show();
