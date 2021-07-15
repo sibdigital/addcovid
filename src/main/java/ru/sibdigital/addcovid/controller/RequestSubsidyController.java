@@ -9,9 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.cms.VerifiedData;
-import ru.sibdigital.addcovid.dto.DocRequestDto;
+import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.dto.KeyValue;
-import ru.sibdigital.addcovid.dto.PostFormDto;
 import ru.sibdigital.addcovid.dto.subs.DocRequestSubsidyDto;
 import ru.sibdigital.addcovid.dto.subs.DocRequestSubsidyPostDto;
 import ru.sibdigital.addcovid.model.*;
@@ -26,18 +25,15 @@ import ru.sibdigital.addcovid.repository.subs.ClsSubsidyRepo;
 import ru.sibdigital.addcovid.repository.subs.DocRequestSubsidyRepo;
 import ru.sibdigital.addcovid.repository.subs.RegVerificationSignatureFileRepo;
 import ru.sibdigital.addcovid.repository.subs.TpRequestSubsidyFileRepo;
+import ru.sibdigital.addcovid.service.EmailService;
 import ru.sibdigital.addcovid.service.queue.CustomQueueService;
 import ru.sibdigital.addcovid.service.subs.RequestSubsidyService;
 import ru.sibdigital.addcovid.utils.DataFormatUtils;
 import ru.sibdigital.addcovid.utils.FileUtils;
 
 import javax.servlet.http.HttpSession;
-import javax.xml.bind.DatatypeConverter;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -72,6 +68,12 @@ public class RequestSubsidyController {
 
     @Autowired
     private CustomQueueService customQueueService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private ApplicationConstants applicationConstants;
 
     @Value("${upload.path:/uploads}")
     String uploadingAttachmentDir;
@@ -183,11 +185,18 @@ public class RequestSubsidyController {
             }
 
             postFormDto.setOrganizationId(id);
+            ClsOrganization clsOrganization = clsOrganizationRepo.findById(id).orElse(null);
 
 //            String errors = validateNewRequestSubsidy(postFormDto);
 //            if (errors.isEmpty()) {
             requestSubsidyService.saveNewDocRequestSubsidy(postFormDto);
             if (postFormDto.getSubsidyRequestStatusCode().equals("SUBMIT")) {
+                if (clsOrganization != null && clsOrganization.getEmail() != null) {
+                    ClsSettings clsSettings = clsSettingsRepo.getActualByKey("submit_request_subsidy_message").orElse(null);
+                    if (clsSettings != null && clsSettings.getStringValue() != null && !clsSettings.getStringValue().equals("")) {
+                        emailService.sendSimpleMessage(clsOrganization.getEmail(), applicationConstants.getApplicationName(), clsSettings.getStringValue());
+                    }
+                }
                 return ResponseEntity.ok()
                         .body("{\"cause\": \"Заявка принята. Ожидайте ответ на электронную почту.\"," +
                                 "\"status\": \"server\"," +
