@@ -372,12 +372,13 @@ body {
 }
 
 .webix_progress_top {
-    height: 15px !important;
+    height: 32px !important;
     border-radius: 4px !important;
+    margin-top: 3px !important;
 }
 
 .webix_progress_top .webix_progress_state {
-    height: 15px !important;
+    height: 32px !important;
 }
 
 .overall-title {
@@ -398,4 +399,8 @@ body {
 
 .custom-icon-hover:hover {
     color: #1CA1C1 !important;
+}
+
+.custom-btn-border {
+    border-radius: 13px !important;
 }
