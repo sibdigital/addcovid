@@ -76,7 +76,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 }
             }
         } catch (NonUniqueResultException | IncorrectResultSizeDataAccessException | InternalAuthenticationServiceException ex){
-            authLog.warn("Too many organizations found found for login " + login + " is inn entered " + isInnEntered);
+            authLog.info("Too many organizations found found for login " + login + " is inn entered " + isInnEntered);
             authLog.error(ex.getMessage(), ex);
             throw new UsernameNotFoundException("Too many organizations found.");
         }
@@ -89,13 +89,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 //                builder.password(passwordEncoder.encode(principal.getPassword()));
                 builder.password(principal.getPassword());
                 builder.roles("USER");
-                authLog.warn(" User FOUND for login " + login + " is inn entered " + isInnEntered + " id org: " + organization.getId());
+                authLog.info(" User FOUND for login " + login + " is inn entered " + isInnEntered + " id org: " + organization.getId());
             } else {
-                authLog.warn(" User no found for login " + login + " is inn entered " + isInnEntered);
+                authLog.info(" User no found for login " + login + " is inn entered " + isInnEntered);
                 throw new UsernameNotFoundException("User no found.");
             }
         } else {
-            authLog.warn("Organization no found. " + login + " is inn entered " + isInnEntered);
+            authLog.info("Organization no found. " + login + " is inn entered " + isInnEntered);
             throw new UsernameNotFoundException("Organization no found." );
         }
 

@@ -73,7 +73,7 @@ public class CertificatePathVerifier {
 
         //verificationLog.warn("%%% SIZE: " + cp.getCertificates().size());
         //System.out.println("%%% PATH:\n" + cp);
-        verificationLog.warn("Построение цепочки - успешно SIZE: " + cp.getCertificates().size() );
+        verificationLog.info("Построение цепочки - успешно SIZE: " + cp.getCertificates().size() );
         pathBuild = true;
 
         // Проверка цепочки.
@@ -82,7 +82,7 @@ public class CertificatePathVerifier {
         cpp.setRevocationEnabled(true);
 
         final CertPathValidatorResult validate = cpv.validate(cp, cpp);
-        verificationLog.warn("Проверка цепочки - успешно");
+        verificationLog.info("Проверка цепочки - успешно");
         result = true;
         //System.out.println(validate);
         pathNotContainsRevocationCertificate = true;

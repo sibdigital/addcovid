@@ -264,10 +264,10 @@ public class CMSVerifier {
                 if (checkResult) {
                     validsign++;
                     CertificateInfo ci = new CertificateInfo(cert);
-                    verificationLog.warn("VALID signature on cert: " + ci.toString());
+                    verificationLog.info("VALID signature on cert: " + ci.toString());
                 }else{
                     CertificateInfo ci = new CertificateInfo(cert);
-                    verificationLog.warn("invalid signature on cert: " + ci.toString());
+                    verificationLog.info("invalid signature on cert: " + ci.toString());
                 }
 
             }
@@ -457,9 +457,9 @@ public class CMSVerifier {
                 Asn1UTCTime time = (Asn1UTCTime) sigTime.getElement();
                 if (time != null){
                     final Calendar cldr = time.getTime();
-                    verificationLog.warn("Signing Time: " + dateFormat.format(cldr.getTime()));
+                    verificationLog.info("Signing Time: " + dateFormat.format(cldr.getTime()));
                 }else {
-                    verificationLog.warn("Signing Time: " + time);
+                    verificationLog.info("Signing Time: " + time);
                 }
             } // if
 
