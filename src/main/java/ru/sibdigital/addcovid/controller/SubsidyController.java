@@ -29,7 +29,10 @@ public class SubsidyController {
             @RequestParam("idRequest") Long idRequest
     ) {
         DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(idRequest).orElse(null);
-        List<TpRequiredSubsidyFile> tpRequiredSubsidyFiles = requestSubsidyService.findAllRequiredSubsidyFiles(docRequestSubsidy.getSubsidy().getId());
+        List<TpRequiredSubsidyFile> tpRequiredSubsidyFiles = new ArrayList<>();
+        if (docRequestSubsidy != null) {
+             tpRequiredSubsidyFiles = requestSubsidyService.findAllRequiredSubsidyFiles(docRequestSubsidy.getSubsidy().getId());
+        }
         return tpRequiredSubsidyFiles;
     }
 
