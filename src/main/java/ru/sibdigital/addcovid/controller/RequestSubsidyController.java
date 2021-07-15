@@ -142,7 +142,7 @@ public class RequestSubsidyController {
 
     @GetMapping("/available_subsidies")
     public @ResponseBody
-    List<KeyValue> getAvailableSubsidies(HttpSession session) {
+    List<ClsSubsidy> getAvailableSubsidies(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
@@ -150,10 +150,11 @@ public class RequestSubsidyController {
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         List<ClsSubsidy> subsidies = clsSubsidyRepo.getAvailableSubsidiesForOrganization(organization.getId(), organization.getIdTypeOrganization());
 
-        List<KeyValue> list = subsidies.stream()
-                .map(ctr -> new KeyValue(ctr.getClass().getSimpleName(), ctr.getId(), ctr.getShortName()))
-                .collect(Collectors.toList());
-        return list;
+//        List<KeyValue> list = subsidies.stream()
+//                .map(ctr -> new KeyValue(ctr.getClass().getSimpleName(), ctr.getId(), ctr.getShortName()))
+//                .collect(Collectors.toList());
+//        return list;
+        return subsidies;
     }
 
     @PostMapping("/save_request_subsidy_draft")
@@ -283,8 +284,24 @@ public class RequestSubsidyController {
             @RequestParam("id_subsidy_file") Long id) {
         TpRequestSubsidyFile tpRequestSubsidyFile = tpRequestSubsidyFileRepo.findById(id).orElse(null);
         TpRequestSubsidyFile tpRequestSubsidyFileSignature = requestSubsidyService.findSignatureFile(tpRequestSubsidyFile.getId());
-        tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFileSignature);
-        tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFile);
+//        tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFileSignature);
+//        tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFile);
+        if (tpRequestSubsidyFile != null) {
+            tpRequestSubsidyFile.setDeleted(true);
+            tpRequestSubsidyFileRepo.save(tpRequestSubsidyFile);
+        }
+        if (tpRequestSubsidyFileSignature != null) {
+            tpRequestSubsidyFileSignature.setDeleted(true);
+            tpRequestSubsidyFileRepo.save(tpRequestSubsidyFileSignature);
+        }
+        if (tpRequestSubsidyFile != null && tpRequestSubsidyFileSignature != null) {
+            RegVerificationSignatureFile rvsf = regVerificationSignatureFileRepo.findByIdFileAndIdSignature(tpRequestSubsidyFile.getId(), tpRequestSubsidyFileSignature.getId()).orElse(null);
+            if (rvsf != null) {
+                rvsf.setIsDeleted(true);
+                regVerificationSignatureFileRepo.save(rvsf);
+            }
+        }
+
         return ResponseEntity.ok()
                 .body("{\"status\": \"server\"," +
                         "\"sname\": \"" + tpRequestSubsidyFile + "\"}");
@@ -453,6 +470,17 @@ public class RequestSubsidyController {
         List<Map<String, String>> list = tpRequestSubsidyFileRepo.getSignatureVerificationTpRequestSubsidyFile(id_request_subsidy);
 
         return list;
+    }
+
+    @GetMapping("check_all_files_are_verified")
+    public @ResponseBody Boolean checkAllFilesAreVerified(@RequestParam("id_request_subsidy") Long id_request_subsidy, HttpSession session) {
+
+        List<Map<String, String>> list = tpRequestSubsidyFileRepo.getNotVerifiedTpRequestSubsidyFile(id_request_subsidy);
+        if (list.size() > 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }
