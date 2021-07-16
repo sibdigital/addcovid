@@ -113,6 +113,8 @@ public class RequestSubsidyController {
                         .build())
                 .collect(Collectors.toList());
 
+        dtos.sort(Comparator.comparing(DocRequestSubsidyDto::getSubsidyName));
+
         return dtos;
     }
 

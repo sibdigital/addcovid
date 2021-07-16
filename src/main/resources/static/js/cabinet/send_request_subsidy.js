@@ -59,11 +59,11 @@ function getFilesListByTypeView(docRequestSubsidyId) {
 
         filesVerification.map((file) => {
             switch (file.verify_status) {
-                case 1: file.verify_status = "проверка прошла успешно"; break;
-                case 2: file.verify_status = "подпись не соответствует файлу"; break;
-                case 3: file.verify_status = "в сертификате или цепочке сертификатов есть ошибки"; break;
-                case 4: file.verify_status = "в подписи есть ошибки"; break;
-                default: file.verify_status = "проверка не проводилась"; break;
+                case 1: file.verify_status = "Проверка прошла успешно"; break;
+                case 2: file.verify_status = "Подпись не соответствует файлу"; break;
+                case 3: file.verify_status = "В сертификате или цепочке сертификатов есть ошибки"; break;
+                case 4: file.verify_status = "В подписи есть ошибки"; break;
+                default: file.verify_status = "Проверка не проводилась"; break;
             }
             return file;
         });
@@ -135,7 +135,19 @@ function getFilesListByTypeView(docRequestSubsidyId) {
                                         header: 'Статус проверки подписи',
                                         adjust: true,
                                         sort: 'string',
-                                        template: '#verificationStatus.verify_status#',
+                                        // template: '#verificationStatus.verify_status#',
+                                        template: function (request) {
+                                            let style2 = '';
+                                            let status = request.verificationStatus.verify_status
+
+                                            if ( status === "Проверка прошла успешно") {
+                                                style2 = 'color: green';
+                                            } else {
+                                                style2 = 'color: red';
+                                            }
+
+                                            return `<div style="${style2}" role="gridcell" aria-rowindex="1" aria-colindex="1" aria-selected="true" tabindex="0" class="webix_cell webix_row_select">${status}</div>`;
+                                        },
                                     },
                                 ],
                             },

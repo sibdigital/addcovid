@@ -1,6 +1,7 @@
 webix.i18n.setLocale("ru-RU");
 
 const dateFormat = webix.Date.dateToStr("%d.%m.%Y %H:%i:%s")
+const dateFormatWOSeconds = webix.Date.dateToStr("%d.%m.%Y %H:%i")
 let userWindowHeight = window.innerHeight;
 
 function view_section(title) {
