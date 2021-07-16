@@ -424,7 +424,7 @@ const requestSubsidyWizard = {
                                                             data = data.json();
                                                             console.log(data)
                                                             $$('requestSubsidyId').setValue(data.id);
-                                                            createDataView(data.id);
+                                                            createDataView();
                                                             nextRS(1);
                                                         }).catch(function () {
                                                                 webix.message('Не удалось сохранить черновик', 'error');
@@ -467,7 +467,7 @@ const requestSubsidyWizard = {
                                         {
                                             view: 'button',
                                             css: 'webix_primary',
-                                            maxWidth: 301,
+                                            maxWidth: 200,
                                             value: 'Продолжить',
                                             click: function () {
                                                 let valid = checkRequiredFiles();
@@ -623,7 +623,7 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                             data = data.json();
                             console.log(data)
                             $$('requestSubsidyId').setValue(data.id);
-                            createDataView(data.id);
+                            createDataView();
                             nextRS(nextNumber);
                         }).catch(function () {
                                 webix.message('Не удалось сохранить черновик', 'error');
