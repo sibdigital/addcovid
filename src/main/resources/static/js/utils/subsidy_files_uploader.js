@@ -23,6 +23,8 @@ const subs = () => {
                             }
                             await webix.ajax().get('check_request_subsidy_files_signatures', params).then((response) => {
                                 let responseJson = response.json();
+                                webix.message(responseJson.cause, responseJson.status, 4000);
+                                console.log(responseJson)
                             });
                             verify_progress();
                             webix.extend($$("progress_bar"), webix.ProgressBar);
@@ -77,7 +79,7 @@ function verify_progress(timerId = null) {
             let data = response.json();
             if (data.notFound) {
                 if (timerId == null) {
-                    webix.message(data.notFound, "error", 10000);
+                    //webix.message(data.notFound, "error", 10000);
                     $$("progress_bar").hideProgress();
                     document.getElementById("progress_bar_text").innerHTML = "";
                 }
@@ -102,7 +104,8 @@ function verify_progress(timerId = null) {
                 }
 
                 if (numberOfFiles === verified) {
-                    clearInterval(timerId)
+                    clearInterval(timerId);
+                    webix.message("Проверка подписей завершена","success",10000);
                     $$('step2_continue_btn').enable();
                 }
             }
@@ -166,39 +169,46 @@ function view_subsidy_files_section(required_subsidy_file) {
                 template: function (obj) {
                     let viewName = obj.docFile.viewFileName ?? "";
                     let originalFileName = obj.docFile.originalFileName;
-                    let overallColor = "";
-                    if (originalFileName.length > 40) {
-                        originalFileName = obj.docFile.originalFileName.substr(0, 40) + "...";
-                    }
-                    let signatureExists = obj.signatureFile != null ?
-                        "<span class='mdi mdi-check-circle-outline subsidy_files_icon'></span>"
-                        : "<span class='mdi mdi-clock-outline subsidy_files_icon' style='color: orange;'></span>";
                     let signatureVerifyStatus = obj?.verificationSignatureFile?.verifyStatus == undefined ? "" : obj?.verificationSignatureFile?.verifyStatus;
                     let signatureVerifyResult = "";
 
-                    if (signatureVerifyStatus === "" || signatureVerifyStatus === 0) {
-                        signatureVerifyStatus = "<span class='mdi mdi-clock-outline subsidy_files_icon' style='color: orange;'></span>";
-                    } else if (signatureVerifyStatus === 1) {
-                        signatureVerifyStatus = "<span class='mdi mdi-check-circle-outline subsidy_files_icon'></span>";
-                        signatureVerifyResult = "<span webix_tooltip='' onclick='verifySignatureResults(" + "\"" + obj?.verificationSignatureFile?.verifyResult +"\"" + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></span>"
-                        overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #00ff2b5c), color-stop(1, #00ff2b5c))";
-                    } else if (signatureVerifyStatus !== 1 && signatureVerifyStatus !== "" && signatureVerifyStatus !== 0) {
-                        signatureVerifyStatus = "<span webix_tooltip='' class='mdi mdi mdi-alert-circle-outline subsidy_files_icon'></span>";
-                        signatureVerifyResult = "<span webix_tooltip='' onclick='verifySignatureResults(" + "\"" + obj?.verificationSignatureFile?.verifyResult +"\"" + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></span>"
-                        overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #ff00005c), color-stop(1, #ff00005c))";
+                    let overallColor = "";
+
+                    if (originalFileName.length > 40) {
+                        originalFileName = obj.docFile.originalFileName.substr(0, 40) + "...";
                     }
+
+                    let title = `<div title='` + obj.docFile.originalFileName + `' style='margin-top: 5px; width: 325px' class="div-hover">` + originalFileName + `</div>`;
+                    let signatureExists = obj.signatureFile != null ?
+                        "<i title='Подпись загружена' class='mdi mdi-check-circle-outline subsidy_files_icon'></i>"
+                        : "<i title='Ожидание загрузки подписи' class='mdi mdi-clock-outline subsidy_files_icon clock-wait-btn' style='color: orange;'></i>";
+
+
+                    if (signatureVerifyStatus === "" || signatureVerifyStatus === 0) {
+                        signatureVerifyStatus = "<i title='Ожидание проверки подписи' class='mdi mdi-clock-outline subsidy_files_icon clock-wait-btn' style='color: orange;'></i>";
+                    } else if (signatureVerifyStatus === 1) {
+                        signatureVerifyStatus = "<i title='Подпись проверена' class='mdi mdi-check-circle-outline subsidy_files_icon'></i>";
+                        overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #00ff2b5c), color-stop(1, #00ff2b5c))";
+                        signatureVerifyResult = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + obj?.verificationSignatureFile?.verifyResult +"\`" + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
+                    } else if (signatureVerifyStatus !== 1 && signatureVerifyStatus !== "" && signatureVerifyStatus !== 0) {
+                        signatureVerifyStatus = "<i title='Ошибка при проверке подписи' class='mdi mdi mdi-alert-circle-outline subsidy_files_icon'></i>";
+                        overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #ff00005c), color-stop(1, #ff00005c))";
+                        signatureVerifyResult = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + obj?.verificationSignatureFile?.verifyResult +"\`" + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
+                    }
+
                     let result =
                         "<div id='overall_" + obj.docFile.id + "' class='overall' style='height: 48px; background: " + overallColor + "'>" +
-                        "<div class='overall-title' style='margin-top: 10px'><div style='margin-top: 5px; width: 325px'>" + originalFileName +
-                        "</div><input webix_tooltip='' title='Тест' class='custom-form-control' type='text' value='" + viewName + "' placeholder='Отображаемое имя файла' onkeydown='update_file_view_name(this," + obj.docFile.id + ")' style=''>" +
-                        "<button type='button' class='webix_button webix_img_btn' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
+                        "<div class='overall-title' style='margin-top: 10px'>" +
+                        title +
+                        "<input title='После ввода нажмите Enter' class='custom-form-control input-hover' type='text' value='" + viewName + "' placeholder='Отображаемое имя файла' onkeydown='update_file_view_name(this," + obj.docFile.id + ")' style=''>" +
+                        "<button type='button' title='Загрузить подпись' class='webix_button webix_img_btn custom-btn-data' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
                         "<span class='webix_icon_btn mdi mdi-upload custom-icon-hover' style='font-size: 24px; margin-top: -2px'></span>" +
                         "</button>" +
                         signatureExists +
                         signatureVerifyStatus +
                         signatureVerifyResult +
                         "</div>" +
-                        "<div id='del_button' style='position: absolute; top: 0; right: 5px;' onclick='del_subsidy_file(" + obj.docFile.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' class='mdi mdi-close-thick'></div>" +
+                        "<div id='del_button' title='Удалить документ' style='position: absolute; top: 0; right: 5px;' onclick='del_subsidy_file(" + obj.docFile.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' class='mdi mdi-close-thick'></div>" +
                         "</div>";
                     return result;
                 },
@@ -230,8 +240,8 @@ const verifySignatureResults = (result) =>{
     let window = webix.ui({
         view: 'window',
         id: 'verify_signature_results',
-        width: 600,
-        height: 300,
+        width: 700,
+        height: 350,
         position: 'center',
         // item: data,
         modal: true,
@@ -252,12 +262,18 @@ const verifySignatureResults = (result) =>{
             ]
         },
         body: {
-            template: result ?? ""
+            type: "form",
+            margin: 10,
+            rows: [
+                {
+                    template: result ?? ""
+                }
+            ]
         },
-        // on: {
-        //     'onShow': function () {
-        //     }
-        // }
+        on: {
+            'onShow': function () {
+            }
+        }
     });
     window.show();
 }
@@ -326,12 +342,9 @@ const checkRequiredFiles = () => {
         let dataViewRequired = dataView.qf[1].name;
         let itemId = $$(dataViewId).getFirstId();
         let item = $$(dataViewId).getItem(itemId);
-        // console.log("req:" + dataViewRequired)
-        // console.log("i:" + item)
         if (dataViewRequired == true && item == undefined) {
             oneOfDataViewsIsNull = false
         }
-        // console.log("resStat:" + oneOfDataViewsIsNull)
     })
     return oneOfDataViewsIsNull;
 }

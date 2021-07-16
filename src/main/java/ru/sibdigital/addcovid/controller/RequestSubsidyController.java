@@ -330,7 +330,7 @@ public class RequestSubsidyController {
         List<TpRequestSubsidyFile> signatureFiles = tpRequestSubsidyFileRepo.getSignatureFilesByIdRequest(idRequest).orElse(null);
         if (signatureFiles == null) {
             return DataFormatUtils.buildResponse(ResponseEntity.ok(),
-                    Map.of("cause", "Файлы не прикреплены", "status", "error", "sname", ""));
+                    Map.of("cause", "Не найдены файлы подписи", "status", "error", "sname", ""));
         }
         List<VerifiedData> verifiedDataList = new ArrayList<>();
         for (TpRequestSubsidyFile signatureFile : signatureFiles) {
@@ -362,7 +362,7 @@ public class RequestSubsidyController {
         }
         customQueueService.enqueueAll(verifiedDataList);
         return DataFormatUtils.buildResponse(ResponseEntity.ok(),
-                Map.of("cause","Началась проверка подписей","status", "server", "sname", "check"));
+                Map.of("cause","Началась проверка подписей","status", "success", "sname", "check"));
     }
 
     //File writer
