@@ -102,7 +102,7 @@ public class VerifyMessageServiceImpl implements VerifyMessageService{
                 digestStatus += "<b>Проверка электронной подписи показала:</b> " + digestStatusDetail;
             }else{
 
-                digestStatus += "НЕ ВЕРНА<br/>";
+                digestStatus += "<font color=\"red\">НЕ ВЕРНА</font><br/><br/>";
                 digestStatus += "<b>Проверка электронной подписи показала:</b> " +
                         getMessageOnSettings(!cmsVerifier.isSignedDataReadable(), prefix + "signedDataReadable",
                                 "Входные данные не являются подписанным сообщением<br/>");
