@@ -13,7 +13,11 @@ import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.dto.KeyValue;
 import ru.sibdigital.addcovid.dto.subs.DocRequestSubsidyDto;
 import ru.sibdigital.addcovid.dto.subs.DocRequestSubsidyPostDto;
-import ru.sibdigital.addcovid.model.*;
+import ru.sibdigital.addcovid.dto.subs.TpRequestSubsidyFileDto;
+import ru.sibdigital.addcovid.model.ActivityStatuses;
+import ru.sibdigital.addcovid.model.ClsFileType;
+import ru.sibdigital.addcovid.model.ClsOrganization;
+import ru.sibdigital.addcovid.model.ClsSettings;
 import ru.sibdigital.addcovid.model.subs.ClsSubsidy;
 import ru.sibdigital.addcovid.model.subs.DocRequestSubsidy;
 import ru.sibdigital.addcovid.model.subs.RegVerificationSignatureFile;
@@ -90,23 +94,23 @@ public class RequestSubsidyController {
                 ActivityStatuses.ACTIVE.getValue(), false).orElse(new ArrayList<>());
         List<DocRequestSubsidyDto> dtos = requestSubsidies.stream()
                 .map(docRequestSubsidy -> DocRequestSubsidyDto.builder()
-                                            .id(docRequestSubsidy.getId())
-                                            .subsidyId((docRequestSubsidy.getSubsidy() != null) ? docRequestSubsidy.getSubsidy().getId() : null)
-                                            .subsidyName((docRequestSubsidy.getSubsidy() != null) ? docRequestSubsidy.getSubsidy().getShortName() : "")
-                                            .departmentName((docRequestSubsidy.getDepartment() != null) ? docRequestSubsidy.getDepartment().getName() : "")
-                                            .subsidyRequestStatusName((docRequestSubsidy.getSubsidyRequestStatus() != null) ? docRequestSubsidy.getSubsidyRequestStatus().getShortName() : "")
-                                            .subsidyRequestStatusCode((docRequestSubsidy.getSubsidyRequestStatus() != null) ? docRequestSubsidy.getSubsidyRequestStatus().getCode() : "")
-                                            .timeCreate(docRequestSubsidy.getTimeCreate())
-                                            .timeUpdate(docRequestSubsidy.getTimeUpdate())
-                                            .timeReview(docRequestSubsidy.getTimeReview())
-                                            .timeSend(docRequestSubsidy.getTimeSend())
-                                            .reqBasis(docRequestSubsidy.getReqBasis())
-                                            .resolutionComment(docRequestSubsidy.getResolutionComment())
-                                            .subsidyName(docRequestSubsidy.getSubsidy().getShortName())
-                                            .districtName((docRequestSubsidy.getDistrict() != null) ? docRequestSubsidy.getDistrict().getName() : "")
-                                            .isDeleted(docRequestSubsidy.getDeleted())
+                        .id(docRequestSubsidy.getId())
+                        .subsidyId((docRequestSubsidy.getSubsidy() != null) ? docRequestSubsidy.getSubsidy().getId() : null)
+                        .subsidyName((docRequestSubsidy.getSubsidy() != null) ? docRequestSubsidy.getSubsidy().getShortName() : "")
+                        .departmentName((docRequestSubsidy.getDepartment() != null) ? docRequestSubsidy.getDepartment().getName() : "")
+                        .subsidyRequestStatusName((docRequestSubsidy.getSubsidyRequestStatus() != null) ? docRequestSubsidy.getSubsidyRequestStatus().getShortName() : "")
+                        .subsidyRequestStatusCode((docRequestSubsidy.getSubsidyRequestStatus() != null) ? docRequestSubsidy.getSubsidyRequestStatus().getCode() : "")
+                        .timeCreate(docRequestSubsidy.getTimeCreate())
+                        .timeUpdate(docRequestSubsidy.getTimeUpdate())
+                        .timeReview(docRequestSubsidy.getTimeReview())
+                        .timeSend(docRequestSubsidy.getTimeSend())
+                        .reqBasis(docRequestSubsidy.getReqBasis())
+                        .resolutionComment(docRequestSubsidy.getResolutionComment())
+                        .subsidyName(docRequestSubsidy.getSubsidy().getShortName())
+                        .districtName((docRequestSubsidy.getDistrict() != null) ? docRequestSubsidy.getDistrict().getName() : "")
+                        .isDeleted(docRequestSubsidy.getDeleted())
 //                                            .statusActivityName(docRequestSubsidy.getStatusActivity().toString())
-                                            .build())
+                        .build())
                 .collect(Collectors.toList());
 
         return dtos;
@@ -121,11 +125,7 @@ public class RequestSubsidyController {
         }
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         List<ClsSubsidy> subsidies = clsSubsidyRepo.getListSubsidyForOrganization(organization.getId(), organization.getIdTypeOrganization());
-        if (subsidies.isEmpty()) {
-            return false;
-        } else {
-            return true;
-        }
+        return !subsidies.isEmpty();
     }
 
     @GetMapping("/no_right_to_apply_request_subsidy_message")
@@ -158,7 +158,8 @@ public class RequestSubsidyController {
     }
 
     @PostMapping("/save_request_subsidy_draft")
-    public @ResponseBody DocRequestSubsidy saveRequestSubsidyDraft(@RequestBody DocRequestSubsidyPostDto postFormDto, HttpSession session) {
+    public @ResponseBody
+    DocRequestSubsidy saveRequestSubsidyDraft(@RequestBody DocRequestSubsidyPostDto postFormDto, HttpSession session) {
         try {
             Long id = (Long) session.getAttribute("id_organization");
             if (id == null) {
@@ -170,12 +171,13 @@ public class RequestSubsidyController {
             DocRequestSubsidy draft = requestSubsidyService.saveDocRequestSubsidyDraft(postFormDto);
             return draft;
         } catch (Exception e) {
-           return null;
+            return null;
         }
     }
 
     @PostMapping("/save_request_subsidy")
-    public @ResponseBody ResponseEntity<String> postNewRequest(@RequestBody DocRequestSubsidyPostDto postFormDto, HttpSession session) {
+    public @ResponseBody
+    ResponseEntity<String> postNewRequest(@RequestBody DocRequestSubsidyPostDto postFormDto, HttpSession session) {
         try {
             Long id = (Long) session.getAttribute("id_organization");
             if (id == null) {
@@ -223,48 +225,49 @@ public class RequestSubsidyController {
 
 
     @GetMapping(value = "/request_subsidy_files")
-    public @ResponseBody List<TpRequestSubsidyFile> uploadRequiredSubsidyFiles(
+    public @ResponseBody
+    List<TpRequestSubsidyFileDto> uploadRequiredSubsidyFiles(
             @RequestParam("doc_request_subsidy_id") Long request_subsidy_id,
             @RequestParam("id_file_type") Long id_file_type) {
         List<TpRequestSubsidyFile> tpRequestSubsidyFiles = requestSubsidyService.findAllRequestSubsidyFilesByRequestAndFileType(request_subsidy_id, id_file_type);
-        return tpRequestSubsidyFiles;
+        List<TpRequestSubsidyFileDto> tpRequestSubsidyFileDtos = new ArrayList<>();
+
+        if (tpRequestSubsidyFiles != null) {
+            for (TpRequestSubsidyFile docFile : tpRequestSubsidyFiles) {
+                TpRequestSubsidyFile signatureFile = tpRequestSubsidyFileRepo.getSignatureFileByDocFileId(docFile.getId()).orElse(null);
+                RegVerificationSignatureFile verificationSignatureFile = null;
+                if(signatureFile != null) {
+                    verificationSignatureFile = regVerificationSignatureFileRepo.findByIdFileAndIdSignature(docFile.getId(),signatureFile.getId()).orElse(null);
+                }
+                TpRequestSubsidyFileDto tpRequestSubsidyFileDto = TpRequestSubsidyFileDto.builder()
+                        .docFile(docFile)
+                        .signatureFile(signatureFile)
+                        .verificationSignatureFile(verificationSignatureFile)
+                        .build();
+                tpRequestSubsidyFileDtos.add(tpRequestSubsidyFileDto);
+            }
+        }
+
+        return tpRequestSubsidyFileDtos;
     }
 
     @PostMapping(value = "/upload_subsidy_files")
     public ResponseEntity<String> uploadRequiredSubsidyFiles(
-            @RequestParam("files") MultipartFile[] files,
-            @RequestParam("id_file_type") Long id_file_type,
-            @RequestParam("id_request") Long idRequest) {
+            @RequestParam("upload") MultipartFile file,
+            @RequestParam(value = "id_file_type", required = false) Long id_file_type,
+            @RequestParam(value = "id_request", required = false) Long idRequest,
+            @RequestParam(value = "id_request_subsidy_file", required = false) Long idRequestSubsidyFile) {
+        TpRequestSubsidyFile tpRequestSubsidyFile = null;
+        ClsFileType clsFileType = clsFileTypeRepo.findById(id_file_type).orElse(null);
+        DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(idRequest).orElse(null);
 
-        if (files.length != 2) {
-            return ResponseEntity.ok()
-                    .body("{\"cause\": \"Ошибка при загрузке\"," +
-                            "\"status\": \"server\"," +
-                            "\"sname\": \"Ожидалось 2 файла\"}");
-        } else {
-            ClsFileType clsFileType = clsFileTypeRepo.findById(id_file_type).orElse(null);
-            DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(idRequest).orElse(null);
-
-            MultipartFile[] sortedFiles = new MultipartFile[2];
-            for (MultipartFile multipartFile : files) {
-                if (!FileUtils.getFileExtension(multipartFile.getOriginalFilename()).equals(".p7s")) {
-                    sortedFiles[0] = multipartFile;
-                } else {
-                    sortedFiles[1] = multipartFile;
-                }
-            }
-            if (sortedFiles[1] == null) {
-                return ResponseEntity.ok()
-                        .body("{\"cause\": \"Ошибка при загрузке подписи\"," +
-                            "\"status\": \"server\"," +
-                            "\"sname\": \"Файл с электронной подписью не найден\"}");
-            }
-            Arrays.stream(sortedFiles).forEach(file -> {
-               saveFile(file, docRequestSubsidy, clsFileType);
-            });
-
-            return ResponseEntity.ok().body("{ \"status\": \"server\", \"sname\": \"Документ успешно загружен\" }");
+        if (idRequestSubsidyFile != null) {
+            tpRequestSubsidyFile = tpRequestSubsidyFileRepo.findById(idRequestSubsidyFile).orElse(null);
         }
+
+        saveFile(file, docRequestSubsidy, clsFileType, tpRequestSubsidyFile);
+
+        return ResponseEntity.ok().body("{ \"status\": \"server\", \"sname\": \"Документ успешно загружен\" }");
     }
 
     @PostMapping(value = "/set_subsidy_file_view_name")
@@ -308,9 +311,10 @@ public class RequestSubsidyController {
     }
 
     @GetMapping(value = "/check_signature_files_verify_progress")
-    public @ResponseBody HashMap<String,Object> checkSignatureFilesVerifyProgress(
+    public @ResponseBody
+    HashMap<String, Object> checkSignatureFilesVerifyProgress(
             @RequestParam("id_request") Long idRequest, HttpSession session) {
-        HashMap<String,Object> result = new HashMap<>();
+        HashMap<String, Object> result = new HashMap<>();
         Long idOrganization = (Long) session.getAttribute("id_organization");
         if (idOrganization == null) {
             return null;
@@ -321,85 +325,89 @@ public class RequestSubsidyController {
                 regVerificationSignatureFileRepo.findByIdRequestAndIdPrincipal(idRequest,
                         organization.getPrincipal()).orElse(null);
 
-        int countVerifySignatures = 0;
-        for(RegVerificationSignatureFile regVerificationSignatureFile : regVerificationSignatureFiles) {
-            if(regVerificationSignatureFile.getVerifyStatus() != 0){
-                countVerifySignatures++;
+        if (regVerificationSignatureFiles == null) {
+            result.put("notFound", "Файлы не найдены");
+        } else {
+            int countVerifySignatures = 0;
+            for (RegVerificationSignatureFile regVerificationSignatureFile : regVerificationSignatureFiles) {
+                if (regVerificationSignatureFile.getVerifyStatus() != 0) {
+                    countVerifySignatures++;
+                }
             }
-        }
 
-        result.put("files", regVerificationSignatureFiles);
-        result.put("verified", countVerifySignatures);
-        result.put("numberOfFiles", regVerificationSignatureFiles.size());
+            result.put("files", regVerificationSignatureFiles);
+            result.put("verified", countVerifySignatures);
+            result.put("numberOfFiles", regVerificationSignatureFiles.size());
+        }
         return result;
     }
 
     @GetMapping(value = "/check_request_subsidy_files_signatures")
-    public ResponseEntity<String> checkRequestSubsidyFilesSignatures(HttpSession session) {
+    public ResponseEntity<String> checkRequestSubsidyFilesSignatures(
+            @RequestParam("id_request") Long idRequest,
+            HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         ClsOrganization clsOrganization = null;
-        if (id != null){
+        if (id != null) {
             clsOrganization = clsOrganizationRepo.findById(id).orElse(null);
         }
         if (id == null || clsOrganization == null) {
             return DataFormatUtils.buildResponse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR),
-                    Map.of("cause", "Не найден id организации","status", "server", "sname", ""));
+                    Map.of("cause", "Не найден id организации", "status", "error", "sname", ""));
         }
-
-        List<TpRequestSubsidyFile> signatureFiles = tpRequestSubsidyFileRepo.getSignatureFiles().orElse(null);
+        List<TpRequestSubsidyFile> signatureFiles = tpRequestSubsidyFileRepo.getSignatureFilesByIdRequest(idRequest).orElse(null);
+        if (signatureFiles == null) {
+            return DataFormatUtils.buildResponse(ResponseEntity.ok(),
+                    Map.of("cause", "Файлы не прикреплены", "status", "error", "sname", ""));
+        }
         List<VerifiedData> verifiedDataList = new ArrayList<>();
-         for(TpRequestSubsidyFile signatureFile : signatureFiles){
-             TpRequestSubsidyFile docFile = tpRequestSubsidyFileRepo.getDocFilesBySignature(signatureFile.getRequestSubsidyFile().getId()).orElse(null);
-             VerifiedData verifiedData = new VerifiedData(
-                     signatureFile.getAttachmentPath(),
-                     docFile.getAttachmentPath(),
-                     docFile.getId(),
-                     signatureFile.getId(),
-                     docFile.getRequestSubsidy().getId()
-             );
-             //if(!verifiedData.isEmptyData()){
-                 RegVerificationSignatureFile regVerificationSignatureFile = RegVerificationSignatureFile.builder()
-                         .requestSubsidy(docFile.getRequestSubsidy())
-                         .requestSubsidyFile(docFile)
-                         .requestSubsidySubsidySignatureFile(signatureFile)
-                         .isDeleted(false)
-                         .timeCreate(new Timestamp(System.currentTimeMillis()))
-                         .verifyStatus(0)
-                         .principal(clsOrganization.getPrincipal())
-                         .build();
+        for (TpRequestSubsidyFile signatureFile : signatureFiles) {
+            TpRequestSubsidyFile docFile = tpRequestSubsidyFileRepo.getDocFilesBySignature(signatureFile.getRequestSubsidyFile().getId()).orElse(null);
+            VerifiedData verifiedData = new VerifiedData(
+                    signatureFile.getAttachmentPath(),
+                    docFile.getAttachmentPath(),
+                    docFile.getId(),
+                    signatureFile.getId(),
+                    docFile.getRequestSubsidy().getId()
+            );
+            //if(!verifiedData.isEmptyData()){
+            RegVerificationSignatureFile regVerificationSignatureFile = RegVerificationSignatureFile.builder()
+                    .requestSubsidy(docFile.getRequestSubsidy())
+                    .requestSubsidyFile(docFile)
+                    .requestSubsidySubsidySignatureFile(signatureFile)
+                    .isDeleted(false)
+                    .timeCreate(new Timestamp(System.currentTimeMillis()))
+                    .verifyStatus(0)
+                    .principal(clsOrganization.getPrincipal())
+                    .build();
                  RegVerificationSignatureFile regVerificationSignatureFileExistFile = regVerificationSignatureFileRepo
                          .findByIdFileAndIdSignature(docFile.getId(),signatureFile.getId()).orElse(null);
                  if(regVerificationSignatureFileExistFile == null){
                     regVerificationSignatureFileRepo.save(regVerificationSignatureFile);
                  }
-                 verifiedDataList.add(verifiedData);
-             //}
-         }
+            verifiedDataList.add(verifiedData);
+            //}
+        }
         customQueueService.enqueueAll(verifiedDataList);
         return DataFormatUtils.buildResponse(ResponseEntity.ok(),
-                Map.of("status", "server","sname", "check"));
+                Map.of("cause","Началась проверка подписей","status", "server", "sname", "check"));
     }
 
     //File writer
-    private TpRequestSubsidyFile saveFile(MultipartFile file, DocRequestSubsidy docRequestSubsidy, ClsFileType clsFileType){
+    private TpRequestSubsidyFile saveFile(MultipartFile file, DocRequestSubsidy docRequestSubsidy, ClsFileType clsFileType, TpRequestSubsidyFile tpRequestSubsidyDocFile) {
         File f = null;
         TpRequestSubsidyFile savedRequestSubsidyFile = null;
         try {
             String name = file.getOriginalFilename();
             String extension = FileUtils.getFileExtension(name);
 
-            TpRequestSubsidyFile parentDocSubsidyFile = null;
             Boolean isSignature = false;
-            if (extension.equals(".p7s")) {
-                Long idLastRequestSubsidyFile = requestSubsidyService.findLastRequestSubsidyFile();
-                parentDocSubsidyFile = tpRequestSubsidyFileRepo.findById(idLastRequestSubsidyFile).orElse(null);
-                isSignature = true;
-            }
+
             String directory = getSavedDirectoryPath(docRequestSubsidy);
             File innIdFolder = getSavingDirectory(directory);
 
             String prefix = String.valueOf(System.currentTimeMillis());
-            if (docRequestSubsidy.getOrganization() != null){
+            if (docRequestSubsidy.getOrganization() != null) {
                 prefix = docRequestSubsidy.getOrganization().getId().toString();
             }
             final String filename = prefix + "_" + UUID.randomUUID() + extension;
@@ -411,7 +419,17 @@ public class RequestSubsidyController {
 
             final long size = Files.size(f.toPath());
             final String fileHash = FileUtils.getFileHash(f);
-
+            if (tpRequestSubsidyDocFile != null) {
+                isSignature = true;
+                TpRequestSubsidyFile tpRequestSubsidySignatureFileExists = tpRequestSubsidyFileRepo.getSignatureFileByDocFileId(tpRequestSubsidyDocFile.getId()).orElse(null);
+                if (tpRequestSubsidySignatureFileExists != null) {
+                    RegVerificationSignatureFile regVerificationSignatureFile = regVerificationSignatureFileRepo.findByIdFileAndIdSignature(tpRequestSubsidyDocFile.getId(), tpRequestSubsidySignatureFileExists.getId()).orElse(null);
+                    if (regVerificationSignatureFile != null) {
+                        regVerificationSignatureFileRepo.delete(regVerificationSignatureFile);
+                    }
+                    tpRequestSubsidyFileRepo.delete(tpRequestSubsidySignatureFileExists);
+                }
+            }
             //view file name ???????????????????????????????????
             TpRequestSubsidyFile tpRequestSubsidyFile = TpRequestSubsidyFile.builder()
                     .fileSize(size)
@@ -428,7 +446,7 @@ public class RequestSubsidyController {
                     .hash(fileHash)
                     .timeCreate(new Timestamp(System.currentTimeMillis()))
                     .isSignature(isSignature)
-                    .requestSubsidyFile(parentDocSubsidyFile)
+                    .requestSubsidyFile(tpRequestSubsidyDocFile)
                     .build();
 
             savedRequestSubsidyFile = tpRequestSubsidyFileRepo.save(tpRequestSubsidyFile);
@@ -438,10 +456,12 @@ public class RequestSubsidyController {
         return savedRequestSubsidyFile;
     }
 
-    private String getSavedDirectoryPath(DocRequestSubsidy docRequestSubsidy){
+
+
+    private String getSavedDirectoryPath(DocRequestSubsidy docRequestSubsidy) {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(docRequestSubsidy.getTimeCreate().getTime());
-        String dir = "subsidy_files"+ File.separator +
+        String dir = "subsidy_files" + File.separator +
                 cal.get(Calendar.YEAR) + File.separator +
                 cal.get(Calendar.MONTH) + File.separator +
                 docRequestSubsidy.getOrganization().getInn() + "_" +
@@ -449,7 +469,7 @@ public class RequestSubsidyController {
         return dir;
     }
 
-    private File getSavingDirectory(String directory){
+    private File getSavingDirectory(String directory) {
         String filepath = uploadingAttachmentDir + File.separator + directory;
         File innIdFolder = new File(filepath);
 

@@ -40,10 +40,6 @@ public class RequestSubsidyServiceImpl implements RequestSubsidyService {
         return tpRequiredSubsidyFileRepo.findAllBySubsidyIdAndIsDeletedFalse(id).orElse(null);
     }
 
-    public Long findLastRequestSubsidyFile() {
-        return tpRequestSubsidyFileRepo.findLastSubsidyFile().orElse(null);
-    }
-
     public List<TpRequestSubsidyFile> findAllRequestSubsidyFilesByRequestAndFileType(Long request_subsidy_id, Long file_type_id) {
         return tpRequestSubsidyFileRepo.findAllRequestSubsidyFilesByRequestAndFileType(request_subsidy_id, file_type_id).orElse(null);
     }

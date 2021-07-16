@@ -467,7 +467,7 @@ const requestSubsidyWizard = {
                                         {
                                             view: 'button',
                                             css: 'webix_primary',
-                                            maxWidth: 200,
+                                            maxWidth: 301,
                                             value: 'Продолжить',
                                             click: function () {
                                                 let valid = checkRequiredFiles();
