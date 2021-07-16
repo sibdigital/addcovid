@@ -33,6 +33,7 @@ const request_subsidy_list = {
                             header: "Мера поддержки",
                             tooltip: false,
                             minWidth: 300,
+                            adjust: true,
                             fillspace: true,
                         },
                         {
@@ -47,7 +48,8 @@ const request_subsidy_list = {
                             header: "Рассматривает",
                             template: "#departmentName#",
                             tooltip: false,
-                            width: 150
+                            minWidth: 150,
+                            adjust: true,
                         },
                         {
                             id: "time_Create",
@@ -126,6 +128,7 @@ const request_subsidy_list = {
                         },
                         "mdi-pencil-plus-outline": function (ev, id, html) {
                             let item = this.getItem(id);
+                            showBtnBack(request_subsidy_list, 'request_subsidy_table');
                             setTimeout(function () {
                                 showRequestSubsidyCreateForm(item);
                             }, 100);
@@ -160,11 +163,28 @@ const request_subsidy_list = {
                             view: 'button',
                             align: 'right',
                             minWidth: 220,
-                            maxWidth: 350,
+                            maxWidth: 200,
                             css: 'webix_primary',
                             value: 'Подать заявку',
                             click: function () {
-                                showRequestSubsidyCreateForm();
+                                const availableSubsidies = findAvailableSubsidies();
+                                showBtnBack(request_subsidy_list, 'request_subsidy_table');
+                                if (availableSubsidies.length > 0) {
+                                    webix.ui({
+                                        id: 'content',
+                                        rows: [
+                                            available_subsidy_list
+                                        ]
+                                    }, $$('content'));
+                                    $$('availableSubsidyListId').parse(availableSubsidies);
+                                } else {
+                                    webix.ui({
+                                        id: 'content',
+                                        rows: [
+                                            noAvailableSubsidiesForm
+                                        ]
+                                    }, $$('content'))
+                                }
                             }
                         }
                     ]
@@ -262,10 +282,16 @@ function showRequestSubsidyViewForm(data) {
                             hidden: true,
                             height: 100
                         },
+                        view_section('Прикрепленные файлы'),
+                        {
+                            id: 'filesListViewByType'
+                        }
                     ]
                 }
         ]
     }, $$('content'));
+
+    getFilesListByTypeView(data.id);
 
     if (data.subsidyRequestStatusCode !== 'NEW' && data.subsidyRequestStatusCode !== 'SUBMIT') {
         $$('resolutionComment').show();

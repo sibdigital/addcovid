@@ -404,3 +404,7 @@ body {
 .custom-btn-border {
     border-radius: 13px !important;
 }
+
+.hover_font_bold:hover {
+    font-weight: bolder;
+}

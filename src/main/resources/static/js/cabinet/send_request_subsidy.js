@@ -1,40 +1,164 @@
-function showRequestSubsidyCreateForm(data) {
-    const availableSubsidies = findAvailableSubsidies();
-    showBtnBack(request_subsidy_list, 'request_subsidy_table');
-    if (availableSubsidies.length > 0) {
-        webix.ui({
-            id: 'content',
-            rows: [
-                requestSubsidyWizard
-            ]
-        }, $$('content'));
-
-        if (data != null) {
-            $$('requestSubsidyId').setValue(data.id);
-            let availableSubsidiesIds = availableSubsidies.map(a => a.id);
-
-            if (availableSubsidiesIds.includes(data.subsidyId)) {
-                $$('subsidyId').setValue(data.subsidyId);
-                $$('subsidyName').setValue(data.subsidyName);
+const available_subsidy_list = {
+    rows: [
+        {
+            view: 'label',
+            label: "Выберите меру поддержки",
+        },
+        {
+            view: "list",
+            id: "availableSubsidyListId",
+            template: "<div class='hover_font_bold'>#shortName#</div>",
+            select: true,
+            autowidth: true,
+            autoheight: true,
+            on: {
+                onItemClick: function (id) {
+                    let item = $$('availableSubsidyListId').getItem(id);
+                    showRequestSubsidyCreateForm();
+                    $$('subsidyId').setValue(item.id);
+                    $$('subsidyNameId').setValue(item.shortName);
+                    $$('subsidyName').setValue(item.shortName);
+                }
             }
-
-            $$('reqBasis').setValue(data.reqBasis);
-            $$('reqBasisFinal').setValue(data.reqBasis);
         }
+    ]
+}
 
-    } else {
-        webix.ui({
-            id: 'content',
-            rows: [
-                noAvailableSubsidiesForm
-            ]
-        }, $$('content'))
+function showRequestSubsidyCreateForm(data) {
+    webix.ui({
+        id: 'content',
+        rows: [
+            requestSubsidyWizard
+        ]
+    }, $$('content'));
+
+    if (data != null) {
+        $$('requestSubsidyId').setValue(data.id);
+        // let availableSubsidiesIds = availableSubsidies.map(a => a.id);
+
+        // if (availableSubsidiesIds.includes(data.subsidyId)) {
+            $$('subsidyId').setValue(data.subsidyId);
+            $$('subsidyNameId').setValue(data.subsidyName);
+            $$('subsidyName').setValue(data.subsidyName);
+        // }
+
+        $$('reqBasis').setValue(data.reqBasis);
+        $$('reqBasisFinal').setValue(data.reqBasis);
+        createDataView(data.id);
     }
 }
 
 function findAvailableSubsidies() {
     const xhr = webix.ajax().sync().get('available_subsidies');
     return JSON.parse(xhr.responseText);
+}
+
+function getFilesListByTypeView(docRequestSubsidyId) {
+    webix.ajax(`request_subsidy_files_verification/${ docRequestSubsidyId }`).then(function (filesVerification) {
+        filesVerification = filesVerification.json();
+
+        filesVerification.map((file) => {
+            switch (file.verify_status) {
+                case 1: file.verify_status = "проверка прошла успешно"; break;
+                case 2: file.verify_status = "подпись не соответствует файлу"; break;
+                case 3: file.verify_status = "в сертификате или цепочке сертификатов есть ошибки"; break;
+                case 4: file.verify_status = "в подписи есть ошибки"; break;
+                default: file.verify_status = "проверка не проводилась"; break;
+            }
+            return file;
+        });
+
+        webix.ajax(`request_subsidy_files/${docRequestSubsidyId}`).then(function (data) {
+            const views = [];
+            data = data.json();
+            console.dir({ data, filesVerification });
+            if (data.length > 0) {
+                const filesTypes = {};
+                const byFileType = data.reduce(function (result, file) {
+                    const fileVerificationStatus = filesVerification.find((fileVerification) => fileVerification.id_request_subsidy_file === file.id);
+                    result[file.fileType.id] = result[file.fileType.id] || [];
+                    result[file.fileType.id].push({ ...file, verificationStatus: fileVerificationStatus ?? { verify_status: 'отсутствует подпись / проверка не проводилась' } });
+
+                    filesTypes[file.fileType.id] = file.fileType.name;
+
+                    return result;
+                }, Object.create(null));
+
+                // console.dir({ byFileType });
+
+                for (const [key, filesArray] of Object.entries(byFileType)) {
+                    // console.dir({ filesArray });
+                    views.push({
+                        rows: [
+                            view_section(filesTypes[key]),
+                            {
+                                id: `request_subsidy_files_table/${key}`,
+                                view: 'datatable',
+                                pager: `Pager/${key}`,
+                                autoheight: true,
+                                header: `id = ${key}`,
+                                select: 'row',
+                                resizeColumn: true,
+                                readonly: true,
+                                data: filesArray,
+                                columns: [
+                                    {
+                                        id: 'viewFileName',
+                                        header: 'Название файла',
+                                        adjust: true,
+                                        fillspace: true,
+                                        sort: 'string',
+                                    },
+                                    {
+                                        id: 'signature',
+                                        template: function (request) {
+                                            let label = '';
+                                            let style = '';
+
+                                            if (request.signature) {
+                                                label = 'Подпись загружена';
+                                                style = 'color: green';
+                                            } else {
+                                                label = 'Подпись не загружена';
+                                                style = 'color: red';
+                                            }
+
+                                            return `<div style="${style}" role="gridcell" aria-rowindex="1" aria-colindex="1" aria-selected="true" tabindex="0" class="webix_cell webix_row_select">${label}</div>`;
+                                        },
+                                        header: 'Подпись',
+                                        adjust: true,
+                                        fillspace: true,
+                                        sort: 'string',
+                                    },
+                                    {
+                                        id: 'verificationStatus',
+                                        header: 'Статус проверки подписи',
+                                        adjust: true,
+                                        sort: 'string',
+                                        template: '#verificationStatus.verify_status#',
+                                    },
+                                ],
+                            },
+                            {
+                                view: 'pager',
+                                id: `Pager/${key}`,
+                                height: 38,
+                                size: 25,
+                                group: 5,
+                                template: '{common.first()}{common.prev()}{common.pages()}{common.next()}{common.last()}'
+                            },
+                        ]
+                    })
+                }
+
+                webix.ui({
+                    id: 'filesListViewByType',
+                    rows: views,
+                }, $$('filesListViewByType'));
+            }
+
+        })
+    });
 }
 
 const noAvailableSubsidiesForm = {
@@ -45,7 +169,7 @@ const noAvailableSubsidiesForm = {
             rows: [
                 {
                     view: 'template',
-                    template: "Заявки по всем доступным мерам поддержки поданы, вы не можете подать новую заявку.",
+                    template: "Заявки по всем доступным мерам поддержки созданы, вы не можете создать новую заявку.",
                     autoheight: true,
                     borderless: true,
                 },
@@ -60,20 +184,26 @@ const requestSubsidyStep1 = {
     id: 'request_subsidy_step1',
     complexData: true,
     elements: [
+        // {
+        //     view: 'richselect',
+        //     id: 'subsidyId',
+        //     label: 'Мера поддержки',
+        //     labelPosition: 'top',
+        //     required: true,
+        //     invalidMessage: 'Поле не может быть пустым',
+        //     options: 'available_subsidies',
+        //     on: {
+        //         onChange: function () {
+        //             var textValue = $$('subsidyId').data.text;
+        //             $$('subsidyName').setValue(textValue);
+        //         }
+        //     }
+        // },
         {
-            view: 'richselect',
-            id: 'subsidyId',
-            label: 'Мера поддержки',
-            labelPosition: 'top',
-            required: true,
-            invalidMessage: 'Поле не может быть пустым',
-            options: 'available_subsidies',
-            on: {
-                onChange: function () {
-                    var textValue = $$('subsidyId').data.text;
-                    $$('subsidyName').setValue(textValue);
-                }
-            }
+          view: 'text',  id: 'subsidyId',  label: 'Мера поддержки', labelPosition: 'top', hidden: true,
+        },
+        {
+            view: 'text',  id: 'subsidyNameId',  label: 'Мера поддержки', labelPosition: 'top', readonly: true,
         },
         {
             view: 'textarea',
@@ -228,7 +358,9 @@ const requestSubsidyStep3 = {
             readonly: true,
         },
         view_section('Прикрепленные файлы'),
-        {}
+        {
+            id: 'filesListViewByType'
+        }
     ]
 }
 
@@ -261,9 +393,9 @@ const requestSubsidyWizard = {
                                         {},
                                         {
                                             view: 'button',
-                                            css: 'webix_primary',
+                                            css: 'webix_secondary',
                                             value: 'Отменить',
-                                            maxWidth: 301,
+                                            maxWidth: 200,
                                             click: function () {
                                                 $$('menu').callEvent('onMenuItemClick', ['RequestSubsidy']);
                                             }
@@ -271,12 +403,13 @@ const requestSubsidyWizard = {
                                         {
                                             view: 'button',
                                             css: 'webix_primary',
-                                            maxWidth: 301,
+                                            maxWidth: 200,
                                             value: 'Продолжить',
                                             click: function () {
                                                 if (($$('request_subsidy_step1').validate() === false || $$('subsidyId').validate() === false)) {
                                                     webix.message('Выберите меру поддержки', 'error');
                                                 } else {
+                                                    if ($$('requestSubsidyId').getValue() == '') {
                                                         let params = {
                                                             subsidyId: $$('subsidyId').getValue(),
                                                             reqBasis: $$('reqBasis').getValue(),
@@ -293,9 +426,22 @@ const requestSubsidyWizard = {
                                                                 webix.message('Не удалось сохранить черновик', 'error');
                                                             }
                                                         )
+                                                    } else {
+                                                        nextRS(1);
+                                                    }
                                                 }
                                             }
-                                        }
+                                        },
+                                        {
+                                            id: 'save_btn1',
+                                            view: 'button',
+                                            css: 'webix_primary',
+                                            maxWidth: 200,
+                                            value: 'Сохранить заявку',
+                                            click: function () {
+                                                saveRequestSubsidy("NEW");
+                                            }
+                                        },
                                     ]
                                 }
                             ]
@@ -309,30 +455,40 @@ const requestSubsidyWizard = {
                                         {},
                                         {
                                             view: 'button',
-                                            css: 'webix_primary',
-                                            maxWidth: 301,
+                                            css: 'webix_secondary',
+                                            maxWidth: 200,
                                             value: 'Назад',
-                                            click: () => {
-                                                removeChildDataviews();
-                                                backRS();
-                                            }
+                                            click: backRS
                                         },
                                         {
                                             view: 'button',
-                                            id: 'step2_continue_btn',
                                             css: 'webix_primary',
-                                            maxWidth: 301,
-                                            disabled: true,
+                                            maxWidth: 200,
                                             value: 'Продолжить',
                                             click: function () {
                                                 let valid = checkRequiredFiles();
                                                 if (valid) {
-                                                    nextRS(2);
+                                                    if (checkVerificationFiles()) {
+                                                        nextRS(2);
+                                                        getFilesListByTypeView($$('requestSubsidyId').getValue());
+                                                    } else {
+                                                        webix.message("Не все подписи файлов прошли проверку", "error", 10000);
+                                                    }
                                                 } else {
-                                                    webix.message("Отсутсвуют обязательные файлы", "error", 10000);
+                                                    webix.message("Отсутствуют обязательные файлы", "error", 10000);
                                                 }
                                             }
-                                        }
+                                        },
+                                        {
+                                            id: 'save_btn2',
+                                            view: 'button',
+                                            css: 'webix_primary',
+                                            maxWidth: 200,
+                                            value: 'Сохранить заявку',
+                                            click: function () {
+                                                saveRequestSubsidy("NEW");
+                                            }
+                                        },
                                     ]
                                 }
                             ]
@@ -346,16 +502,16 @@ const requestSubsidyWizard = {
                                         {},
                                         {
                                             view: 'button',
-                                            css: 'webix_primary',
-                                            maxWidth: 301,
+                                            css: 'webix_secondary',
+                                            maxWidth: 200,
                                             value: 'Назад',
                                             click: backRS
                                         },
                                         {
-                                            id: 'save_btn',
+                                            id: 'save_btn3',
                                             view: 'button',
                                             css: 'webix_primary',
-                                            minWidth: 150,
+                                            maxWidth: 200,
                                             value: 'Сохранить заявку',
                                             click: function () {
                                                 saveRequestSubsidy("NEW");
@@ -365,7 +521,7 @@ const requestSubsidyWizard = {
                                             id: 'send_btn',
                                             view: 'button',
                                             css: 'webix_primary',
-                                            minWidth: 150,
+                                            maxWidth: 200,
                                             value: 'Подать заявку',
                                             click: function () {
                                                 saveRequestSubsidy("SUBMIT");
@@ -396,6 +552,9 @@ function saveRequestSubsidy(statusCode) {
             var response = JSON.parse(data.text());
             if (response.sname == "success") {
                 webix.message({text: response.cause, type: 'success'});
+                if ($$('btnBackMainId')) {
+                    $$('btnBackMainId').hide();
+                }
                 webix.ui({
                     id: 'content',
                     rows: [
@@ -406,6 +565,23 @@ function saveRequestSubsidy(statusCode) {
                 webix.message({text: response.cause, type: 'error'});
             }
         })
+}
+
+function saveDraft() {
+    let params = {
+        subsidyId: $$('subsidyId').getValue(),
+        reqBasis: $$('reqBasis').getValue(),
+    }
+    webix.ajax()
+        .headers({'Content-type': 'application/json'})
+        .post('save_request_subsidy_draft', JSON.stringify(params)).then(function (data) {
+        data = data.json();
+        $$('requestSubsidyId').setValue(data.id);
+    }).catch(function () {
+            webix.message('Не удалось сохранить черновик', 'error');
+        }
+    )
+
 }
 
 function multiviewSubsidyHeader(title, previous, nextNumber) {
@@ -420,10 +596,6 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                 icon: 'mdi mdi-arrow-left',
                 tooltip: 'Назад',
                 click: () => {
-                    console.log(nextNumber)
-                    if (nextNumber === 2) {
-                        removeChildDataviews();
-                    }
                     previous()
                 }
             },
@@ -436,7 +608,7 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                 click: () => {
                     if (nextNumber === 1 && ($$('request_subsidy_step1').validate() === false || $$('subsidyId').validate() === false)) {
                         webix.message('Выберите меру поддержки', 'error');
-                    } else if (nextNumber === 1) {
+                    } else if (nextNumber === 1 && $$('requestSubsidyId').getValue() == '') {
                         let params = {
                             subsidyId: $$('subsidyId').getValue(),
                             reqBasis: $$('reqBasis').getValue(),
@@ -461,11 +633,26 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                     }  else if (nextNumber === 2) {
                         let valid = checkRequiredFiles();
                         if (valid) {
-                            nextRS(nextNumber);
+                            if (checkVerificationFiles()) {
+                                nextRS(nextNumber);
+                                getFilesListByTypeView($$('requestSubsidyId').getValue());
+                            } else {
+                                webix.message("Не все подписи файлов прошли проверку", "error", 10000);
+                            }
                         } else {
-                            webix.message("Отсутсвуют обязательные файлы", "error", 10000);
+                            webix.message("Отсутствуют обязательные файлы", "error", 10000);
                         }
                     }
+                }
+            },
+            {
+                view: 'button',
+                type: 'icon',
+                width: 40,
+                icon: 'mdi mdi-content-save',
+                tooltip: 'Сохранить',
+                click: () => {
+                    saveRequestSubsidy("NEW")
                 }
             },
             {type: 'header', template: title, borderless: true},

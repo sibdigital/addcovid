@@ -53,16 +53,19 @@ public class RequestSubsidyServiceImpl implements RequestSubsidyService {
         ClsOrganization organization = clsOrganizationRepo.findById(postFormDto.getOrganizationId()).orElse(null);
         ClsSubsidy subsidy = clsSubsidyRepo.findById(postFormDto.getSubsidyId()).orElse(null);
         ClsSubsidyRequestStatus subsidyRequestStatus = clsSubsidyRequestStatusRepo.findByCode(postFormDto.getSubsidyRequestStatusCode());
-        DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(postFormDto.getId()).orElse(null);
+        DocRequestSubsidy docRequestSubsidy = null;
 
         if (postFormDto.getId() != null) {
-            docRequestSubsidy.setDepartment(subsidy.getDepartment());
-            docRequestSubsidy.setSubsidyRequestStatus(subsidyRequestStatus);
-            docRequestSubsidy.setTimeUpdate(new Timestamp(System.currentTimeMillis()));
-            docRequestSubsidy.setReqBasis(postFormDto.getReqBasis());
-            docRequestSubsidy.setSubsidy(subsidy);
-            docRequestSubsidy.setStatusActivity(ActivityStatuses.ACTIVE.getValue());
-            docRequestSubsidy.setDeleted(false);
+            docRequestSubsidy = docRequestSubsidyRepo.findById(postFormDto.getId()).orElse(null);
+            if (docRequestSubsidy != null) {
+                docRequestSubsidy.setDepartment(subsidy.getDepartment());
+                docRequestSubsidy.setSubsidyRequestStatus(subsidyRequestStatus);
+                docRequestSubsidy.setTimeUpdate(new Timestamp(System.currentTimeMillis()));
+                docRequestSubsidy.setReqBasis(postFormDto.getReqBasis());
+                docRequestSubsidy.setSubsidy(subsidy);
+                docRequestSubsidy.setStatusActivity(ActivityStatuses.ACTIVE.getValue());
+                docRequestSubsidy.setDeleted(false);
+            }
         } else  {
             docRequestSubsidy = DocRequestSubsidy.builder()
                     .organization(organization)

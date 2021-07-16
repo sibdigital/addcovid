@@ -9,14 +9,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.sibdigital.addcovid.cms.VerifiedData;
+import ru.sibdigital.addcovid.config.ApplicationConstants;
 import ru.sibdigital.addcovid.dto.KeyValue;
 import ru.sibdigital.addcovid.dto.subs.DocRequestSubsidyDto;
 import ru.sibdigital.addcovid.dto.subs.DocRequestSubsidyPostDto;
 import ru.sibdigital.addcovid.dto.subs.TpRequestSubsidyFileDto;
-import ru.sibdigital.addcovid.model.ActivityStatuses;
-import ru.sibdigital.addcovid.model.ClsFileType;
-import ru.sibdigital.addcovid.model.ClsOrganization;
-import ru.sibdigital.addcovid.model.ClsSettings;
+import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.model.subs.ClsSubsidy;
 import ru.sibdigital.addcovid.model.subs.DocRequestSubsidy;
 import ru.sibdigital.addcovid.model.subs.RegVerificationSignatureFile;
@@ -28,6 +26,7 @@ import ru.sibdigital.addcovid.repository.subs.ClsSubsidyRepo;
 import ru.sibdigital.addcovid.repository.subs.DocRequestSubsidyRepo;
 import ru.sibdigital.addcovid.repository.subs.RegVerificationSignatureFileRepo;
 import ru.sibdigital.addcovid.repository.subs.TpRequestSubsidyFileRepo;
+import ru.sibdigital.addcovid.service.EmailService;
 import ru.sibdigital.addcovid.service.queue.CustomQueueService;
 import ru.sibdigital.addcovid.service.subs.RequestSubsidyService;
 import ru.sibdigital.addcovid.utils.DataFormatUtils;
@@ -58,16 +57,27 @@ public class RequestSubsidyController {
 
     @Autowired
     ClsSettingsRepo clsSettingsRepo;
-    @Value("${upload.path:/uploads}")
-    String uploadingAttachmentDir;
+
     @Autowired
     private ClsFileTypeRepo clsFileTypeRepo;
+
     @Autowired
     private TpRequestSubsidyFileRepo tpRequestSubsidyFileRepo;
+
     @Autowired
     private RegVerificationSignatureFileRepo regVerificationSignatureFileRepo;
+
     @Autowired
     private CustomQueueService customQueueService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private ApplicationConstants applicationConstants;
+
+    @Value("${upload.path:/uploads}")
+    String uploadingAttachmentDir;
 
     @GetMapping("/org_request_subsidies")
     public @ResponseBody
@@ -129,7 +139,7 @@ public class RequestSubsidyController {
 
     @GetMapping("/available_subsidies")
     public @ResponseBody
-    List<KeyValue> getAvailableSubsidies(HttpSession session) {
+    List<ClsSubsidy> getAvailableSubsidies(HttpSession session) {
         Long id = (Long) session.getAttribute("id_organization");
         if (id == null) {
             return null;
@@ -137,10 +147,11 @@ public class RequestSubsidyController {
         ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
         List<ClsSubsidy> subsidies = clsSubsidyRepo.getAvailableSubsidiesForOrganization(organization.getId(), organization.getIdTypeOrganization());
 
-        List<KeyValue> list = subsidies.stream()
-                .map(ctr -> new KeyValue(ctr.getClass().getSimpleName(), ctr.getId(), ctr.getShortName()))
-                .collect(Collectors.toList());
-        return list;
+//        List<KeyValue> list = subsidies.stream()
+//                .map(ctr -> new KeyValue(ctr.getClass().getSimpleName(), ctr.getId(), ctr.getShortName()))
+//                .collect(Collectors.toList());
+//        return list;
+        return subsidies;
     }
 
     @PostMapping("/save_request_subsidy_draft")
@@ -167,27 +178,40 @@ public class RequestSubsidyController {
         try {
             Long id = (Long) session.getAttribute("id_organization");
             if (id == null) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body("{\"cause\": \"Не найден id организации\"," +
-                                "\"status\": \"server\"," +
-                                "\"sname\": \"" + "" + "\"}");
+                return DataFormatUtils.buildInternalServerErrorResponse(Map.of(
+                        "status", "server", "sname", "error", "cause", "Не найден id организации"));
+//                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                        .body("{\"cause\": \"Не найден id организации\"," +
+//                                "\"status\": \"server\"," +
+//                                "\"sname\": \"" + "" + "\"}");
             }
 
             postFormDto.setOrganizationId(id);
+            ClsOrganization clsOrganization = clsOrganizationRepo.findById(id).orElse(null);
 
 //            String errors = validateNewRequestSubsidy(postFormDto);
 //            if (errors.isEmpty()) {
             requestSubsidyService.saveNewDocRequestSubsidy(postFormDto);
             if (postFormDto.getSubsidyRequestStatusCode().equals("SUBMIT")) {
-                return ResponseEntity.ok()
-                        .body("{\"cause\": \"Заявка принята. Ожидайте ответ на электронную почту.\"," +
-                                "\"status\": \"server\"," +
-                                "\"sname\": \"" + "success" + "\"}");
+                if (clsOrganization != null && clsOrganization.getEmail() != null) {
+                    ClsSettings clsSettings = clsSettingsRepo.getActualByKey("submit_request_subsidy_message").orElse(null);
+                    if (clsSettings != null && clsSettings.getStringValue() != null && !clsSettings.getStringValue().equals("")) {
+                        emailService.sendSimpleMessage(clsOrganization.getEmail(), applicationConstants.getApplicationName(), clsSettings.getStringValue());
+                    }
+                }
+                return DataFormatUtils.buildOkResponse(Map.of(
+                        "status", "server", "sname", "success", "cause", "Заявка принята. Ожидайте ответ на электронную почту"));
+//                return ResponseEntity.ok()
+//                        .body("{\"cause\": \"Заявка принята. Ожидайте ответ на электронную почту.\"," +
+//                                "\"status\": \"server\"," +
+//                                "\"sname\": \"" + "success" + "\"}");
             } else {
-                return ResponseEntity.ok()
-                        .body("{\"cause\": \"Заявка сохранена.\"," +
-                                "\"status\": \"server\"," +
-                                "\"sname\": \"" + "success" + "\"}");
+                return DataFormatUtils.buildOkResponse(Map.of(
+                        "status", "server", "sname", "success", "cause", "Заявка сохранена"));
+//                return ResponseEntity.ok()
+//                        .body("{\"cause\": \"Заявка сохранена.\"," +
+//                                "\"status\": \"server\"," +
+//                                "\"sname\": \"" + "success" + "\"}");
             }
 
 //            } else {
@@ -195,10 +219,12 @@ public class RequestSubsidyController {
 //            }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("{\"cause\": \"Невозможно подать заявку\"," +
-                            "\"status\": \"server\"," +
-                            "\"sname\": \"" + "error" + "\"}");
+            return DataFormatUtils.buildInternalServerErrorResponse(Map.of(
+                    "status", "server", "sname", "error", "cause", "Невозможно подать заявку"));
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("{\"cause\": \"Невозможно подать заявку\"," +
+//                            "\"status\": \"server\"," +
+//                            "\"sname\": \"" + "error" + "\"}");
         }
     }
 
@@ -246,7 +272,8 @@ public class RequestSubsidyController {
 
         saveFile(file, docRequestSubsidy, clsFileType, tpRequestSubsidyFile);
 
-        return ResponseEntity.ok().body("{ \"status\": \"server\", \"sname\": \"Документ успешно загружен\" }");
+        return DataFormatUtils.buildOkResponse(Map.of("status", "server", "sname", "Документ успешно загружен"));
+        //return ResponseEntity.ok().body("{ \"status\": \"server\", \"sname\": \"Документ успешно загружен\" }");
     }
 
     @PostMapping(value = "/set_subsidy_file_view_name")
@@ -256,9 +283,10 @@ public class RequestSubsidyController {
         TpRequestSubsidyFile tpRequestSubsidyFile = tpRequestSubsidyFileRepo.findById(id).orElse(null);
         tpRequestSubsidyFile.setViewFileName(viewName);
         tpRequestSubsidyFileRepo.save(tpRequestSubsidyFile);
-        return ResponseEntity.ok()
-                .body("{\"status\": \"server\"," +
-                        "\"sname\": \"" + tpRequestSubsidyFile + "\"}");
+        return DataFormatUtils.buildOkResponse(Map.of("status", "server", "sname", tpRequestSubsidyFile));
+//        return ResponseEntity.ok()
+//                .body("{\"status\": \"server\"," +
+//                        "\"sname\": \"" + tpRequestSubsidyFile + "\"}");
     }
 
     @PostMapping(value = "/del_request_subsidy_file")
@@ -266,25 +294,32 @@ public class RequestSubsidyController {
             @RequestParam("id_subsidy_file") Long id) {
         TpRequestSubsidyFile tpRequestSubsidyFile = tpRequestSubsidyFileRepo.findById(id).orElse(null);
         TpRequestSubsidyFile tpRequestSubsidyFileSignature = requestSubsidyService.findSignatureFile(tpRequestSubsidyFile.getId());
-        RegVerificationSignatureFile regVerificationSignatureFile = null;
+//        tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFileSignature);
+//        tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFile);
+        if (tpRequestSubsidyFile != null) {
+            tpRequestSubsidyFile.setDeleted(true);
+            tpRequestSubsidyFileRepo.save(tpRequestSubsidyFile);
+        }
         if (tpRequestSubsidyFileSignature != null) {
-            regVerificationSignatureFile = regVerificationSignatureFileRepo.findByIdFileAndIdSignature(tpRequestSubsidyFile.getId(), tpRequestSubsidyFileSignature.getId()).orElse(null);
+            tpRequestSubsidyFileSignature.setDeleted(true);
+            tpRequestSubsidyFileRepo.save(tpRequestSubsidyFileSignature);
         }
-        if (regVerificationSignatureFile != null) {
-            regVerificationSignatureFileRepo.delete(regVerificationSignatureFile);
+        if (tpRequestSubsidyFile != null && tpRequestSubsidyFileSignature != null) {
+            RegVerificationSignatureFile rvsf = regVerificationSignatureFileRepo.findByIdFileAndIdSignature(tpRequestSubsidyFile.getId(), tpRequestSubsidyFileSignature.getId()).orElse(null);
+            if (rvsf != null) {
+                rvsf.setIsDeleted(true);
+                regVerificationSignatureFileRepo.save(rvsf);
+            }
         }
-        if (tpRequestSubsidyFileSignature != null) {
-            tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFileSignature);
-        }
-        tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFile);
-        return ResponseEntity.ok()
-                .body("{\"status\": \"server\"," +
-                        "\"sname\": \"" + tpRequestSubsidyFile + "\"}");
+
+        return DataFormatUtils.buildOkResponse(Map.of("status", "server", "sname", tpRequestSubsidyFile));
+//                ResponseEntity.ok()
+//                .body("{\"status\": \"server\"," +
+//                        "\"sname\": \"" + tpRequestSubsidyFile + "\"}");
     }
 
     @GetMapping(value = "/check_signature_files_verify_progress")
-    public @ResponseBody
-    HashMap<String, Object> checkSignatureFilesVerifyProgress(
+    public @ResponseBody HashMap<String, Object> checkSignatureFilesVerifyProgress(
             @RequestParam("id_request") Long idRequest, HttpSession session) {
         HashMap<String, Object> result = new HashMap<>();
         Long idOrganization = (Long) session.getAttribute("id_organization");
@@ -324,7 +359,7 @@ public class RequestSubsidyController {
             clsOrganization = clsOrganizationRepo.findById(id).orElse(null);
         }
         if (id == null || clsOrganization == null) {
-            return DataFormatUtils.buildResponse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR),
+            return DataFormatUtils.buildInternalServerErrorResponse(
                     Map.of("cause", "Не найден id организации", "status", "error", "sname", ""));
         }
         List<TpRequestSubsidyFile> signatureFiles = tpRequestSubsidyFileRepo.getSignatureFilesByIdRequest(idRequest).orElse(null);
@@ -335,14 +370,46 @@ public class RequestSubsidyController {
         List<VerifiedData> verifiedDataList = new ArrayList<>();
         for (TpRequestSubsidyFile signatureFile : signatureFiles) {
             TpRequestSubsidyFile docFile = tpRequestSubsidyFileRepo.getDocFilesBySignature(signatureFile.getRequestSubsidyFile().getId()).orElse(null);
+
+            final RegVerificationSignatureFile rvsf = constructVerificationSignatureFile(signatureFile, docFile, clsOrganization);
+            regVerificationSignatureFileRepo.save(rvsf);
+
             VerifiedData verifiedData = new VerifiedData(
                     signatureFile.getAttachmentPath(),
                     docFile.getAttachmentPath(),
                     docFile.getId(),
                     signatureFile.getId(),
-                    docFile.getRequestSubsidy().getId()
+                    rvsf.getId()
             );
-            //if(!verifiedData.isEmptyData()){
+            verifiedDataList.add(verifiedData);
+//            //if(!verifiedData.isEmptyData()){
+//            RegVerificationSignatureFile regVerificationSignatureFile = RegVerificationSignatureFile.builder()
+//                    .requestSubsidy(docFile.getRequestSubsidy())
+//                    .requestSubsidyFile(docFile)
+//                    .requestSubsidySubsidySignatureFile(signatureFile)
+//                    .isDeleted(false)
+//                    .timeCreate(new Timestamp(System.currentTimeMillis()))
+//                    .verifyStatus(0)
+//                    .principal(clsOrganization.getPrincipal())
+//                    .build();
+//                 RegVerificationSignatureFile regVerificationSignatureFileExistFile = regVerificationSignatureFileRepo
+//                         .findByIdFileAndIdSignature(docFile.getId(),signatureFile.getId()).orElse(null);
+//                 if(regVerificationSignatureFileExistFile == null){
+//                    regVerificationSignatureFileRepo.save(regVerificationSignatureFile);
+//                 }
+//            verifiedDataList.add(verifiedData);
+//            //}
+        }
+        customQueueService.enqueueAll(verifiedDataList);
+        return DataFormatUtils.buildOkResponse(
+                Map.of("cause","Началась проверка подписей","status", "server", "sname", "check"));
+    }
+
+    private RegVerificationSignatureFile constructVerificationSignatureFile(TpRequestSubsidyFile signatureFile,
+            TpRequestSubsidyFile docFile, ClsOrganization clsOrganization){
+        List<RegVerificationSignatureFile> previsious =
+                regVerificationSignatureFileRepo.findByPrevisiousVerification(clsOrganization.getPrincipal(), signatureFile.getRequestSubsidy(), signatureFile, docFile);
+        if(previsious.isEmpty()){
             RegVerificationSignatureFile regVerificationSignatureFile = RegVerificationSignatureFile.builder()
                     .requestSubsidy(docFile.getRequestSubsidy())
                     .requestSubsidyFile(docFile)
@@ -352,17 +419,15 @@ public class RequestSubsidyController {
                     .verifyStatus(0)
                     .principal(clsOrganization.getPrincipal())
                     .build();
-                 RegVerificationSignatureFile regVerificationSignatureFileExistFile = regVerificationSignatureFileRepo
-                         .findByIdFileAndIdSignature(docFile.getId(),signatureFile.getId()).orElse(null);
-                 if(regVerificationSignatureFileExistFile == null){
-                    regVerificationSignatureFileRepo.save(regVerificationSignatureFile);
-                 }
-            verifiedDataList.add(verifiedData);
-            //}
+            previsious.add(regVerificationSignatureFile);
+        }else{
+            previsious.stream().forEach(p -> {
+                p.setTimeCreate(new Timestamp(System.currentTimeMillis()));
+                p.setVerifyStatus(0);
+                p.setVerifyResult("");
+            });
         }
-        customQueueService.enqueueAll(verifiedDataList);
-        return DataFormatUtils.buildResponse(ResponseEntity.ok(),
-                Map.of("cause","Началась проверка подписей","status", "success", "sname", "check"));
+        return previsious.get(0); //подразумевается, что лежит только одна запись о проверке
     }
 
     //File writer
@@ -449,6 +514,30 @@ public class RequestSubsidyController {
             innIdFolder.mkdirs();
         }
         return innIdFolder;
+    }
+
+    @GetMapping("request_subsidy_files/{id_request_subsidy}")
+    public @ResponseBody List<TpRequestSubsidyFile> getTpRequestSubsidyFiles(@PathVariable("id_request_subsidy") Long id_request_subsidy, HttpSession session) {
+        return tpRequestSubsidyFileRepo.getTpRequestSubsidyFilesByDocRequestId(id_request_subsidy);
+    }
+
+    @GetMapping("request_subsidy_files_verification/{id_request_subsidy}")
+    public @ResponseBody List<Map<String, String>> getVerificationTpRequestSubsidyFiles(@PathVariable("id_request_subsidy") Long id_request_subsidy, HttpSession session) {
+
+        List<Map<String, String>> list = tpRequestSubsidyFileRepo.getSignatureVerificationTpRequestSubsidyFile(id_request_subsidy);
+
+        return list;
+    }
+
+    @GetMapping("check_all_files_are_verified")
+    public @ResponseBody Boolean checkAllFilesAreVerified(@RequestParam("id_request_subsidy") Long id_request_subsidy, HttpSession session) {
+
+        List<Map<String, String>> list = tpRequestSubsidyFileRepo.getNotVerifiedTpRequestSubsidyFile(id_request_subsidy);
+        if (list.size() > 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
 }

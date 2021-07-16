@@ -43,7 +43,7 @@ public interface ClsSubsidyRepo extends JpaRepository<ClsSubsidy, Long> {
             "    SELECT sdrs.id_subsidy\n" +
             "    FROM subs.doc_request_subsidy sdrs\n" +
             "        INNER JOIN subs.cls_subsidy_request_status sub_status\n" +
-            "            ON sdrs.id_subsidy_request_status = sub_status.id AND sdrs.id_organization = :id_organization AND sub_status.is_block_request\n" +
+            "            ON sdrs.id_subsidy_request_status = sub_status.id AND sdrs.id_organization = :id_organization AND sub_status.is_block_request AND sdrs.is_deleted = false\n" +
             "    GROUP BY sdrs.id_subsidy\n" +
             "),\n" +
             "available_subs_ids AS (\n" +

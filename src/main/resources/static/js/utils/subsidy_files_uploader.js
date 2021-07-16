@@ -1,4 +1,3 @@
-//Шаг 2 - прикрепление файлов к заявке
 const subs = () => {
     return {
         borderless: true,
@@ -305,7 +304,6 @@ webix.ui({
     }
 });
 
-//Добавление viewFileName tpRequestSubsidyFile
 const update_file_view_name = (el, idSubsidyFile) => {
     if (event.key === 'Enter') {
         webix.ajax().post('set_subsidy_file_view_name', {"id_subsidy_file": idSubsidyFile, "view_name": el.value});
@@ -362,4 +360,13 @@ const removeChildDataviews = () => {
                 rows: []
             }, $$('required_subsidy_files_templates'));
     }, 2000)
+}
+
+const checkVerificationFiles = () => {
+    let xhr = webix.ajax().sync().get('check_all_files_are_verified', {"id_request_subsidy": $$('requestSubsidyId').getValue()})
+    if (xhr.responseText==='true') {
+        return true;
+    } else {
+        return false;
+    }
 }
