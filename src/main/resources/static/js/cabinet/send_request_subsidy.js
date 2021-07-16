@@ -7,11 +7,7 @@ const available_subsidy_list = {
         {
             view: "list",
             id: "availableSubsidyListId",
-            template: "#shortName#",
-            // type:{
-            //     height:60
-            // },
-            // hover: {"background": "#ccd7e6"},
+            template: "<div class='hover_font_bold'>#shortName#</div>",
             select: true,
             autowidth: true,
             autoheight: true,
