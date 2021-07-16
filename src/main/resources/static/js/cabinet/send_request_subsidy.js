@@ -483,6 +483,7 @@ const requestSubsidyWizard = {
                                                     if (checkVerificationFiles()) {
                                                         nextRS(2);
                                                         getFilesListByTypeView($$('requestSubsidyId').getValue());
+                                                        $$('submit_btn_id').show();
                                                     } else {
                                                         webix.message("Не все подписи файлов прошли проверку", "error", 10000);
                                                     }
@@ -648,6 +649,7 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                             if (checkVerificationFiles()) {
                                 nextRS(nextNumber);
                                 getFilesListByTypeView($$('requestSubsidyId').getValue());
+                                $$('submit_btn_id').show();
                             } else {
                                 webix.message("Не все подписи файлов прошли проверку", "error", 10000);
                             }
@@ -667,6 +669,17 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                     saveRequestSubsidy("NEW")
                 }
             },
+            {
+                id: 'submit_btn_id',
+                view: 'button',
+                css: 'webix_primary',
+                maxWidth: 150,
+                hidden: true,
+                value: 'Подать заявку',
+                click: function () {
+                    saveRequestSubsidy("SUBMIT");
+                }
+            },
             {type: 'header', template: title, borderless: true},
         ]
     }
@@ -674,6 +687,7 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
 
 function backRS() {
     $$("wizardRS").back();
+    $$('submit_btn_id').hide();
 }
 
 function nextRS(page) {
