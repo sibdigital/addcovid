@@ -187,7 +187,7 @@ body {
 }
 
 .doc_title {
-    left: 10px;
+    left: 80px;
     position: absolute;
     line-height: 20px;
     font-family: Roboto, sans-serif;
@@ -204,7 +204,7 @@ body {
 .doc_time_create {
     position: absolute;
     padding-left: 5px;
-    left: 10px;
+    left: 80px;
     /*white-space: normal !important;*/
     width: 100%;
     top: 40%;
@@ -368,7 +368,7 @@ body {
 .subsidy_files_icon{
     margin-left: 10px;
     font-size: 24px;
-    margin-top: 4px;
+    margin-top: 5px;
 }
 
 .webix_progress_top {

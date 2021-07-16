@@ -329,10 +329,6 @@ const requestSubsidyStep1 = {
     }
 }
 
-const requestSubsidyStep2 = () => {
-    return subs();
-}
-
 const requestSubsidyStep3 = {
     view: 'form',
     id: 'request_subsidy_step3',
@@ -449,7 +445,7 @@ const requestSubsidyWizard = {
                         {
                             rows: [
                                 multiviewSubsidyHeader('Шаг 2. Прикрепите документы', backRS, 2),
-                                subs(),
+                                requestSubsidyStep2(),
                                 {
                                     cols: [
                                         {},

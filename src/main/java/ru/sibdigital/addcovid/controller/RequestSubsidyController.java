@@ -402,7 +402,7 @@ public class RequestSubsidyController {
         }
         customQueueService.enqueueAll(verifiedDataList);
         return DataFormatUtils.buildOkResponse(
-                Map.of("cause","Началась проверка подписей","status", "server", "sname", "check"));
+                Map.of("cause","Файлы подписей добавлены в очередь","status", "server", "sname", "check"));
     }
 
     private RegVerificationSignatureFile constructVerificationSignatureFile(TpRequestSubsidyFile signatureFile,
