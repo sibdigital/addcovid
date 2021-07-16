@@ -39,8 +39,8 @@ public class VerifyMessageServiceImpl implements VerifyMessageService{
     @Override
     public String getVerifyResult(CMSVerifier cmsVerifier) {
 
-        String status = "<b>" + (cmsVerifier.isSuccess() ? "Подлинность документа ПОДТВЕРЖДЕНА"
-                : "Подлинность документа НЕ ПОДТВЕРЖДЕНА") + "</b>";
+        String status = "<b>" + (cmsVerifier.isSuccess() ? "Подлинность документа <font color=\"green\">ПОДТВЕРЖДЕНА</font>"
+                : "Подлинность документа <font color=\"red\">НЕ ПОДТВЕРЖДЕНА</font>") + "</b>";
 
         String result = status + "<br/>";
         String digestStatus = getSignatureInfo(cmsVerifier);
@@ -87,14 +87,18 @@ public class VerifyMessageServiceImpl implements VerifyMessageService{
     }
 
     private String getSignatureInfo(CMSVerifier cmsVerifier){
-        String digestStatus = "<b>Электронная подпись: </b>";
+        String digestStatus = "";
         //String result = status + "<br/>";
         if (cmsVerifier.signatureSuccessVerify()){
-            digestStatus += "ВЕРНА";
+            if (cmsVerifier.certificateSuccessVerify()) {
+                digestStatus += "<b>Электронная подпись: </b>";
+                digestStatus += "<font color=\"green\">ВЕРНА</font>";
+            }
         }else{
             if (cmsVerifier.isSignedDataReadable()) {
+                digestStatus += "<b>Электронная подпись: </b>";
                 String digestStatusDetail = getDigestStatusDetail(cmsVerifier);
-                digestStatus += "НЕ ВЕРНА<br/>";
+                digestStatus += "<font color=\"red\">НЕ ВЕРНА</font><br/>";
                 digestStatus += "<b>Проверка электронной подписи показала:</b> " + digestStatusDetail;
             }else{
 
