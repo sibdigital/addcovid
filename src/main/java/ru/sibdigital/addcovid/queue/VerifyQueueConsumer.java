@@ -52,15 +52,20 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
             VerifiedData verifiedData = task.getPayloadOrThrow();
             Long idRequestSubsidyFile = Long.valueOf(verifiedData.getIdentificator());
             Long idRequestSubsidyFileSignature = Long.valueOf(verifiedData.getSignatureIdentificator());
-            Long idRequestSubsidy = Long.valueOf(verifiedData.getGroup());
+            Long idRegVerificationSignatureFile = Long.valueOf(verifiedData.getGroup());
 
             TpRequestSubsidyFile dataFile = tpRequestSubsidyFileRepo.findById(idRequestSubsidyFile).orElse(null);
             TpRequestSubsidyFile signatureFile = tpRequestSubsidyFileRepo.findById(idRequestSubsidyFileSignature).orElse(null);
+            RegVerificationSignatureFile rvsf = regVerificationSignatureFileRepo.findById(idRegVerificationSignatureFile).orElse(null);
 
-            CMSVerifier cmsVerifier = process(dataFile, signatureFile);
+            if (dataFile != null && signatureFile != null && rvsf != null) {
+                CMSVerifier cmsVerifier = process(dataFile, signatureFile, rvsf);
 
-            final RegVerificationSignatureFile verificationSignatureFile = saveRegVerificationSignatureFile(cmsVerifier, dataFile,
-                    signatureFile, beginVerification);
+                final RegVerificationSignatureFile verificationSignatureFile = saveRegVerificationSignatureFile(cmsVerifier, rvsf, beginVerification);
+                verificationLog.info("Задача выполнена " + verificationSignatureFile.toString());
+            }else{
+                verificationLog.error("Не удалось получить задачу из очереди: " + task.toString());
+            }
 
         } catch (Exception e) {
             verificationLog.error("Не удалось получить задачу из очереди: " + task.toString());
@@ -69,7 +74,7 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
         return TaskExecutionResult.finish();
     }
 
-    private CMSVerifier process(TpRequestSubsidyFile dataFile, TpRequestSubsidyFile signatureFile){
+    private CMSVerifier process(TpRequestSubsidyFile dataFile, TpRequestSubsidyFile signatureFile, RegVerificationSignatureFile rvsf){
         final String absolutePath = Paths.get(uploadingAttachmentDir).toFile().getAbsolutePath();
         String dataFileName = absolutePath + File.separator + dataFile.getAttachmentPath();
         String signatureFileName = absolutePath + File.separator + signatureFile.getAttachmentPath();
@@ -78,7 +83,7 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
         File signature = new File(signatureFileName);
 
         VerifiedData verifiedData = new VerifiedData(signature.getAbsolutePath(), file.getAbsolutePath(),
-                dataFile.getId(), signatureFile.getId(), dataFile.getRequestSubsidy().getId());
+                dataFile.getId(), signatureFile.getId(), rvsf.getId());
 
         final CMSVerifier cmsVerifier = verifyMessageService.buildCMSVerifier(verifiedData);
         cmsVerifier.verify();
@@ -86,11 +91,11 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
     }
 
     private RegVerificationSignatureFile saveRegVerificationSignatureFile(CMSVerifier cmsVerifier,
-            TpRequestSubsidyFile dataFile, TpRequestSubsidyFile signatureFile, Timestamp beginVerification){
+                                         RegVerificationSignatureFile rvsf, Timestamp beginVerification){
         //но надо будет искать немного по-другому как минимум с учетом принципала и потом еще последний срез у этого принципала
-        RegVerificationSignatureFile rvsf =
-                regVerificationSignatureFileRepo.findByRequestSubsidy_IdAndRequestSubsidyFile_IdAndRequestSubsidySubsidySignatureFile_Id
-                        (dataFile.getRequestSubsidy().getId(), dataFile.getId(), signatureFile.getId());
+//        RegVerificationSignatureFile rvsf =
+//                regVerificationSignatureFileRepo.findByRequestSubsidy_IdAndRequestSubsidyFile_IdAndRequestSubsidySubsidySignatureFile_Id
+//                        (dataFile.getRequestSubsidy().getId(), dataFile.getId(), signatureFile.getId());
 
         rvsf.setVerifyResult(verifyMessageService.getVerifyResult(cmsVerifier));
         //    -- 1 - проверка прошла успешно
