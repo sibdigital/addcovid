@@ -25,11 +25,13 @@ const requestSubsidyStep2 = () => {
                                 await webix.ajax().get('check_request_subsidy_files_signatures', params).then((response) => {
                                     let responseJson = response.json();
                                     webix.message(responseJson.cause, responseJson.status, 4000);
+                                    if (responseJson.status === "ok") {
+                                        verify_progress(params.id_request, responseJson.cause); //show progress on start event
+                                        let timerId = setInterval(() => {
+                                            verify_progress(params.id_request, responseJson.cause, timerId);
+                                        }, 4000)
+                                    }
                                 });
-                                verify_progress(params.id_request); //show progress on start event
-                                let timerId = setInterval(() => {
-                                    verify_progress(params.id_request, timerId);
-                                }, 4000)
                             }
                         }
                     },
@@ -76,7 +78,7 @@ function createDataView() {
 }
 
 //ProgressBar event
-function verify_progress(id, timerId = null) {
+function verify_progress(id, queueTime, timerId = null) {
     let progressBar = $$("progress_bar");
     if (id != null && progressBar !== undefined) {
         webix.extend(progressBar, webix.ProgressBar);
@@ -95,13 +97,24 @@ function verify_progress(id, timerId = null) {
                     let numberOfFiles = data.numberOfFiles;
                     let progress = verified / numberOfFiles;
 
+                    await progressBar.showProgress({type: "top", position: progress === 0 ? 0.001 : progress})
+
                     if (progress !== 0) {
+                        document.getElementById("progress_bar_text").innerHTML =
+                            "<span style='position: absolute; margin-top: 8px; left: 10px; z-index: 100; font-weight: 500'>" +
+                                "Проверено: " + verified + "/" + numberOfFiles +
+                            "</span>";
                         progress === 1 ? webix.message("Началась проверка подписей", "", 2000) : null;
                         let dataViews = $$('required_subsidy_files_templates').getChildViews()
                         dataViews.forEach((dataView) => {
                             let dataViewId = dataView.qf[1].id;
                             updateDataview(dataViewId.slice(0, -9), $$(dataViewId).config.formData.fileTypeId)
                         })
+                    } else {
+                        document.getElementById("progress_bar_text").innerHTML =
+                            "<span style='position: absolute; margin-top: 8px; left: 10px; z-index: 100; font-weight: 500'>" +
+                                "Проверено: " + verified + "/" + numberOfFiles + " (" + queueTime + ")" +
+                            "</span>";
                     }
 
                     if (numberOfFiles === verified) {
@@ -109,8 +122,6 @@ function verify_progress(id, timerId = null) {
                         webix.message("Проверка подписей завершена", "success", 10000);
                     }
 
-                    await progressBar.showProgress({type: "top", position: progress === 0 ? 0.001 : progress})
-                    document.getElementById("progress_bar_text").innerHTML = "<span style='position: absolute; margin-top: 8px; left: 10px; z-index: 100; font-weight: 500'>Проверено: " + verified + "/" + numberOfFiles + "</span>";
                 }
             })
     } else {
@@ -208,7 +219,7 @@ function view_subsidy_files_section(required_subsidy_file) {
                         title +
                         "<input title='После ввода нажмите Enter' class='custom-form-control' type='text' value='" + viewName + "' placeholder='Отображаемое имя файла' onkeydown='update_file_view_name(this," + obj.docFile.id + ")' style=''>" +
                         "<button type='button' title='Загрузить подпись' class='webix_button webix_img_btn' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
-                        "<span class='webix_icon_btn mdi mdi-paperclip custom-icon-hover' style='font-size: 24px; margin-top: -2px'></span>" +
+                        "<span class='webix_icon_btn mdi mdi-upload custom-icon-hover' style='font-size: 24px; margin-top: -2px'></span>" +
                         "</button>" +
                         "<span style='padding-top: 5px'>Загрузить подпись</span>" +
                         signatureExists +

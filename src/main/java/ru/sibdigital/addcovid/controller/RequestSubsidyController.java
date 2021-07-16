@@ -363,7 +363,7 @@ public class RequestSubsidyController {
         String waitingInterface = (waiting <= 60) ? "1 мин." : ((waiting / 60) + "  мин. " + (waiting % 60) + "  сек. ");
         return DataFormatUtils.buildOkResponse(
                 Map.of("cause","До начала проверки подписей не менее " + waitingInterface,
-                        "status", "server", "sname", "check"));
+                        "status", "ok", "sname", "check"));
     }
 
     private RegVerificationSignatureFile constructVerificationSignatureFile(TpRequestSubsidyFile signatureFile,
