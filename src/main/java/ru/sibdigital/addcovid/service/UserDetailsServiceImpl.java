@@ -16,10 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import ru.sibdigital.addcovid.model.ClsOrganization;
-import ru.sibdigital.addcovid.model.ClsPrincipal;
-import ru.sibdigital.addcovid.model.OrganizationTypes;
+import ru.sibdigital.addcovid.model.*;
+import ru.sibdigital.addcovid.repository.ClsActionTypeRepo;
 import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
+import ru.sibdigital.addcovid.repository.RegActionHistoryRepo;
 
 import javax.persistence.NonUniqueResultException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,66 +39,94 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     ClsOrganizationRepo clsOrganizationRepo;
 
+    @Autowired
+    RegActionHistoryRepo regActionHistoryRepo;
+
+    @Autowired
+    ClsActionTypeRepo clsActionTypeRepo;
+
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         ClsOrganization organization = null;
+        User.UserBuilder builder = null;
         boolean isInnEntered = true;
         try {
-            if (login.matches("^([0-9]{10}|[0-9]{12})$")) {
-                List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.JURIDICAL.getValue(),
-                        OrganizationTypes.IP.getValue(), OrganizationTypes.SELF_EMPLOYED.getValue());
-                organization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(login, typeOrganizations);
-                if (organization == null) {
-                    typeOrganizations = Arrays.asList(OrganizationTypes.FILIATION.getValue(),
-                            OrganizationTypes.REPRESENTATION.getValue(), OrganizationTypes.DETACHED.getValue(),
-                            OrganizationTypes.KFH.getValue());
-                    organization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(login, typeOrganizations);
-                    if (organization != null) {
-                        throw new UsernameNotFoundException("Need to enter email");
-                    }
-                }
-            } else {
-                isInnEntered = false;
-                if (!login.contains(".")) {
-                    throw new UsernameNotFoundException("Need to enter inn or email");
-                }
-                List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.FILIATION.getValue(),
-                        OrganizationTypes.REPRESENTATION.getValue(), OrganizationTypes.DETACHED.getValue(),
-                        OrganizationTypes.KFH.getValue());
-                organization = clsOrganizationRepo.findByEmailAndPrincipalIsNotNull(login, typeOrganizations);
-                if (organization == null) {
-                    typeOrganizations = Arrays.asList(OrganizationTypes.JURIDICAL.getValue(),
-                            OrganizationTypes.IP.getValue(), OrganizationTypes.SELF_EMPLOYED.getValue());
-                    organization = clsOrganizationRepo.findByEmailAndPrincipalIsNotNull(login, typeOrganizations);
-                    if (organization != null) {
-                        throw new UsernameNotFoundException("Need to enter inn");
-                    }
-                }
-            }
+        isInnEntered = login.matches("^([0-9]{10}|[0-9]{12})$");//true;
+        organization = findOrganization(login);
+
         } catch (NonUniqueResultException | IncorrectResultSizeDataAccessException | InternalAuthenticationServiceException ex){
-            authLog.warn("Too many organizations found found for login " + login + " is inn entered " + isInnEntered);
+            authLog.info("Too many organizations found found for login " + login + " is inn entered " + isInnEntered);
             authLog.error(ex.getMessage(), ex);
             throw new UsernameNotFoundException("Too many organizations found.");
         }
 
-        User.UserBuilder builder = null;
         if (organization != null) {
             ClsPrincipal principal = organization.getPrincipal();
+            addToHistory(organization, principal);
             if (principal != null) {
                 builder = User.withUsername(organization.getId().toString());
 //                builder.password(passwordEncoder.encode(principal.getPassword()));
                 builder.password(principal.getPassword());
                 builder.roles("USER");
-                authLog.warn(" User FOUND for login " + login + " is inn entered " + isInnEntered + " id org: " + organization.getId());
+                authLog.info(" User FOUND for login " + login + " is inn entered " + isInnEntered + " id org: " + organization.getId());
             } else {
-                authLog.warn(" User no found for login " + login + " is inn entered " + isInnEntered);
+                authLog.info(" User no found for login " + login + " is inn entered " + isInnEntered);
                 throw new UsernameNotFoundException("User no found.");
             }
         } else {
-            authLog.warn("Organization no found. " + login + " is inn entered " + isInnEntered);
+            authLog.info("Organization no found. " + login + " is inn entered " + isInnEntered);
             throw new UsernameNotFoundException("Organization no found." );
         }
 
         return builder.build();
+    }
+
+    private ClsOrganization findOrganization(String login){
+        ClsOrganization organization = null;
+        if (login.matches("^([0-9]{10}|[0-9]{12})$")) {
+            List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.JURIDICAL.getValue(),
+                    OrganizationTypes.IP.getValue(), OrganizationTypes.SELF_EMPLOYED.getValue());
+            organization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(login, typeOrganizations);
+            if (organization == null) {
+                typeOrganizations = Arrays.asList(OrganizationTypes.FILIATION.getValue(),
+                        OrganizationTypes.REPRESENTATION.getValue(), OrganizationTypes.DETACHED.getValue(),
+                        OrganizationTypes.KFH.getValue());
+                organization = clsOrganizationRepo.findByInnAndPrincipalIsNotNull(login, typeOrganizations);
+                if (organization != null) {
+                    throw new UsernameNotFoundException("Need to enter email");
+                }
+            }
+        } else {
+            if (!login.contains(".")) {
+                throw new UsernameNotFoundException("Need to enter inn or email");
+            }
+            List<Integer> typeOrganizations = Arrays.asList(OrganizationTypes.FILIATION.getValue(),
+                    OrganizationTypes.REPRESENTATION.getValue(), OrganizationTypes.DETACHED.getValue(),
+                    OrganizationTypes.KFH.getValue());
+            organization = clsOrganizationRepo.findByEmailAndPrincipalIsNotNull(login, typeOrganizations);
+            if (organization == null) {
+                typeOrganizations = Arrays.asList(OrganizationTypes.JURIDICAL.getValue(),
+                        OrganizationTypes.IP.getValue(), OrganizationTypes.SELF_EMPLOYED.getValue());
+                organization = clsOrganizationRepo.findByEmailAndPrincipalIsNotNull(login, typeOrganizations);
+                if (organization != null) {
+                    throw new UsernameNotFoundException("Need to enter inn");
+                }
+            }
+        }
+        return organization;
+    }
+
+    private void addToHistory(ClsOrganization organization, ClsPrincipal principal){
+        try {
+            final ClsActionType actionType = clsActionTypeRepo.findByCode(ClsActionType.AUTH_CODE);
+            RegActionHistory rah = RegActionHistory.builder()
+                    .organization(organization)
+                    .principal(principal)
+                    .actionType(actionType)
+                    .build();
+            regActionHistoryRepo.save(rah);
+        }catch (Exception ex){
+            log.error(ex.getMessage(), ex);
+        }
     }
 }
