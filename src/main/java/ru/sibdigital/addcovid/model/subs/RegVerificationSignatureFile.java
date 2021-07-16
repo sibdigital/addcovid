@@ -116,6 +116,12 @@ public class RegVerificationSignatureFile {
     }
 
     @Override
+    public String toString(){
+        String str = "id=" + id + "; verifyStatus=" + verifyStatus + "; timeCreate=" + timeCreate;
+        return str;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(id, timeCreate, timeBeginVerification, timeEndVerification, verifyStatus, verifyResult);
     }
