@@ -405,10 +405,12 @@ public class CMSVerifier {
             } // for
 
             if (contentTypeAttr == null) {
+                verificationLog.error("content-type attribute not present on cert \n"+ ci.toString());
                 throw new CMSVerifyException("content-type attribute not present on cert \n" + ci.toString());
             } // if
 
             if (!contentTypeAttr.values.elements[0].equals(new Asn1ObjectIdentifier(eContTypeOID.value))) {
+                verificationLog.error("content-type attribute OID not equal eContentType OID on cert \n" + ci.toString());
                 throw new CMSVerifyException("content-type attribute OID not equal eContentType OID on cert \n" + ci.toString());
             } // if
 
@@ -425,6 +427,7 @@ public class CMSVerifier {
             } // for
 
             if (messageDigestAttr == null) {
+                verificationLog.error("message-digest attribute not present on cert \n" + ci.toString());
                 throw new CMSVerifyException("message-digest attribute not present on cert \n" + ci.toString());
             } // if
 
@@ -436,6 +439,7 @@ public class CMSVerifier {
             final byte[] dm = digestm(text, digestAlgOid.toString(), providerName);
 
             if (!Array.toHexString(dm).equals(Array.toHexString(md))) {
+                verificationLog.error("message-digest attribute verify failed on cert \n" + ci.toString());
                 throw new CMSVerifyException("message-digest attribute verify failed on cert \n" + ci.toString());
             } // if
 

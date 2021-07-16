@@ -11,6 +11,7 @@ import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
 import ru.sibdigital.addcovid.repository.subs.*;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 @Log4j2
@@ -104,5 +105,11 @@ public class RequestSubsidyServiceImpl implements RequestSubsidyService {
 
         docRequestSubsidyRepo.save(docRequestSubsidy);
         return docRequestSubsidy;
+    }
+
+    public Long getWaitingStartTaskExecution(Date date){
+        long avgTimeExecution = 12L;
+        final Long countEarilerTasks = docRequestSubsidyRepo.getEarilerTasks(date);
+        return countEarilerTasks * avgTimeExecution;
     }
 }

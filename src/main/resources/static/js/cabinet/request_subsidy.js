@@ -35,13 +35,15 @@ const request_subsidy_list = {
                             minWidth: 300,
                             adjust: true,
                             fillspace: true,
+                            sort: "text",
                         },
                         {
                             id: "subsidyRequestStatusName",
                             template: "#subsidyRequestStatusName#",
                             header: "Статус",
                             tooltip: false,
-                            width: 200
+                            width: 200,
+                            sort: "text",
                         },
                         {
                             id: "department",
@@ -50,24 +52,34 @@ const request_subsidy_list = {
                             tooltip: false,
                             minWidth: 150,
                             adjust: true,
+                            sort: "text",
                         },
                         {
                             id: "time_Create",
                             header: "Дата создания",
-                            width: 150,
+                            minWidth: 150,
                             tooltip: false,
+                            adjust: true,
+                            format: dateFormatWOSeconds,
+                            sort: 'date',
                         },
                         {
                             id: "time_Send",
                             header: "Дата подачи",
-                            width: 150,
+                            minWidth: 150,
                             tooltip: false,
+                            adjust: true,
+                            format: dateFormatWOSeconds,
+                            sort: 'date',
                         },
                         {
                             id: "time_Review",
                             header: "Дата рассмотрения",
-                            width: 200,
+                            minWidth: 150,
                             tooltip: false,
+                            adjust: true,
+                            format: dateFormatWOSeconds,
+                            sort: 'date',
                         },
                         {
                             tooltip: false,
@@ -87,16 +99,19 @@ const request_subsidy_list = {
                             if (obj.timeCreate != null) {
                                 let tmp_time_create = obj.timeCreate.substr(0, 16);
                                 obj.time_Create = tmp_time_create.replace("T", " ");
+                                obj.time_Create = xml_format(obj.time_Create);
                             }
 
                             if (obj.timeReview != null) {
                                 let tmp_time_review = obj.timeReview.substr(0, 16);
                                 obj.time_Review = tmp_time_review.replace("T", " ");
+                                obj.time_Review = xml_format(obj.time_Review);
                             }
 
                             if (obj.timeSend != null) {
                                 let tmp_time_send = obj.timeSend.substr(0, 16);
                                 obj.time_Send = tmp_time_send.replace("T", " ");
+                                obj.time_Review = xml_format(obj.time_Review);
                             }
 
                             $$('request_subsidy_table').refresh()
