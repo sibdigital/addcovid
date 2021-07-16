@@ -344,8 +344,7 @@ public class RequestSubsidyController {
         }
         List<VerifiedData> verifiedDataList = new ArrayList<>();
         for (TpRequestSubsidyFile signatureFile : signatureFiles) {
-            TpRequestSubsidyFile docFile = tpRequestSubsidyFileRepo.getDocFilesBySignature(signatureFile.getRequestSubsidyFile().getId()).orElse(null);
-
+            TpRequestSubsidyFile docFile = signatureFile.getRequestSubsidyFile();
             final RegVerificationSignatureFile rvsf = constructVerificationSignatureFile(signatureFile, docFile, clsOrganization);
             regVerificationSignatureFileRepo.save(rvsf);
 

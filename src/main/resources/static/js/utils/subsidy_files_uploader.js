@@ -24,12 +24,13 @@ const requestSubsidyStep2 = () => {
                             if (params.id_request != null) {
                                 await webix.ajax().get('check_request_subsidy_files_signatures', params).then((response) => {
                                     let responseJson = response.json();
-                                    webix.message(responseJson.cause, responseJson.status, 4000);
                                     if (responseJson.status === "ok") {
                                         verify_progress(params.id_request, responseJson.cause); //show progress on start event
                                         let timerId = setInterval(() => {
                                             verify_progress(params.id_request, responseJson.cause, timerId);
                                         }, 4000)
+                                    } else {
+                                        webix.message(responseJson.cause, responseJson.status, 4000);
                                     }
                                 });
                             }
