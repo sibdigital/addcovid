@@ -189,8 +189,8 @@ function view_subsidy_files_section(required_subsidy_file) {
                     let result =
                         "<div id='overall_" + obj.docFile.id + "' class='overall' style='height: 48px; background: " + overallColor + "'>" +
                         "<div class='overall-title' style='margin-top: 10px'><div style='margin-top: 5px; width: 325px'>" + originalFileName +
-                        "</div><input webix_tooltip='' title='Тест' class='custom-form-control' type='text' value='" + viewName + "' placeholder='Отображаемое имя файла' onkeydown='update_file_view_name(this," + obj.docFile.id + ")' style=''>" +
-                        "<button type='button' class='webix_button webix_img_btn' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
+                        "</div><input webix_tooltip='' title='После ввода имени нажмите Enter' class='custom-form-control' type='text' value='" + viewName + "' placeholder='Отображаемое имя файла' onkeydown='update_file_view_name(this," + obj.docFile.id + ")' style=''>" +
+                        "<button type='button' title='Загрузка подписи' class='webix_button webix_img_btn' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
                         "<span class='webix_icon_btn mdi mdi-upload custom-icon-hover' style='font-size: 24px; margin-top: -2px'></span>" +
                         "</button>" +
                         signatureExists +
