@@ -77,7 +77,7 @@ function getFilesListByTypeView(docRequestSubsidyId) {
                 const byFileType = data.reduce(function (result, file) {
                     const fileVerificationStatus = filesVerification.find((fileVerification) => fileVerification.id_request_subsidy_file === file.id);
                     result[file.fileType.id] = result[file.fileType.id] || [];
-                    result[file.fileType.id].push({ ...file, verificationStatus: fileVerificationStatus ?? { verify_status: 'отсутствует подпись / проверка не проводилась' } });
+                    result[file.fileType.id].push({ ...file, verificationStatus: fileVerificationStatus ?? { verify_status: 'Проверка не проводилась' } });
 
                     filesTypes[file.fileType.id] = file.fileType.name;
 
