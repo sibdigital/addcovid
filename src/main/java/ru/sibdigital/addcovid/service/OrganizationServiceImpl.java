@@ -14,10 +14,7 @@ import ru.sibdigital.addcovid.dto.esia.User;
 import ru.sibdigital.addcovid.dto.esia.UserOrganization;
 import ru.sibdigital.addcovid.model.*;
 import ru.sibdigital.addcovid.model.classifier.gov.*;
-import ru.sibdigital.addcovid.repository.ClsOrganizationContactRepo;
-import ru.sibdigital.addcovid.repository.ClsOrganizationRepo;
-import ru.sibdigital.addcovid.repository.ClsPrincipalRepo;
-import ru.sibdigital.addcovid.repository.RegOrganizationOkvedRepo;
+import ru.sibdigital.addcovid.repository.*;
 import ru.sibdigital.addcovid.repository.classifier.gov.OkvedRepo;
 import ru.sibdigital.addcovid.repository.classifier.gov.RegEgripRepo;
 import ru.sibdigital.addcovid.repository.classifier.gov.RegEgrulRepo;
@@ -31,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -72,6 +70,9 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Autowired
     private DBActualizeService dbActualizeService;
+
+    @Autowired
+    private ClsSettingsRepo  clsSettingsRepo;
 
     @Transactional
     public ClsOrganization saveNewClsOrganization(OrganizationDto organizationDto) {
