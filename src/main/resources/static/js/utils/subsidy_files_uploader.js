@@ -238,7 +238,7 @@ function view_subsidy_files_section(required_subsidy_file) {
                         "<button type='button' title='Добавить подпись' class='webix_button webix_img_btn' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
                         "<span class='webix_icon_btn mdi mdi-upload custom-icon-hover' style=' color:" + uploadSignatureBtnColor + "; font-size: 24px; margin-top: -2px'></span>" +
                         "</button>" +
-                        "<span style='padding-top: 5px'>Добавить подпись</span>" +
+                         "<span onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='padding-top: 5px'>Добавить подпись</span>" +
                         signatureExists +
                         signatureVerifyStatus +
                         signatureVerifyResult +
