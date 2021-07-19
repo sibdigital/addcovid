@@ -392,6 +392,7 @@ const requestSubsidyWizard = {
                     id: 'wizardRS',
                     cells: [
                         {
+                            id: 'cell1',
                             rows: [
                                 multiviewSubsidyHeader('Шаг 1. Выберите меру поддержки', backRS, 1),
                                 requestSubsidyStep1,
@@ -447,7 +448,7 @@ const requestSubsidyWizard = {
                                             maxWidth: 200,
                                             value: 'Сохранить заявку',
                                             click: function () {
-                                                saveRequestSubsidy("NEW");
+                                                saveDoc("NEW");
                                             }
                                         },
                                     ]
@@ -455,6 +456,7 @@ const requestSubsidyWizard = {
                             ]
                         },
                         {
+                            id: 'cell2',
                             rows: [
                                 multiviewSubsidyHeader('Шаг 2. Прикрепите документы', backRS, 2),
                                 requestSubsidyStep2(),
@@ -479,6 +481,7 @@ const requestSubsidyWizard = {
                                                     if (checkVerificationFiles()) {
                                                         nextRS(2);
                                                         getFilesListByTypeView($$('requestSubsidyId').getValue());
+                                                        $$('submit_btn_id').show();
                                                     } else {
                                                         webix.message("Не все подписи файлов прошли проверку", "error", 10000);
                                                     }
@@ -494,7 +497,7 @@ const requestSubsidyWizard = {
                                             maxWidth: 200,
                                             value: 'Сохранить заявку',
                                             click: function () {
-                                                saveRequestSubsidy("NEW");
+                                                saveDoc("NEW");
                                             }
                                         },
                                     ]
@@ -502,6 +505,7 @@ const requestSubsidyWizard = {
                             ]
                         },
                         {
+                            id: 'cell3',
                             rows: [
                                 multiviewSubsidyHeader('Шаг 3. Подача заявки', backRS, 3),
                                 requestSubsidyStep3,
@@ -522,7 +526,7 @@ const requestSubsidyWizard = {
                                             maxWidth: 200,
                                             value: 'Сохранить заявку',
                                             click: function () {
-                                                saveRequestSubsidy("NEW");
+                                                saveDoc("NEW");
                                             }
                                         },
                                         {
@@ -532,7 +536,7 @@ const requestSubsidyWizard = {
                                             maxWidth: 200,
                                             value: 'Подать заявку',
                                             click: function () {
-                                                saveRequestSubsidy("SUBMIT");
+                                                saveRequestSubsidy("SUBMIT", true);
                                             }
                                         }
                                     ]
@@ -546,7 +550,34 @@ const requestSubsidyWizard = {
     ]
 }
 
-function saveRequestSubsidy(statusCode) {
+function saveDoc(statusCode) {
+    let closeForm = false;
+    if ($$('wizardRS').getActiveId() == 'cell3') {
+        webix.modalbox({
+            title:"Сохранение",
+            buttons:["Отмена", "Сохранить", "Сохранить и выйти без подачи"],
+            width:540,
+            css: 'confirm_mine',
+            text:"Сохранить и выйти без подачи заявления?"
+        }).then(function(result) {
+            if (result != 0) {
+                if (result == 2) {
+                    closeForm = true;
+                }
+                saveRequestSubsidy(statusCode, closeForm)
+            }
+        });
+        var modalbox = document.getElementsByClassName("confirm_mine")[0];
+        var button1 = modalbox.getElementsByClassName("webix_popup_button")[1];
+        var button2 = modalbox.getElementsByClassName("webix_popup_button")[2];
+        webix.html.addCss(button1, "confirm");
+        webix.html.addCss(button2, "confirm");
+    } else {
+        saveRequestSubsidy(statusCode, false);
+    }
+}
+
+function saveRequestSubsidy(statusCode, closeForm) {
     let params = {
         id: $$('requestSubsidyId').getValue(),
         subsidyId: $$('subsidyId').getValue(),
@@ -560,15 +591,20 @@ function saveRequestSubsidy(statusCode) {
             var response = JSON.parse(data.text());
             if (response.sname == "success") {
                 webix.message({text: response.cause, type: 'success'});
-                if ($$('btnBackMainId')) {
-                    $$('btnBackMainId').hide();
+
+                if (closeForm) {
+                    webix.ui({
+                        id: 'content',
+                        rows: [
+                            webix.copy(request_subsidy_list)
+                        ]
+                    }, $$('content'));
+
+
+                    if ($$('btnBackMainId')) {
+                        $$('btnBackMainId').hide();
+                    }
                 }
-                webix.ui({
-                    id: 'content',
-                    rows: [
-                        webix.copy(request_subsidy_list)
-                    ]
-                }, $$('content'));
             } else {
                 webix.message({text: response.cause, type: 'error'});
             }
@@ -625,7 +661,7 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                             .headers({'Content-type': 'application/json'})
                             .post('save_request_subsidy_draft', JSON.stringify(params)).then(function (data) {
                             data = data.json();
-                            console.log(data)
+                            // console.log(data)
                             $$('requestSubsidyId').setValue(data.id);
                             createDataView();
                             nextRS(nextNumber);
@@ -644,6 +680,7 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                             if (checkVerificationFiles()) {
                                 nextRS(nextNumber);
                                 getFilesListByTypeView($$('requestSubsidyId').getValue());
+                                $$('submit_btn_id').show();
                             } else {
                                 webix.message("Не все подписи файлов прошли проверку", "error", 10000);
                             }
@@ -660,7 +697,18 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
                 icon: 'mdi mdi-content-save',
                 tooltip: 'Сохранить',
                 click: () => {
-                    saveRequestSubsidy("NEW")
+                    saveDoc("NEW");
+                }
+            },
+            {
+                id: 'submit_btn_id',
+                view: 'button',
+                css: 'webix_primary',
+                maxWidth: 150,
+                hidden: true,
+                value: 'Подать заявку',
+                click: function () {
+                    saveRequestSubsidy("SUBMIT", true);
                 }
             },
             {type: 'header', template: title, borderless: true},
@@ -670,6 +718,7 @@ function multiviewSubsidyHeader(title, previous, nextNumber) {
 
 function backRS() {
     $$("wizardRS").back();
+    $$('submit_btn_id').hide();
 }
 
 function nextRS(page) {
