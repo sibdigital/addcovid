@@ -5,6 +5,9 @@ target/
 !**/src/test/**
 uploads/
 uploads_xls/
+root_cert/
+libs/cryptopro/javadoc
+libs/cryptopro/samples-sources
 
 ### STS ###
 .apt_generated
