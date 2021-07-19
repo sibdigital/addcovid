@@ -28,6 +28,7 @@ public class TpRequiredSubsidyFile {
     private Boolean isRequired;
     private Timestamp timeCreate;
     private String comment;
+    private int weight;
 
     public Long getId() {
         return id;
@@ -93,6 +94,12 @@ public class TpRequiredSubsidyFile {
     public void setComment(String comment) {
         this.comment = comment;
     }
+
+    @Basic
+    @Column(name = "weight")
+    public int getWeight() { return weight; }
+
+    public void setWeight(int weight) { this.weight = weight; }
 
     @Override
     public boolean equals(Object o) {

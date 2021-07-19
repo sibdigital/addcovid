@@ -134,18 +134,12 @@ function verify_progress(id, queueTime, timerId = null) {
 function view_subsidy_files_section(required_subsidy_file) {
     let fileTypeName = required_subsidy_file.clsFileType.name;
     let dynamicElementId = required_subsidy_file.clsFileType.name.replace(/\s+/g, '');
-    let req_status = required_subsidy_file.required === true ? "Обязательный документ" : "Не обязательный документ";
+    let req_status = required_subsidy_file.required === true ? "Обязательный" : "Не обязательный";
     return {
         type: "clean",
         rows: [
             {
                 cols: [
-                    {
-                        view: 'label',
-                        label: fileTypeName + ` <span style="color: red">(` + req_status + `)</span>`,
-                        autowidth: true,
-                        autoheight: true,
-                    },
                     {
                         id: dynamicElementId + '_uploader',
                         view: 'uploader',
@@ -168,7 +162,20 @@ function view_subsidy_files_section(required_subsidy_file) {
                             }
                         }
                     },
-                    {}
+                    {
+                        view: 'template',
+                        borderless: true,
+                        width: 800,
+                        template: fileTypeName + ` <span style="color: red">(` + req_status + `)</span>`,
+                        autowidth: true,
+                        autoheight: true,
+                    },
+                    // {
+                    //     view: 'label',
+                    //     label: fileTypeName + ` <span style="color: red">(` + req_status + `)</span>`,
+                    //     autowidth: true,
+                    //     autoheight: true,
+                    // },
                 ]
             },
             {
@@ -189,6 +196,7 @@ function view_subsidy_files_section(required_subsidy_file) {
                     let originalFileName = obj?.docFile?.originalFileName;
                     let signatureVerifyStatus = obj?.verificationSignatureFile?.verifyStatus == undefined ? "" : obj?.verificationSignatureFile?.verifyStatus;
                     let signatureVerifyResult = "";
+                    let uploadSignatureBtnColor = "#94A1B3";
 
                     let overallColor = "";
 
@@ -197,9 +205,14 @@ function view_subsidy_files_section(required_subsidy_file) {
                     }
 
                     let title = `<div title='` + obj?.docFile?.originalFileName + `' style='margin-top: 5px; width: 325px' class="div-hover">` + originalFileName + `</div>`;
-                    let signatureExists = obj.signatureFile != null ?
-                        "<i title='Подпись загружена' class='mdi mdi-check-circle-outline subsidy_files_icon'></i>"
-                        : "<i title='Ожидание загрузки подписи' class='mdi mdi-clock-outline subsidy_files_icon' style='color: orange;'></i>";
+
+                    let signatureExists = null;
+                    if (obj.signatureFile != null) {
+                        signatureExists = "<i title='Подпись загружена' class='mdi mdi-check-circle-outline subsidy_files_icon'></i>";
+                        uploadSignatureBtnColor = "#1CA1C1";
+                    } else {
+                        signatureExists = "<i title='Ожидание загрузки подписи' class='mdi mdi-clock-outline subsidy_files_icon' style='color: orange;'></i>";
+                    }
 
 
                     if (signatureVerifyStatus === "" || signatureVerifyStatus === 0) {
@@ -219,10 +232,10 @@ function view_subsidy_files_section(required_subsidy_file) {
                         "<div class='overall-title' style='margin-top: 10px'>" +
                         title +
                         "<input title='После ввода нажмите Enter' class='custom-form-control' type='text' value='" + viewName + "' placeholder='Отображаемое имя файла' onkeydown='update_file_view_name(this," + obj.docFile.id + ")' style=''>" +
-                        "<button type='button' title='Загрузить подпись' class='webix_button webix_img_btn' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
-                        "<span class='webix_icon_btn mdi mdi-upload custom-icon-hover' style='font-size: 24px; margin-top: -2px'></span>" +
+                        "<button type='button' title='Добавить подпись' class='webix_button webix_img_btn' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
+                        "<span class='webix_icon_btn mdi mdi-upload custom-icon-hover' style=' color:" + uploadSignatureBtnColor + "; font-size: 24px; margin-top: -2px'></span>" +
                         "</button>" +
-                        "<span style='padding-top: 5px'>Загрузить подпись</span>" +
+                        "<span style='padding-top: 5px'>Добавить подпись</span>" +
                         signatureExists +
                         signatureVerifyStatus +
                         signatureVerifyResult +

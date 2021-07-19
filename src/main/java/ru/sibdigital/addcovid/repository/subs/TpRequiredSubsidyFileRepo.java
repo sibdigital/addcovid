@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TpRequiredSubsidyFileRepo extends JpaRepository<TpRequiredSubsidyFile, Long> {
-    @Query(value = "select t from TpRequiredSubsidyFile as t where t.idSubsidy = :id and t.isDeleted = false order by t.isRequired desc")
+    @Query(value = "select t from TpRequiredSubsidyFile as t where t.idSubsidy = :id and t.isDeleted = false order by t.weight desc")
     Optional<List<TpRequiredSubsidyFile>> findAllBySubsidyIdAndIsDeletedFalse(Long id);
 
 }
