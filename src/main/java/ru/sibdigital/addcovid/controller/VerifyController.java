@@ -27,7 +27,6 @@ public class VerifyController {
     private CustomQueueService customQueueService;
 
     @PostMapping("/verify/subsidy/file")
-
     @ResponseBody
     public ResponseEntity<String> testVerifyProcess(@RequestBody VerifiedData verifiedData) {
         String status = "Проверка электронной подписи начата";
@@ -52,7 +51,7 @@ public class VerifyController {
         try {
             tasks = customQueueService.enqueueAll(verifiedDataList);
             verificationLog.info("Проверка ИОГВ: " + verifiedDataList);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             verificationLog.error(ex.getMessage(), ex);
             log.error(ex.getMessage(), ex);
             status = "Ошибка добавления в очередь проверки ЭП";

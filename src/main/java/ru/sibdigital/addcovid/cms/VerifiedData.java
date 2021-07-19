@@ -1,5 +1,9 @@
 package ru.sibdigital.addcovid.cms;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
@@ -9,6 +13,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Slf4j
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
 public class VerifiedData {
 
     private String signaturePath;
