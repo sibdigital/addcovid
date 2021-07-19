@@ -1,0 +1,2 @@
+2021-07-19 08:38:37,237-INFO-ru.sibdigital.addcovid.service.UserDetailsServiceImpl [http-nio-8080-exec-10]-- User FOUND for login 2311066061 is inn entered true id org: 18902
+2021-07-19 09:09:20,809-INFO-ru.sibdigital.addcovid.service.UserDetailsServiceImpl [http-nio-8080-exec-1]-- User FOUND for login 2311066061 is inn entered true id org: 18902
