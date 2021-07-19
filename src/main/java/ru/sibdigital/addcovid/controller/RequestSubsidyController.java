@@ -1,6 +1,7 @@
 package ru.sibdigital.addcovid.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -188,12 +189,18 @@ public class RequestSubsidyController {
             ClsOrganization clsOrganization = clsOrganizationRepo.findById(id).orElse(null);
 
             requestSubsidyService.saveNewDocRequestSubsidy(postFormDto);
-            if (postFormDto.getSubsidyRequestStatusCode().equals("SUBMIT")) {
+            if ("SUBMIT".equalsIgnoreCase(postFormDto.getSubsidyRequestStatusCode())) {
+                try{
                 if (clsOrganization != null && clsOrganization.getEmail() != null) {
-                    ClsSettings clsSettings = clsSettingsRepo.getActualByKey("submit_request_subsidy_message").orElse(null);
-                    if (clsSettings != null && clsSettings.getStringValue() != null && !clsSettings.getStringValue().equals("")) {
-                        emailService.sendSimpleMessage(clsOrganization.getEmail(), applicationConstants.getApplicationName(), clsSettings.getStringValue());
+                    Optional<ClsSettings> clsSettings = clsSettingsRepo.getActualByKey("submit_request_subsidy_message");//.orElse(null);
+                    String message = "Ваша заявка на меры поддержки по ИНН " + clsOrganization.getInn() + " принята";
+                    if (clsSettings.isPresent() && !Strings.isBlank(clsSettings.get().getStringValue())) {
+                        message = String.format(clsSettings.get().getStringValue(),  clsOrganization.getInn());
                     }
+                        emailService.sendSimpleMessage(clsOrganization.getEmail(), applicationConstants.getApplicationName() + ". Уведомление о приеме заявки", message);
+                    }
+                }catch (Exception ex){
+                    log.error(ex.getMessage(), ex);
                 }
                 return DataFormatUtils.buildOkResponse(Map.of(
                         "status", "server", "sname", "success", "cause", "Заявка принята. Ожидайте ответ на электронную почту"));
