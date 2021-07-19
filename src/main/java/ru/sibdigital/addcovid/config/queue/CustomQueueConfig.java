@@ -1,5 +1,6 @@
 package ru.sibdigital.addcovid.config.queue;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import java.time.Duration;
 import java.util.Collections;
 
 @Configuration
+@Slf4j
 public class CustomQueueConfig {
 
     @Autowired
@@ -33,6 +35,7 @@ public class CustomQueueConfig {
 
     @Bean
     QueueConfig queueConfig() {
+        log.info("queue config create ");
         return new QueueConfig(QueueLocation.builder().withTableName("reg_queue_tasks")
                         .withQueueId(new QueueId("verify_queue")).build(),
                             QueueSettings.builder()
@@ -43,6 +46,7 @@ public class CustomQueueConfig {
 
     @Bean
     QueueShard queueShard() {
+        log.info("queue shard create ");
         transactionTemplate = new TransactionTemplate(transactionManager);
         final QueueTableSchema.Builder builder = QueueTableSchema.builder();
         final QueueTableSchema build = builder.build();
@@ -56,16 +60,19 @@ public class CustomQueueConfig {
 
     @Bean
     VerifyQueueProducer verifyQueueProducer(QueueConfig queueConfig, QueueShard queueShard) {
+        log.info("queue producer create ");
         return new VerifyQueueProducer(queueConfig, queueShard);
     }
 
     @Bean
     VerifyQueueConsumer verifyQueueConsumer(QueueConfig queueConfig) {
+        log.info("queue consumer create ");
         return new VerifyQueueConsumer(queueConfig);
     }
 
     @Bean
     QueueService queueService(){
+        log.info("queue service create ");
         QueueService queueService = new ru.yoomoney.tech.dbqueue.config.QueueService(Collections.singletonList(queueShard()),
                 NoopThreadLifecycleListener.getInstance(), NoopTaskLifecycleListener.getInstance());
         queueService.registerQueue(verifyQueueConsumer(queueConfig()));

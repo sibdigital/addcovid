@@ -63,7 +63,7 @@ public class CertificateInfo {
             String dateBefore = getNotBefore() != null ? getNotBefore().format(formatter) : "Неизвестно";
             String dateAfter = getNotAfter() != null ? getNotAfter().format(formatter) : "Неизвестно";
             result = "Владелец: " + getSubject() + "\n"
-                    + "Издатетель: " + getIssuer() + "\n"
+                    + "Издатель: " + getIssuer() + "\n"
                     + "Действителен: " + dateBefore + " - " + dateAfter;
         }catch (Exception ex){
             exception = true;
@@ -77,7 +77,7 @@ public class CertificateInfo {
             String dateBefore = getNotBefore() != null ? getNotBefore().format(formatter) : "Неизвестно";
             String dateAfter = getNotAfter() != null ? getNotAfter().format(formatter) : "Неизвестно";
             result = "<b>Владелец:</b> <i>" + getSubject() + "</i><br/>"
-                    + "<b>Издатетель:</b> <i>" + getIssuer() + "</i><br/>"
+                    + "<b>Издатель:</b> <i>" + getIssuer() + "</i><br/>"
                     + "<b>Действителен:</b> <i>" + dateBefore + " - " + dateAfter + "</i>";
         }catch (Exception ex){
             exception = true;
