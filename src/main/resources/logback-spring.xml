@@ -31,7 +31,7 @@
     </appender>
     <appender name="AuthorizationFileByDate"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}/auth.log</file>
+        <file>${LOGS}/auth.log</file>
         <encoder
                 class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>%d-%p-%C{1.} [%t]--%m%n</Pattern>
@@ -51,7 +51,7 @@
 
     <appender name="VerificationFileByDate"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}/verification.log</file>
+        <file>${LOGS}/verification.log</file>
         <encoder
                 class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>%d-%p-%C{1.} [%t]--%m%n</Pattern>
