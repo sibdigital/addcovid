@@ -194,7 +194,7 @@ function view_subsidy_files_section(required_subsidy_file) {
                 template: function (obj) {
                     let viewName = obj?.docFile?.viewFileName ?? "";
                     let originalFileName = obj?.docFile?.originalFileName;
-                    let signatureVerifyStatus = obj?.verificationSignatureFile?.verifyStatus == undefined ? "" : obj?.verificationSignatureFile?.verifyStatus;
+                    let signatureVerifyStatus = obj?.verificationSignatureFile?.verifyStatus == undefined ? 0 : obj?.verificationSignatureFile?.verifyStatus;
                     let signatureVerifyResult = "";
                     let uploadSignatureBtnColor = "#94A1B3";
 
@@ -214,17 +214,20 @@ function view_subsidy_files_section(required_subsidy_file) {
                         signatureExists = "<i title='Ожидание загрузки подписи' class='mdi mdi-clock-outline subsidy_files_icon' style='color: orange;'></i>";
                     }
 
-
-                    if (signatureVerifyStatus === "" || signatureVerifyStatus === 0) {
-                        signatureVerifyStatus = "<i title='Ожидание проверки подписи' class='mdi mdi-clock-outline subsidy_files_icon' style='color: orange;'></i>";
-                    } else if (signatureVerifyStatus === 1) {
-                        signatureVerifyStatus = "<i title='Подпись проверена' class='mdi mdi-check-circle-outline subsidy_files_icon'></i>";
-                        overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #00ff2b5c), color-stop(1, #00ff2b5c))";
-                        signatureVerifyResult = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + obj?.verificationSignatureFile?.verifyResult + "\`" + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
-                    } else if (signatureVerifyStatus !== 1 && signatureVerifyStatus !== "" && signatureVerifyStatus !== 0) {
-                        signatureVerifyStatus = "<i title='Ошибка при проверке подписи' class='mdi mdi mdi-alert-circle-outline subsidy_files_icon'></i>";
-                        overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #ff00005c), color-stop(1, #ff00005c))";
-                        signatureVerifyResult = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + obj?.verificationSignatureFile?.verifyResult + "\`" + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
+                    switch (signatureVerifyStatus) {
+                        case 0:
+                            signatureVerifyStatus = "<i title='Ожидание проверки подписи' class='mdi mdi-clock-outline subsidy_files_icon' style='color: orange;'></i>";
+                            break;
+                        case 1:
+                            signatureVerifyStatus = "<i title='Подпись проверена' class='mdi mdi-check-circle-outline subsidy_files_icon'></i>";
+                            overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #00ff2b5c), color-stop(1, #00ff2b5c))";
+                            signatureVerifyResult = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + obj?.verificationSignatureFile?.verifyResult + "\`" + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
+                            break;
+                        default:
+                            signatureVerifyStatus = "<i title='Ошибка при проверке подписи' class='mdi mdi mdi-alert-circle-outline subsidy_files_icon'></i>";
+                            overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #ff00005c), color-stop(1, #ff00005c))";
+                            signatureVerifyResult = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + obj?.verificationSignatureFile?.verifyResult + "\`" + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
+                            break;
                     }
 
                     let result =
