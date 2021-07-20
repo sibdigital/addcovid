@@ -56,8 +56,8 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
 
             TpRequestSubsidyFile dataFile = tpRequestSubsidyFileRepo.findById(idRequestSubsidyFile).orElse(null);
             TpRequestSubsidyFile signatureFile = tpRequestSubsidyFileRepo.findById(idRequestSubsidyFileSignature).orElse(null);
+//            RegVerificationSignatureFile rvsf = regVerificationSignatureFileRepo.findById(idRegVerificationSignatureFile).orElse(null);
             RegVerificationSignatureFile rvsf = regVerificationSignatureFileRepo.findByIdCustom(idRegVerificationSignatureFile).orElse(null);
-//            RegVerificationSignatureFile rvsf = regVerificationSignatureFileRepo.findByIdSignatureFile(idRegVerificationSignatureFile).orElse(null);
 
             if (dataFile != null && signatureFile != null && rvsf != null) {
                 CMSVerifier cmsVerifier = process(dataFile, signatureFile, rvsf);
