@@ -40,10 +40,10 @@ public class RegVerificationSignatureFile {
     @JoinColumn(name = "id_request_subsidy_signature_file", referencedColumnName = "id", nullable = false)
     private TpRequestSubsidyFile requestSubsidySubsidySignatureFile;
     @ManyToOne
-    @JoinColumn(name = "id_principal", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_principal", referencedColumnName = "id")
     private ClsPrincipal principal;
     @ManyToOne
-    @JoinColumn(name = "id_user", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_user", referencedColumnName = "id")
     private ClsUser user;
 
     public Long getId() {
