@@ -25,6 +25,21 @@ public interface RegVerificationSignatureFileRepo extends JpaRepository<RegVerif
 
     @Query(value = "select t from RegVerificationSignatureFile as t " +
             "where t.isDeleted = false " +
+            "and t.requestSubsidy.id = :idRequest")
+    Optional<List<RegVerificationSignatureFile>> findByIdRequest (Long idRequest);
+
+    @Query(value = "select t from RegVerificationSignatureFile as t " +
+            "where t.isDeleted = false " +
+            "and t.requestSubsidySubsidySignatureFile.id = :idSignature")
+    Optional<RegVerificationSignatureFile> findByIdSignatureFile (Long idSignature);
+
+    @Query(value = "select t from RegVerificationSignatureFile as t " +
+            "where t.isDeleted = false " +
+            "and t.id = :id")
+    Optional<RegVerificationSignatureFile> findByIdCustom (Long id);
+
+    @Query(value = "select t from RegVerificationSignatureFile as t " +
+            "where t.isDeleted = false " +
             "and t.principal = :principal " +
             "and t.requestSubsidy = :docRequestSubsidy " +
             "and t.requestSubsidyFile = :file " +
