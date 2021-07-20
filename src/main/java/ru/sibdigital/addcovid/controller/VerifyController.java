@@ -98,16 +98,12 @@ public class VerifyController {
         if (regVerificationSignatureFiles == null) {
             result.put("notFound", "Файлы не найдены");
         } else {
-            int countVerifySignatures = 0;
-            int countNumberOfFiles = 0;
-            for (RegVerificationSignatureFile regVerificationSignatureFile : regVerificationSignatureFiles) {
-                if (regVerificationSignatureFile.getVerifyStatus() != 0 && regVerificationSignatureFile.getUser() != null) {
-                    countVerifySignatures++;
-                }
-                if (regVerificationSignatureFile.getUser() != null) {
-                    countNumberOfFiles++;
-                }
-            }
+            long countVerifySignatures = regVerificationSignatureFiles.stream()
+                    .filter(rvsf -> rvsf.getVerifyStatus() != 0 && rvsf.getUser() != null)
+                    .count();
+            long countNumberOfFiles = regVerificationSignatureFiles.stream()
+                    .filter(rvsf -> rvsf.getUser() != null)
+                    .count();
 
             result.put("files", regVerificationSignatureFiles);
             result.put("verified", countVerifySignatures);
