@@ -30,6 +30,25 @@ webix.html.addStyle(
     "}"
 );
 
+/* [FIX] tooltips styles in html templates */
+(function () {
+    const _tooltip = webix.ui({view: "tooltip", dx: 20, dy: 0});
+    let _moveTimeout;
+    webix.event(document, "mousemove", e => {
+        clearTimeout(_moveTimeout);
+        _tooltip.hide();
+        if (e.target.title || e.target.$title) {
+            const data = {value: e.target.title || e.target.$title}, pos = webix.html.pos(e);
+            if (e.target.title) {
+                e.target.$title = e.target.title;
+                e.target.removeAttribute("title");//to prevent native title behaviour
+            }
+            _tooltip.define({template: "{obj.value}", css: ""})
+            _moveTimeout = webix.delay(_tooltip.show, _tooltip, [data, pos], webix.TooltipControl.delay);
+        }
+    }, {capture: true});
+}());
+
 webix.attachEvent("onFocusChange", function (to, from) {
     if (from && from.getTopParentView().config.view === "window" && !to) {
         from.getTopParentView().hide();

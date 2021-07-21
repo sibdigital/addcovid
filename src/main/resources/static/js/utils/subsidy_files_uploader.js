@@ -69,11 +69,13 @@ function createDataView() {
         webix.ajax().get("required_subsidy_files", {"idRequest": id}).then((response) => {
             let required_subsidy_files = response.json();
             Array.from(required_subsidy_files).forEach(required_subsidy_file => {
+                let idDataview = required_subsidy_file.clsFileType.name.replace(/\s+/g, '') + '_dataview';
                 $$('required_subsidy_files_templates').addView(
                     view_subsidy_files_section(required_subsidy_file)
                 );
+                webix.extend($$(idDataview),webix.ProgressBar)
             })
-        })
+        });
     }, 200)
 
 }
@@ -195,9 +197,9 @@ function view_subsidy_files_section(required_subsidy_file) {
                     let viewName = obj?.docFile?.viewFileName ?? "";
                     let originalFileName = obj?.docFile?.originalFileName;
                     let signatureVerifyStatus = obj?.verificationSignatureFile?.verifyStatus == undefined ? 0 : obj?.verificationSignatureFile?.verifyStatus;
+                    let signatureVerifyResultBtn = "";
                     let signatureVerifyResult = "";
                     let uploadSignatureBtnColor = "#94A1B3";
-
                     let overallColor = "";
 
                     if (originalFileName.length > 40) {
@@ -206,6 +208,12 @@ function view_subsidy_files_section(required_subsidy_file) {
 
                     let title = `<div title='` + obj?.docFile?.originalFileName + `' style='margin-top: 5px; width: 325px' class="div-hover">` + originalFileName + `</div>`;
 
+                    if(obj?.verificationSignatureFile != null) {
+                        signatureVerifyResult = "<b>ID организации: </b>" +
+                            obj?.signatureFile?.organization?.id +
+                            "<br/>" +
+                            obj?.verificationSignatureFile?.verifyResult
+                    }
                     let signatureExists = null;
                     if (obj.signatureFile != null) {
                         signatureExists = "<i title='Подпись загружена' class='mdi mdi-check-circle-outline subsidy_files_icon'></i>";
@@ -221,12 +229,12 @@ function view_subsidy_files_section(required_subsidy_file) {
                         case 1:
                             signatureVerifyStatus = "<i title='Подпись проверена' class='mdi mdi-check-circle-outline subsidy_files_icon'></i>";
                             overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #00ff2b5c), color-stop(1, #00ff2b5c))";
-                            signatureVerifyResult = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + obj?.verificationSignatureFile?.verifyResult + "\`" + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
+                            signatureVerifyResultBtn = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + signatureVerifyResult + "\`," +  obj?.verificationSignatureFile?.id + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
                             break;
                         default:
                             signatureVerifyStatus = "<i title='Ошибка при проверке подписи' class='mdi mdi mdi-alert-circle-outline subsidy_files_icon'></i>";
                             overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #ff00005c), color-stop(1, #ff00005c))";
-                            signatureVerifyResult = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + obj?.verificationSignatureFile?.verifyResult + "\`" + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
+                            signatureVerifyResultBtn = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + signatureVerifyResult + "\`," +  obj?.verificationSignatureFile?.id + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
                             break;
                     }
 
@@ -235,13 +243,13 @@ function view_subsidy_files_section(required_subsidy_file) {
                         "<div class='overall-title' style='margin-top: 5px'>" +
                         title +
                         "<input title='После ввода нажмите Enter' class='custom-form-control' type='text' value='" + viewName + "' placeholder='Отображаемое имя файла' onkeydown='update_file_view_name(this," + obj.docFile.id + ")' style=''>" +
-                        "<button type='button' title='Добавить подпись' class='webix_button webix_img_btn' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
-                        "<span class='webix_icon_btn mdi mdi-upload custom-icon-hover' style=' color:" + uploadSignatureBtnColor + "; font-size: 24px; margin-top: -2px'></span>" +
+                        "<button type='button' class='webix_button webix_img_btn' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
+                        "<span title='Добавить подпись' class='webix_icon_btn mdi mdi-upload custom-icon-hover' style=' color:" + uploadSignatureBtnColor + "; font-size: 24px; margin-top: -2px'></span>" +
                         "</button>" +
-                         "<span onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='padding-top: 5px'>Добавить подпись</span>" +
+                        "<span onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='padding-top: 5px'>Добавить подпись</span>" +
                         signatureExists +
                         signatureVerifyStatus +
-                        signatureVerifyResult +
+                        signatureVerifyResultBtn +
                         "</div>" +
                         "<div id='del_button' title='Удалить документ' style='position: absolute; top: 0; right: 5px;' onclick='del_subsidy_file(" + obj.docFile.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' class='mdi mdi-close-thick'></div>" +
                         "</div>";
@@ -270,11 +278,11 @@ function view_subsidy_files_section(required_subsidy_file) {
                 scheme: {},
                 on: {
                     onAfterLoad: function () {
-                        if (!this.count()) {
+                        webix.extend($$(dynamicElementId + '_dataview'), webix.OverlayBox);
+                        if (!this.count())
                             this.showOverlay("<div style='margin:75px; font-size:20px;'>Файлы не загружены</div>");
-                        } else {
+                        else
                             this.hideOverlay();
-                        }
                     },
                 }
             }
@@ -283,12 +291,12 @@ function view_subsidy_files_section(required_subsidy_file) {
 }
 
 //Модальное окно с результатом проверки подписи
-const verifySignatureResults = (result) => {
+const verifySignatureResults = (result, idVerify) => {
     let window = webix.ui({
         view: 'window',
         id: 'verify_signature_results',
         width: 700,
-        height: 350,
+        height: 380,
         position: 'center',
         // item: data,
         modal: true,
@@ -297,7 +305,7 @@ const verifySignatureResults = (result) => {
             elements: [
                 {
                     view: 'label',
-                    label: 'Результаты проверки подписи'
+                    label: '№ ' + idVerify + '. Результаты проверки подписи'
                 },
                 {
                     view: 'icon',
@@ -365,21 +373,12 @@ const del_subsidy_file = async (id, fileType, fileTypeId) => {
 
 //Обновление данные DataView по ID
 const updateDataview = async (fileType, fileTypeId) => {
-    webix.extend($$(fileType + '_dataview'), webix.ProgressBar);
     $$(fileType + '_dataview').showProgress({
-        delay: 400,
-        hide: true
+        delay: 1000,
+        hide: false
     })
-    // $$(fileType + '_dataview').clearAll();
-    // $$(fileType + '_dataview').load(() => {
-    //     return webix.ajax()
-    //         .get('request_subsidy_files', {
-    //             "doc_request_subsidy_id": $$('requestSubsidyId').getValue(),
-    //             "id_file_type": fileTypeId
-    //         })
-    // });
-    // $$(fileType + '_dataview').clearAll();
-    await webix.ajax()
+    setTimeout(async () => {
+        await webix.ajax()
         .get('request_subsidy_files', {
             "doc_request_subsidy_id": $$('requestSubsidyId').getValue(),
             "id_file_type": fileTypeId
@@ -389,7 +388,8 @@ const updateDataview = async (fileType, fileTypeId) => {
             $$(fileType + '_dataview').clearAll();
             $$(fileType + '_dataview').parse(data);
         })
-    $$(fileType + '_dataview').hideProgress();
+        $$(fileType + '_dataview').hideProgress();
+    },400)
 }
 
 //Проверка прикрепленности обязательных документов
