@@ -73,7 +73,7 @@ function createDataView() {
                     view_subsidy_files_section(required_subsidy_file)
                 );
             })
-        })
+        });
     }, 200)
 
 }
@@ -235,10 +235,10 @@ function view_subsidy_files_section(required_subsidy_file) {
                         "<div class='overall-title' style='margin-top: 5px'>" +
                         title +
                         "<input title='После ввода нажмите Enter' class='custom-form-control' type='text' value='" + viewName + "' placeholder='Отображаемое имя файла' onkeydown='update_file_view_name(this," + obj.docFile.id + ")' style=''>" +
-                        "<button type='button' title='Добавить подпись' class='webix_button webix_img_btn' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
-                        "<span class='webix_icon_btn mdi mdi-upload custom-icon-hover' style=' color:" + uploadSignatureBtnColor + "; font-size: 24px; margin-top: -2px'></span>" +
+                        "<button type='button' class='webix_button webix_img_btn' onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='margin-left: 10px; width: auto; height: 32px; background: transparent'>" +
+                        "<span title='Добавить подпись' class='webix_icon_btn mdi mdi-upload custom-icon-hover' style=' color:" + uploadSignatureBtnColor + "; font-size: 24px; margin-top: -2px'></span>" +
                         "</button>" +
-                         "<span onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='padding-top: 5px'>Добавить подпись</span>" +
+                        "<span onclick='upload_subsidy_signature(" + obj.docFile.id + "," + obj.docFile.fileType.id + ",\"" + dynamicElementId + "\"," + required_subsidy_file.clsFileType.id + ")' style='padding-top: 5px'>Добавить подпись</span>" +
                         signatureExists +
                         signatureVerifyStatus +
                         signatureVerifyResult +
