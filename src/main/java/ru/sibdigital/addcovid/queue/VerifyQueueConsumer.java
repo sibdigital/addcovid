@@ -57,18 +57,20 @@ public class VerifyQueueConsumer implements QueueConsumer<VerifiedData> {
             TpRequestSubsidyFile dataFile = tpRequestSubsidyFileRepo.findById(idRequestSubsidyFile).orElse(null);
             TpRequestSubsidyFile signatureFile = tpRequestSubsidyFileRepo.findById(idRequestSubsidyFileSignature).orElse(null);
             RegVerificationSignatureFile rvsf = regVerificationSignatureFileRepo.findById(idRegVerificationSignatureFile).orElse(null);
+            //RegVerificationSignatureFile rvsf = regVerificationSignatureFileRepo.findByIdCustom(idRegVerificationSignatureFile).orElse(null);
 
             if (dataFile != null && signatureFile != null && rvsf != null) {
                 CMSVerifier cmsVerifier = process(dataFile, signatureFile, rvsf);
 
                 final RegVerificationSignatureFile verificationSignatureFile = saveRegVerificationSignatureFile(cmsVerifier, rvsf, beginVerification);
                 verificationLog.info("Задача выполнена " + verificationSignatureFile.toString());
-            }else{
+            } else {
                 verificationLog.error("Не удалось получить задачу из очереди: " + task.toString());
             }
 
-        } catch (Exception e) {
+        } catch (Exception ex) {
             verificationLog.error("Не удалось получить задачу из очереди: " + task.toString());
+            verificationLog.error(ex.getMessage(), ex);
         }
 
         return TaskExecutionResult.finish();

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import ru.sibdigital.addcovid.model.ClsPrincipal;
+import ru.sibdigital.addcovid.model.ClsUser;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -39,9 +40,11 @@ public class RegVerificationSignatureFile {
     @JoinColumn(name = "id_request_subsidy_signature_file", referencedColumnName = "id", nullable = false)
     private TpRequestSubsidyFile requestSubsidySubsidySignatureFile;
     @ManyToOne
-    @JoinColumn(name = "id_principal", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "id_principal", referencedColumnName = "id")
     private ClsPrincipal principal;
-
+    @ManyToOne
+    @JoinColumn(name = "id_user", referencedColumnName = "id")
+    private ClsUser user;
 
     public Long getId() {
         return id;
@@ -158,4 +161,11 @@ public class RegVerificationSignatureFile {
         this.principal = principal;
     }
 
+    public ClsUser getUser() {
+        return user;
+    }
+
+    public void setUser(ClsUser user) {
+        this.user = user;
+    }
 }
