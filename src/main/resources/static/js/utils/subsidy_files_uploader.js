@@ -226,12 +226,22 @@ function view_subsidy_files_section(required_subsidy_file) {
                         case 1:
                             signatureVerifyStatus = "<i title='Подпись проверена' class='mdi mdi-check-circle-outline subsidy_files_icon'></i>";
                             overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #00ff2b5c), color-stop(1, #00ff2b5c))";
-                            signatureVerifyResultBtn = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + signatureVerifyResult + "\`," +  obj?.verificationSignatureFile?.id + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
+                            signatureVerifyResultBtn = "<i title='Результаты проверки подписи' " +
+                                "onclick='verifySignatureResults(" + "\`" +
+                                    signatureVerifyResult + "\`," +
+                                    obj?.verificationSignatureFile?.id + "," +
+                                    obj?.signatureFile?.organization.inn  + ")' " +
+                                "class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
                             break;
                         default:
                             signatureVerifyStatus = "<i title='Ошибка при проверке подписи' class='mdi mdi mdi-alert-circle-outline subsidy_files_icon'></i>";
                             overallColor = "-webkit-gradient(linear, left top, left bottom, color-stop(0, #ff00005c), color-stop(1, #ff00005c))";
-                            signatureVerifyResultBtn = "<i title='Результаты проверки подписи' onclick='verifySignatureResults(" + "\`" + signatureVerifyResult + "\`," +  obj?.verificationSignatureFile?.id + ")' class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
+                            signatureVerifyResultBtn = "<i title='Результаты проверки подписи' " +
+                                "onclick='verifySignatureResults(" + "\`" +
+                                    signatureVerifyResult + "\`," +
+                                    obj?.verificationSignatureFile?.id + "," +
+                                    obj?.signatureFile?.organization.inn + ")' " +
+                                "class='mdi mdi mdi-information-outline subsidy_files_icon'></i>"
                             break;
                     }
 
@@ -288,7 +298,7 @@ function view_subsidy_files_section(required_subsidy_file) {
 }
 
 //Модальное окно с результатом проверки подписи
-const verifySignatureResults = (result, idVerify) => {
+const verifySignatureResults = (result, idVerify, orgInn) => {
     let window = webix.ui({
         view: 'window',
         id: 'verify_signature_results',
@@ -302,7 +312,7 @@ const verifySignatureResults = (result, idVerify) => {
             elements: [
                 {
                     view: 'label',
-                    label: '№ ' + idVerify + '. Результаты проверки подписи'
+                    label: '№ ' + idVerify + '. Результаты проверки подписи (ИНН: ' + orgInn + ")"
                 },
                 {
                     view: 'icon',
