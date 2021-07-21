@@ -18,14 +18,14 @@ public class ClsPrincipal {
     @Column(name = "id", nullable = false)
     @SequenceGenerator(name = "CLS_PRINCIPAL", sequenceName = "cls_principal_id_seq", allocationSize = 1, schema = "public")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "CLS_PRINCIPAL")
-    private Integer id;
+    private Long id;
     private String password;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

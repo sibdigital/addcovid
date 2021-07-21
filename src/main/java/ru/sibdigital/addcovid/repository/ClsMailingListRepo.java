@@ -20,7 +20,7 @@ public interface ClsMailingListRepo extends JpaRepository<ClsMailingList, Long> 
             "    AND rmlf.id_principal =:id_principal\n" +
             "    AND cml2.status = 1\n" +
             "    AND rmlf.deactivation_date IS NULL", nativeQuery = true)
-    List<ClsMailingList> findMyMailingList(Integer id_principal);
+    List<ClsMailingList> findMyMailingList(Long id_principal);
 
     @Query(value = "SELECT cml.*, rmlf.id\n" +
             "FROM cls_mailing_list cml\n" +
@@ -28,6 +28,6 @@ public interface ClsMailingListRepo extends JpaRepository<ClsMailingList, Long> 
             "    AND rmlf.id_principal =:id_principal\n" +
             "    AND rmlf.deactivation_date IS NULL\n" +
             "WHERE cml.status = 1 AND rmlf.id IS NULL", nativeQuery = true)
-    List<ClsMailingList> findAvailableMailingListNotMine(Integer id_principal);
+    List<ClsMailingList> findAvailableMailingListNotMine(Long id_principal);
 
 }

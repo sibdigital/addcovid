@@ -248,6 +248,16 @@ function showRequestSubsidyViewForm(data) {
                             cols: [
                                 {
                                     view: 'text',
+                                    name: 'id',
+                                    autoheight: true,
+                                    // align: 'center',
+                                    width: 100,
+                                    label: '№',
+                                    labelPosition: 'top',
+                                    readonly: true
+                                },
+                                {
+                                    view: 'text',
                                     name: 'subsidyName',
                                     autoheight: true,
                                     // align: 'center',
