@@ -258,7 +258,8 @@ public class RequestSubsidyController {
             @RequestParam("upload") MultipartFile file,
             @RequestParam(value = "id_file_type", required = false) Long id_file_type,
             @RequestParam(value = "id_request", required = false) Long idRequest,
-            @RequestParam(value = "id_request_subsidy_file", required = false) Long idRequestSubsidyFile) {
+            @RequestParam(value = "id_request_subsidy_file", required = false) Long idRequestSubsidyFile,
+            HttpSession session) {
         TpRequestSubsidyFile tpRequestSubsidyFile = null;
         ClsFileType clsFileType = clsFileTypeRepo.findById(id_file_type).orElse(null);
         DocRequestSubsidy docRequestSubsidy = docRequestSubsidyRepo.findById(idRequest).orElse(null);

@@ -209,10 +209,7 @@ function view_subsidy_files_section(required_subsidy_file) {
                     let title = `<div title='` + obj?.docFile?.originalFileName + `' style='margin-top: 5px; width: 325px' class="div-hover">` + originalFileName + `</div>`;
 
                     if(obj?.verificationSignatureFile != null) {
-                        signatureVerifyResult = "<b>ID организации: </b>" +
-                            obj?.signatureFile?.organization?.id +
-                            "<br/>" +
-                            obj?.verificationSignatureFile?.verifyResult
+                        signatureVerifyResult = obj?.verificationSignatureFile?.verifyResult
                     }
                     let signatureExists = null;
                     if (obj.signatureFile != null) {
@@ -305,7 +302,7 @@ const verifySignatureResults = (result, idVerify) => {
             elements: [
                 {
                     view: 'label',
-                    label: 'Результаты проверки подписи (ID: ' + idVerify + ')'
+                    label: '№ ' + idVerify + '. Результаты проверки подписи'
                 },
                 {
                     view: 'icon',
