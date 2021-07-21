@@ -221,16 +221,25 @@ public class RequestSubsidyController {
     public @ResponseBody
     List<TpRequestSubsidyFileDto> uploadRequiredSubsidyFiles(
             @RequestParam("doc_request_subsidy_id") Long request_subsidy_id,
-            @RequestParam("id_file_type") Long id_file_type) {
-        List<TpRequestSubsidyFile> tpRequestSubsidyFiles = requestSubsidyService.findAllRequestSubsidyFilesByRequestAndFileType(request_subsidy_id, id_file_type);
+            @RequestParam("id_file_type") Long id_file_type,
+            HttpSession session) {
+        Long id = (Long) session.getAttribute("id_organization");
         List<TpRequestSubsidyFileDto> tpRequestSubsidyFileDtos = new ArrayList<>();
+        if (id == null) {
+            return tpRequestSubsidyFileDtos;
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(id).orElse(null);
 
-        if (tpRequestSubsidyFiles != null) {
+        List<TpRequestSubsidyFile> tpRequestSubsidyFiles = requestSubsidyService.findAllRequestSubsidyFilesByRequestAndFileType(request_subsidy_id, id_file_type);
+
+
+        if (tpRequestSubsidyFiles != null && organization != null) {
             for (TpRequestSubsidyFile docFile : tpRequestSubsidyFiles) {
                 TpRequestSubsidyFile signatureFile = tpRequestSubsidyFileRepo.getSignatureFileByDocFileId(docFile.getId()).orElse(null);
                 RegVerificationSignatureFile verificationSignatureFile = null;
                 if(signatureFile != null) {
-                    verificationSignatureFile = regVerificationSignatureFileRepo.findByIdFileAndIdSignature(docFile.getId(),signatureFile.getId()).orElse(null);
+                    verificationSignatureFile = regVerificationSignatureFileRepo
+                            .findByIdFileAndIdSignature(docFile.getId(), signatureFile.getId(), organization.getPrincipal().getId()).orElse(null);
                 }
                 TpRequestSubsidyFileDto tpRequestSubsidyFileDto = TpRequestSubsidyFileDto.builder()
                         .docFile(docFile)
@@ -276,7 +285,14 @@ public class RequestSubsidyController {
 
     @PostMapping(value = "/del_request_subsidy_file")
     public ResponseEntity<String> delRequestSubsidyFile(
-            @RequestParam("id_subsidy_file") Long id) {
+            @RequestParam("id_subsidy_file") Long id,
+            HttpSession session) {
+        Long idOrg = (Long) session.getAttribute("id_organization");
+        List<TpRequestSubsidyFileDto> tpRequestSubsidyFileDtos = new ArrayList<>();
+        if (idOrg == null) {
+            return DataFormatUtils.buildOkResponse(Map.of("status", "server", "sname", "не найдена организация"));
+        }
+        ClsOrganization organization = clsOrganizationRepo.findById(idOrg).orElse(null);
         TpRequestSubsidyFile tpRequestSubsidyFile = tpRequestSubsidyFileRepo.findById(id).orElse(null);
         TpRequestSubsidyFile tpRequestSubsidyFileSignature = requestSubsidyService.findSignatureFile(tpRequestSubsidyFile.getId());
 //        tpRequestSubsidyFileRepo.delete(tpRequestSubsidyFileSignature);
@@ -289,8 +305,9 @@ public class RequestSubsidyController {
             tpRequestSubsidyFileSignature.setDeleted(true);
             tpRequestSubsidyFileRepo.save(tpRequestSubsidyFileSignature);
         }
-        if (tpRequestSubsidyFile != null && tpRequestSubsidyFileSignature != null) {
-            RegVerificationSignatureFile rvsf = regVerificationSignatureFileRepo.findByIdFileAndIdSignature(tpRequestSubsidyFile.getId(), tpRequestSubsidyFileSignature.getId()).orElse(null);
+        if (tpRequestSubsidyFile != null && tpRequestSubsidyFileSignature != null && organization != null) {
+            RegVerificationSignatureFile rvsf = regVerificationSignatureFileRepo
+                    .findByIdFileAndIdSignature(tpRequestSubsidyFile.getId(), tpRequestSubsidyFileSignature.getId(), organization.getPrincipal().getId()).orElse(null);
             if (rvsf != null) {
                 rvsf.setIsDeleted(true);
                 regVerificationSignatureFileRepo.save(rvsf);
@@ -427,7 +444,8 @@ public class RequestSubsidyController {
                 isSignature = true;
                 TpRequestSubsidyFile tpRequestSubsidySignatureFileExists = tpRequestSubsidyFileRepo.getSignatureFileByDocFileId(tpRequestSubsidyDocFile.getId()).orElse(null);
                 if (tpRequestSubsidySignatureFileExists != null) {
-                    RegVerificationSignatureFile regVerificationSignatureFile = regVerificationSignatureFileRepo.findByIdFileAndIdSignature(tpRequestSubsidyDocFile.getId(), tpRequestSubsidySignatureFileExists.getId()).orElse(null);
+                    RegVerificationSignatureFile regVerificationSignatureFile = regVerificationSignatureFileRepo
+                            .findByIdFileAndIdSignature(tpRequestSubsidyDocFile.getId(), tpRequestSubsidySignatureFileExists.getId(), docRequestSubsidy.getOrganization().getPrincipal().getId()).orElse(null);
                     if (regVerificationSignatureFile != null) {
                         regVerificationSignatureFileRepo.delete(regVerificationSignatureFile);
                     }
