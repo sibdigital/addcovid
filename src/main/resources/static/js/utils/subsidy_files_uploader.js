@@ -69,9 +69,11 @@ function createDataView() {
         webix.ajax().get("required_subsidy_files", {"idRequest": id}).then((response) => {
             let required_subsidy_files = response.json();
             Array.from(required_subsidy_files).forEach(required_subsidy_file => {
+                let idDataview = required_subsidy_file.clsFileType.name.replace(/\s+/g, '') + '_dataview';
                 $$('required_subsidy_files_templates').addView(
                     view_subsidy_files_section(required_subsidy_file)
                 );
+                webix.extend($$(idDataview),webix.ProgressBar)
             })
         });
     }, 200)
@@ -371,12 +373,12 @@ const del_subsidy_file = async (id, fileType, fileTypeId) => {
 
 //Обновление данные DataView по ID
 const updateDataview = async (fileType, fileTypeId) => {
-    webix.extend($$(fileType + '_dataview'), webix.ProgressBar);
     $$(fileType + '_dataview').showProgress({
-        delay: 400,
-        hide: true
+        delay: 1000,
+        hide: false
     })
-    await webix.ajax()
+    setTimeout(async () => {
+        await webix.ajax()
         .get('request_subsidy_files', {
             "doc_request_subsidy_id": $$('requestSubsidyId').getValue(),
             "id_file_type": fileTypeId
@@ -386,7 +388,8 @@ const updateDataview = async (fileType, fileTypeId) => {
             $$(fileType + '_dataview').clearAll();
             $$(fileType + '_dataview').parse(data);
         })
-    $$(fileType + '_dataview').hideProgress();
+        $$(fileType + '_dataview').hideProgress();
+    },400)
 }
 
 //Проверка прикрепленности обязательных документов
