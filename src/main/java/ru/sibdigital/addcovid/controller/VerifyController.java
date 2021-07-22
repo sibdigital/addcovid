@@ -85,30 +85,4 @@ public class VerifyController {
         return DataFormatUtils.buildResponse(ResponseEntity.ok(),
                 Map.of("status", status,"sname", tasks));
     }
-
-    @GetMapping(value = "/verify/subsidy/check_signature_files_verify_progress")
-    public @ResponseBody HashMap<String, Object> checkSignatureFilesVerifyProgress(
-            @RequestParam("id_request") Long idRequest,
-            HttpSession session) {
-        HashMap<String, Object> result = new HashMap<>();
-
-        List<RegVerificationSignatureFile> regVerificationSignatureFiles =
-                regVerificationSignatureFileRepo.findByIdRequest(idRequest).orElse(null);
-
-        if (regVerificationSignatureFiles == null) {
-            result.put("notFound", "Файлы не найдены");
-        } else {
-            long countVerifySignatures = regVerificationSignatureFiles.stream()
-                    .filter(rvsf -> rvsf.getVerifyStatus() != 0 && rvsf.getUser() != null)
-                    .count();
-            long countNumberOfFiles = regVerificationSignatureFiles.stream()
-                    .filter(rvsf -> rvsf.getUser() != null)
-                    .count();
-
-            result.put("files", regVerificationSignatureFiles);
-            result.put("verified", countVerifySignatures);
-            result.put("numberOfFiles", countNumberOfFiles);
-        }
-        return result;
-    }
 }
