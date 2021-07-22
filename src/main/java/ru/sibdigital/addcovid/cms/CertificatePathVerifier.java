@@ -77,6 +77,9 @@ public class CertificatePathVerifier {
         pathBuild = true;
 
         // Проверка цепочки.
+        //для отладки включить
+        //logging.level.ru.CryptoPro = DEBUG
+        //logging.level.java.security.cert = DEBUG
 
         final CertPathValidator cpv = CertPathValidator.getInstance("CPPKIX", "RevCheck");
         cpp.setRevocationEnabled(true);

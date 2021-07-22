@@ -28,7 +28,7 @@ function showRequestSubsidyCreateForm(data) {
     webix.ui({
         id: 'content',
         rows: [
-            requestSubsidyWizard
+            requestSubsidyWizard((data) ? data.id : null)
         ]
     }, $$('content'));
 
@@ -372,182 +372,188 @@ const requestSubsidyStep3 = {
     ]
 }
 
-const requestSubsidyWizard = {
-    rows: [
-        {
-            view: 'form',
-            type: 'clean',
-            id: 'newRequestSubsidyForm',
-            minWidth: 200,
-            complexData: true,
-            elements: [
-                {
-                    view: 'text',
-                    id: 'requestSubsidyId',
-                    name: 'requestSubsidyId',
-                    hidden: true,
-                },
-                {
-                    view: 'multiview',
-                    id: 'wizardRS',
-                    cells: [
-                        {
-                            id: 'cell1',
-                            rows: [
-                                multiviewSubsidyHeader('Шаг 1. Выберите меру поддержки', backRS, 1),
-                                requestSubsidyStep1,
-                                {},
-                                {
-                                    cols: [
-                                        {},
-                                        {
-                                            view: 'button',
-                                            css: 'webix_secondary',
-                                            value: 'Отменить',
-                                            maxWidth: 200,
-                                            click: function () {
-                                                $$('menu').callEvent('onMenuItemClick', ['RequestSubsidy']);
-                                            }
-                                        },
-                                        {
-                                            view: 'button',
-                                            css: 'webix_primary',
-                                            maxWidth: 200,
-                                            value: 'Продолжить',
-                                            click: function () {
-                                                if (($$('request_subsidy_step1').validate() === false || $$('subsidyId').validate() === false)) {
-                                                    webix.message('Выберите меру поддержки', 'error');
-                                                } else {
-                                                    if ($$('requestSubsidyId').getValue() == '') {
-                                                        let params = {
-                                                            subsidyId: $$('subsidyId').getValue(),
-                                                            reqBasis: $$('reqBasis').getValue(),
-                                                        }
-                                                        webix.ajax()
-                                                            .headers({'Content-type': 'application/json'})
-                                                            .post('save_request_subsidy_draft', JSON.stringify(params)).then(function (data) {
-                                                            data = data.json();
-                                                            console.log(data)
-                                                            $$('requestSubsidyId').setValue(data.id);
-                                                            createDataView();
-                                                            nextRS(1);
-                                                        }).catch(function () {
-                                                                webix.message('Не удалось сохранить черновик', 'error');
+const requestSubsidyWizard = (id) => {
+    var pretitle = ""
+    if (id != null && id != "") {
+        pretitle = "№ "+ id + ". "
+    }
+    return {
+        rows: [
+            {
+                view: 'form',
+                type: 'clean',
+                id: 'newRequestSubsidyForm',
+                minWidth: 200,
+                complexData: true,
+                elements: [
+                    {
+                        view: 'text',
+                        id: 'requestSubsidyId',
+                        name: 'requestSubsidyId',
+                        hidden: true,
+                    },
+                    {
+                        view: 'multiview',
+                        id: 'wizardRS',
+                        cells: [
+                            {
+                                id: 'cell1',
+                                rows: [
+                                    multiviewSubsidyHeader(pretitle + 'Шаг 1. Выберите меру поддержки', backRS, 1),
+                                    requestSubsidyStep1,
+                                    {},
+                                    {
+                                        cols: [
+                                            {},
+                                            {
+                                                view: 'button',
+                                                css: 'webix_secondary',
+                                                value: 'Отменить',
+                                                maxWidth: 200,
+                                                click: function () {
+                                                    $$('menu').callEvent('onMenuItemClick', ['RequestSubsidy']);
+                                                }
+                                            },
+                                            {
+                                                view: 'button',
+                                                css: 'webix_primary',
+                                                maxWidth: 200,
+                                                value: 'Продолжить',
+                                                click: function () {
+                                                    if (($$('request_subsidy_step1').validate() === false || $$('subsidyId').validate() === false)) {
+                                                        webix.message('Выберите меру поддержки', 'error');
+                                                    } else {
+                                                        if ($$('requestSubsidyId').getValue() == '') {
+                                                            let params = {
+                                                                subsidyId: $$('subsidyId').getValue(),
+                                                                reqBasis: $$('reqBasis').getValue(),
                                                             }
-                                                        )
-                                                    } else {
-                                                        nextRS(1);
+                                                            webix.ajax()
+                                                                .headers({'Content-type': 'application/json'})
+                                                                .post('save_request_subsidy_draft', JSON.stringify(params)).then(function (data) {
+                                                                data = data.json();
+                                                                console.log(data)
+                                                                $$('requestSubsidyId').setValue(data.id);
+                                                                createDataView();
+                                                                nextRS(1);
+                                                            }).catch(function () {
+                                                                    webix.message('Не удалось сохранить черновик', 'error');
+                                                                }
+                                                            )
+                                                        } else {
+                                                            nextRS(1);
+                                                        }
                                                     }
                                                 }
-                                            }
-                                        },
-                                        {
-                                            id: 'save_btn1',
-                                            view: 'button',
-                                            css: 'webix_primary',
-                                            maxWidth: 200,
-                                            value: 'Сохранить заявку',
-                                            click: function () {
-                                                saveDoc("NEW");
-                                            }
-                                        },
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            id: 'cell2',
-                            rows: [
-                                multiviewSubsidyHeader('Шаг 2. Прикрепите документы', backRS, 2),
-                                requestSubsidyStep2(),
-                                {
-                                    cols: [
-                                        {},
-                                        {
-                                            view: 'button',
-                                            css: 'webix_secondary',
-                                            maxWidth: 200,
-                                            value: 'Назад',
-                                            click: backRS
-                                        },
-                                        {
-                                            view: 'button',
-                                            css: 'webix_primary',
-                                            maxWidth: 200,
-                                            value: 'Продолжить',
-                                            click: function () {
-                                                let valid = checkRequiredFiles();
-                                                if (valid) {
-                                                    if (checkVerificationFiles()) {
-                                                        nextRS(2);
-                                                        getFilesListByTypeView($$('requestSubsidyId').getValue());
-                                                        $$('submit_btn_id').show();
+                                            },
+                                            {
+                                                id: 'save_btn1',
+                                                view: 'button',
+                                                css: 'webix_primary',
+                                                maxWidth: 200,
+                                                value: 'Сохранить заявку',
+                                                click: function () {
+                                                    saveDoc("NEW");
+                                                }
+                                            },
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                id: 'cell2',
+                                rows: [
+                                    multiviewSubsidyHeader(pretitle + 'Шаг 2. Прикрепите документы', backRS, 2),
+                                    requestSubsidyStep2(),
+                                    {
+                                        cols: [
+                                            {},
+                                            {
+                                                view: 'button',
+                                                css: 'webix_secondary',
+                                                maxWidth: 200,
+                                                value: 'Назад',
+                                                click: backRS
+                                            },
+                                            {
+                                                view: 'button',
+                                                css: 'webix_primary',
+                                                maxWidth: 200,
+                                                value: 'Продолжить',
+                                                click: function () {
+                                                    let valid = checkRequiredFiles();
+                                                    if (valid) {
+                                                        if (checkVerificationFiles()) {
+                                                            nextRS(2);
+                                                            getFilesListByTypeView($$('requestSubsidyId').getValue());
+                                                            $$('submit_btn_id').show();
+                                                        } else {
+                                                            webix.message("Не все подписи файлов прошли проверку", "error", 10000);
+                                                        }
                                                     } else {
-                                                        webix.message("Не все подписи файлов прошли проверку", "error", 10000);
+                                                        webix.message("Отсутствуют обязательные файлы", "error", 10000);
                                                     }
-                                                } else {
-                                                    webix.message("Отсутствуют обязательные файлы", "error", 10000);
+                                                }
+                                            },
+                                            {
+                                                id: 'save_btn2',
+                                                view: 'button',
+                                                css: 'webix_primary',
+                                                maxWidth: 200,
+                                                value: 'Сохранить заявку',
+                                                click: function () {
+                                                    saveDoc("NEW");
+                                                }
+                                            },
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                id: 'cell3',
+                                rows: [
+                                    multiviewSubsidyHeader(pretitle + 'Шаг 3. Подача заявки', backRS, 3),
+                                    requestSubsidyStep3,
+                                    {
+                                        cols: [
+                                            {},
+                                            {
+                                                view: 'button',
+                                                css: 'webix_secondary',
+                                                maxWidth: 200,
+                                                value: 'Назад',
+                                                click: backRS
+                                            },
+                                            {
+                                                id: 'save_btn3',
+                                                view: 'button',
+                                                css: 'webix_primary',
+                                                maxWidth: 200,
+                                                value: 'Сохранить заявку',
+                                                click: function () {
+                                                    saveDoc("NEW");
+                                                }
+                                            },
+                                            {
+                                                id: 'send_btn',
+                                                view: 'button',
+                                                css: 'webix_primary',
+                                                maxWidth: 200,
+                                                value: 'Подать заявку',
+                                                click: function () {
+                                                    saveRequestSubsidy("SUBMIT", true);
                                                 }
                                             }
-                                        },
-                                        {
-                                            id: 'save_btn2',
-                                            view: 'button',
-                                            css: 'webix_primary',
-                                            maxWidth: 200,
-                                            value: 'Сохранить заявку',
-                                            click: function () {
-                                                saveDoc("NEW");
-                                            }
-                                        },
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            id: 'cell3',
-                            rows: [
-                                multiviewSubsidyHeader('Шаг 3. Подача заявки', backRS, 3),
-                                requestSubsidyStep3,
-                                {
-                                    cols: [
-                                        {},
-                                        {
-                                            view: 'button',
-                                            css: 'webix_secondary',
-                                            maxWidth: 200,
-                                            value: 'Назад',
-                                            click: backRS
-                                        },
-                                        {
-                                            id: 'save_btn3',
-                                            view: 'button',
-                                            css: 'webix_primary',
-                                            maxWidth: 200,
-                                            value: 'Сохранить заявку',
-                                            click: function () {
-                                                saveDoc("NEW");
-                                            }
-                                        },
-                                        {
-                                            id: 'send_btn',
-                                            view: 'button',
-                                            css: 'webix_primary',
-                                            maxWidth: 200,
-                                            value: 'Подать заявку',
-                                            click: function () {
-                                                saveRequestSubsidy("SUBMIT", true);
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        }
-    ]
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
 }
 
 function saveDoc(statusCode) {

@@ -1,8 +1,11 @@
 package ru.sibdigital.addcovid.model.subs;
 
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -13,6 +16,9 @@ import java.util.Objects;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
+@TypeDefs({
+        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+})
 public class ClsSubsidyRequestStatus {
 
     @Id
